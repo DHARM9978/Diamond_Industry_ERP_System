@@ -88,8 +88,6 @@ model Employee {
   subordinates         Employee[]            @relation("EmployeeManager")
   fingerprintTemplates FingerprintTemplate[]
   payrolls             Payroll[]
-  leaveBalances        LeaveBalance[]
-  leaveRequests        LeaveRequest[]
 
   @@index([companyId])
   @@index([branchId])
@@ -268,78 +266,5 @@ model companies {
   employees     Employee[]
   devices       IotDevice[]
   settings      Setting[]
-  leaveTypes LeaveType[]
 }
 
-
-model LeaveType {
-  leaveTypeId       Int          @id @default(autoincrement()) @map("leave_type_id")
-  companyId         Int          @map("company_id")
-  name              String       @db.VarChar(100)
-  code              String       @db.VarChar(30)
-  description       String?      @db.Text
-  annualQuota       Decimal?     @map("annual_quota") @db.Decimal(6, 2)
-  isPaid            Boolean      @default(true) @map("is_paid")
-  requiresApproval  Boolean      @default(true) @map("requires_approval")
-  allowHalfDay      Boolean      @default(true) @map("allow_half_day")
-  allowCarryForward Boolean      @default(false) @map("allow_carry_forward")
-  status            String       @default("ACTIVE") @db.VarChar(20)
-  createdAt         DateTime     @default(now()) @map("created_at")
-  updatedAt         DateTime     @updatedAt @map("updated_at")
-
-  company           companies    @relation(fields: [companyId], references: [company_id])
-  balances          LeaveBalance[]
-  requests          LeaveRequest[]
-
-  @@unique([companyId, code])
-  @@unique([companyId, name])
-  @@index([companyId])
-  @@index([status])
-  @@map("leave_types")
-}
-
-model LeaveBalance {
-  leaveBalanceId Int         @id @default(autoincrement()) @map("leave_balance_id")
-  employeeId    Int         @map("employee_id")
-  leaveTypeId   Int         @map("leave_type_id")
-  year          Int
-  allocated     Decimal     @default(0) @db.Decimal(6, 2)
-  used          Decimal     @default(0) @db.Decimal(6, 2)
-  remaining     Decimal     @default(0) @db.Decimal(6, 2)
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-
-  employee      Employee    @relation(fields: [employeeId], references: [employeeId])
-  leaveType     LeaveType   @relation(fields: [leaveTypeId], references: [leaveTypeId])
-
-  @@unique([employeeId, leaveTypeId, year])
-  @@index([employeeId])
-  @@index([leaveTypeId])
-  @@index([year])
-  @@map("leave_balances")
-}
-
-model LeaveRequest {
-  leaveRequestId Int         @id @default(autoincrement()) @map("leave_request_id")
-  employeeId    Int         @map("employee_id")
-  leaveTypeId   Int         @map("leave_type_id")
-  startDate     DateTime    @map("start_date") @db.Date
-  endDate       DateTime    @map("end_date") @db.Date
-  totalDays     Decimal     @map("total_days") @db.Decimal(6, 2)
-  reason        String?     @db.Text
-  status        String      @default("PENDING") @db.VarChar(20)
-  approvedBy    Int?        @map("approved_by")
-  approvedAt    DateTime?   @map("approved_at")
-  rejectionReason String?   @map("rejection_reason") @db.Text
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-
-  employee      Employee    @relation(fields: [employeeId], references: [employeeId])
-  leaveType     LeaveType   @relation(fields: [leaveTypeId], references: [leaveTypeId])
-
-  @@index([employeeId])
-  @@index([leaveTypeId])
-  @@index([status])
-  @@index([startDate, endDate])
-  @@map("leave_requests")
-}
