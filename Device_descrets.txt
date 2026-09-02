@@ -1,0 +1,4 @@
+Device Code : ESP32-001
+Device Secret: c008c665a1ee695f7d088dc98da43f91e772c98fc388695d08bd34ab4c7c1b93
+
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjozLCJjb21wYW55SWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc4NzUwODU0MywiZXhwIjoxNzg3NTk0OTQzfQ.zTvPNuAGGcdEZ4vgvoWZs3nHaN7zsBIWSyKDCUFyg_c",
