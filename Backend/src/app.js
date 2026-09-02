@@ -16,6 +16,9 @@ const deviceEnrollmentRoutes = require("./routes/device-enrollment.routes");
 const employeeSelfRoutes = require("./routes/employee-self.routes");
 const payrollRoutes = require("./routes/payroll.routes");
 const advanceRoutes = require("./routes/advance.routes");
+const leaveTypeRoutes = require("./routes/leaveType.routes");
+const leaveBalanceRoutes = require("./routes/leaveBalance.routes");
+const leaveRequestRoutes = require("./routes/leaveRequest.routes");
 
 const app = express();
 
@@ -40,6 +43,9 @@ app.use("/api/device",deviceEnrollmentRoutes);
 app.use("/api/me", employeeSelfRoutes);
 app.use("/api/payroll", payrollRoutes);
 app.use("/api/advances", advanceRoutes);
+app.use("/api/leave-types",leaveTypeRoutes);
+app.use("/api/leave-balances",leaveBalanceRoutes);
+app.use("/api/leave-requests",leaveRequestRoutes);
 
 // Health
 app.get("/api/health", (req, res) => {
