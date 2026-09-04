@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-navy-50 text-navy-900 antialiased;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #bcccdc transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply bg-navy-200 rounded-full;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-navy-800 text-white hover:bg-navy-900 active:bg-navy-950;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-navy-700 border border-navy-200 hover:bg-navy-50;
+  }
+  .btn-danger {
+    @apply btn bg-error-600 text-white hover:bg-error-700;
+  }
+  .btn-success {
+    @apply btn bg-success-600 text-white hover:bg-success-700;
+  }
+  .btn-ghost {
+    @apply btn text-navy-600 hover:bg-navy-100;
+  }
+  .input-field {
+    @apply w-full px-3.5 py-2.5 rounded-lg border border-navy-200 bg-white text-navy-900 text-sm placeholder:text-navy-300 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-navy-100;
+  }
+  .card-hover {
+    @apply card transition-shadow duration-200 hover:shadow-card-hover;
+  }
+  .table-row-hover {
+    @apply transition-colors duration-100 hover:bg-navy-50;
+  }
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-navy-100 transition-all duration-150 hover:bg-navy-700/50;
+  }
+  .sidebar-link-active {
+    @apply bg-accent-600 text-white hover:bg-accent-600;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in {
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-toast-in {
+  animation: toastIn 0.2s ease-out;
+}
