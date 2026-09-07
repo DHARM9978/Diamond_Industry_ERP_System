@@ -2,7 +2,7 @@ const leaveBalanceService =
     require("../services/leaveBalance.service");
 
 /**
- * Get company ID
+ * Get Company ID
  */
 function getCompanyId(req) {
     const companyId = req.user?.companyId;
@@ -20,6 +20,69 @@ function getCompanyId(req) {
 }
 
 /**
+ * Get Employee ID from authenticated user
+ *
+ * Employees must only be able to access
+ * their own leave balances.
+ *
+ * Admins can optionally filter balances
+ * using ?employeeId=ID.
+ */
+function getEmployeeFilter(req) {
+    const role = String(
+        req.user?.role || ""
+    ).toUpperCase();
+
+    /**
+     * EMPLOYEE
+     *
+     * Always use employeeId from JWT.
+     * Never trust employeeId from query parameters.
+     */
+    if (role === "EMPLOYEE") {
+        const employeeId = req.user?.employeeId;
+
+        if (!employeeId) {
+            const error = new Error(
+                "Employee ID not found in authentication"
+            );
+
+            error.statusCode = 401;
+            throw error;
+        }
+
+        return Number(employeeId);
+    }
+
+    /**
+     * ADMIN
+     *
+     * Admin can optionally request balances
+     * for a specific employee.
+     */
+    if (role === "ADMIN") {
+        if (
+            req.query.employeeId !== undefined &&
+            req.query.employeeId !== ""
+        ) {
+            return req.query.employeeId;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Unknown role
+     */
+    const error = new Error(
+        "Unauthorized role"
+    );
+
+    error.statusCode = 403;
+    throw error;
+}
+
+/**
  * Create Leave Balance
  */
 const createLeaveBalance = async (
@@ -28,7 +91,8 @@ const createLeaveBalance = async (
     next
 ) => {
     try {
-        const companyId = getCompanyId(req);
+        const companyId =
+            getCompanyId(req);
 
         const balance =
             await leaveBalanceService.createLeaveBalance(
@@ -49,6 +113,21 @@ const createLeaveBalance = async (
 
 /**
  * Get Leave Balances
+ *
+ * Employee:
+ *     GET /api/leave-balances
+ *     → only authenticated employee's balances
+ *
+ * Admin:
+ *     GET /api/leave-balances
+ *     → all company balances
+ *
+ * Admin:
+ *     GET /api/leave-balances?employeeId=4
+ *     → Employee 4 balances
+ *
+ * Optional:
+ *     ?year=2026
  */
 const getLeaveBalances = async (
     req,
@@ -56,14 +135,17 @@ const getLeaveBalances = async (
     next
 ) => {
     try {
-        const companyId = getCompanyId(req);
+        const companyId =
+            getCompanyId(req);
+
+        const employeeId =
+            getEmployeeFilter(req);
 
         const balances =
             await leaveBalanceService.getLeaveBalances(
                 companyId,
                 {
-                    employeeId:
-                        req.query.employeeId,
+                    employeeId,
                     year:
                         req.query.year
                 }
@@ -89,7 +171,8 @@ const getLeaveBalanceById = async (
     next
 ) => {
     try {
-        const companyId = getCompanyId(req);
+        const companyId =
+            getCompanyId(req);
 
         const balance =
             await leaveBalanceService.getLeaveBalanceById(
@@ -117,7 +200,8 @@ const updateLeaveBalance = async (
     next
 ) => {
     try {
-        const companyId = getCompanyId(req);
+        const companyId =
+            getCompanyId(req);
 
         const balance =
             await leaveBalanceService.updateLeaveBalance(

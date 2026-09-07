@@ -95,7 +95,7 @@ export const authService = {
     // --------------------------------------------------------
 
     employeeLogin: async (
-        employeeId,
+        email,
         password
     ) => {
 
@@ -105,7 +105,7 @@ export const authService = {
                 await apiClient.post(
                     API.auth.employeeLogin,
                     {
-                        employeeId,
+                        email,
                         password,
                     }
                 );
@@ -686,6 +686,19 @@ export const fingerprintService = {
             await apiClient.post(
                 API.fingerprints.create,
                 data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // GET /api/fingerprints/enrollment/:id/status
+    // --------------------------------------------------------
+    getEnrollmentStatus: async (enrollmentId) => {
+        const response =
+            await apiClient.get(
+                `/api/fingerprints/enrollment/${enrollmentId}/status`
             );
 
         return unwrap(response);

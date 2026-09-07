@@ -24,7 +24,6 @@ import {
 } from '@/services/apiServices';
 
 import {
-  mockEmployeeProfile,
   mockEmployeeAttendanceSummary,
   mockEmployeeLeaves,
   mockEmployeeAdvances,
@@ -49,15 +48,34 @@ export function EmployeeDashboard() {
 
       try {
 
-        const [profileResponse, summaryResponse] =
-          await Promise.all([
-            selfService.profile(),
-            selfService.attendanceSummary(),
-          ]);
+        const [
+          profileResponse,
+          summaryResponse,
+        ] = await Promise.all([
+
+          // ======================================================
+          // REAL API
+          // GET /api/me/profile
+          //
+          // selfService.profile() already unwraps:
+          // response.data.data
+          // ======================================================
+
+          selfService.profile(),
+
+
+          // ======================================================
+          // REAL API
+          // Employee Attendance Summary
+          // ======================================================
+
+          selfService.attendanceSummary(),
+
+        ]);
 
 
         console.log(
-          'Employee Profile Response:',
+          'Employee Profile:',
           profileResponse
         );
 
@@ -67,7 +85,17 @@ export function EmployeeDashboard() {
         );
 
 
+        // ======================================================
+        // REAL PROFILE DATA
+        // ======================================================
+
         setProfile(profileResponse);
+
+
+        // ======================================================
+        // REAL ATTENDANCE SUMMARY
+        // ======================================================
+
         setSummary(summaryResponse);
 
       } catch (error) {
@@ -77,14 +105,22 @@ export function EmployeeDashboard() {
           error
         );
 
-        /*
-         * Temporary fallback to mock data.
-         *
-         * We can remove this after all employee dashboard
-         * APIs are connected and tested.
-         */
 
-        setProfile(mockEmployeeProfile);
+        // ======================================================
+        // IMPORTANT
+        //
+        // Profile is now connected to the REAL API.
+        // Do NOT fall back to mockEmployeeProfile.
+        // ======================================================
+
+        setProfile(null);
+
+
+        // ======================================================
+        // Attendance summary is still allowed to use the
+        // temporary mock until its API response is finalized.
+        // ======================================================
+
         setSummary(mockEmployeeAttendanceSummary);
 
       } finally {
@@ -120,105 +156,130 @@ export function EmployeeDashboard() {
   // Raw Data
   // ============================================================
 
-  const rawProfile =
-    profile || mockEmployeeProfile;
+  // REAL /api/me/profile data
+  const rawProfile = profile || {};
 
-  const s =
-    summary || mockEmployeeAttendanceSummary;
+
+  // Attendance summary
+  const s = summary || {};
 
 
   // ============================================================
-  // Normalize Employee Profile
+  // Employee Name
   // ============================================================
-
-  /*
-   * Backend may return:
-   *
-   * department: {
-   *   departmentId,
-   *   departmentName
-   * }
-   *
-   * branch: {
-   *   branchId,
-   *   branchName
-   * }
-   *
-   * The frontend must display the NAME, not the entire object.
-   */
-
 
   const firstName =
-    rawProfile?.firstName ||
-    rawProfile?.first_name ||
-    '';
+    rawProfile?.firstName || '';
 
   const lastName =
-    rawProfile?.lastName ||
-    rawProfile?.last_name ||
-    '';
+    rawProfile?.lastName || '';
 
   const fullName =
-    rawProfile?.name ||
     `${firstName} ${lastName}`.trim() ||
     'Employee';
 
 
+  // ============================================================
+  // Employee ID
+  // ============================================================
+
   const employeeId =
-    rawProfile?.employeeId ||
-    rawProfile?.employee_id ||
-    'N/A';
-
-
-  const designation =
-    rawProfile?.designation ||
-    rawProfile?.jobTitle ||
-    rawProfile?.job_title ||
-    '';
+    rawProfile?.employeeId ?? 'N/A';
 
 
   // ============================================================
   // Department
+  //
+  // API:
+  //
+  // "department": {
+  //   "departmentId": 1,
+  //   "departmentName": "Information Technology"
+  // }
   // ============================================================
 
   const department =
-    typeof rawProfile?.department === 'object'
-      ? (
-          rawProfile.department?.departmentName ||
-          rawProfile.department?.name ||
-          'N/A'
-        )
-      : (
-          rawProfile?.department ||
-          'N/A'
-        );
+    rawProfile?.department?.departmentName ||
+    'N/A';
 
 
   // ============================================================
   // Branch
+  //
+  // API:
+  //
+  // "branch": {
+  //   "branchId": 1,
+  //   "branchName": "Main Branch",
+  //   "location": "Bangalore"
+  // }
   // ============================================================
 
   const branch =
-    typeof rawProfile?.branch === 'object'
-      ? (
-          rawProfile.branch?.branchName ||
-          rawProfile.branch?.name ||
-          'N/A'
-        )
-      : (
-          rawProfile?.branch ||
-          'N/A'
-        );
+    rawProfile?.branch?.branchName ||
+    'N/A';
 
 
   // ============================================================
-  // Join Date
+  // Branch Location
+  // ============================================================
+
+  const branchLocation =
+    rawProfile?.branch?.location ||
+    'N/A';
+
+
+  // ============================================================
+  // Hire Date
+  //
+  // API field:
+  // hireDate
+  //
+  // Currently:
+  // "hireDate": null
   // ============================================================
 
   const joinDate =
-    rawProfile?.joinDate ||
-    rawProfile?.join_date ||
-    'N/A';
+    rawProfile?.hireDate
+      ? new Date(
+          rawProfile.hireDate
+        ).toLocaleDateString(
+          'en-IN',
+          {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          }
+        )
+      : 'N/A';
+
+
+  // ============================================================
+  // Employee Role
+  // ============================================================
+
+  const role =
+    rawProfile?.role ||
+    'EMPLOYEE';
+
+
+  // ============================================================
+  // Employee Status
+  // ============================================================
+
+  const employeeStatus =
+    rawProfile?.status ||
+    'UNKNOWN';
+
+
+  // ============================================================
+  // Salary Rate Per Hour
+  // ============================================================
+
+  const salaryRatePerHour =
+    Number(
+      rawProfile?.salaryRatePerHour || 0
+    );
 
 
   // ============================================================
@@ -226,28 +287,32 @@ export function EmployeeDashboard() {
   // ============================================================
 
   const employeeInitial =
-    fullName
+    firstName
       ?.charAt(0)
-      ?.toUpperCase() || 'E';
+      ?.toUpperCase() ||
+    'E';
 
 
   // ============================================================
   // Latest Existing Records
+  //
+  // TEMPORARY MOCK DATA
+  //
+  // These will be replaced with real APIs when we integrate:
+  //
+  // GET /api/me/payroll
+  // GET /api/me/advances
+  // GET /api/leave-requests
+  //
   // ============================================================
-
-  /*
-   * Payroll, advances and leaves are still using the existing
-   * mock data at this stage.
-   *
-   * We will connect these to their real APIs in their respective
-   * modules later.
-   */
 
   const latestPayroll =
     mockEmployeePayroll?.[0];
 
+
   const latestAdvance =
     mockEmployeeAdvances?.[0];
+
 
   const latestLeave =
     mockEmployeeLeaves?.[0];
@@ -260,16 +325,20 @@ export function EmployeeDashboard() {
   const present =
     s?.present ?? 0;
 
+
   const absent =
     s?.absent ?? 0;
 
+
   const late =
     s?.late ?? 0;
+
 
   const attendanceRate =
     s?.attendance_rate ??
     s?.attendanceRate ??
     0;
+
 
   const totalHours =
     s?.total_hours ??
@@ -290,12 +359,8 @@ export function EmployeeDashboard() {
       ====================================================== */}
 
       <PageHeader
-        title={`Welcome, ${fullName.split(' ')[0]}!`}
-        subtitle={
-          designation
-            ? `${designation} · ${department}`
-            : 'Employee Portal'
-        }
+        title={`Welcome, ${firstName || 'Employee'}!`}
+        subtitle={`${role} · ${department}`}
       />
 
 
@@ -312,6 +377,7 @@ export function EmployeeDashboard() {
           color="success"
         />
 
+
         <StatCard
           icon={UserX}
           label="Absent Days"
@@ -319,12 +385,14 @@ export function EmployeeDashboard() {
           color="error"
         />
 
+
         <StatCard
           icon={Clock}
           label="Late Arrivals"
           value={late}
           color="warning"
         />
+
 
         <StatCard
           icon={TrendingUp}
@@ -344,7 +412,7 @@ export function EmployeeDashboard() {
 
 
         {/* ====================================================
-            Profile Card
+            My Profile
         ==================================================== */}
 
         <div className="card p-6">
@@ -383,6 +451,7 @@ export function EmployeeDashboard() {
                 {fullName}
               </p>
 
+
               <p className="text-sm text-navy-500">
                 {employeeId}
               </p>
@@ -405,6 +474,7 @@ export function EmployeeDashboard() {
                 Department
               </span>
 
+
               <span className="font-medium text-navy-800 text-right">
                 {department}
               </span>
@@ -420,8 +490,25 @@ export function EmployeeDashboard() {
                 Branch
               </span>
 
+
               <span className="font-medium text-navy-800 text-right">
                 {branch}
+              </span>
+
+            </div>
+
+
+            {/* Location */}
+
+            <div className="flex justify-between gap-4">
+
+              <span className="text-navy-500">
+                Location
+              </span>
+
+
+              <span className="font-medium text-navy-800 text-right">
+                {branchLocation}
               </span>
 
             </div>
@@ -435,8 +522,57 @@ export function EmployeeDashboard() {
                 Join Date
               </span>
 
+
               <span className="font-medium text-navy-800 text-right">
                 {joinDate}
+              </span>
+
+            </div>
+
+
+            {/* Role */}
+
+            <div className="flex justify-between gap-4">
+
+              <span className="text-navy-500">
+                Role
+              </span>
+
+
+              <span className="font-medium text-navy-800 text-right">
+                {role}
+              </span>
+
+            </div>
+
+
+            {/* Status */}
+
+            <div className="flex justify-between gap-4">
+
+              <span className="text-navy-500">
+                Status
+              </span>
+
+
+              <span className="font-medium text-navy-800 text-right">
+                {employeeStatus}
+              </span>
+
+            </div>
+
+
+            {/* Hourly Rate */}
+
+            <div className="flex justify-between gap-4">
+
+              <span className="text-navy-500">
+                Hourly Rate
+              </span>
+
+
+              <span className="font-medium text-navy-800 text-right">
+                ₹{salaryRatePerHour.toLocaleString('en-IN')}/h
               </span>
 
             </div>
@@ -450,6 +586,7 @@ export function EmployeeDashboard() {
                 Total Hours
               </span>
 
+
               <span className="font-medium text-navy-800 text-right">
                 {totalHours}h
               </span>
@@ -462,7 +599,7 @@ export function EmployeeDashboard() {
 
 
         {/* ====================================================
-            Recent Items
+            Right Side
         ==================================================== */}
 
         <div className="lg:col-span-2 space-y-6">
@@ -491,9 +628,11 @@ export function EmployeeDashboard() {
 
 
               {latestPayroll && (
+
                 <StatusBadge
                   status={latestPayroll.status}
                 />
+
               )}
 
             </div>
@@ -512,6 +651,7 @@ export function EmployeeDashboard() {
                     Month
                   </p>
 
+
                   <p className="text-sm font-medium text-navy-800">
                     {latestPayroll.month}
                   </p>
@@ -526,6 +666,7 @@ export function EmployeeDashboard() {
                   <p className="text-xs text-navy-400">
                     Basic
                   </p>
+
 
                   <p className="text-sm font-medium text-navy-800">
 
@@ -547,6 +688,7 @@ export function EmployeeDashboard() {
                     Deductions
                   </p>
 
+
                   <p className="text-sm font-medium text-error-600">
 
                     ₹
@@ -567,6 +709,7 @@ export function EmployeeDashboard() {
                   <p className="text-xs text-navy-400">
                     Net Pay
                   </p>
+
 
                   <p className="text-sm font-bold text-navy-900">
 
@@ -593,7 +736,9 @@ export function EmployeeDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
 
-            {/* Attendance */}
+            {/* ==================================================
+                My Attendance
+            ================================================== */}
 
             <div className="card-hover p-5">
 
@@ -602,9 +747,11 @@ export function EmployeeDashboard() {
                 className="text-accent-600 mb-2"
               />
 
+
               <p className="font-medium text-navy-900 text-sm">
                 My Attendance
               </p>
+
 
               <p className="text-xs text-navy-500 mt-1">
                 {present} present, {late} late this month
@@ -613,7 +760,9 @@ export function EmployeeDashboard() {
             </div>
 
 
-            {/* Leaves */}
+            {/* ==================================================
+                My Leaves
+            ================================================== */}
 
             <div className="card-hover p-5">
 
@@ -622,9 +771,11 @@ export function EmployeeDashboard() {
                 className="text-success-600 mb-2"
               />
 
+
               <p className="font-medium text-navy-900 text-sm">
                 My Leaves
               </p>
+
 
               <p className="text-xs text-navy-500 mt-1">
 
@@ -639,7 +790,9 @@ export function EmployeeDashboard() {
             </div>
 
 
-            {/* Advances */}
+            {/* ==================================================
+                My Advances
+            ================================================== */}
 
             <div className="card-hover p-5">
 
@@ -648,9 +801,11 @@ export function EmployeeDashboard() {
                 className="text-warning-600 mb-2"
               />
 
+
               <p className="font-medium text-navy-900 text-sm">
                 My Advances
               </p>
+
 
               <p className="text-xs text-navy-500 mt-1">
 

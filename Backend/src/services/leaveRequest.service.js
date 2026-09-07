@@ -14,10 +14,7 @@ function validateId(value, fieldName) {
     const id = Number(value);
 
     if (!Number.isInteger(id) || id <= 0) {
-        const error = new Error(
-            `Invalid ${fieldName}`
-        );
-
+        const error = new Error(`Invalid ${fieldName}`);
         error.statusCode = 400;
         throw error;
     }
@@ -27,6 +24,9 @@ function validateId(value, fieldName) {
 
 /**
  * Parse date safely
+ *
+ * Expected format:
+ * YYYY-MM-DD
  */
 function parseDate(value, fieldName) {
     if (
@@ -56,12 +56,13 @@ function parseDate(value, fieldName) {
 }
 
 /**
- * Calculate inclusive days
+ * Calculate inclusive leave days
+ *
+ * Example:
+ * 2026-09-04 → 2026-09-04 = 1 day
+ * 2026-09-04 → 2026-09-05 = 2 days
  */
-function calculateTotalDays(
-    startDate,
-    endDate
-) {
+function calculateTotalDays(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -69,35 +70,29 @@ function calculateTotalDays(
     end.setHours(0, 0, 0, 0);
 
     return (
-        (
-            end.getTime() -
-            start.getTime()
-        ) /
+        (end.getTime() - start.getTime()) /
             (1000 * 60 * 60 * 24)
     ) + 1;
 }
 
 /**
- * Verify employee
+ * Verify employee belongs to the company
+ * and is active.
  */
-async function verifyEmployee(
-    employeeId,
-    companyId
-) {
-    const employee =
-        await prisma.employee.findFirst({
-            where: {
-                employeeId,
-                companyId
-            },
-            select: {
-                employeeId: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                status: true
-            }
-        });
+async function verifyEmployee(employeeId, companyId) {
+    const employee = await prisma.employee.findFirst({
+        where: {
+            employeeId,
+            companyId
+        },
+        select: {
+            employeeId: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            status: true
+        }
+    });
 
     if (!employee) {
         const error = new Error(
@@ -128,24 +123,33 @@ async function createLeaveRequest(
     employeeId,
     data
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
+
+    const employee = validateId(
+        employeeId,
+        "employee ID"
+    );
+
+    if (!data || typeof data !== "object") {
+        const error = new Error(
+            "Leave request data is required"
         );
 
-    const employee =
-        validateId(
-            employeeId,
-            "employee ID"
-        );
+        error.statusCode = 400;
+        throw error;
+    }
 
-    const leaveTypeId =
-        validateId(
-            data.leaveTypeId,
-            "leave type ID"
-        );
+    const leaveTypeId = validateId(
+        data.leaveTypeId,
+        "leave type ID"
+    );
 
+    /**
+     * Validate start date
+     */
     if (!data.startDate) {
         const error = new Error(
             "startDate is required"
@@ -155,6 +159,9 @@ async function createLeaveRequest(
         throw error;
     }
 
+    /**
+     * Validate end date
+     */
     if (!data.endDate) {
         const error = new Error(
             "endDate is required"
@@ -164,18 +171,19 @@ async function createLeaveRequest(
         throw error;
     }
 
-    const startDate =
-        parseDate(
-            data.startDate,
-            "startDate"
-        );
+    const startDate = parseDate(
+        data.startDate,
+        "startDate"
+    );
 
-    const endDate =
-        parseDate(
-            data.endDate,
-            "endDate"
-        );
+    const endDate = parseDate(
+        data.endDate,
+        "endDate"
+    );
 
+    /**
+     * End date cannot be before start date
+     */
     if (endDate < startDate) {
         const error = new Error(
             "endDate cannot be before startDate"
@@ -185,6 +193,12 @@ async function createLeaveRequest(
         throw error;
     }
 
+    /**
+     * Calculate total days.
+     *
+     * Normally the backend calculates this.
+     * If totalDays is supplied, validate it.
+     */
     const totalDays =
         data.totalDays !== undefined
             ? Number(data.totalDays)
@@ -205,11 +219,17 @@ async function createLeaveRequest(
         throw error;
     }
 
+    /**
+     * Verify employee
+     */
     await verifyEmployee(
         employee,
         company
     );
 
+    /**
+     * Verify leave type belongs to company
+     */
     const leaveType =
         await prisma.leaveType.findFirst({
             where: {
@@ -227,6 +247,9 @@ async function createLeaveRequest(
         throw error;
     }
 
+    /**
+     * Leave type must be active
+     */
     if (leaveType.status !== "ACTIVE") {
         const error = new Error(
             "Leave type is inactive"
@@ -236,6 +259,9 @@ async function createLeaveRequest(
         throw error;
     }
 
+    /**
+     * Half-day validation
+     */
     if (
         totalDays % 1 !== 0 &&
         !leaveType.allowHalfDay
@@ -249,47 +275,104 @@ async function createLeaveRequest(
     }
 
     /**
-     * Check overlapping request
+     * ----------------------------------------------------
+     * CHECK OVERLAPPING LEAVE
+     * ----------------------------------------------------
+     *
+     * Only PENDING and APPROVED leaves block
+     * another leave request.
+     *
+     * REJECTED and CANCELLED leaves do not block.
+     *
+     * Overlap condition:
+     *
+     * existing.startDate <= new.endDate
+     * AND
+     * existing.endDate >= new.startDate
      */
     const overlapping =
         await prisma.leaveRequest.findFirst({
             where: {
                 employeeId: employee,
+
                 status: {
                     in: [
                         "PENDING",
                         "APPROVED"
                     ]
                 },
+
                 startDate: {
                     lte: endDate
                 },
+
                 endDate: {
                     gte: startDate
                 }
+            },
+
+            include: {
+                leaveType: true
             }
         });
 
     if (overlapping) {
         const error = new Error(
-            "Employee already has an overlapping leave request"
+            "Leave dates overlap an existing leave request"
         );
 
         error.statusCode = 409;
+
+        /**
+         * Extra information for controller/frontend.
+         */
+        error.code = "LEAVE_DATE_OVERLAP";
+
+        error.details = {
+            conflictingLeaveRequestId:
+                overlapping.leaveRequestId,
+
+            status:
+                overlapping.status,
+
+            startDate:
+                overlapping.startDate,
+
+            endDate:
+                overlapping.endDate,
+
+            leaveTypeId:
+                overlapping.leaveTypeId
+        };
+
         throw error;
     }
 
+    /**
+     * ----------------------------------------------------
+     * CREATE REQUEST
+     * ----------------------------------------------------
+     */
     return await prisma.leaveRequest.create({
         data: {
             employeeId: employee,
+
             leaveTypeId,
+
             startDate,
+
             endDate,
+
             totalDays,
+
             reason:
-                data.reason?.trim() || null,
+                typeof data.reason === "string"
+                    ? data.reason.trim() || null
+                    : null,
+
             status: "PENDING"
         },
+
         include: {
             employee: {
                 select: {
@@ -299,6 +382,7 @@ async function createLeaveRequest(
                     email: true
                 }
             },
+
             leaveType: true
         }
     });
@@ -311,11 +395,10 @@ async function getLeaveRequests(
     companyId,
     filters = {}
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
-        );
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
 
     const where = {
         employee: {
@@ -323,17 +406,22 @@ async function getLeaveRequests(
         }
     };
 
+    /**
+     * Optional employee filter
+     */
     if (
         filters.employeeId !== undefined &&
         filters.employeeId !== ""
     ) {
-        where.employeeId =
-            validateId(
-                filters.employeeId,
-                "employee ID"
-            );
+        where.employeeId = validateId(
+            filters.employeeId,
+            "employee ID"
+        );
     }
 
+    /**
+     * Optional status filter
+     */
     if (
         filters.status !== undefined &&
         filters.status !== ""
@@ -351,12 +439,12 @@ async function getLeaveRequests(
             throw error;
         }
 
-        where.status =
-            filters.status;
+        where.status = filters.status;
     }
 
     return await prisma.leaveRequest.findMany({
         where,
+
         include: {
             employee: {
                 select: {
@@ -366,8 +454,10 @@ async function getLeaveRequests(
                     email: true
                 }
             },
+
             leaveType: true
         },
+
         orderBy: {
             createdAt: "desc"
         }
@@ -381,26 +471,26 @@ async function getLeaveRequestById(
     companyId,
     leaveRequestId
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
-        );
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
 
-    const id =
-        validateId(
-            leaveRequestId,
-            "leave request ID"
-        );
+    const id = validateId(
+        leaveRequestId,
+        "leave request ID"
+    );
 
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
                 leaveRequestId: id,
+
                 employee: {
                     companyId: company
                 }
             },
+
             include: {
                 employee: {
                     select: {
@@ -410,6 +500,7 @@ async function getLeaveRequestById(
                         email: true
                     }
                 },
+
                 leaveType: true
             }
         });
@@ -428,34 +519,38 @@ async function getLeaveRequestById(
 
 /**
  * Approve Leave Request
+ *
+ * Approval performs two operations inside
+ * one database transaction:
+ *
+ * 1. Request → APPROVED
+ * 2. Leave balance is updated
  */
 async function approveLeaveRequest(
     companyId,
     leaveRequestId,
     adminId
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
-        );
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
 
-    const requestId =
-        validateId(
-            leaveRequestId,
-            "leave request ID"
-        );
+    const requestId = validateId(
+        leaveRequestId,
+        "leave request ID"
+    );
 
-    const admin =
-        validateId(
-            adminId,
-            "admin ID"
-        );
+    const admin = validateId(
+        adminId,
+        "admin ID"
+    );
 
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
                 leaveRequestId: requestId,
+
                 employee: {
                     companyId: company
                 }
@@ -471,6 +566,9 @@ async function approveLeaveRequest(
         throw error;
     }
 
+    /**
+     * Only pending requests can be approved.
+     */
     if (request.status !== "PENDING") {
         const error = new Error(
             `Leave request cannot be approved because its current status is ${request.status}`
@@ -487,14 +585,20 @@ async function approveLeaveRequest(
                     request.startDate
                 ).getFullYear();
 
+            /**
+             * Find employee's balance for
+             * this leave type and year.
+             */
             const balance =
                 await tx.leaveBalance.findUnique({
                     where: {
                         employeeId_leaveTypeId_year: {
                             employeeId:
                                 request.employeeId,
+
                             leaveTypeId:
                                 request.leaveTypeId,
+
                             year
                         }
                     }
@@ -510,15 +614,14 @@ async function approveLeaveRequest(
             }
 
             const remaining =
-                Number(
-                    balance.remaining
-                );
+                Number(balance.remaining);
 
             const totalDays =
-                Number(
-                    request.totalDays
-                );
+                Number(request.totalDays);
 
+            /**
+             * Prevent negative balance.
+             */
             if (remaining < totalDays) {
                 const error = new Error(
                     "Insufficient leave balance"
@@ -528,18 +631,25 @@ async function approveLeaveRequest(
                 throw error;
             }
 
+            /**
+             * Update request to APPROVED.
+             */
             const updatedRequest =
                 await tx.leaveRequest.update({
                     where: {
                         leaveRequestId:
                             requestId
                     },
+
                     data: {
                         status: "APPROVED",
+
                         approvedBy: admin,
+
                         approvedAt:
                             new Date()
                     },
+
                     include: {
                         employee: {
                             select: {
@@ -549,20 +659,24 @@ async function approveLeaveRequest(
                                 email: true
                             }
                         },
+
                         leaveType: true
                     }
                 });
 
+            /**
+             * Update leave balance.
+             */
             await tx.leaveBalance.update({
                 where: {
                     leaveBalanceId:
                         balance.leaveBalanceId
                 },
+
                 data: {
                     used:
-                        Number(
-                            balance.used
-                        ) + totalDays,
+                        Number(balance.used) +
+                        totalDays,
 
                     remaining:
                         remaining -
@@ -584,28 +698,26 @@ async function rejectLeaveRequest(
     adminId,
     rejectionReason
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
-        );
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
 
-    const requestId =
-        validateId(
-            leaveRequestId,
-            "leave request ID"
-        );
+    const requestId = validateId(
+        leaveRequestId,
+        "leave request ID"
+    );
 
-    const admin =
-        validateId(
-            adminId,
-            "admin ID"
-        );
+    const admin = validateId(
+        adminId,
+        "admin ID"
+    );
 
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
                 leaveRequestId: requestId,
+
                 employee: {
                     companyId: company
                 }
@@ -621,6 +733,9 @@ async function rejectLeaveRequest(
         throw error;
     }
 
+    /**
+     * Only pending requests can be rejected.
+     */
     if (request.status !== "PENDING") {
         const error = new Error(
             `Leave request cannot be rejected because its current status is ${request.status}`
@@ -634,14 +749,21 @@ async function rejectLeaveRequest(
         where: {
             leaveRequestId: requestId
         },
+
         data: {
             status: "REJECTED",
+
             approvedBy: admin,
+
             approvedAt:
                 new Date(),
+
             rejectionReason:
-                rejectionReason?.trim() || null
+                typeof rejectionReason === "string"
+                    ? rejectionReason.trim() || null
+                    : null
         },
+
         include: {
             employee: {
                 select: {
@@ -651,6 +773,7 @@ async function rejectLeaveRequest(
                     email: true
                 }
             },
+
             leaveType: true
         }
     });
@@ -664,29 +787,28 @@ async function cancelLeaveRequest(
     leaveRequestId,
     employeeId
 ) {
-    const company =
-        validateId(
-            companyId,
-            "company ID"
-        );
+    const company = validateId(
+        companyId,
+        "company ID"
+    );
 
-    const requestId =
-        validateId(
-            leaveRequestId,
-            "leave request ID"
-        );
+    const requestId = validateId(
+        leaveRequestId,
+        "leave request ID"
+    );
 
-    const employee =
-        validateId(
-            employeeId,
-            "employee ID"
-        );
+    const employee = validateId(
+        employeeId,
+        "employee ID"
+    );
 
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
                 leaveRequestId: requestId,
+
                 employeeId: employee,
+
                 employee: {
                     companyId: company
                 }
@@ -702,6 +824,10 @@ async function cancelLeaveRequest(
         throw error;
     }
 
+    /**
+     * Only PENDING and APPROVED requests
+     * can be cancelled.
+     */
     if (
         ![
             "PENDING",
@@ -718,16 +844,20 @@ async function cancelLeaveRequest(
 
     return await prisma.$transaction(
         async (tx) => {
+            /**
+             * Change request status.
+             */
             const updatedRequest =
                 await tx.leaveRequest.update({
                     where: {
                         leaveRequestId:
                             requestId
                     },
+
                     data: {
-                        status:
-                            "CANCELLED"
+                        status: "CANCELLED"
                     },
+
                     include: {
                         employee: {
                             select: {
@@ -737,18 +867,19 @@ async function cancelLeaveRequest(
                                 email: true
                             }
                         },
+
                         leaveType: true
                     }
                 });
 
             /**
-             * Return balance when an APPROVED
-             * leave is cancelled.
+             * If the request was already approved,
+             * restore the leave balance.
+             *
+             * PENDING cancellation does not affect
+             * the balance because it was never deducted.
              */
-            if (
-                request.status ===
-                "APPROVED"
-            ) {
+            if (request.status === "APPROVED") {
                 const year =
                     new Date(
                         request.startDate
@@ -760,8 +891,10 @@ async function cancelLeaveRequest(
                             employeeId_leaveTypeId_year: {
                                 employeeId:
                                     request.employeeId,
+
                                 leaveTypeId:
                                     request.leaveTypeId,
+
                                 year
                             }
                         }
@@ -769,9 +902,7 @@ async function cancelLeaveRequest(
 
                 if (balance) {
                     const used =
-                        Number(
-                            balance.used
-                        );
+                        Number(balance.used);
 
                     const remaining =
                         Number(
@@ -788,6 +919,7 @@ async function cancelLeaveRequest(
                             leaveBalanceId:
                                 balance.leaveBalanceId
                         },
+
                         data: {
                             used:
                                 Math.max(
@@ -809,6 +941,9 @@ async function cancelLeaveRequest(
     );
 }
 
+/**
+ * Export service functions
+ */
 module.exports = {
     createLeaveRequest,
     getLeaveRequests,

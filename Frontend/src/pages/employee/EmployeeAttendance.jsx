@@ -1,66 +1,400 @@
 import { useState, useEffect } from 'react';
-import { CalendarCheck } from 'lucide-react';
-import { PageHeader, DataTable, StatCard } from '@/components/ui/PageComponents';
-import { StatusBadge } from '@/components/ui/Badge';
+
+import {
+  CalendarCheck,
+  Clock,
+  TrendingUp,
+} from 'lucide-react';
+
+import {
+  PageHeader,
+  StatCard,
+} from '@/components/ui/PageComponents';
+
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
+
 import { selfService } from '@/services/apiServices';
-import { mockEmployeeAttendance, mockEmployeeAttendanceSummary } from '@/services/mockData';
+
 
 export function EmployeeAttendance() {
-  const [records, setRecords] = useState([]);
+
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+  // ============================================================
+  // LOAD EMPLOYEE ATTENDANCE SUMMARY
+  // ============================================================
+
   useEffect(() => {
-    const load = async () => {
+
+    const loadAttendanceSummary = async () => {
+
       try {
-        const [att, summ] = await Promise.all([
-          selfService.attendance(),
-          selfService.attendanceSummary(),
-        ]);
-        setRecords(Array.isArray(att) ? att : att.data || []);
-        setSummary(summ);
-      } catch {
-        setRecords(mockEmployeeAttendance);
-        setSummary(mockEmployeeAttendanceSummary);
+
+        setLoading(true);
+
+
+        // ======================================================
+        // REAL API
+        //
+        // GET /api/me/attendance/summary
+        //
+        // The service already unwraps:
+        //
+        // response.data.data
+        // ======================================================
+
+        const response =
+          await selfService.attendanceSummary();
+
+
+        console.log(
+          'Employee Attendance Summary:',
+          response
+        );
+
+
+        setSummary(response);
+
+      } catch (error) {
+
+        console.error(
+          'Failed to load employee attendance summary:',
+          error
+        );
+
+
+        // ======================================================
+        // IMPORTANT:
+        //
+        // NO MOCK / DUMMY DATA
+        // ======================================================
+
+        setSummary(null);
+
       } finally {
+
         setLoading(false);
+
       }
+
     };
-    load();
+
+
+    loadAttendanceSummary();
+
   }, []);
 
-  const s = summary || mockEmployeeAttendanceSummary;
 
-  const columns = [
-    { key: 'date', label: 'Date', render: (r) => <span className="font-medium text-navy-800">{r.date}</span> },
-    { key: 'check_in', label: 'Check In', align: 'center', render: (r) => <span className={`font-mono ${r.check_in ? 'text-navy-700' : 'text-navy-300'}`}>{r.check_in || '--'}</span> },
-    { key: 'check_out', label: 'Check Out', align: 'center', render: (r) => <span className={`font-mono ${r.check_out ? 'text-navy-700' : 'text-navy-300'}`}>{r.check_out || '--'}</span> },
-    { key: 'work_hours', label: 'Hours', align: 'right', render: (r) => <span className="font-semibold text-navy-700">{r.work_hours > 0 ? `${r.work_hours}h` : '--'}</span> },
-    { key: 'status', label: 'Status', align: 'center', render: (r) => <StatusBadge status={r.status} /> },
-  ];
+  // ============================================================
+  // LOADING
+  // ============================================================
 
-  if (loading) return <FullPageSpinner message="Loading your attendance..." />;
+  if (loading) {
+
+    return (
+      <FullPageSpinner
+        message="Loading your attendance..."
+      />
+    );
+
+  }
+
+
+  // ============================================================
+  // API DATA
+  // ============================================================
+
+  const s = summary || {};
+
+
+  // ============================================================
+  // ATTENDANCE VALUES
+  //
+  // These names exactly match the backend response.
+  // ============================================================
+
+  const totalDays =
+    Number(s?.totalDays ?? 0);
+
+
+  const presentDays =
+    Number(s?.presentDays ?? 0);
+
+
+  const absentDays =
+    Number(s?.absentDays ?? 0);
+
+
+  const totalHours =
+    Number(s?.totalHours ?? 0);
+
+
+  const totalHoursFormatted =
+    s?.totalHoursFormatted ||
+    '0 minutes';
+
+
+  const averageHours =
+    Number(s?.averageHours ?? 0);
+
+
+  const averageHoursFormatted =
+    s?.averageHoursFormatted ||
+    '0 minutes';
+
+
+  // ============================================================
+  // ATTENDANCE RATE
+  //
+  // The current API does not provide attendanceRate.
+  //
+  // Therefore calculate it from:
+  //
+  // presentDays / totalDays * 100
+  // ============================================================
+
+  const attendanceRate =
+    totalDays > 0
+      ? ((presentDays / totalDays) * 100).toFixed(1)
+      : '0';
+
+
+  // ============================================================
+  // UI
+  // ============================================================
 
   return (
-    <div>
-      <PageHeader title="My Attendance" subtitle="Your daily attendance records" />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        <StatCard icon={CalendarCheck} label="Present" value={s.present} color="success" />
-        <StatCard icon={CalendarCheck} label="Absent" value={s.absent} color="error" />
-        <StatCard icon={CalendarCheck} label="Late" value={s.late} color="warning" />
-        <StatCard icon={CalendarCheck} label="On Leave" value={s.on_leave} color="accent" />
-        <StatCard icon={CalendarCheck} label="Weekly Off" value={s.weekly_off} color="navy" />
-        <StatCard icon={CalendarCheck} label="Total Hours" value={`${s.total_hours}h`} color="navy" />
+    <div>
+
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
+
+      <PageHeader
+        title="My Attendance"
+        subtitle="Your attendance summary"
+      />
+
+
+      {/* ======================================================
+          ATTENDANCE SUMMARY
+      ====================================================== */}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+
+        {/* ====================================================
+            Present Days
+        ==================================================== */}
+
+        <StatCard
+          icon={CalendarCheck}
+          label="Present Days"
+          value={presentDays}
+          color="success"
+        />
+
+
+        {/* ====================================================
+            Absent Days
+        ==================================================== */}
+
+        <StatCard
+          icon={CalendarCheck}
+          label="Absent Days"
+          value={absentDays}
+          color="error"
+        />
+
+
+        {/* ====================================================
+            Attendance Rate
+        ==================================================== */}
+
+        <StatCard
+          icon={TrendingUp}
+          label="Attendance Rate"
+          value={`${attendanceRate}%`}
+          color="accent"
+        />
+
+
+        {/* ====================================================
+            Total Hours
+        ==================================================== */}
+
+        <StatCard
+          icon={Clock}
+          label="Total Hours"
+          value={totalHours}
+          color="navy"
+        />
+
       </div>
 
-      {records.length === 0 ? (
-        <EmptyState icon={CalendarCheck} title="No attendance records" message="Your attendance will appear here once recorded." />
-      ) : (
-        <DataTable columns={columns} data={records} />
-      )}
+
+      {/* ======================================================
+          ATTENDANCE DETAILS
+      ====================================================== */}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
+        {/* ====================================================
+            Work Summary
+        ==================================================== */}
+
+        <div className="card p-6">
+
+          <h3 className="font-semibold text-navy-900 mb-5">
+            Attendance Summary
+          </h3>
+
+
+          <div className="space-y-4">
+
+
+            {/* Total Days */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Total Days
+              </span>
+
+              <span className="font-medium text-navy-900">
+                {totalDays}
+              </span>
+
+            </div>
+
+
+            {/* Present */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Present Days
+              </span>
+
+              <span className="font-medium text-success-600">
+                {presentDays}
+              </span>
+
+            </div>
+
+
+            {/* Absent */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Absent Days
+              </span>
+
+              <span className="font-medium text-error-600">
+                {absentDays}
+              </span>
+
+            </div>
+
+
+            {/* Attendance Rate */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Attendance Rate
+              </span>
+
+              <span className="font-medium text-navy-900">
+                {attendanceRate}%
+              </span>
+
+            </div>
+
+
+            {/* Total Hours */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Total Hours
+              </span>
+
+              <span className="font-medium text-navy-900">
+                {totalHoursFormatted}
+              </span>
+
+            </div>
+
+
+            {/* Average Hours */}
+
+            <div className="flex justify-between">
+
+              <span className="text-navy-500">
+                Average Hours
+              </span>
+
+              <span className="font-medium text-navy-900">
+                {averageHoursFormatted}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* ====================================================
+            Attendance Records Placeholder
+        ==================================================== */}
+
+        <div className="card p-6">
+
+          <h3 className="font-semibold text-navy-900 mb-5">
+            Daily Attendance
+          </h3>
+
+
+          <EmptyState
+            icon={CalendarCheck}
+            title="Attendance records"
+            message="Daily attendance records will appear here once the attendance records API is connected."
+          />
+
+
+          {/* ==================================================
+              API PLACEHOLDER
+          ==================================================
+
+              Next API:
+
+              GET /api/me/attendance
+
+              This API will populate the daily attendance
+              table with:
+
+              - Date
+              - Check In
+              - Check Out
+              - Total Hours
+              - Status
+
+          ================================================== */}
+
+        </div>
+
+      </div>
+
     </div>
+
   );
+
 }

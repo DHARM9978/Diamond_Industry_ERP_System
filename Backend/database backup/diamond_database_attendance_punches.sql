@@ -1,0 +1,62 @@
+-- MySQL dump 10.13  Distrib 8.0.46, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: diamond_database
+-- ------------------------------------------------------
+-- Server version	8.0.46
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `attendance_punches`
+--
+
+DROP TABLE IF EXISTS `attendance_punches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attendance_punches` (
+  `punch_id` bigint NOT NULL AUTO_INCREMENT,
+  `employeeId` int NOT NULL,
+  `deviceId` int NOT NULL,
+  `sensor_slot` int NOT NULL,
+  `punch_type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `punched_at` datetime(3) NOT NULL,
+  `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  PRIMARY KEY (`punch_id`),
+  KEY `attendance_punches_employeeId_idx` (`employeeId`),
+  KEY `attendance_punches_deviceId_idx` (`deviceId`),
+  KEY `attendance_punches_sensor_slot_idx` (`sensor_slot`),
+  KEY `attendance_punches_punched_at_idx` (`punched_at`),
+  CONSTRAINT `attendance_punches_deviceId_fkey` FOREIGN KEY (`deviceId`) REFERENCES `iot_devices` (`device_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `attendance_punches_employeeId_fkey` FOREIGN KEY (`employeeId`) REFERENCES `employees` (`employee_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attendance_punches`
+--
+
+LOCK TABLES `attendance_punches` WRITE;
+/*!40000 ALTER TABLE `attendance_punches` DISABLE KEYS */;
+INSERT INTO `attendance_punches` VALUES (1,1,1,4,'IN','2026-08-23 18:21:37.253','2026-08-23 18:21:37.266'),(2,1,1,4,'OUT','2026-08-23 18:22:38.202','2026-08-23 18:22:38.206'),(3,1,1,4,'IN','2026-08-23 18:23:59.355','2026-08-23 18:23:59.360'),(4,1,1,4,'OUT','2026-08-23 18:24:32.318','2026-08-23 18:24:32.323'),(5,1,1,1,'IN','2026-08-23 18:53:22.991','2026-08-23 18:53:23.004'),(6,1,1,5,'OUT','2026-08-23 19:08:25.188','2026-08-23 19:08:25.195'),(7,1,1,4,'IN','2026-08-23 19:41:58.507','2026-08-23 19:41:58.523'),(8,1,1,4,'OUT','2026-08-23 19:48:50.976','2026-08-23 19:48:50.994'),(9,1,1,4,'IN','2026-08-23 19:49:45.932','2026-08-23 19:49:45.939'),(10,1,1,1,'OUT','2026-08-23 20:04:41.578','2026-08-23 20:04:41.582'),(11,1,1,4,'IN','2026-08-23 20:14:01.616','2026-08-23 20:14:01.636'),(12,1,1,4,'OUT','2026-08-23 20:39:49.462','2026-08-23 20:39:49.512'),(13,1,1,4,'IN','2026-08-23 20:45:39.186','2026-08-23 20:45:39.191'),(14,1,1,1,'OUT','2026-08-23 20:46:28.079','2026-08-23 20:46:28.084'),(15,1,1,1,'IN','2026-09-01 06:16:13.832','2026-09-01 06:16:13.852'),(16,1,1,5,'OUT','2026-09-01 06:23:24.937','2026-09-01 06:23:24.947'),(17,1,1,4,'IN','2026-09-01 10:23:48.061','2026-09-01 10:23:48.066'),(18,1,1,4,'OUT','2026-09-01 10:36:57.332','2026-09-01 10:36:57.355'),(19,1,1,4,'IN','2026-09-01 10:37:30.938','2026-09-01 10:37:30.943'),(20,1,1,1,'OUT','2026-09-01 10:40:08.094','2026-09-01 10:40:08.114'),(21,1,1,4,'IN','2026-09-04 06:34:56.936','2026-09-04 06:34:56.959'),(22,1,1,4,'OUT','2026-09-04 06:36:38.993','2026-09-04 06:36:38.997'),(23,1,1,4,'IN','2026-09-04 06:38:18.252','2026-09-04 06:38:18.255'),(24,1,1,4,'OUT','2026-09-04 06:39:12.248','2026-09-04 06:39:12.252'),(25,1,1,4,'IN','2026-09-04 06:39:50.677','2026-09-04 06:39:50.681'),(26,1,1,5,'IN','2026-09-05 09:22:19.985','2026-09-05 09:22:20.010'),(27,1,1,4,'OUT','2026-09-05 11:31:25.622','2026-09-05 11:31:25.665');
+/*!40000 ALTER TABLE `attendance_punches` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-09-05 17:08:06

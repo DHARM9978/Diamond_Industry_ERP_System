@@ -324,6 +324,19 @@ exports.Prisma.LeaveRequestScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.FingerprintEnrollmentScalarFieldEnum = {
+  enrollmentId: 'enrollmentId',
+  employeeId: 'employeeId',
+  sensorSlot: 'sensorSlot',
+  fingerName: 'fingerName',
+  status: 'status',
+  confidence: 'confidence',
+  errorMessage: 'errorMessage',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -422,6 +435,12 @@ exports.Prisma.LeaveRequestOrderByRelevanceFieldEnum = {
   rejectionReason: 'rejectionReason'
 };
 
+exports.Prisma.FingerprintEnrollmentOrderByRelevanceFieldEnum = {
+  fingerName: 'fingerName',
+  status: 'status',
+  errorMessage: 'errorMessage'
+};
+
 
 exports.Prisma.ModelName = {
   Admin: 'Admin',
@@ -440,7 +459,8 @@ exports.Prisma.ModelName = {
   companies: 'companies',
   LeaveType: 'LeaveType',
   LeaveBalance: 'LeaveBalance',
-  LeaveRequest: 'LeaveRequest'
+  LeaveRequest: 'LeaveRequest',
+  FingerprintEnrollment: 'FingerprintEnrollment'
 };
 
 /**

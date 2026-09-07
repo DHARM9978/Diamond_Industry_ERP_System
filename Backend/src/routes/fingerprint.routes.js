@@ -52,6 +52,19 @@ router.get(
 
 
 // ==========================================
+// Get Enrollment Status
+// GET /api/fingerprints/enrollment/:id/status
+// ==========================================
+
+router.get(
+    "/enrollment/:id/status",
+    asyncHandler(
+        fingerprintController.getEnrollmentStatus
+    )
+);
+
+
+// ==========================================
 // Get Fingerprint
 // GET /api/fingerprints/:id
 // ==========================================

@@ -59,37 +59,38 @@ model Department {
 }
 
 model Employee {
-  employeeId           Int                   @id @default(autoincrement()) @map("employee_id")
-  firstName            String                @map("first_name") @db.VarChar(100)
-  lastName             String                @map("last_name") @db.VarChar(100)
-  gender               String?               @db.VarChar(20)
-  email                String                @unique @db.VarChar(150)
-  phone                String?               @db.VarChar(20)
-  hireDate             DateTime?             @map("hire_date") @db.Date
-  role                 String                @db.VarChar(30)
-  salaryRatePerHour    Decimal?              @map("salary_rate_per_hour") @db.Decimal(10, 2)
-  companyId            Int
-  branchId             Int
-  departmentId         Int?
-  managerId            Int?
-  status               String                @db.VarChar(20)
-  passwordHash         String                @map("password_hash") @db.Text
-  createdAt            DateTime              @default(now()) @map("created_at")
-  updatedAt            DateTime              @updatedAt @map("updated_at")
-  activityLogs         ActivityLog[]
-  advancePayments      AdvancePayment[]      @relation("EmployeeAdvances")
-  attendance           Attendance[]
-  attendancePunches    AttendancePunch[]
-  managedDepartments   Department[]          @relation("DepartmentManager")
-  branch               Branch                @relation(fields: [branchId], references: [branchId])
-  company              companies             @relation(fields: [companyId], references: [company_id])
-  department           Department?           @relation("EmployeeDepartment", fields: [departmentId], references: [departmentId])
-  manager              Employee?             @relation("EmployeeManager", fields: [managerId], references: [employeeId])
-  subordinates         Employee[]            @relation("EmployeeManager")
-  fingerprintTemplates FingerprintTemplate[]
-  payrolls             Payroll[]
-  leaveBalances        LeaveBalance[]
-  leaveRequests        LeaveRequest[]
+  employeeId             Int                     @id @default(autoincrement()) @map("employee_id")
+  firstName              String                  @map("first_name") @db.VarChar(100)
+  lastName               String                  @map("last_name") @db.VarChar(100)
+  gender                 String?                 @db.VarChar(20)
+  email                  String                  @unique @db.VarChar(150)
+  phone                  String?                 @db.VarChar(20)
+  hireDate               DateTime?               @map("hire_date") @db.Date
+  role                   String                  @db.VarChar(30)
+  salaryRatePerHour      Decimal?                @map("salary_rate_per_hour") @db.Decimal(10, 2)
+  companyId              Int
+  branchId               Int
+  departmentId           Int?
+  managerId              Int?
+  status                 String                  @db.VarChar(20)
+  passwordHash           String                  @map("password_hash") @db.Text
+  createdAt              DateTime                @default(now()) @map("created_at")
+  updatedAt              DateTime                @updatedAt @map("updated_at")
+  activityLogs           ActivityLog[]
+  advancePayments        AdvancePayment[]        @relation("EmployeeAdvances")
+  attendance             Attendance[]
+  attendancePunches      AttendancePunch[]
+  managedDepartments     Department[]            @relation("DepartmentManager")
+  branch                 Branch                  @relation(fields: [branchId], references: [branchId])
+  company                companies               @relation(fields: [companyId], references: [company_id])
+  department             Department?             @relation("EmployeeDepartment", fields: [departmentId], references: [departmentId])
+  manager                Employee?               @relation("EmployeeManager", fields: [managerId], references: [employeeId])
+  subordinates           Employee[]              @relation("EmployeeManager")
+  fingerprintTemplates   FingerprintTemplate[]
+  fingerprintEnrollments FingerprintEnrollment[]
+  leaveBalances          LeaveBalance[]
+  leaveRequests          LeaveRequest[]
+  payrolls               Payroll[]
 
   @@index([companyId])
   @@index([branchId])
@@ -267,28 +268,27 @@ model companies {
   departments   Department[]
   employees     Employee[]
   devices       IotDevice[]
-  settings      Setting[]
   leaveTypes    LeaveType[]
+  settings      Setting[]
 }
 
 model LeaveType {
-  leaveTypeId       Int      @id @default(autoincrement()) @map("leave_type_id")
-  companyId         Int      @map("company_id")
-  name              String   @db.VarChar(100)
-  code              String   @db.VarChar(30)
-  description       String?  @db.Text
-  annualQuota       Decimal? @map("annual_quota") @db.Decimal(6, 2)
-  isPaid            Boolean  @default(true) @map("is_paid")
-  requiresApproval  Boolean  @default(true) @map("requires_approval")
-  allowHalfDay      Boolean  @default(true) @map("allow_half_day")
-  allowCarryForward Boolean  @default(false) @map("allow_carry_forward")
-  status            String   @default("ACTIVE") @db.VarChar(20)
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  company  companies      @relation(fields: [companyId], references: [company_id])
-  balances LeaveBalance[]
-  requests LeaveRequest[]
+  leaveTypeId       Int            @id @default(autoincrement()) @map("leave_type_id")
+  companyId         Int            @map("company_id")
+  name              String         @db.VarChar(100)
+  code              String         @db.VarChar(30)
+  description       String?        @db.Text
+  annualQuota       Decimal?       @map("annual_quota") @db.Decimal(6, 2)
+  isPaid            Boolean        @default(true) @map("is_paid")
+  requiresApproval  Boolean        @default(true) @map("requires_approval")
+  allowHalfDay      Boolean        @default(true) @map("allow_half_day")
+  allowCarryForward Boolean        @default(false) @map("allow_carry_forward")
+  status            String         @default("ACTIVE") @db.VarChar(20)
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  balances          LeaveBalance[]
+  requests          LeaveRequest[]
+  company           companies      @relation(fields: [companyId], references: [company_id])
 
   @@unique([companyId, code])
   @@unique([companyId, name])
@@ -298,18 +298,17 @@ model LeaveType {
 }
 
 model LeaveBalance {
-  leaveBalanceId Int      @id @default(autoincrement()) @map("leave_balance_id")
-  employeeId     Int      @map("employee_id")
-  leaveTypeId    Int      @map("leave_type_id")
+  leaveBalanceId Int       @id @default(autoincrement()) @map("leave_balance_id")
+  employeeId     Int       @map("employee_id")
+  leaveTypeId    Int       @map("leave_type_id")
   year           Int
-  allocated      Decimal  @default(0) @db.Decimal(6, 2)
-  used           Decimal  @default(0) @db.Decimal(6, 2)
-  remaining      Decimal  @default(0) @db.Decimal(6, 2)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  employee  Employee  @relation(fields: [employeeId], references: [employeeId])
-  leaveType LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
+  allocated      Decimal   @default(0.00) @db.Decimal(6, 2)
+  used           Decimal   @default(0.00) @db.Decimal(6, 2)
+  remaining      Decimal   @default(0.00) @db.Decimal(6, 2)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  employee       Employee  @relation(fields: [employeeId], references: [employeeId])
+  leaveType      LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
 
   @@unique([employeeId, leaveTypeId, year])
   @@index([employeeId])
@@ -332,13 +331,33 @@ model LeaveRequest {
   rejectionReason String?   @map("rejection_reason") @db.Text
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
-
-  employee  Employee  @relation(fields: [employeeId], references: [employeeId])
-  leaveType LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
+  employee        Employee  @relation(fields: [employeeId], references: [employeeId])
+  leaveType       LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
 
   @@index([employeeId])
   @@index([leaveTypeId])
   @@index([status])
   @@index([startDate, endDate])
   @@map("leave_requests")
+}
+
+model FingerprintEnrollment {
+  enrollmentId Int       @id @default(autoincrement()) @map("enrollment_id")
+  employeeId   Int       @map("employee_id")
+  sensorSlot   Int       @map("sensor_slot")
+  fingerName   String?   @map("finger_name") @db.VarChar(30)
+  status       String    @default("PENDING") @db.VarChar(20)
+  confidence   Int?
+  errorMessage String?   @map("error_message") @db.Text
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([sensorSlot])
+  @@index([createdAt])
+  @@map("fingerprint_enrollments")
 }
