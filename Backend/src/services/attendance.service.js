@@ -1,6 +1,5 @@
 const prisma = require("../config/database");
 
-
 // ======================================================
 // INDIA STANDARD TIME
 // ======================================================
@@ -10,48 +9,31 @@ const IST_OFFSET_MS =
 
 
 // ======================================================
-// GET IST DATE PARTS
+// DATE / TIME HELPERS
 // ======================================================
 
 const getISTDateParts = (date) => {
+    const utcDate = new Date(date);
 
-    const utcDate =
-        new Date(date);
-
-    const istDate =
-        new Date(
-            utcDate.getTime() +
-            IST_OFFSET_MS
-        );
+    const istDate = new Date(
+        utcDate.getTime() + IST_OFFSET_MS
+    );
 
     return {
-
-        year:
-            istDate.getUTCFullYear(),
-
-        month:
-            istDate.getUTCMonth(),
-
-        day:
-            istDate.getUTCDate()
+        year: istDate.getUTCFullYear(),
+        month: istDate.getUTCMonth(),
+        day: istDate.getUTCDate()
     };
 };
 
 
-// ======================================================
-// GET START OF DAY - IST
-// ======================================================
-
 const getStartOfDay = (date) => {
-
     const {
         year,
         month,
         day
     } = getISTDateParts(date);
 
-    // Midnight of the IST calendar day,
-    // represented internally as a UTC instant.
     return new Date(
         Date.UTC(
             year,
@@ -61,18 +43,12 @@ const getStartOfDay = (date) => {
             0,
             0,
             0
-        ) -
-        IST_OFFSET_MS
+        ) - IST_OFFSET_MS
     );
 };
 
 
-// ======================================================
-// GET END OF DAY - IST
-// ======================================================
-
 const getEndOfDay = (date) => {
-
     return new Date(
         getStartOfDay(date).getTime() +
         (24 * 60 * 60 * 1000) -
@@ -81,72 +57,175 @@ const getEndOfDay = (date) => {
 };
 
 
-// ======================================================
-// GET IST DATE STRING
-// ======================================================
-
 const getISTDateString = (date) => {
-
     const {
         year,
         month,
         day
     } = getISTDateParts(date);
 
-    const monthString =
-        String(month + 1).padStart(2, "0");
-
-    const dayString =
-        String(day).padStart(2, "0");
-
-    return `${year}-${monthString}-${dayString}`;
+    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
 
 // ======================================================
-// CONVERT MYSQL TIME VALUE TO MINUTES
+// MYSQL TIME HELPERS
 // ======================================================
 //
 // Prisma represents MySQL TIME values as Date objects
-// using 1970-01-01. We only use the UTC time components.
+// based on 1970-01-01.
+//
+// IMPORTANT:
+// We use UTC components because the TIME itself has no
+// timezone information.
 // ======================================================
 
 const timeValueToMinutes = (timeValue) => {
-
     if (!timeValue) {
         return null;
     }
 
+    if (typeof timeValue === "string") {
+        const parts = timeValue
+            .split(":")
+            .map(Number);
+
+        return (
+            parts[0] * 60 +
+            parts[1] +
+            ((parts[2] || 0) / 60)
+        );
+    }
+
     return (
-        timeValue.getUTCHours() * 60
-    ) +
-    timeValue.getUTCMinutes() +
-    (
-        timeValue.getUTCSeconds() / 60
+        timeValue.getUTCHours() * 60 +
+        timeValue.getUTCMinutes() +
+        (
+            timeValue.getUTCSeconds() / 60
+        )
+    );
+};
+
+
+const formatTimeValue = (timeValue) => {
+    if (!timeValue) {
+        return null;
+    }
+
+    // Already a time string
+    if (typeof timeValue === "string") {
+        const match = timeValue.match(
+            /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
+        );
+
+        if (!match) {
+            return null;
+        }
+
+        const hours = String(
+            Number(match[1])
+        ).padStart(2, "0");
+
+        const minutes = match[2];
+
+        const seconds =
+            match[3] || "00";
+
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Prisma MySQL TIME -> Date
+    if (timeValue instanceof Date) {
+        return [
+            String(
+                timeValue.getUTCHours()
+            ).padStart(2, "0"),
+
+            String(
+                timeValue.getUTCMinutes()
+            ).padStart(2, "0"),
+
+            String(
+                timeValue.getUTCSeconds()
+            ).padStart(2, "0")
+        ].join(":");
+    }
+
+    return null;
+};
+
+
+const parseTime = (
+    value,
+    fieldName
+) => {
+    if (value === null) {
+        return null;
+    }
+
+    if (
+        typeof value !== "string" ||
+        !/^\d{2}:\d{2}(:\d{2})?$/.test(value)
+    ) {
+        const error = new Error(
+            `${fieldName} must use HH:mm or HH:mm:ss format`
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    const parts =
+        value.split(":").map(Number);
+
+    const hours = parts[0];
+    const minutes = parts[1];
+    const seconds = parts[2] ?? 0;
+
+    if (
+        hours < 0 ||
+        hours > 23 ||
+        minutes < 0 ||
+        minutes > 59 ||
+        seconds < 0 ||
+        seconds > 59
+    ) {
+        const error = new Error(
+            `${fieldName} contains an invalid time`
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    return new Date(
+        Date.UTC(
+            1970,
+            0,
+            1,
+            hours,
+            minutes,
+            seconds,
+            0
+        )
     );
 };
 
 
 // ======================================================
-// CREATE IST INSTANT FROM ATTENDANCE DATE + TIME
-// ======================================================
-//
-// attendanceDate is the MySQL DATE represented by Prisma.
-// timeValue is the MySQL TIME represented by Prisma.
-//
-// This reconstructs the actual IST instant.
+// COMBINE ATTENDANCE DATE + TIME
 // ======================================================
 
 const combineAttendanceDateAndTime = (
     attendanceDate,
     timeValue
 ) => {
-
     if (
         !attendanceDate ||
         !timeValue
     ) {
-
         return null;
     }
 
@@ -157,19 +236,34 @@ const combineAttendanceDateAndTime = (
     } = getISTDateParts(attendanceDate);
 
     const hours =
-        timeValue.getUTCHours();
+        timeValue instanceof Date
+            ? timeValue.getUTCHours()
+            : Number(
+                String(timeValue)
+                    .split(":")[0]
+            );
 
     const minutes =
-        timeValue.getUTCMinutes();
+        timeValue instanceof Date
+            ? timeValue.getUTCMinutes()
+            : Number(
+                String(timeValue)
+                    .split(":")[1]
+            );
 
     const seconds =
-        timeValue.getUTCSeconds();
+        timeValue instanceof Date
+            ? timeValue.getUTCSeconds()
+            : Number(
+                String(timeValue)
+                    .split(":")[2] || 0
+            );
 
     const milliseconds =
-        timeValue.getUTCMilliseconds();
+        timeValue instanceof Date
+            ? timeValue.getUTCMilliseconds()
+            : 0;
 
-    // Create the IST clock time as UTC first,
-    // then subtract the IST offset to get the real instant.
     return new Date(
         Date.UTC(
             year,
@@ -179,21 +273,13 @@ const combineAttendanceDateAndTime = (
             minutes,
             seconds,
             milliseconds
-        ) -
-        IST_OFFSET_MS
+        ) - IST_OFFSET_MS
     );
 };
 
 
 // ======================================================
-// CALCULATE TOTAL WORKING HOURS
-// ======================================================
-//
-// attendanceDate = Attendance.date
-// checkInTime    = MySQL TIME
-// checkOutTime   = actual punch DateTime
-//
-// This handles normal and overnight shifts correctly.
+// CALCULATE TOTAL HOURS
 // ======================================================
 
 const calculateTotalHours = (
@@ -201,13 +287,11 @@ const calculateTotalHours = (
     checkInTime,
     checkOutTime
 ) => {
-
     if (
         !attendanceDate ||
         !checkInTime ||
         !checkOutTime
     ) {
-
         return null;
     }
 
@@ -218,17 +302,23 @@ const calculateTotalHours = (
         );
 
     if (!checkInInstant) {
-
         return null;
     }
 
-    const milliseconds =
-        new Date(checkOutTime).getTime() -
+    const checkOutInstant =
+        new Date(checkOutTime);
+
+    let milliseconds =
+        checkOutInstant.getTime() -
         checkInInstant.getTime();
 
+    /*
+     * If the OUT time is earlier because the
+     * attendance crossed midnight, add one day.
+     */
     if (milliseconds < 0) {
-
-        return null;
+        milliseconds +=
+            24 * 60 * 60 * 1000;
     }
 
     const hours =
@@ -242,28 +332,126 @@ const calculateTotalHours = (
 
 
 // ======================================================
-// PROCESS DEVICE ATTENDANCE PUNCH
+// FORMAT TOTAL HOURS
 // ======================================================
 
+const formatDuration = (hours) => {
+    const totalMinutes =
+        Math.round(
+            Number(hours || 0) * 60
+        );
+
+    const wholeHours =
+        Math.floor(
+            totalMinutes / 60
+        );
+
+    const minutes =
+        totalMinutes % 60;
+
+    if (
+        wholeHours === 0 &&
+        minutes === 0
+    ) {
+        return "0 minutes";
+    }
+
+    if (wholeHours === 0) {
+        return `${minutes} ${
+            minutes === 1
+                ? "minute"
+                : "minutes"
+        }`;
+    }
+
+    if (minutes === 0) {
+        return `${wholeHours} ${
+            wholeHours === 1
+                ? "hour"
+                : "hours"
+        }`;
+    }
+
+    return `${wholeHours} ${
+        wholeHours === 1
+            ? "hour"
+            : "hours"
+    } ${minutes} ${
+        minutes === 1
+            ? "minute"
+            : "minutes"
+    }`;
+};
+
+
 // ======================================================
-// PROCESS DEVICE ATTENDANCE PUNCH
+// SERIALIZE ATTENDANCE RECORD
 // ======================================================
+//
+// This is the important fix.
+//
+// Instead of returning:
+//
+// 1970-01-01T22:41:02.000Z
+//
+// the API returns:
+//
+// 22:41:02
+//
+// And instead of:
+//
+// 2026-09-07T00:00:00.000Z
+//
+// the API returns:
+//
+// 2026-09-07
+// ======================================================
+
+const serializeAttendance = (
+    attendance
+) => {
+    if (!attendance) {
+        return null;
+    }
+
+    return {
+        ...attendance,
+
+        date:
+            attendance.date
+                ? getISTDateString(
+                    attendance.date
+                )
+                : null,
+
+        checkInTime:
+            formatTimeValue(
+                attendance.checkInTime
+            ),
+
+        checkOutTime:
+            formatTimeValue(
+                attendance.checkOutTime
+            ),
+
+        totalHours:
+            attendance.totalHours !== null &&
+            attendance.totalHours !== undefined
+                ? Number(attendance.totalHours)
+                : null
+    };
+};
+
 
 // ======================================================
 // PROCESS DEVICE ATTENDANCE PUNCH
 // ======================================================
 
 const processDevicePunch = async (data) => {
-
     const {
         device,
         sensorSlot
     } = data;
-
-
-    // ==================================================
-    // CONFIGURATION
-    // ==================================================
 
     const DUPLICATE_WINDOW_SECONDS = 30;
 
@@ -273,7 +461,6 @@ const processDevicePunch = async (data) => {
     // ==================================================
 
     if (!device) {
-
         const error = new Error(
             "Authenticated device is required"
         );
@@ -292,7 +479,6 @@ const processDevicePunch = async (data) => {
         sensorSlot === undefined ||
         sensorSlot === null
     ) {
-
         const error = new Error(
             "Sensor slot is required"
         );
@@ -302,16 +488,13 @@ const processDevicePunch = async (data) => {
         throw error;
     }
 
-
     const slot =
         Number(sensorSlot);
-
 
     if (
         !Number.isInteger(slot) ||
         slot < 1
     ) {
-
         const error = new Error(
             "Sensor slot must be a positive integer"
         );
@@ -327,7 +510,6 @@ const processDevicePunch = async (data) => {
     // ==================================================
 
     await prisma.iotDevice.update({
-
         where: {
             deviceId:
                 device.deviceId
@@ -346,7 +528,6 @@ const processDevicePunch = async (data) => {
 
     const fingerprint =
         await prisma.fingerprintTemplate.findUnique({
-
             where: {
                 sensorSlot: slot
             },
@@ -358,7 +539,6 @@ const processDevicePunch = async (data) => {
 
 
     if (!fingerprint) {
-
         const error = new Error(
             "No fingerprint is registered for this sensor slot"
         );
@@ -376,7 +556,6 @@ const processDevicePunch = async (data) => {
     if (
         fingerprint.status !== "ACTIVE"
     ) {
-
         const error = new Error(
             "Fingerprint template is inactive"
         );
@@ -388,21 +567,16 @@ const processDevicePunch = async (data) => {
 
 
     // ==================================================
-    // GET EMPLOYEE
+    // EMPLOYEE
     // ==================================================
 
     const employee =
         fingerprint.employee;
 
 
-    // ==================================================
-    // CHECK EMPLOYEE STATUS
-    // ==================================================
-
     if (
         employee.status !== "ACTIVE"
     ) {
-
         const error = new Error(
             "Employee is not active"
         );
@@ -422,7 +596,7 @@ const processDevicePunch = async (data) => {
 
 
     // ==================================================
-    // TODAY RANGE
+    // TODAY IN IST
     // ==================================================
 
     const startOfToday =
@@ -438,14 +612,11 @@ const processDevicePunch = async (data) => {
 
     const todayPunches =
         await prisma.attendancePunch.findMany({
-
             where: {
-
                 employeeId:
                     employee.employeeId,
 
                 punchedAt: {
-
                     gte:
                         startOfToday,
 
@@ -455,24 +626,20 @@ const processDevicePunch = async (data) => {
             },
 
             orderBy: {
-
-                punchedAt:
-                    "desc"
+                punchedAt: "desc"
             }
         });
 
 
     // ==================================================
-    // DUPLICATE PUNCH PROTECTION
+    // DUPLICATE PROTECTION
     // ==================================================
 
     if (
         todayPunches.length > 0
     ) {
-
         const lastPunch =
             todayPunches[0];
-
 
         const secondsSinceLastPunch =
             (
@@ -482,13 +649,11 @@ const processDevicePunch = async (data) => {
                 ).getTime()
             ) / 1000;
 
-
         if (
             secondsSinceLastPunch >= 0 &&
             secondsSinceLastPunch <
                 DUPLICATE_WINDOW_SECONDS
         ) {
-
             const error = new Error(
                 `Duplicate punch detected. Please wait ${DUPLICATE_WINDOW_SECONDS} seconds before scanning again.`
             );
@@ -501,37 +666,21 @@ const processDevicePunch = async (data) => {
 
 
     // ==================================================
-    // DETERMINE PUNCH TYPE
+    // DETERMINE IN / OUT
     // ==================================================
 
-    let punchType;
-
+    let punchType = "IN";
 
     if (
-        todayPunches.length === 0
+        todayPunches.length > 0
     ) {
-
-        // First punch of the day
-        punchType = "IN";
-
-    } else {
-
         const lastPunch =
             todayPunches[0];
 
-
-        if (
+        punchType =
             lastPunch.punchType === "IN"
-        ) {
-
-            // IN → OUT
-            punchType = "OUT";
-
-        } else {
-
-            // OUT → IN
-            punchType = "IN";
-        }
+                ? "OUT"
+                : "IN";
     }
 
 
@@ -542,27 +691,6 @@ const processDevicePunch = async (data) => {
 
 
     // ==================================================
-    // GET ATTENDANCE RECORD
-    // ==================================================
-
-    let attendance =
-        await prisma.attendance.findUnique({
-
-            where: {
-
-                employeeId_date: {
-
-                    employeeId:
-                        employee.employeeId,
-
-                    date:
-                        startOfToday
-                }
-            }
-        });
-
-
-    // ==================================================
     // TRANSACTION
     // ==================================================
 
@@ -570,16 +698,13 @@ const processDevicePunch = async (data) => {
         await prisma.$transaction(
             async (tx) => {
 
-
                 // ======================================
                 // CREATE RAW PUNCH
                 // ======================================
 
                 const punch =
                     await tx.attendancePunch.create({
-
                         data: {
-
                             employeeId:
                                 employee.employeeId,
 
@@ -597,31 +722,20 @@ const processDevicePunch = async (data) => {
                         },
 
                         include: {
-
                             employee: {
-
                                 select: {
-
                                     employeeId: true,
-
                                     firstName: true,
-
                                     lastName: true,
-
                                     email: true
                                 }
                             },
 
                             device: {
-
                                 select: {
-
                                     deviceId: true,
-
                                     deviceCode: true,
-
                                     deviceName: true,
-
                                     branchId: true
                                 }
                             }
@@ -631,20 +745,15 @@ const processDevicePunch = async (data) => {
 
                 // ======================================
                 // GET ALL TODAY'S PUNCHES
-                //
-                // Include the punch we just created.
                 // ======================================
 
                 const allPunches =
                     await tx.attendancePunch.findMany({
-
                         where: {
-
                             employeeId:
                                 employee.employeeId,
 
                             punchedAt: {
-
                                 gte:
                                     startOfToday,
 
@@ -654,19 +763,16 @@ const processDevicePunch = async (data) => {
                         },
 
                         orderBy: {
-
-                            punchedAt:
-                                "asc"
+                            punchedAt: "asc"
                         }
                     });
 
 
                 // ======================================
-                // CALCULATE TOTAL WORKING HOURS
+                // CALCULATE TOTAL WORKING TIME
                 // ======================================
 
                 let totalMilliseconds = 0;
-
                 let openInTime = null;
 
 
@@ -678,28 +784,19 @@ const processDevicePunch = async (data) => {
                     if (
                         currentPunch.punchType === "IN"
                     ) {
-
-                        // Only open a new interval if
-                        // there isn't already an open IN.
-
                         if (
                             openInTime === null
                         ) {
-
                             openInTime =
                                 new Date(
                                     currentPunch.punchedAt
                                 );
                         }
-
                     }
 
                     else if (
                         currentPunch.punchType === "OUT"
                     ) {
-
-                        // Only calculate OUT if we have
-                        // a corresponding IN.
 
                         if (
                             openInTime !== null
@@ -710,32 +807,22 @@ const processDevicePunch = async (data) => {
                                     currentPunch.punchedAt
                                 );
 
-
                             const duration =
                                 outTime.getTime() -
                                 openInTime.getTime();
 
-
                             if (
                                 duration > 0
                             ) {
-
                                 totalMilliseconds +=
                                     duration;
                             }
-
-
-                            // Close this IN → OUT pair.
 
                             openInTime = null;
                         }
                     }
                 }
 
-
-                // ======================================
-                // CONVERT TO HOURS
-                // ======================================
 
                 const totalHours =
                     totalMilliseconds /
@@ -745,20 +832,42 @@ const processDevicePunch = async (data) => {
                         60
                     );
 
-                const totalHoursFormatted =formatDuration(totalHours);
+
+                const totalHoursRounded =
+                    totalHours > 0
+                        ? Number(
+                            totalHours.toFixed(2)
+                        )
+                        : null;
 
 
                 // ======================================
-                // CREATE / UPDATE ATTENDANCE
+                // FIND ATTENDANCE
+                // ======================================
+
+                let attendance =
+                    await tx.attendance.findUnique({
+                        where: {
+                            employeeId_date: {
+                                employeeId:
+                                    employee.employeeId,
+
+                                date:
+                                    startOfToday
+                            }
+                        }
+                    });
+
+
+                // ======================================
+                // FIRST PUNCH / CREATE
                 // ======================================
 
                 if (!attendance) {
 
                     attendance =
                         await tx.attendance.create({
-
                             data: {
-
                                 employeeId:
                                     employee.employeeId,
 
@@ -766,7 +875,9 @@ const processDevicePunch = async (data) => {
                                     startOfToday,
 
                                 checkInTime:
-                                    punchedAt,
+                                    punchType === "IN"
+                                        ? punchedAt
+                                        : null,
 
                                 checkOutTime:
                                     punchType === "OUT"
@@ -774,25 +885,21 @@ const processDevicePunch = async (data) => {
                                         : null,
 
                                 totalHours:
-                                    totalHours > 0
-                                        ? Number(
-                                            totalHours.toFixed(2)
-                                        )
-                                        : null,
+                                    totalHoursRounded,
 
                                 status:
                                     "PRESENT"
                             }
                         });
+                }
 
-                } else {
+                // ======================================
+                // UPDATE ATTENDANCE
+                // ======================================
 
-                    // ==================================
-                    // UPDATE EXISTING ATTENDANCE
-                    // ==================================
+                else {
 
                     let firstInTime = null;
-
                     let lastOutTime = null;
 
 
@@ -808,12 +915,12 @@ const processDevicePunch = async (data) => {
                             if (
                                 firstInTime === null
                             ) {
-
                                 firstInTime =
                                     currentPunch.punchedAt;
                             }
+                        }
 
-                        } else if (
+                        else if (
                             currentPunch.punchType === "OUT"
                         ) {
 
@@ -825,15 +932,12 @@ const processDevicePunch = async (data) => {
 
                     attendance =
                         await tx.attendance.update({
-
                             where: {
-
                                 attendanceId:
                                     attendance.attendanceId
                             },
 
                             data: {
-
                                 checkInTime:
                                     firstInTime,
 
@@ -841,11 +945,7 @@ const processDevicePunch = async (data) => {
                                     lastOutTime,
 
                                 totalHours:
-                                    totalHours > 0
-                                        ? Number(
-                                            totalHours.toFixed(2)
-                                        )
-                                        : null,
+                                    totalHoursRounded,
 
                                 status:
                                     "PRESENT"
@@ -854,94 +954,24 @@ const processDevicePunch = async (data) => {
                 }
 
 
-                // ======================================
-                // RETURN
-                // ======================================
                 return {
-
                     punch,
-
                     attendance,
-
                     totalHours:
-                        totalHours > 0
-                            ? Number(
-                                totalHours.toFixed(2)
-                            )
-                            : 0,
+                        totalHoursRounded || 0,
 
                     totalHoursFormatted:
-                        totalHoursFormatted
+                        formatDuration(
+                            totalHours
+                        )
                 };
             }
         );
 
 
-    // ==================================================
-    // RETURN RESULT
-    // ==================================================
-
     return result;
 };
 
-// ======================================================
-// FORMAT TOTAL HOURS
-// ======================================================
-
-const formatDuration = (hours) => {
-
-    const totalMinutes =
-        Math.round(
-            Number(hours || 0) * 60
-        );
-
-    const wholeHours =
-        Math.floor(
-            totalMinutes / 60
-        );
-
-    const minutes =
-        totalMinutes % 60;
-
-
-    if (
-        wholeHours === 0 &&
-        minutes === 0
-    ) {
-        return "0 minutes";
-    }
-
-
-    if (wholeHours === 0) {
-
-        return `${minutes} ${
-            minutes === 1
-                ? "minute"
-                : "minutes"
-        }`;
-    }
-
-
-    if (minutes === 0) {
-
-        return `${wholeHours} ${
-            wholeHours === 1
-                ? "hour"
-                : "hours"
-        }`;
-    }
-
-
-    return `${wholeHours} ${
-        wholeHours === 1
-            ? "hour"
-            : "hours"
-    } ${minutes} ${
-        minutes === 1
-            ? "minute"
-            : "minutes"
-    }`;
-};
 
 // ======================================================
 // GET ALL ATTENDANCE
@@ -957,13 +987,8 @@ const getAllAttendance = async (
         to
     } = filters;
 
-
     const where = {};
 
-
-    // ==========================================
-    // Specific date
-    // ==========================================
 
     if (date) {
 
@@ -972,30 +997,32 @@ const getAllAttendance = async (
                 `${date}T00:00:00`
             );
 
-        const nextDate =
-            new Date(
-                selectedDate
+        if (
+            Number.isNaN(
+                selectedDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid date. Use YYYY-MM-DD"
             );
 
-        nextDate.setDate(
-            nextDate.getDate() + 1
-        );
+            error.statusCode = 400;
 
+            throw error;
+        }
 
         where.date = {
-
             gte:
-                selectedDate,
+                getStartOfDay(
+                    selectedDate
+                ),
 
             lt:
-                nextDate
+                getEndOfDay(
+                    selectedDate
+                )
         };
     }
-
-
-    // ==========================================
-    // Date range
-    // ==========================================
 
     else if (
         from ||
@@ -1004,68 +1031,94 @@ const getAllAttendance = async (
 
         where.date = {};
 
-
         if (from) {
 
-            where.date.gte =
+            const fromDate =
                 new Date(
                     `${from}T00:00:00`
+                );
+
+            if (
+                Number.isNaN(
+                    fromDate.getTime()
+                )
+            ) {
+                const error = new Error(
+                    "Invalid from date. Use YYYY-MM-DD"
+                );
+
+                error.statusCode = 400;
+
+                throw error;
+            }
+
+            where.date.gte =
+                getStartOfDay(
+                    fromDate
                 );
         }
 
 
         if (to) {
 
-            const endDate =
+            const toDate =
                 new Date(
                     `${to}T00:00:00`
                 );
 
-            endDate.setDate(
-                endDate.getDate() + 1
-            );
+            if (
+                Number.isNaN(
+                    toDate.getTime()
+                )
+            ) {
+                const error = new Error(
+                    "Invalid to date. Use YYYY-MM-DD"
+                );
 
+                error.statusCode = 400;
+
+                throw error;
+            }
 
             where.date.lt =
-                endDate;
+                getEndOfDay(
+                    toDate
+                );
         }
     }
 
 
-    return await prisma.attendance.findMany({
+    const attendance =
+        await prisma.attendance.findMany({
+            where,
 
-        where,
-
-        include: {
-
-            employee: {
-
-                select: {
-
-                    employeeId: true,
-
-                    firstName: true,
-
-                    lastName: true,
-
-                    email: true
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
                 }
-            }
-        },
-
-        orderBy: [
-
-            {
-                date:
-                    "desc"
             },
 
-            {
-                employeeId:
-                    "asc"
-            }
-        ]
-    });
+            orderBy: [
+                {
+                    date: "desc"
+                },
+
+                {
+                    employeeId: "asc"
+                }
+            ]
+        });
+
+
+    return attendance.map(
+        serializeAttendance
+    );
 };
 
 
@@ -1077,28 +1130,37 @@ const getAttendanceById = async (
     attendanceId
 ) => {
 
+    const id =
+        Number(attendanceId);
+
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+        const error = new Error(
+            "Invalid attendance ID"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
     const attendance =
         await prisma.attendance.findUnique({
-
             where: {
-
-                attendanceId:
-                    Number(attendanceId)
+                attendanceId: id
             },
 
             include: {
-
                 employee: {
-
                     select: {
-
                         employeeId: true,
-
                         firstName: true,
-
                         lastName: true,
-
-                        email: true
+                        email: true,
+                        status: true
                     }
                 }
             }
@@ -1106,7 +1168,6 @@ const getAttendanceById = async (
 
 
     if (!attendance) {
-
         const error = new Error(
             "Attendance record not found"
         );
@@ -1117,7 +1178,9 @@ const getAttendanceById = async (
     }
 
 
-    return attendance;
+    return serializeAttendance(
+        attendance
+    );
 };
 
 
@@ -1130,6 +1193,23 @@ const getEmployeeAttendance = async (
     filters = {}
 ) => {
 
+    const id =
+        Number(employeeId);
+
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+        const error = new Error(
+            "Invalid employee ID"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
     const {
         from,
         to
@@ -1137,15 +1217,9 @@ const getEmployeeAttendance = async (
 
 
     const where = {
-
-        employeeId:
-            Number(employeeId)
+        employeeId: id
     };
 
-
-    // ==========================================
-    // Date filtering
-    // ==========================================
 
     if (
         from ||
@@ -1157,69 +1231,138 @@ const getEmployeeAttendance = async (
 
         if (from) {
 
-            where.date.gte =
+            const fromDate =
                 new Date(
                     `${from}T00:00:00`
+                );
+
+            if (
+                Number.isNaN(
+                    fromDate.getTime()
+                )
+            ) {
+                const error = new Error(
+                    "Invalid from date. Use YYYY-MM-DD"
+                );
+
+                error.statusCode = 400;
+
+                throw error;
+            }
+
+            where.date.gte =
+                getStartOfDay(
+                    fromDate
                 );
         }
 
 
         if (to) {
 
-            const endDate =
+            const toDate =
                 new Date(
                     `${to}T00:00:00`
                 );
 
-            endDate.setDate(
-                endDate.getDate() + 1
-            );
+            if (
+                Number.isNaN(
+                    toDate.getTime()
+                )
+            ) {
+                const error = new Error(
+                    "Invalid to date. Use YYYY-MM-DD"
+                );
 
+                error.statusCode = 400;
+
+                throw error;
+            }
 
             where.date.lt =
-                endDate;
+                getEndOfDay(
+                    toDate
+                );
         }
     }
 
 
-    return await prisma.attendance.findMany({
+    const attendance =
+        await prisma.attendance.findMany({
+            where,
 
-        where,
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
+                }
+            },
 
-        orderBy: {
+            orderBy: {
+                date: "desc"
+            }
+        });
 
-            date:
-                "desc"
-        }
-    });
+
+    return attendance.map(
+        serializeAttendance
+    );
 };
-
 
 
 // ======================================================
 // GET DAILY ATTENDANCE SUMMARY
 // ======================================================
 
-const getAttendanceSummary = async (date) => {
+const getAttendanceSummary = async (
+    date
+) => {
 
     const targetDate =
         date
-            ? new Date(`${date}T00:00:00`)
+            ? new Date(
+                `${date}T00:00:00`
+            )
             : new Date();
 
-    if (Number.isNaN(targetDate.getTime())) {
-        const error = new Error("Invalid date. Use YYYY-MM-DD");
+
+    if (
+        Number.isNaN(
+            targetDate.getTime()
+        )
+    ) {
+        const error = new Error(
+            "Invalid date. Use YYYY-MM-DD"
+        );
+
         error.statusCode = 400;
+
         throw error;
     }
 
-    const startOfDay = getStartOfDay(targetDate);
-    const endOfDay = getEndOfDay(targetDate);
+
+    const startOfDay =
+        getStartOfDay(
+            targetDate
+        );
+
+    const endOfDay =
+        getEndOfDay(
+            targetDate
+        );
+
 
     const totalEmployees =
         await prisma.employee.count({
-            where: { status: "ACTIVE" }
+            where: {
+                status: "ACTIVE"
+            }
         });
+
 
     const attendance =
         await prisma.attendance.findMany({
@@ -1228,10 +1371,12 @@ const getAttendanceSummary = async (date) => {
                     gte: startOfDay,
                     lt: endOfDay
                 },
+
                 employee: {
                     status: "ACTIVE"
                 }
             },
+
             select: {
                 employeeId: true,
                 checkInTime: true,
@@ -1241,10 +1386,13 @@ const getAttendanceSummary = async (date) => {
             }
         });
 
+
     const present =
         attendance.filter(
-            record => record.status === "PRESENT"
+            record =>
+                record.status === "PRESENT"
         ).length;
+
 
     const checkedIn =
         attendance.filter(
@@ -1253,32 +1401,56 @@ const getAttendanceSummary = async (date) => {
                 !record.checkOutTime
         ).length;
 
+
     const checkedOut =
         attendance.filter(
-            record => !!record.checkOutTime
+            record =>
+                !!record.checkOutTime
         ).length;
 
+
     const absent =
-        Math.max(totalEmployees - present, 0);
+        Math.max(
+            totalEmployees - present,
+            0
+        );
+
 
     const totalHours =
         attendance.reduce(
             (total, record) =>
                 total +
-                (record.totalHours
-                    ? Number(record.totalHours)
-                    : 0),
+                (
+                    record.totalHours
+                        ? Number(
+                            record.totalHours
+                        )
+                        : 0
+                ),
             0
         );
 
+
     return {
-        date: getISTDateString(targetDate),
+        date:
+            getISTDateString(
+                targetDate
+            ),
+
         totalEmployees,
+
         present,
+
         absent,
+
         checkedIn,
+
         checkedOut,
-        totalHours: Number(totalHours.toFixed(2))
+
+        totalHours:
+            Number(
+                totalHours.toFixed(2)
+            )
     };
 };
 
@@ -1292,19 +1464,29 @@ const getEmployeeAttendanceSummary = async (
     filters = {}
 ) => {
 
-    const id = Number(employeeId);
+    const id =
+        Number(employeeId);
 
-    if (!Number.isInteger(id) || id < 1) {
-        const error = new Error("Invalid employee ID");
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+        const error = new Error(
+            "Invalid employee ID"
+        );
+
         error.statusCode = 400;
+
         throw error;
     }
+
 
     const employee =
         await prisma.employee.findUnique({
             where: {
                 employeeId: id
             },
+
             select: {
                 employeeId: true,
                 firstName: true,
@@ -1314,120 +1496,203 @@ const getEmployeeAttendanceSummary = async (
             }
         });
 
+
     if (!employee) {
-        const error = new Error("Employee not found");
+        const error = new Error(
+            "Employee not found"
+        );
+
         error.statusCode = 404;
+
         throw error;
     }
 
-    const { from, to } = filters;
+
+    const {
+        from,
+        to
+    } = filters;
+
 
     const where = {
         employeeId: id
     };
 
-    if (from || to) {
+
+    if (
+        from ||
+        to
+    ) {
+
         where.date = {};
 
-        if (from) {
-            const fromDate =
-                new Date(`${from}T00:00:00`);
 
-            if (Number.isNaN(fromDate.getTime())) {
+        if (from) {
+
+            const fromDate =
+                new Date(
+                    `${from}T00:00:00`
+                );
+
+            if (
+                Number.isNaN(
+                    fromDate.getTime()
+                )
+            ) {
                 const error = new Error(
                     "Invalid from date. Use YYYY-MM-DD"
                 );
+
                 error.statusCode = 400;
+
                 throw error;
             }
 
             where.date.gte =
-                getStartOfDay(fromDate);
+                getStartOfDay(
+                    fromDate
+                );
         }
 
-        if (to) {
-            const toDate =
-                new Date(`${to}T00:00:00`);
 
-            if (Number.isNaN(toDate.getTime())) {
+        if (to) {
+
+            const toDate =
+                new Date(
+                    `${to}T00:00:00`
+                );
+
+            if (
+                Number.isNaN(
+                    toDate.getTime()
+                )
+            ) {
                 const error = new Error(
                     "Invalid to date. Use YYYY-MM-DD"
                 );
+
                 error.statusCode = 400;
+
                 throw error;
             }
 
             where.date.lt =
-                getEndOfDay(toDate);
+                getEndOfDay(
+                    toDate
+                );
         }
     }
+
 
     const attendance =
         await prisma.attendance.findMany({
             where,
+
             orderBy: {
                 date: "asc"
             }
         });
 
-    const totalDays = attendance.length;
+
+    const totalDays =
+        attendance.length;
+
 
     const presentDays =
         attendance.filter(
-            record => record.status === "PRESENT"
+            record =>
+                record.status === "PRESENT"
         ).length;
+
 
     const absentDays =
         attendance.filter(
-            record => record.status === "ABSENT"
+            record =>
+                record.status === "ABSENT"
         ).length;
+
 
     const totalHours =
         attendance.reduce(
             (total, record) =>
                 total +
-                (record.totalHours
-                    ? Number(record.totalHours)
-                    : 0),
+                (
+                    record.totalHours
+                        ? Number(
+                            record.totalHours
+                        )
+                        : 0
+                ),
             0
         );
+
 
     const averageHours =
         presentDays > 0
             ? totalHours / presentDays
             : 0;
 
-    const totalHoursFormatted =
-        formatDuration(totalHours);
-
-    const averageHoursFormatted =
-        formatDuration(averageHours);
 
     return {
         employee: {
-            employeeId: employee.employeeId,
-            firstName: employee.firstName,
-            lastName: employee.lastName,
-            email: employee.email,
-            status: employee.status
+            employeeId:
+                employee.employeeId,
+
+            firstName:
+                employee.firstName,
+
+            lastName:
+                employee.lastName,
+
+            email:
+                employee.email,
+
+            status:
+                employee.status
         },
-        from: from || null,
-        to: to || null,
+
+        from:
+            from || null,
+
+        to:
+            to || null,
+
         totalDays,
+
         presentDays,
+
         absentDays,
-        totalHours:Number(totalHours.toFixed(2)),
-        totalHoursFormatted:totalHoursFormatted,
-        averageHours:Number(averageHours.toFixed(2)),
-        averageHoursFormatted:averageHoursFormatted
+
+        totalHours:
+            Number(
+                totalHours.toFixed(2)
+            ),
+
+        totalHoursFormatted:
+            formatDuration(
+                totalHours
+            ),
+
+        averageHours:
+            Number(
+                averageHours.toFixed(2)
+            ),
+
+        averageHoursFormatted:
+            formatDuration(
+                averageHours
+            )
     };
 };
+
 
 // ======================================================
 // GET ATTENDANCE WITH FILTERS + PAGINATION
 // ======================================================
 
-const getAttendancePaginated = async (filters = {}) => {
+const getAttendancePaginated = async (
+    filters = {}
+) => {
 
     const {
         date,
@@ -1439,19 +1704,21 @@ const getAttendancePaginated = async (filters = {}) => {
     } = filters;
 
 
-    const parsedPage = Number(page);
-    const parsedLimit = Number(limit);
+    const parsedPage =
+        Number(page);
+
+    const parsedLimit =
+        Number(limit);
 
 
     // ==============================================
-    // Validate page
+    // VALIDATE PAGE
     // ==============================================
 
     if (
         !Number.isInteger(parsedPage) ||
         parsedPage < 1
     ) {
-
         const error = new Error(
             "Page must be a positive integer"
         );
@@ -1463,7 +1730,7 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
     // ==============================================
-    // Validate limit
+    // VALIDATE LIMIT
     // ==============================================
 
     if (
@@ -1471,7 +1738,6 @@ const getAttendancePaginated = async (filters = {}) => {
         parsedLimit < 1 ||
         parsedLimit > 100
     ) {
-
         const error = new Error(
             "Limit must be between 1 and 100"
         );
@@ -1483,29 +1749,24 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
     // ==============================================
-    // Build WHERE condition
+    // WHERE
     // ==============================================
 
     const where = {};
 
-
-    // ==============================================
-    // Employee filter
-    // ==============================================
 
     if (
         employeeId !== undefined &&
         employeeId !== ""
     ) {
 
-        const id = Number(employeeId);
-
+        const id =
+            Number(employeeId);
 
         if (
             !Number.isInteger(id) ||
             id < 1
         ) {
-
             const error = new Error(
                 "Invalid employee ID"
             );
@@ -1515,19 +1776,20 @@ const getAttendancePaginated = async (filters = {}) => {
             throw error;
         }
 
-
         where.employeeId = id;
     }
 
 
     // ==============================================
-    // Date filter
+    // DATE FILTER
     // ==============================================
 
     if (date) {
 
         const selectedDate =
-            new Date(`${date}T00:00:00`);
+            new Date(
+                `${date}T00:00:00`
+            );
 
 
         if (
@@ -1535,7 +1797,6 @@ const getAttendancePaginated = async (filters = {}) => {
                 selectedDate.getTime()
             )
         ) {
-
             const error = new Error(
                 "Invalid date. Use YYYY-MM-DD"
             );
@@ -1547,7 +1808,6 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
         where.date = {
-
             gte:
                 getStartOfDay(
                     selectedDate
@@ -1560,12 +1820,10 @@ const getAttendancePaginated = async (filters = {}) => {
         };
     }
 
-
-    // ==============================================
-    // Date range filter
-    // ==============================================
-
-    else if (from || to) {
+    else if (
+        from ||
+        to
+    ) {
 
         where.date = {};
 
@@ -1573,7 +1831,9 @@ const getAttendancePaginated = async (filters = {}) => {
         if (from) {
 
             const fromDate =
-                new Date(`${from}T00:00:00`);
+                new Date(
+                    `${from}T00:00:00`
+                );
 
 
             if (
@@ -1581,7 +1841,6 @@ const getAttendancePaginated = async (filters = {}) => {
                     fromDate.getTime()
                 )
             ) {
-
                 const error = new Error(
                     "Invalid from date. Use YYYY-MM-DD"
                 );
@@ -1602,7 +1861,9 @@ const getAttendancePaginated = async (filters = {}) => {
         if (to) {
 
             const toDate =
-                new Date(`${to}T00:00:00`);
+                new Date(
+                    `${to}T00:00:00`
+                );
 
 
             if (
@@ -1610,7 +1871,6 @@ const getAttendancePaginated = async (filters = {}) => {
                     toDate.getTime()
                 )
             ) {
-
                 const error = new Error(
                     "Invalid to date. Use YYYY-MM-DD"
                 );
@@ -1630,7 +1890,7 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
     // ==============================================
-    // Pagination
+    // PAGINATION
     // ==============================================
 
     const skip =
@@ -1639,7 +1899,7 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
     // ==============================================
-    // Fetch attendance + count
+    // QUERY
     // ==============================================
 
     const [
@@ -1649,31 +1909,21 @@ const getAttendancePaginated = async (filters = {}) => {
         await prisma.$transaction([
 
             prisma.attendance.findMany({
-
                 where,
 
                 include: {
-
                     employee: {
-
                         select: {
-
                             employeeId: true,
-
                             firstName: true,
-
                             lastName: true,
-
                             email: true,
-
                             status: true
                         }
                     }
                 },
 
-
                 orderBy: [
-
                     {
                         date: "desc"
                     },
@@ -1683,7 +1933,6 @@ const getAttendancePaginated = async (filters = {}) => {
                     }
                 ],
 
-
                 skip,
 
                 take:
@@ -1692,14 +1941,23 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
             prisma.attendance.count({
-
                 where
             })
         ]);
 
 
     // ==============================================
-    // Pagination information
+    // SERIALIZE
+    // ==============================================
+
+    const serializedAttendance =
+        attendance.map(
+            serializeAttendance
+        );
+
+
+    // ==============================================
+    // PAGINATION INFO
     // ==============================================
 
     const totalPages =
@@ -1710,13 +1968,10 @@ const getAttendancePaginated = async (filters = {}) => {
 
 
     return {
-
         data:
-            attendance,
-
+            serializedAttendance,
 
         pagination: {
-
             page:
                 parsedPage,
 
@@ -1737,6 +1992,7 @@ const getAttendancePaginated = async (filters = {}) => {
     };
 };
 
+
 // ======================================================
 // GET ATTENDANCE PUNCH HISTORY
 // ======================================================
@@ -1746,7 +2002,8 @@ const getAttendancePunchHistory = async (
     filters = {}
 ) => {
 
-    const id = Number(employeeId);
+    const id =
+        Number(employeeId);
 
     if (
         !Number.isInteger(id) ||
@@ -1762,34 +2019,23 @@ const getAttendancePunchHistory = async (
     }
 
 
-    // ==============================================
-    // Verify employee
-    // ==============================================
-
     const employee =
         await prisma.employee.findUnique({
-
             where: {
                 employeeId: id
             },
 
             select: {
-
                 employeeId: true,
-
                 firstName: true,
-
                 lastName: true,
-
                 email: true,
-
                 status: true
             }
         });
 
 
     if (!employee) {
-
         const error = new Error(
             "Employee not found"
         );
@@ -1808,14 +2054,9 @@ const getAttendancePunchHistory = async (
 
 
     const where = {
-
         employeeId: id
     };
 
-
-    // ==============================================
-    // Single date
-    // ==============================================
 
     if (date) {
 
@@ -1830,7 +2071,6 @@ const getAttendancePunchHistory = async (
                 selectedDate.getTime()
             )
         ) {
-
             const error = new Error(
                 "Invalid date. Use YYYY-MM-DD"
             );
@@ -1842,7 +2082,6 @@ const getAttendancePunchHistory = async (
 
 
         where.punchedAt = {
-
             gte:
                 getStartOfDay(
                     selectedDate
@@ -1855,12 +2094,10 @@ const getAttendancePunchHistory = async (
         };
     }
 
-
-    // ==============================================
-    // Date range
-    // ==============================================
-
-    else if (from || to) {
+    else if (
+        from ||
+        to
+    ) {
 
         where.punchedAt = {};
 
@@ -1878,7 +2115,6 @@ const getAttendancePunchHistory = async (
                     fromDate.getTime()
                 )
             ) {
-
                 const error = new Error(
                     "Invalid from date. Use YYYY-MM-DD"
                 );
@@ -1909,7 +2145,6 @@ const getAttendancePunchHistory = async (
                     toDate.getTime()
                 )
             ) {
-
                 const error = new Error(
                     "Invalid to date. Use YYYY-MM-DD"
                 );
@@ -1928,45 +2163,31 @@ const getAttendancePunchHistory = async (
     }
 
 
-    // ==============================================
-    // Get punches
-    // ==============================================
-
     const punches =
         await prisma.attendancePunch.findMany({
-
             where,
 
             include: {
-
                 device: {
-
                     select: {
-
                         deviceId: true,
-
                         deviceCode: true,
-
                         deviceName: true,
-
                         branchId: true
                     }
                 }
             },
 
             orderBy: {
-
                 punchedAt: "asc"
             }
         });
 
 
     return {
-
         employee,
 
         filters: {
-
             date:
                 date || null,
 
@@ -1983,7 +2204,6 @@ const getAttendancePunchHistory = async (
         punches:
             punches.map(
                 punch => ({
-
                     ...punch,
 
                     punchId:
@@ -1992,6 +2212,7 @@ const getAttendancePunchHistory = async (
             )
     };
 };
+
 
 // ======================================================
 // ADMIN ATTENDANCE CORRECTION
@@ -2003,17 +2224,14 @@ const updateAttendance = async (
     adminUser = null
 ) => {
 
-    const id = Number(attendanceId);
+    const id =
+        Number(attendanceId);
 
-    // ==============================================
-    // Validate attendance ID
-    // ==============================================
 
     if (
         !Number.isInteger(id) ||
         id < 1
     ) {
-
         const error = new Error(
             "Invalid attendance ID"
         );
@@ -2024,31 +2242,19 @@ const updateAttendance = async (
     }
 
 
-    // ==============================================
-    // Find attendance
-    // ==============================================
-
     const existingAttendance =
         await prisma.attendance.findUnique({
-
             where: {
                 attendanceId: id
             },
 
             include: {
-
                 employee: {
-
                     select: {
-
                         employeeId: true,
-
                         firstName: true,
-
                         lastName: true,
-
                         email: true,
-
                         status: true
                     }
                 }
@@ -2057,7 +2263,6 @@ const updateAttendance = async (
 
 
     if (!existingAttendance) {
-
         const error = new Error(
             "Attendance record not found"
         );
@@ -2075,16 +2280,11 @@ const updateAttendance = async (
     } = data;
 
 
-    // ==============================================
-    // At least one field must be supplied
-    // ==============================================
-
     if (
         checkInTime === undefined &&
         checkOutTime === undefined &&
         status === undefined
     ) {
-
         const error = new Error(
             "At least one attendance field is required"
         );
@@ -2094,81 +2294,6 @@ const updateAttendance = async (
         throw error;
     }
 
-
-    // ==============================================
-    // Convert HH:mm / HH:mm:ss to Date
-    //
-    // MySQL TIME is represented by Prisma as
-    // a Date object based on 1970-01-01.
-    // ==============================================
-
-    const parseTime = (value, fieldName) => {
-
-        if (value === null) {
-            return null;
-        }
-
-
-        if (
-            typeof value !== "string" ||
-            !/^\d{2}:\d{2}(:\d{2})?$/.test(value)
-        ) {
-
-            const error = new Error(
-                `${fieldName} must use HH:mm or HH:mm:ss format`
-            );
-
-            error.statusCode = 400;
-
-            throw error;
-        }
-
-
-        const parts =
-            value.split(":").map(Number);
-
-        const hours = parts[0];
-        const minutes = parts[1];
-        const seconds =
-            parts[2] ?? 0;
-
-
-        if (
-            hours < 0 ||
-            hours > 23 ||
-            minutes < 0 ||
-            minutes > 59 ||
-            seconds < 0 ||
-            seconds > 59
-        ) {
-
-            const error = new Error(
-                `${fieldName} contains an invalid time`
-            );
-
-            error.statusCode = 400;
-
-            throw error;
-        }
-
-
-        return new Date(
-            Date.UTC(
-                1970,
-                0,
-                1,
-                hours,
-                minutes,
-                seconds,
-                0
-            )
-        );
-    };
-
-
-    // ==============================================
-    // Prepare times
-    // ==============================================
 
     const newCheckInTime =
         checkInTime !== undefined
@@ -2188,12 +2313,9 @@ const updateAttendance = async (
             : existingAttendance.checkOutTime;
 
 
-    // ==============================================
-    // Calculate total hours
-    // ==============================================
-
     let totalHours = null;
-    let totalHoursFormatted = "0 minutes";
+    let totalHoursFormatted =
+        "0 minutes";
 
 
     if (
@@ -2218,17 +2340,17 @@ const updateAttendance = async (
             checkInMinutes;
 
 
-        // ==========================================
-        // Overnight shift
-        // ==========================================
-
-        if (durationMinutes < 0) {
-
-            durationMinutes += 24 * 60;
+        if (
+            durationMinutes < 0
+        ) {
+            durationMinutes +=
+                24 * 60;
         }
 
 
-        if (durationMinutes > 0) {
+        if (
+            durationMinutes > 0
+        ) {
 
             totalHours =
                 Number(
@@ -2246,17 +2368,12 @@ const updateAttendance = async (
     }
 
 
-    // ==============================================
-    // Prepare update
-    // ==============================================
-
     const updateData = {};
 
 
     if (
         checkInTime !== undefined
     ) {
-
         updateData.checkInTime =
             newCheckInTime;
     }
@@ -2265,7 +2382,6 @@ const updateAttendance = async (
     if (
         checkOutTime !== undefined
     ) {
-
         updateData.checkOutTime =
             newCheckOutTime;
     }
@@ -2275,7 +2391,6 @@ const updateAttendance = async (
         checkInTime !== undefined ||
         checkOutTime !== undefined
     ) {
-
         updateData.totalHours =
             totalHours;
     }
@@ -2292,9 +2407,10 @@ const updateAttendance = async (
 
 
         if (
-            !allowedStatuses.includes(status)
+            !allowedStatuses.includes(
+                status
+            )
         ) {
-
             const error = new Error(
                 "Invalid attendance status"
             );
@@ -2305,38 +2421,26 @@ const updateAttendance = async (
         }
 
 
-        updateData.status = status;
+        updateData.status =
+            status;
     }
 
 
-    // ==============================================
-    // Update attendance
-    // ==============================================
-
     const updatedAttendance =
         await prisma.attendance.update({
-
             where: {
-
                 attendanceId: id
             },
 
             data: updateData,
 
             include: {
-
                 employee: {
-
                     select: {
-
                         employeeId: true,
-
                         firstName: true,
-
                         lastName: true,
-
                         email: true,
-
                         status: true
                     }
                 }
@@ -2344,14 +2448,11 @@ const updateAttendance = async (
         });
 
 
-    // ==============================================
-    // Return result
-    // ==============================================
-
     return {
-
         attendance:
-            updatedAttendance,
+            serializeAttendance(
+                updatedAttendance
+            ),
 
         totalHours,
 
@@ -2364,12 +2465,12 @@ const updateAttendance = async (
     };
 };
 
+
 // ======================================================
 // EXPORT
 // ======================================================
 
 module.exports = {
-
     processDevicePunch,
 
     getAllAttendance,
@@ -2387,5 +2488,4 @@ module.exports = {
     getEmployeeAttendanceSummary,
 
     updateAttendance
-
 };

@@ -18,16 +18,12 @@ const authorizeRoles =
 const authenticateDevice =
     require("../middleware/deviceAuth.middleware");
 
-const router = express.Router();
+const router =
+    express.Router();
 
 
 // ======================================================
 // DEVICE ATTENDANCE PUNCH
-// ======================================================
-// POST /api/attendance/punch
-//
-// This endpoint is used by the fingerprint device.
-// Device authentication will be added later.
 // ======================================================
 
 router.post(
@@ -46,6 +42,19 @@ router.post(
 router.use(
     authenticate,
     authorizeRoles("ADMIN")
+);
+
+
+// ======================================================
+// LIVE ATTENDANCE
+// ======================================================
+
+// GET /api/attendance/live
+router.get(
+    "/live",
+    asyncHandler(
+        attendanceController.getLiveAttendance
+    )
 );
 
 
@@ -114,7 +123,7 @@ router.get(
 // DAILY ATTENDANCE SUMMARY
 // ======================================================
 
-// GET /api/attendance/summary?date=YYYY-MM-DD
+// GET /api/attendance/summary
 router.get(
     "/summary",
     asyncHandler(
@@ -135,12 +144,12 @@ router.get(
     )
 );
 
+
 // ======================================================
 // ADMIN ATTENDANCE CORRECTION
 // ======================================================
 
 // PUT /api/attendance/:id
-
 router.put(
     "/:id",
     asyncHandler(
@@ -157,10 +166,5 @@ router.get(
     )
 );
 
-
-
-// ======================================================
-// EXPORT ROUTER
-// ======================================================
 
 module.exports = router;

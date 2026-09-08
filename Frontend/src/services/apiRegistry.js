@@ -153,6 +153,7 @@ const API = {
 
         // GET /api/attendance
         list: "/api/attendance",
+        live: "/api/attendance/live",
 
         // GET /api/attendance/:id
         get: (id) =>

@@ -493,6 +493,20 @@ export const attendanceService = {
         return unwrap(response);
     },
 
+    live: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.attendance.live,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
 
     // --------------------------------------------------------
     // GET /api/attendance/:id

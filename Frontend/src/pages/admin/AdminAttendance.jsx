@@ -1,5 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
-import { CalendarCheck, Download } from 'lucide-react';
+import {
+  useState,
+  useEffect,
+  useMemo,
+} from 'react';
+
+import {
+  CalendarCheck,
+  Download,
+  RefreshCw,
+} from 'lucide-react';
 
 import {
   PageHeader,
@@ -7,93 +16,339 @@ import {
 } from '@/components/ui/PageComponents';
 
 import { StatusBadge } from '@/components/ui/Badge';
-import { FullPageSpinner } from '@/components/ui/Spinner';
-import { EmptyState } from '@/components/ui/EmptyState';
+
+import {
+  FullPageSpinner,
+} from '@/components/ui/Spinner';
+
+import {
+  EmptyState,
+} from '@/components/ui/EmptyState';
+
 import {
   SearchInput,
   Select,
 } from '@/components/ui/Form';
 
-import { attendanceService } from '@/services/apiServices';
+import {
+  attendanceService,
+} from '@/services/apiServices';
 
+
+// ============================================================
+// ADMIN ATTENDANCE
+// ============================================================
 
 export function AdminAttendance() {
 
+  const [records, setRecords] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [refreshing, setRefreshing] =
+    useState(false);
+
+  const [search, setSearch] =
+    useState('');
+
+  const [statusFilter, setStatusFilter] =
+    useState('');
+
+  const [dateFilter, setDateFilter] =
+    useState('');
+
+
   // ============================================================
-  // STATE
+  // FORMAT DATE
+  // ============================================================
+  //
+  // Backend now returns:
+  //
+  // YYYY-MM-DD
+  //
+  // Therefore we DO NOT use:
+  //
+  // new Date(dateString)
+  //
+  // because that can introduce timezone shifts.
   // ============================================================
 
-  const [records, setRecords] = useState([]);
+  const formatDate = (dateValue) => {
 
-  const [loading, setLoading] = useState(true);
+    if (!dateValue) {
+      return '--';
+    }
 
-  const [search, setSearch] = useState('');
 
-  const [statusFilter, setStatusFilter] = useState('');
+    // Backend format:
+    // YYYY-MM-DD
 
-  const [dateFilter, setDateFilter] = useState('');
+    if (
+      typeof dateValue === 'string' &&
+      /^\d{4}-\d{2}-\d{2}$/.test(
+        dateValue
+      )
+    ) {
+
+      const [
+        year,
+        month,
+        day
+      ] =
+        dateValue.split('-');
+
+
+      return `${day}/${month}/${year}`;
+    }
+
+
+    // Fallback for old API data
+
+    const date =
+      new Date(dateValue);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '--';
+    }
+
+
+    return date.toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }
+    );
+  };
 
 
   // ============================================================
-  // FETCH ATTENDANCE
+  // FORMAT TIME
+  // ============================================================
+  //
+  // Backend now returns:
+  //
+  // HH:mm:ss
+  //
+  // We treat it as a CLOCK TIME, not a DateTime.
   // ============================================================
 
-  useEffect(() => {
+  const formatTime = (timeValue) => {
 
-    const loadAttendance = async () => {
+    if (!timeValue) {
+      return '--';
+    }
 
-      try {
 
+    // ==========================================
+    // New API format
+    // HH:mm:ss
+    // ==========================================
+
+    if (
+      typeof timeValue === 'string' &&
+      /^\d{2}:\d{2}(:\d{2})?$/.test(
+        timeValue
+      )
+    ) {
+
+      const parts =
+        timeValue.split(':');
+
+      const hours =
+        Number(parts[0]);
+
+      const minutes =
+        Number(parts[1]);
+
+
+      if (
+        Number.isNaN(hours) ||
+        Number.isNaN(minutes)
+      ) {
+        return '--';
+      }
+
+
+      const date =
+        new Date();
+
+      date.setHours(
+        hours,
+        minutes,
+        0,
+        0
+      );
+
+
+      return date.toLocaleTimeString(
+        'en-IN',
+        {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        }
+      );
+    }
+
+
+    // ==========================================
+    // Fallback for old API response
+    // ==========================================
+
+    const date =
+      new Date(timeValue);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '--';
+    }
+
+
+    return date.toLocaleTimeString(
+      'en-IN',
+      {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      }
+    );
+  };
+
+
+  // ============================================================
+  // DATE FILTER VALUE
+  // ============================================================
+
+  const getDateForFilter = (
+    dateValue
+  ) => {
+
+    if (!dateValue) {
+      return '';
+    }
+
+
+    // New backend format
+
+    if (
+      typeof dateValue === 'string' &&
+      /^\d{4}-\d{2}-\d{2}$/.test(
+        dateValue
+      )
+    ) {
+      return dateValue;
+    }
+
+
+    // Fallback
+
+    const date =
+      new Date(dateValue);
+
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return '';
+    }
+
+
+    const year =
+      date.getFullYear();
+
+    const month =
+      String(
+        date.getMonth() + 1
+      ).padStart(2, '0');
+
+    const day =
+      String(
+        date.getDate()
+      ).padStart(2, '0');
+
+
+    return `${year}-${month}-${day}`;
+  };
+
+
+  // ============================================================
+  // LOAD ATTENDANCE
+  // ============================================================
+
+  const loadAttendance = async (
+    showRefresh = false
+  ) => {
+
+    try {
+
+      if (showRefresh) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
-
-        const response =
-          await attendanceService.list();
-
-        console.log(
-          'Attendance API response:',
-          response
-        );
+      }
 
 
-        /*
-         * Backend response:
-         *
-         * {
-         *   success: true,
-         *   message: "...",
-         *   data: [...]
-         * }
-         */
-
-        const apiData =
-          Array.isArray(response)
-            ? response
-            : Array.isArray(response?.data)
-              ? response.data
-              : [];
+      const response =
+        await attendanceService.list();
 
 
-        /*
-         * Convert backend response into a
-         * frontend-friendly structure.
-         */
+      console.log(
+        'Attendance API response:',
+        response
+      );
 
-        const normalizedRecords =
-          apiData.map((record) => {
+
+      // ========================================================
+      // EXTRACT DATA
+      // ========================================================
+
+      const apiData =
+        Array.isArray(response)
+          ? response
+          : Array.isArray(
+              response?.data
+            )
+            ? response.data
+            : [];
+
+
+      // ========================================================
+      // NORMALIZE
+      // ========================================================
+
+      const normalizedRecords =
+        apiData.map(
+          (record) => {
 
             const firstName =
-              record.employee?.firstName || '';
+              record.employee?.firstName ||
+              '';
 
             const lastName =
-              record.employee?.lastName || '';
-
+              record.employee?.lastName ||
+              '';
 
             const employeeName =
-              `${firstName} ${lastName}`.trim();
+              `${firstName} ${lastName}`
+                .trim();
 
 
             return {
-
               attendanceId:
                 record.attendanceId,
 
@@ -105,10 +360,12 @@ export function AdminAttendance() {
                 `Employee ${record.employeeId}`,
 
               employeeEmail:
-                record.employee?.email || '',
+                record.employee?.email ||
+                '',
 
               employeeStatus:
-                record.employee?.status || '',
+                record.employee?.status ||
+                '',
 
               date:
                 record.date,
@@ -130,261 +387,121 @@ export function AdminAttendance() {
 
               updatedAt:
                 record.updatedAt,
-
             };
-
-          });
-
-
-        console.log(
-          'Normalized attendance records:',
-          normalizedRecords
+          }
         );
 
 
-        setRecords(normalizedRecords);
-
-      }
-
-      catch (error) {
-
-        console.error(
-          'Failed to fetch attendance:',
-          error
-        );
-
-        /*
-         * IMPORTANT:
-         *
-         * Do NOT use mockAttendance here.
-         *
-         * If the API fails, show an empty state
-         * instead of displaying fake data.
-         */
-
-        setRecords([]);
-
-      }
-
-      finally {
-
-        setLoading(false);
-
-      }
-
-    };
+      console.log(
+        'Normalized attendance records:',
+        normalizedRecords
+      );
 
 
+      setRecords(
+        normalizedRecords
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Failed to fetch attendance:',
+        error
+      );
+
+      setRecords([]);
+
+    } finally {
+
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+
+  // ============================================================
+  // INITIAL LOAD
+  // ============================================================
+
+  useEffect(() => {
     loadAttendance();
-
   }, []);
-
-
-  // ============================================================
-  // FORMAT DATE
-  // ============================================================
-
-  const formatDate = (dateString) => {
-
-    if (!dateString) {
-      return '--';
-    }
-
-
-    const date =
-      new Date(dateString);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
-      return '--';
-
-    }
-
-
-    return date.toLocaleDateString(
-      'en-GB',
-      {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }
-    );
-
-  };
-
-
-  // ============================================================
-  // FORMAT TIME
-  // ============================================================
-
-  const formatTime = (timeString) => {
-
-    if (!timeString) {
-      return '--';
-    }
-
-
-    const date =
-      new Date(timeString);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
-      return '--';
-
-    }
-
-
-    return date.toLocaleTimeString(
-      'en-IN',
-      {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      }
-    );
-
-  };
-
-
-  // ============================================================
-  // GET DATE FOR FILTER
-  // ============================================================
-
-  const getDateForFilter = (dateString) => {
-
-    if (!dateString) {
-      return '';
-    }
-
-
-    const date =
-      new Date(dateString);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
-      return '';
-
-    }
-
-
-    const year =
-      date.getFullYear();
-
-
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, '0');
-
-
-    const day =
-      String(
-        date.getDate()
-      ).padStart(2, '0');
-
-
-    return `${year}-${month}-${day}`;
-
-  };
 
 
   // ============================================================
   // FILTER RECORDS
   // ============================================================
 
-  const filtered = useMemo(() => {
+  const filtered =
+    useMemo(() => {
 
-    const searchValue =
-      search
-        .trim()
-        .toLowerCase();
+      return records.filter(
+        (record) => {
 
+          // ========================================
+          // SEARCH
+          // ========================================
 
-    return records.filter((record) => {
-
-
-      // --------------------------------------------------------
-      // SEARCH
-      // --------------------------------------------------------
-
-      const employeeName =
-        record.employeeName
-          ?.toLowerCase() || '';
+          const searchValue =
+            search
+              .trim()
+              .toLowerCase();
 
 
-      const employeeId =
-        String(
-          record.employeeId ?? ''
-        ).toLowerCase();
+          const matchSearch =
+            !searchValue ||
+
+            record.employeeName
+              ?.toLowerCase()
+              .includes(
+                searchValue
+              ) ||
+
+            String(
+              record.employeeId
+            )
+              .toLowerCase()
+              .includes(
+                searchValue
+              );
 
 
-      const employeeEmail =
-        record.employeeEmail
-          ?.toLowerCase() || '';
+          // ========================================
+          // STATUS
+          // ========================================
+
+          const matchStatus =
+            !statusFilter ||
+            record.status ===
+              statusFilter;
 
 
-      const matchSearch =
-        !searchValue ||
-        employeeName.includes(
-          searchValue
-        ) ||
-        employeeId.includes(
-          searchValue
-        ) ||
-        employeeEmail.includes(
-          searchValue
-        );
+          // ========================================
+          // DATE
+          // ========================================
+
+          const matchDate =
+            !dateFilter ||
+
+            getDateForFilter(
+              record.date
+            ) === dateFilter;
 
 
-      // --------------------------------------------------------
-      // STATUS
-      // --------------------------------------------------------
-
-      const matchStatus =
-        !statusFilter ||
-        record.status === statusFilter;
-
-
-      // --------------------------------------------------------
-      // DATE
-      // --------------------------------------------------------
-
-      const matchDate =
-        !dateFilter ||
-        getDateForFilter(
-          record.date
-        ) === dateFilter;
-
-
-      return (
-        matchSearch &&
-        matchStatus &&
-        matchDate
+          return (
+            matchSearch &&
+            matchStatus &&
+            matchDate
+          );
+        }
       );
 
-    });
-
-  }, [
-    records,
-    search,
-    statusFilter,
-    dateFilter,
-  ]);
+    }, [
+      records,
+      search,
+      statusFilter,
+      dateFilter,
+    ]);
 
 
   // ============================================================
@@ -393,98 +510,81 @@ export function AdminAttendance() {
 
   const handleExport = () => {
 
-    /*
-     * IMPORTANT:
-     *
-     * This function is INSIDE the component,
-     * therefore it can access `filtered`.
-     */
-
-    if (!filtered || filtered.length === 0) {
-
+    if (
+      filtered.length === 0
+    ) {
       alert(
         'No attendance records available to export.'
       );
 
       return;
-
     }
 
 
-    // ----------------------------------------------------------
-    // CSV HEADERS
-    // ----------------------------------------------------------
-
     const headers = [
-
-      'Attendance ID',
-
       'Employee ID',
-
       'Employee Name',
-
       'Email',
-
       'Date',
-
       'Check In',
-
       'Check Out',
-
       'Total Hours',
-
       'Status',
-
     ];
 
 
-    // ----------------------------------------------------------
-    // CSV ROWS
-    // ----------------------------------------------------------
-
     const rows =
-      filtered.map((record) => [
+      filtered.map(
+        (record) => [
 
-        record.attendanceId ?? '',
+          record.employeeId,
 
-        record.employeeId ?? '',
+          record.employeeName ||
+            '',
 
-        record.employeeName ?? '',
+          record.employeeEmail ||
+            '',
 
-        record.employeeEmail ?? '',
+          formatDate(
+            record.date
+          ),
 
-        formatDate(record.date),
+          formatTime(
+            record.checkInTime
+          ),
 
-        formatTime(record.checkInTime),
+          formatTime(
+            record.checkOutTime
+          ),
 
-        formatTime(record.checkOutTime),
+          record.totalHours !==
+            null &&
+          record.totalHours !==
+            undefined
+            ? Number(
+                record.totalHours
+              ).toFixed(2)
+            : '',
 
-        record.totalHours !== null &&
-        record.totalHours !== undefined &&
-        record.totalHours !== ''
-          ? Number(
-              record.totalHours
-            ).toFixed(2)
-          : '',
-
-        record.status ?? '',
-
-      ]);
+          record.status ||
+            '',
+        ]
+      );
 
 
-    // ----------------------------------------------------------
-    // ESCAPE CSV VALUES
-    // ----------------------------------------------------------
+    // ========================================================
+    // CSV ESCAPE
+    // ========================================================
 
-    const escapeCsvValue = (value) => {
+    const escapeCsvValue = (
+      value
+    ) => {
 
       if (
         value === null ||
         value === undefined
       ) {
-
         return '';
-
       }
 
 
@@ -492,86 +592,69 @@ export function AdminAttendance() {
         String(value);
 
 
-      /*
-       * If value contains comma,
-       * quotation mark or newline,
-       * wrap it inside quotes.
-       */
-
       if (
         stringValue.includes(',') ||
         stringValue.includes('"') ||
-        stringValue.includes('\n') ||
-        stringValue.includes('\r')
+        stringValue.includes('\n')
       ) {
 
         return `"${stringValue.replace(
           /"/g,
           '""'
         )}"`;
-
       }
 
 
       return stringValue;
-
     };
 
 
-    // ----------------------------------------------------------
-    // CREATE CSV
-    // ----------------------------------------------------------
-
     const csvContent = [
-
       headers
-        .map(escapeCsvValue)
+        .map(
+          escapeCsvValue
+        )
         .join(','),
 
-      ...rows.map((row) =>
-        row
-          .map(escapeCsvValue)
-          .join(',')
+      ...rows.map(
+        (row) =>
+          row
+            .map(
+              escapeCsvValue
+            )
+            .join(',')
       ),
 
     ].join('\n');
 
 
-    // ----------------------------------------------------------
-    // CREATE FILE
-    // ----------------------------------------------------------
-
-    /*
-     * UTF-8 BOM makes Excel handle
-     * the CSV correctly.
-     */
-
-    const blob = new Blob(
-      [
-        '\uFEFF' +
-        csvContent
-      ],
-      {
-        type:
-          'text/csv;charset=utf-8;',
-      }
-    );
+    const blob =
+      new Blob(
+        [
+          '\uFEFF' +
+            csvContent
+        ],
+        {
+          type:
+            'text/csv;charset=utf-8;',
+        }
+      );
 
 
     const url =
-      URL.createObjectURL(blob);
+      URL.createObjectURL(
+        blob
+      );
 
 
     const link =
-      document.createElement('a');
+      document.createElement(
+        'a'
+      );
 
 
     link.href = url;
 
-
-    // ----------------------------------------------------------
-    // FILE NAME
-    // ----------------------------------------------------------
 
     const today =
       new Date()
@@ -583,272 +666,23 @@ export function AdminAttendance() {
       `attendance_${today}.csv`;
 
 
-    // ----------------------------------------------------------
-    // DOWNLOAD
-    // ----------------------------------------------------------
+    document.body.appendChild(
+      link
+    );
 
-    document.body.appendChild(link);
 
     link.click();
 
-    document.body.removeChild(link);
+
+    document.body.removeChild(
+      link
+    );
 
 
-    // Release browser memory
-
-    URL.revokeObjectURL(url);
-
+    URL.revokeObjectURL(
+      url
+    );
   };
-
-
-  // ============================================================
-  // TABLE COLUMNS
-  // ============================================================
-
-  const columns = [
-
-    // ----------------------------------------------------------
-    // EMPLOYEE ID
-    // ----------------------------------------------------------
-
-    {
-      key: 'employeeId',
-
-      label: 'Emp ID',
-
-      render: (record) => (
-
-        <span
-          className="
-            font-mono
-            text-xs
-            font-semibold
-            text-navy-600
-          "
-        >
-
-          {record.employeeId}
-
-        </span>
-
-      ),
-
-    },
-
-
-    // ----------------------------------------------------------
-    // EMPLOYEE
-    // ----------------------------------------------------------
-
-    {
-      key: 'employeeName',
-
-      label: 'Employee',
-
-      render: (record) => (
-
-        <div>
-
-          <span
-            className="
-              font-medium
-              text-navy-900
-            "
-          >
-
-            {record.employeeName || '--'}
-
-          </span>
-
-
-          {record.employeeEmail && (
-
-            <div
-              className="
-                text-xs
-                text-navy-400
-                mt-1
-              "
-            >
-
-              {record.employeeEmail}
-
-            </div>
-
-          )}
-
-        </div>
-
-      ),
-
-    },
-
-
-    // ----------------------------------------------------------
-    // DATE
-    // ----------------------------------------------------------
-
-    {
-      key: 'date',
-
-      label: 'Date',
-
-      render: (record) => (
-
-        <span
-          className="
-            text-navy-600
-          "
-        >
-
-          {formatDate(
-            record.date
-          )}
-
-        </span>
-
-      ),
-
-    },
-
-
-    // ----------------------------------------------------------
-    // CHECK IN
-    // ----------------------------------------------------------
-
-    {
-      key: 'checkInTime',
-
-      label: 'Check In',
-
-      align: 'center',
-
-      render: (record) => (
-
-        <span
-          className={`
-            font-mono
-            ${
-              record.checkInTime
-                ? 'text-navy-700'
-                : 'text-navy-300'
-            }
-          `}
-        >
-
-          {formatTime(
-            record.checkInTime
-          )}
-
-        </span>
-
-      ),
-
-    },
-
-
-    // ----------------------------------------------------------
-    // CHECK OUT
-    // ----------------------------------------------------------
-
-    {
-      key: 'checkOutTime',
-
-      label: 'Check Out',
-
-      align: 'center',
-
-      render: (record) => (
-
-        <span
-          className={`
-            font-mono
-            ${
-              record.checkOutTime
-                ? 'text-navy-700'
-                : 'text-navy-300'
-            }
-          `}
-        >
-
-          {formatTime(
-            record.checkOutTime
-          )}
-
-        </span>
-
-      ),
-
-    },
-
-
-    // ----------------------------------------------------------
-    // HOURS
-    // ----------------------------------------------------------
-
-    {
-      key: 'totalHours',
-
-      label: 'Hours',
-
-      align: 'right',
-
-      render: (record) => {
-
-        const hours =
-          Number(
-            record.totalHours
-          );
-
-
-        const validHours =
-          Number.isFinite(hours);
-
-
-        return (
-
-          <span
-            className="
-              font-semibold
-              text-navy-700
-            "
-          >
-
-            {validHours
-              ? `${hours.toFixed(2)}h`
-              : '--'}
-
-          </span>
-
-        );
-
-      },
-
-    },
-
-
-    // ----------------------------------------------------------
-    // STATUS
-    // ----------------------------------------------------------
-
-    {
-      key: 'status',
-
-      label: 'Status',
-
-      align: 'center',
-
-      render: (record) => (
-
-        <StatusBadge
-          status={record.status}
-        />
-
-      ),
-
-    },
-
-  ];
 
 
   // ============================================================
@@ -858,13 +692,10 @@ export function AdminAttendance() {
   if (loading) {
 
     return (
-
       <FullPageSpinner
         message="Loading attendance..."
       />
-
     );
-
   }
 
 
@@ -873,101 +704,82 @@ export function AdminAttendance() {
   // ============================================================
 
   return (
-
     <div>
 
-
-      {/* ======================================================
-          PAGE HEADER
-      ====================================================== */}
-
       <PageHeader
-
         title="Attendance"
-
-        subtitle={`
-          ${filtered.length}
-          record${filtered.length !== 1 ? 's' : ''}
-        `}
-
+        subtitle={`${filtered.length} record${
+          filtered.length !== 1
+            ? 's'
+            : ''
+        }`}
         actions={
 
-          <button
+          <div className="flex items-center gap-2">
 
-            type="button"
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() =>
+                loadAttendance(true)
+              }
+              disabled={refreshing}
+            >
+              <RefreshCw
+                size={18}
+                className={
+                  refreshing
+                    ? 'animate-spin'
+                    : ''
+                }
+              />
 
-            className="
-              btn-secondary
-              flex
-              items-center
-              gap-2
-            "
+              Refresh
+            </button>
 
-            onClick={handleExport}
 
-            disabled={
-              filtered.length === 0
-            }
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={
+                handleExport
+              }
+              disabled={
+                filtered.length === 0
+              }
+            >
+              <Download
+                size={18}
+              />
 
-          >
+              Export
+            </button>
 
-            <Download
-              size={18}
-            />
-
-            Export
-
-          </button>
-
+          </div>
         }
-
       />
 
 
-      {/* ======================================================
+      {/* ========================================================
           FILTERS
-      ====================================================== */}
+      ======================================================== */}
 
-      <div
-        className="
-          grid
-          grid-cols-1
-          sm:grid-cols-3
-          gap-3
-          mb-5
-        "
-      >
-
-
-        {/* ----------------------------------------------------
-            SEARCH
-        ---------------------------------------------------- */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
 
         <SearchInput
-
           value={search}
-
           onChange={setSearch}
-
           placeholder="Search employee..."
-
         />
 
 
-        {/* ----------------------------------------------------
-            STATUS
-        ---------------------------------------------------- */}
-
         <Select
-
           value={statusFilter}
-
-          onChange={setStatusFilter}
-
+          onChange={
+            setStatusFilter
+          }
           placeholder="All Statuses"
-
           options={[
-
             {
               value: 'PRESENT',
               label: 'Present',
@@ -987,69 +799,229 @@ export function AdminAttendance() {
               value: 'ON_LEAVE',
               label: 'On Leave',
             },
-
           ]}
-
         />
 
 
-        {/* ----------------------------------------------------
-            DATE
-        ---------------------------------------------------- */}
-
         <input
-
           type="date"
-
           className="input-field"
-
           value={dateFilter}
-
-          onChange={(event) =>
+          onChange={(e) =>
             setDateFilter(
-              event.target.value
+              e.target.value
             )
           }
-
         />
 
       </div>
 
 
-      {/* ======================================================
+      {/* ========================================================
           TABLE / EMPTY STATE
-      ====================================================== */}
+      ======================================================== */}
 
       {filtered.length === 0 ? (
 
         <EmptyState
-
           icon={CalendarCheck}
-
           title="No attendance records"
-
           message={
             records.length === 0
               ? 'No attendance records are available.'
               : 'No records match your filters.'
           }
-
         />
 
       ) : (
 
         <DataTable
+          columns={[
+            {
+              key: 'employeeId',
+              label: 'Emp ID',
 
-          columns={columns}
+              render: (
+                record
+              ) => (
 
+                <span className="font-mono text-xs font-semibold text-navy-600">
+                  {
+                    record.employeeId
+                  }
+                </span>
+
+              ),
+            },
+
+
+            {
+              key: 'employeeName',
+              label: 'Employee',
+
+              render: (
+                record
+              ) => (
+
+                <div>
+
+                  <span className="font-medium text-navy-900">
+                    {
+                      record.employeeName ||
+                      '--'
+                    }
+                  </span>
+
+
+                  {record.employeeEmail && (
+
+                    <div className="text-xs text-navy-400 mt-1">
+                      {
+                        record.employeeEmail
+                      }
+                    </div>
+
+                  )}
+
+                </div>
+
+              ),
+            },
+
+
+            {
+              key: 'date',
+              label: 'Date',
+
+              render: (
+                record
+              ) => (
+
+                <span className="text-navy-600">
+                  {
+                    formatDate(
+                      record.date
+                    )
+                  }
+                </span>
+
+              ),
+            },
+
+
+            {
+              key: 'checkInTime',
+              label: 'Check In',
+              align: 'center',
+
+              render: (
+                record
+              ) => (
+
+                <span
+                  className={`font-mono ${
+                    record.checkInTime
+                      ? 'text-navy-700'
+                      : 'text-navy-300'
+                  }`}
+                >
+                  {
+                    formatTime(
+                      record.checkInTime
+                    )
+                  }
+                </span>
+
+              ),
+            },
+
+
+            {
+              key: 'checkOutTime',
+              label: 'Check Out',
+              align: 'center',
+
+              render: (
+                record
+              ) => (
+
+                <span
+                  className={`font-mono ${
+                    record.checkOutTime
+                      ? 'text-navy-700'
+                      : 'text-navy-300'
+                  }`}
+                >
+                  {
+                    formatTime(
+                      record.checkOutTime
+                    )
+                  }
+                </span>
+
+              ),
+            },
+
+
+            {
+              key: 'totalHours',
+              label: 'Hours',
+              align: 'right',
+
+              render: (
+                record
+              ) => {
+
+                const hours =
+                  Number(
+                    record.totalHours
+                  );
+
+
+                return (
+
+                  <span className="font-semibold text-navy-700">
+
+                    {!Number.isNaN(
+                      hours
+                    ) &&
+                    hours > 0
+                      ? `${hours.toFixed(
+                          2
+                        )}h`
+                      : '--'}
+
+                  </span>
+
+                );
+              },
+            },
+
+
+            {
+              key: 'status',
+              label: 'Status',
+              align: 'center',
+
+              render: (
+                record
+              ) => (
+
+                <StatusBadge
+                  status={
+                    record.status
+                  }
+                />
+
+              ),
+            },
+
+          ]}
           data={filtered}
-
         />
 
       )}
 
     </div>
-
   );
-
 }

@@ -1018,34 +1018,111 @@ bool enrollFingerprint(
   // cannot accidentally reuse the same physical finger.
   waitForFingerRemoval(5000);
 
-  if (!verified) {
-    /*
-     * IMPORTANT:
-     * The template is already stored in the physical sensor. The caller
-     * must know that a physical template exists even if verification failed.
-     */
-    if (errorMessageOut.length() == 0) {
-      errorMessageOut =
-        "Fingerprint verification failed after the template was saved.";
+    if (!verified) {
+      /*
+      * Verification failed after the template was physically stored.
+      *
+      * IMPORTANT:
+      * A fingerprint is considered successfully enrolled only when
+      * both storage and verification succeed.
+      *
+      * Therefore, remove the physical template before reporting
+      * enrollment failure to the backend.
+      */
+
+      if (errorMessageOut.length() == 0) {
+        errorMessageOut =
+          "Fingerprint verification failed after the template was saved.";
+      }
+
+      Serial.println();
+      Serial.println("====================================");
+      Serial.println(" VERIFICATION FAILED");
+      Serial.println(" CLEANING UP SENSOR SLOT");
+      Serial.println("====================================");
+
+      reportEnrollmentLog(
+        "Verification failed. Removing the physical fingerprint template from sensor slot " +
+        String(sensorSlot) + "..."
+      );
+
+      // Make sure the template still exists before attempting deletion.
+      uint8_t loadResult = finger.loadModel(sensorSlot);
+
+      if (loadResult == FINGERPRINT_OK) {
+        uint8_t deleteResult = finger.deleteModel(sensorSlot);
+
+        Serial.print("deleteModel() result code: ");
+        Serial.println(deleteResult);
+
+        if (deleteResult == FINGERPRINT_OK) {
+          Serial.println(
+            "Physical fingerprint template deleted successfully."
+          );
+
+          reportEnrollmentLog(
+            "Physical fingerprint template removed successfully from sensor slot " +
+            String(sensorSlot) + "."
+          );
+
+          showOLED(
+            "Enrollment Failed",
+            "Template Removed",
+            "Try Again"
+          );
+        } else {
+          /*
+          * Cleanup failed.
+          *
+          * This is important enough to make the failure explicit because
+          * the sensor may still contain an orphaned template.
+          */
+          errorMessageOut +=
+            " Physical sensor cleanup FAILED. Sensor slot " +
+            String(sensorSlot) +
+            " may still contain the fingerprint.";
+
+          Serial.println(
+            "CRITICAL: Failed to delete physical fingerprint template."
+          );
+
+          reportEnrollmentLog(
+            "CRITICAL: Could not remove physical fingerprint template from sensor slot " +
+            String(sensorSlot) +
+            ". Manual cleanup may be required."
+          );
+
+          showOLED(
+            "Cleanup Failed",
+            "Slot: " + String(sensorSlot),
+            "Manual Check"
+          );
+        }
+      } else {
+        /*
+        * The sensor did not confirm that the slot contains a model.
+        * Do not blindly call deleteModel().
+        */
+        Serial.print(
+          "Could not confirm stored template before cleanup. Sensor code: "
+        );
+        Serial.println(loadResult);
+
+        errorMessageOut +=
+          " Could not confirm the stored template for cleanup. Sensor slot " +
+          String(sensorSlot) +
+          " must be checked manually.";
+
+        reportEnrollmentLog(
+          "CRITICAL: Could not confirm the physical template before cleanup. " +
+          String(sensorSlot)
+        );
+      }
+
+      errorSignal();
+
+      return false;
     }
-
-    Serial.println("New fingerprint could not be verified.");
-
-    showOLED(
-      "Enrollment Warning",
-      "Template Saved",
-      "Verification Failed"
-    );
-
-    reportEnrollmentLog(
-      "WARNING: Template is physically saved, but verification failed. " +
-      errorMessageOut
-    );
-
-    errorSignal();
-
-    return false;
-  }
 
   reportEnrollmentLog(
     "Fingerprint enrollment and verification completed successfully."
