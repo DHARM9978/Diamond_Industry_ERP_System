@@ -86,8 +86,8 @@ model Employee {
   department             Department?             @relation("EmployeeDepartment", fields: [departmentId], references: [departmentId])
   manager                Employee?               @relation("EmployeeManager", fields: [managerId], references: [employeeId])
   subordinates           Employee[]              @relation("EmployeeManager")
-  fingerprintTemplates   FingerprintTemplate[]
   fingerprintEnrollments FingerprintEnrollment[]
+  fingerprintTemplates   FingerprintTemplate[]
   leaveBalances          LeaveBalance[]
   leaveRequests          LeaveRequest[]
   payrolls               Payroll[]
@@ -352,8 +352,7 @@ model FingerprintEnrollment {
   completedAt  DateTime? @map("completed_at")
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
-
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
+  employee     Employee  @relation(fields: [employeeId], references: [employeeId])
 
   @@index([employeeId])
   @@index([status])

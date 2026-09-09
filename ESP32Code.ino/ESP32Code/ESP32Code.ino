@@ -1147,27 +1147,42 @@ bool enrollFingerprint(
 // ============================================================
 
 bool fetchPendingEnrollment(EnrollmentJob& job) {
+  // Always start with a clean job object.
   job.valid = false;
+  job.enrollmentId = 0;
+  job.employeeId = 0;
+  job.sensorSlot = 0;
+  job.fingerName = "";
+
+  Serial.println();
+  Serial.println("----------------------------------------");
+  Serial.println("ENROLLMENT POLL START");
+  Serial.println("----------------------------------------");
 
   if (!backendConfigured()) {
+    Serial.println("Enrollment poll stopped: backend configuration is invalid.");
     return false;
   }
 
   if (!ensureWiFi()) {
+    Serial.println("Enrollment poll stopped: Wi-Fi is not connected.");
     return false;
   }
+
+  Serial.print("ESP32 IP: ");
+  Serial.println(WiFi.localIP());
 
   HTTPClient http;
   String url = makeUrl(ENROLLMENT_PENDING_ENDPOINT);
 
-  Serial.print("Checking enrollment queue: ");
+  Serial.print("GET: ");
   Serial.println(url);
 
   http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
   http.setTimeout(HTTP_TIMEOUT);
 
   if (!http.begin(url)) {
-    Serial.println("HTTP begin failed for enrollment queue.");
+    Serial.println("ERROR: HTTP begin failed for enrollment queue.");
     return false;
   }
 
@@ -1179,19 +1194,28 @@ bool fetchPendingEnrollment(EnrollmentJob& job) {
   Serial.println(httpCode);
 
   if (httpCode <= 0) {
-    Serial.print("Enrollment queue request failed: ");
+    Serial.print("ERROR: Enrollment queue request failed: ");
     Serial.println(http.errorToString(httpCode));
     http.end();
     return false;
   }
 
   String response = http.getString();
-  http.end();
 
   Serial.println("Enrollment queue response:");
   Serial.println(response);
 
+  // Authentication failures are different from an empty queue.
+  if (httpCode == 401 || httpCode == 403) {
+    Serial.println("ERROR: Device authentication was rejected by the backend.");
+    Serial.println("Check x-device-code / x-device-secret and the registered device.");
+    http.end();
+    return false;
+  }
+
   if (httpCode < 200 || httpCode >= 300) {
+    Serial.println("ERROR: Backend returned a non-success HTTP status.");
+    http.end();
     return false;
   }
 
@@ -1199,21 +1223,27 @@ bool fetchPendingEnrollment(EnrollmentJob& job) {
   DeserializationError error = deserializeJson(doc, response);
 
   if (error) {
-    Serial.print("Could not parse enrollment queue JSON: ");
+    Serial.print("ERROR: Could not parse enrollment queue JSON: ");
     Serial.println(error.c_str());
+    http.end();
     return false;
   }
 
   bool success = doc["success"] | false;
 
   if (!success) {
-    Serial.println("Backend returned success=false for enrollment queue.");
+    Serial.println("ERROR: Backend returned success=false for enrollment queue.");
+    http.end();
     return false;
   }
 
   JsonVariant data = doc["data"];
 
+  // This is the normal state when no admin enrollment is waiting.
   if (data.isNull()) {
+    Serial.println("NO PENDING ENROLLMENT REQUEST.");
+    Serial.println("Enrollment mode will remain OFF.");
+    http.end();
     return true;
   }
 
@@ -1225,16 +1255,30 @@ bool fetchPendingEnrollment(EnrollmentJob& job) {
   if (
     job.enrollmentId <= 0 ||
     job.employeeId <= 0 ||
-    job.sensorSlot < 1 ||
-    job.sensorSlot > finger.capacity
+    job.sensorSlot < 1
   ) {
-    Serial.println("Invalid enrollment job received from backend.");
+    Serial.println("ERROR: Invalid enrollment job received from backend.");
+    http.end();
+    return false;
+  }
+
+  // Some sensors may report capacity incorrectly during startup.
+  // Only enforce the upper bound when the capacity is actually known.
+  if (finger.capacity > 0 && job.sensorSlot > finger.capacity) {
+    Serial.print("ERROR: Backend assigned sensor slot ");
+    Serial.print(job.sensorSlot);
+    Serial.print(" but sensor capacity is ");
+    Serial.println(finger.capacity);
+    http.end();
     return false;
   }
 
   job.valid = true;
 
-  Serial.println("Pending enrollment job received.");
+  Serial.println();
+  Serial.println("****************************************");
+  Serial.println("PENDING ENROLLMENT JOB RECEIVED");
+  Serial.println("****************************************");
   Serial.print("Enrollment ID: ");
   Serial.println(job.enrollmentId);
   Serial.print("Employee ID: ");
@@ -1243,7 +1287,9 @@ bool fetchPendingEnrollment(EnrollmentJob& job) {
   Serial.println(job.sensorSlot);
   Serial.print("Finger Name: ");
   Serial.println(job.fingerName);
+  Serial.println("****************************************");
 
+  http.end();
   return true;
 }
 
@@ -1322,8 +1368,25 @@ bool reportEnrollmentResult(
 // ============================================================
 
 void processEnrollmentJob(const EnrollmentJob& job) {
+  // The mode transition happens here and only after the backend job has
+  // been fully parsed and marked valid.
+  if (!job.valid) {
+    Serial.println("ERROR: processEnrollmentJob() received an invalid job.");
+    return;
+  }
+
   currentEnrollment = job;
+
+  Serial.println();
+  Serial.println("====================================");
+  Serial.println(" BACKEND ENROLLMENT JOB ACCEPTED");
+  Serial.println("====================================");
+  Serial.println("Setting currentMode = ENROLLMENT_MODE...");
+
   currentMode = ENROLLMENT_MODE;
+
+  Serial.print("Current mode value: ");
+  Serial.println((currentMode == ENROLLMENT_MODE) ? "ENROLLMENT_MODE" : "ATTENDANCE_MODE");
 
   Serial.println();
   Serial.println("====================================");
@@ -1411,11 +1474,15 @@ void pollEnrollmentRequest() {
 
   EnrollmentJob job;
 
-  if (!fetchPendingEnrollment(job)) {
+  bool requestHandled = fetchPendingEnrollment(job);
+
+  if (!requestHandled) {
+    Serial.println("Enrollment poll finished with an error.");
     return;
   }
 
   if (!job.valid) {
+    // Empty queue is normal; stay in attendance mode and wait for the next poll.
     return;
   }
 
@@ -1879,6 +1946,10 @@ void setup() {
 
   // Wi-Fi.
   connectWiFi();
+
+  // Force the first backend enrollment check to happen immediately on the
+  // first main-loop pass rather than waiting for the full polling interval.
+  lastEnrollmentPoll = millis() - ENROLLMENT_POLL_INTERVAL;
 
   // Normal initial state.
   currentMode = ATTENDANCE_MODE;
