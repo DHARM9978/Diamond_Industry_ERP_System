@@ -12463,6 +12463,8 @@ export namespace Prisma {
     advanceId: number | null
     employeeId: number | null
     amount: Decimal | null
+    approvedAmount: Decimal | null
+    paidAmount: Decimal | null
     approvedBy: number | null
     deductedInPayrollId: number | null
   }
@@ -12471,6 +12473,8 @@ export namespace Prisma {
     advanceId: number | null
     employeeId: number | null
     amount: Decimal | null
+    approvedAmount: Decimal | null
+    paidAmount: Decimal | null
     approvedBy: number | null
     deductedInPayrollId: number | null
   }
@@ -12479,6 +12483,8 @@ export namespace Prisma {
     advanceId: number | null
     employeeId: number | null
     amount: Decimal | null
+    approvedAmount: Decimal | null
+    paidAmount: Decimal | null
     reason: string | null
     paymentDate: Date | null
     approvedBy: number | null
@@ -12493,6 +12499,8 @@ export namespace Prisma {
     advanceId: number | null
     employeeId: number | null
     amount: Decimal | null
+    approvedAmount: Decimal | null
+    paidAmount: Decimal | null
     reason: string | null
     paymentDate: Date | null
     approvedBy: number | null
@@ -12507,6 +12515,8 @@ export namespace Prisma {
     advanceId: number
     employeeId: number
     amount: number
+    approvedAmount: number
+    paidAmount: number
     reason: number
     paymentDate: number
     approvedBy: number
@@ -12523,6 +12533,8 @@ export namespace Prisma {
     advanceId?: true
     employeeId?: true
     amount?: true
+    approvedAmount?: true
+    paidAmount?: true
     approvedBy?: true
     deductedInPayrollId?: true
   }
@@ -12531,6 +12543,8 @@ export namespace Prisma {
     advanceId?: true
     employeeId?: true
     amount?: true
+    approvedAmount?: true
+    paidAmount?: true
     approvedBy?: true
     deductedInPayrollId?: true
   }
@@ -12539,6 +12553,8 @@ export namespace Prisma {
     advanceId?: true
     employeeId?: true
     amount?: true
+    approvedAmount?: true
+    paidAmount?: true
     reason?: true
     paymentDate?: true
     approvedBy?: true
@@ -12553,6 +12569,8 @@ export namespace Prisma {
     advanceId?: true
     employeeId?: true
     amount?: true
+    approvedAmount?: true
+    paidAmount?: true
     reason?: true
     paymentDate?: true
     approvedBy?: true
@@ -12567,6 +12585,8 @@ export namespace Prisma {
     advanceId?: true
     employeeId?: true
     amount?: true
+    approvedAmount?: true
+    paidAmount?: true
     reason?: true
     paymentDate?: true
     approvedBy?: true
@@ -12668,6 +12688,8 @@ export namespace Prisma {
     advanceId: number
     employeeId: number
     amount: Decimal
+    approvedAmount: Decimal | null
+    paidAmount: Decimal | null
     reason: string | null
     paymentDate: Date
     approvedBy: number | null
@@ -12701,6 +12723,8 @@ export namespace Prisma {
     advanceId?: boolean
     employeeId?: boolean
     amount?: boolean
+    approvedAmount?: boolean
+    paidAmount?: boolean
     reason?: boolean
     paymentDate?: boolean
     approvedBy?: boolean
@@ -12720,6 +12744,8 @@ export namespace Prisma {
     advanceId?: boolean
     employeeId?: boolean
     amount?: boolean
+    approvedAmount?: boolean
+    paidAmount?: boolean
     reason?: boolean
     paymentDate?: boolean
     approvedBy?: boolean
@@ -12730,7 +12756,7 @@ export namespace Prisma {
     deductedInPayrollId?: boolean
   }
 
-  export type AdvancePaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"advanceId" | "employeeId" | "amount" | "reason" | "paymentDate" | "approvedBy" | "status" | "createdAt" | "updatedAt" | "deductedAt" | "deductedInPayrollId", ExtArgs["result"]["advancePayment"]>
+  export type AdvancePaymentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"advanceId" | "employeeId" | "amount" | "approvedAmount" | "paidAmount" | "reason" | "paymentDate" | "approvedBy" | "status" | "createdAt" | "updatedAt" | "deductedAt" | "deductedInPayrollId", ExtArgs["result"]["advancePayment"]>
   export type AdvancePaymentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     approver?: boolean | AdvancePayment$approverArgs<ExtArgs>
     deductedInPayroll?: boolean | AdvancePayment$deductedInPayrollArgs<ExtArgs>
@@ -12748,6 +12774,8 @@ export namespace Prisma {
       advanceId: number
       employeeId: number
       amount: Prisma.Decimal
+      approvedAmount: Prisma.Decimal | null
+      paidAmount: Prisma.Decimal | null
       reason: string | null
       paymentDate: Date
       approvedBy: number | null
@@ -13131,6 +13159,8 @@ export namespace Prisma {
     readonly advanceId: FieldRef<"AdvancePayment", 'Int'>
     readonly employeeId: FieldRef<"AdvancePayment", 'Int'>
     readonly amount: FieldRef<"AdvancePayment", 'Decimal'>
+    readonly approvedAmount: FieldRef<"AdvancePayment", 'Decimal'>
+    readonly paidAmount: FieldRef<"AdvancePayment", 'Decimal'>
     readonly reason: FieldRef<"AdvancePayment", 'String'>
     readonly paymentDate: FieldRef<"AdvancePayment", 'DateTime'>
     readonly approvedBy: FieldRef<"AdvancePayment", 'Int'>
@@ -22238,6 +22268,8 @@ export namespace Prisma {
     advanceId: 'advanceId',
     employeeId: 'employeeId',
     amount: 'amount',
+    approvedAmount: 'approvedAmount',
+    paidAmount: 'paidAmount',
     reason: 'reason',
     paymentDate: 'paymentDate',
     approvedBy: 'approvedBy',
@@ -23361,6 +23393,8 @@ export namespace Prisma {
     advanceId?: IntFilter<"AdvancePayment"> | number
     employeeId?: IntFilter<"AdvancePayment"> | number
     amount?: DecimalFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string
+    approvedAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
     reason?: StringNullableFilter<"AdvancePayment"> | string | null
     paymentDate?: DateTimeFilter<"AdvancePayment"> | Date | string
     approvedBy?: IntNullableFilter<"AdvancePayment"> | number | null
@@ -23378,6 +23412,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrderInput | SortOrder
+    paidAmount?: SortOrderInput | SortOrder
     reason?: SortOrderInput | SortOrder
     paymentDate?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
@@ -23400,6 +23436,8 @@ export namespace Prisma {
     NOT?: AdvancePaymentWhereInput | AdvancePaymentWhereInput[]
     employeeId?: IntFilter<"AdvancePayment"> | number
     amount?: DecimalFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string
+    approvedAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
     reason?: StringNullableFilter<"AdvancePayment"> | string | null
     paymentDate?: DateTimeFilter<"AdvancePayment"> | Date | string
     approvedBy?: IntNullableFilter<"AdvancePayment"> | number | null
@@ -23416,6 +23454,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrderInput | SortOrder
+    paidAmount?: SortOrderInput | SortOrder
     reason?: SortOrderInput | SortOrder
     paymentDate?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
@@ -23438,6 +23478,8 @@ export namespace Prisma {
     advanceId?: IntWithAggregatesFilter<"AdvancePayment"> | number
     employeeId?: IntWithAggregatesFilter<"AdvancePayment"> | number
     amount?: DecimalWithAggregatesFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string
+    approvedAmount?: DecimalNullableWithAggregatesFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: DecimalNullableWithAggregatesFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
     reason?: StringNullableWithAggregatesFilter<"AdvancePayment"> | string | null
     paymentDate?: DateTimeWithAggregatesFilter<"AdvancePayment"> | Date | string
     approvedBy?: IntNullableWithAggregatesFilter<"AdvancePayment"> | number | null
@@ -24904,6 +24946,8 @@ export namespace Prisma {
 
   export type AdvancePaymentCreateInput = {
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -24919,6 +24963,8 @@ export namespace Prisma {
     advanceId?: number
     employeeId: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     approvedBy?: number | null
@@ -24931,6 +24977,8 @@ export namespace Prisma {
 
   export type AdvancePaymentUpdateInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -24946,6 +24994,8 @@ export namespace Prisma {
     advanceId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -24960,6 +25010,8 @@ export namespace Prisma {
     advanceId?: number
     employeeId: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     approvedBy?: number | null
@@ -24972,6 +25024,8 @@ export namespace Prisma {
 
   export type AdvancePaymentUpdateManyMutationInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -24984,6 +25038,8 @@ export namespace Prisma {
     advanceId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -26617,6 +26673,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrder
+    paidAmount?: SortOrder
     reason?: SortOrder
     paymentDate?: SortOrder
     approvedBy?: SortOrder
@@ -26631,6 +26689,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrder
+    paidAmount?: SortOrder
     approvedBy?: SortOrder
     deductedInPayrollId?: SortOrder
   }
@@ -26639,6 +26699,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrder
+    paidAmount?: SortOrder
     reason?: SortOrder
     paymentDate?: SortOrder
     approvedBy?: SortOrder
@@ -26653,6 +26715,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrder
+    paidAmount?: SortOrder
     reason?: SortOrder
     paymentDate?: SortOrder
     approvedBy?: SortOrder
@@ -26667,6 +26731,8 @@ export namespace Prisma {
     advanceId?: SortOrder
     employeeId?: SortOrder
     amount?: SortOrder
+    approvedAmount?: SortOrder
+    paidAmount?: SortOrder
     approvedBy?: SortOrder
     deductedInPayrollId?: SortOrder
   }
@@ -29174,6 +29240,8 @@ export namespace Prisma {
 
   export type AdvancePaymentCreateWithoutApproverInput = {
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -29188,6 +29256,8 @@ export namespace Prisma {
     advanceId?: number
     employeeId: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -29272,6 +29342,8 @@ export namespace Prisma {
     advanceId?: IntFilter<"AdvancePayment"> | number
     employeeId?: IntFilter<"AdvancePayment"> | number
     amount?: DecimalFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string
+    approvedAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: DecimalNullableFilter<"AdvancePayment"> | Decimal | DecimalJsLike | number | string | null
     reason?: StringNullableFilter<"AdvancePayment"> | string | null
     paymentDate?: DateTimeFilter<"AdvancePayment"> | Date | string
     approvedBy?: IntNullableFilter<"AdvancePayment"> | number | null
@@ -29979,6 +30051,8 @@ export namespace Prisma {
 
   export type AdvancePaymentCreateWithoutEmployeeInput = {
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -29992,6 +30066,8 @@ export namespace Prisma {
   export type AdvancePaymentUncheckedCreateWithoutEmployeeInput = {
     advanceId?: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     approvedBy?: number | null
@@ -32012,6 +32088,8 @@ export namespace Prisma {
 
   export type AdvancePaymentCreateWithoutDeductedInPayrollInput = {
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -32026,6 +32104,8 @@ export namespace Prisma {
     advanceId?: number
     employeeId: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     approvedBy?: number | null
@@ -32117,6 +32197,8 @@ export namespace Prisma {
 
   export type AdvancePaymentUpdateWithoutDeductedInPayrollInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -32131,6 +32213,8 @@ export namespace Prisma {
     advanceId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33614,6 +33698,8 @@ export namespace Prisma {
     advanceId?: number
     employeeId: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     status: string
@@ -33625,6 +33711,8 @@ export namespace Prisma {
 
   export type AdvancePaymentUpdateWithoutApproverInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -33639,6 +33727,8 @@ export namespace Prisma {
     advanceId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -33652,6 +33742,8 @@ export namespace Prisma {
     advanceId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -33957,6 +34049,8 @@ export namespace Prisma {
   export type AdvancePaymentCreateManyEmployeeInput = {
     advanceId?: number
     amount: Decimal | DecimalJsLike | number | string
+    approvedAmount?: Decimal | DecimalJsLike | number | string | null
+    paidAmount?: Decimal | DecimalJsLike | number | string | null
     reason?: string | null
     paymentDate: Date | string
     approvedBy?: number | null
@@ -34102,6 +34196,8 @@ export namespace Prisma {
 
   export type AdvancePaymentUpdateWithoutEmployeeInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: StringFieldUpdateOperationsInput | string
@@ -34115,6 +34211,8 @@ export namespace Prisma {
   export type AdvancePaymentUncheckedUpdateWithoutEmployeeInput = {
     advanceId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -34128,6 +34226,8 @@ export namespace Prisma {
   export type AdvancePaymentUncheckedUpdateManyWithoutEmployeeInput = {
     advanceId?: IntFieldUpdateOperationsInput | number
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    paidAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     paymentDate?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedBy?: NullableIntFieldUpdateOperationsInput | number | null

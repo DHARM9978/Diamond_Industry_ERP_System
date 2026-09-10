@@ -23,6 +23,7 @@ import API from "./apiRegistry";
  *
  * {...}
  */
+
 const unwrap = (response) => {
     return (
         response?.data?.data ??
@@ -54,6 +55,7 @@ export const authService = {
     // --------------------------------------------------------
     // Admin Login
     // --------------------------------------------------------
+
     adminLogin: async (
         email,
         password
@@ -84,6 +86,7 @@ export const authService = {
     // --------------------------------------------------------
     // Employee Login
     // --------------------------------------------------------
+
     employeeLogin: async (
         email,
         password
@@ -114,6 +117,7 @@ export const authService = {
     // --------------------------------------------------------
     // Current User
     // --------------------------------------------------------
+
     me: async () => {
         const response =
             await apiClient.get(
@@ -127,6 +131,7 @@ export const authService = {
     // --------------------------------------------------------
     // Admin Test
     // --------------------------------------------------------
+
     adminTest: async () => {
         const response =
             await apiClient.get(
@@ -149,6 +154,7 @@ export const companyService = {
     // GET ALL COMPANIES
     // GET /api/companies
     // --------------------------------------------------------
+
     list: async () => {
         const response =
             await apiClient.get(
@@ -163,6 +169,7 @@ export const companyService = {
     // GET COMPANY
     // GET /api/companies/:id
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -179,6 +186,7 @@ export const companyService = {
     // CREATE COMPANY
     // POST /api/companies
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -196,6 +204,7 @@ export const companyService = {
     // UPDATE COMPANY
     // PUT /api/companies/:id
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -214,6 +223,7 @@ export const companyService = {
     // DELETE COMPANY
     // DELETE /api/companies/:id
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -237,6 +247,7 @@ export const employeeService = {
     // --------------------------------------------------------
     // GET EMPLOYEES
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -255,6 +266,7 @@ export const employeeService = {
     // --------------------------------------------------------
     // GET EMPLOYEE
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -270,6 +282,7 @@ export const employeeService = {
     // --------------------------------------------------------
     // CREATE EMPLOYEE
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -286,6 +299,7 @@ export const employeeService = {
     // --------------------------------------------------------
     // UPDATE EMPLOYEE
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -303,6 +317,7 @@ export const employeeService = {
     // --------------------------------------------------------
     // DELETE EMPLOYEE
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -326,6 +341,7 @@ export const branchService = {
     // --------------------------------------------------------
     // GET BRANCHES
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -344,6 +360,7 @@ export const branchService = {
     // --------------------------------------------------------
     // GET BRANCH
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -359,6 +376,7 @@ export const branchService = {
     // --------------------------------------------------------
     // CREATE BRANCH
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -375,6 +393,7 @@ export const branchService = {
     // --------------------------------------------------------
     // UPDATE BRANCH
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -392,6 +411,7 @@ export const branchService = {
     // --------------------------------------------------------
     // DELETE BRANCH
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -415,6 +435,7 @@ export const departmentService = {
     // --------------------------------------------------------
     // GET DEPARTMENTS
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -433,6 +454,7 @@ export const departmentService = {
     // --------------------------------------------------------
     // GET DEPARTMENT
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -448,6 +470,7 @@ export const departmentService = {
     // --------------------------------------------------------
     // CREATE DEPARTMENT
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -464,6 +487,7 @@ export const departmentService = {
     // --------------------------------------------------------
     // UPDATE DEPARTMENT
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -481,6 +505,7 @@ export const departmentService = {
     // --------------------------------------------------------
     // DELETE DEPARTMENT
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -504,6 +529,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -522,6 +548,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/live
     // --------------------------------------------------------
+
     live: async (
         params = {}
     ) => {
@@ -540,6 +567,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/:id
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -555,6 +583,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/punches
     // --------------------------------------------------------
+
     punches: async (
         params = {}
     ) => {
@@ -573,6 +602,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/punches/:id
     // --------------------------------------------------------
+
     getPunch: async (
         id
     ) => {
@@ -588,6 +618,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET employee attendance
     // --------------------------------------------------------
+
     employee: async (
         employeeId,
         params = {}
@@ -609,6 +640,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Employee punch history
     // --------------------------------------------------------
+
     employeePunches: async (
         employeeId,
         params = {}
@@ -630,6 +662,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Employee attendance summary
     // --------------------------------------------------------
+
     employeeSummary: async (
         employeeId,
         params = {}
@@ -651,6 +684,7 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Daily attendance summary
     // --------------------------------------------------------
+
     summary: async (
         params = {}
     ) => {
@@ -677,6 +711,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // GET /api/fingerprints
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -695,6 +730,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // GET /api/fingerprints/:id
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -710,6 +746,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // POST /api/fingerprints
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -726,6 +763,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // GET enrollment status
     // --------------------------------------------------------
+
     getEnrollmentStatus: async (
         enrollmentId
     ) => {
@@ -741,6 +779,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // PUT /api/fingerprints/:id
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -758,6 +797,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // DELETE /api/fingerprints/:id
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -773,6 +813,7 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // Employee fingerprints
     // --------------------------------------------------------
+
     employee: async (
         employeeId,
         params = {}
@@ -802,6 +843,7 @@ export const deviceService = {
     // --------------------------------------------------------
     // GET DEVICES
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -820,6 +862,7 @@ export const deviceService = {
     // --------------------------------------------------------
     // GET DEVICE
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -835,6 +878,7 @@ export const deviceService = {
     // --------------------------------------------------------
     // CREATE DEVICE
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -851,6 +895,7 @@ export const deviceService = {
     // --------------------------------------------------------
     // UPDATE DEVICE
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -868,6 +913,7 @@ export const deviceService = {
     // --------------------------------------------------------
     // DELETE DEVICE
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -891,6 +937,7 @@ export const deviceEnrollmentService = {
     // --------------------------------------------------------
     // POST /api/device/fingerprint-enroll
     // --------------------------------------------------------
+
     fingerprintEnroll: async (
         data
     ) => {
@@ -915,6 +962,7 @@ export const leaveTypeService = {
     // --------------------------------------------------------
     // GET LEAVE TYPES
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -933,6 +981,7 @@ export const leaveTypeService = {
     // --------------------------------------------------------
     // GET LEAVE TYPE
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -948,6 +997,7 @@ export const leaveTypeService = {
     // --------------------------------------------------------
     // CREATE LEAVE TYPE
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -964,6 +1014,7 @@ export const leaveTypeService = {
     // --------------------------------------------------------
     // UPDATE LEAVE TYPE
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -981,6 +1032,7 @@ export const leaveTypeService = {
     // --------------------------------------------------------
     // DELETE LEAVE TYPE
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -1004,6 +1056,7 @@ export const leaveBalanceService = {
     // --------------------------------------------------------
     // GET LEAVE BALANCES
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -1022,6 +1075,7 @@ export const leaveBalanceService = {
     // --------------------------------------------------------
     // GET LEAVE BALANCE
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -1037,6 +1091,7 @@ export const leaveBalanceService = {
     // --------------------------------------------------------
     // CREATE LEAVE BALANCE
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -1053,6 +1108,7 @@ export const leaveBalanceService = {
     // --------------------------------------------------------
     // UPDATE LEAVE BALANCE
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -1078,6 +1134,7 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // GET /api/leave-requests
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -1096,6 +1153,7 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // GET /api/leave-requests/:id
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -1111,6 +1169,7 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // POST /api/leave-requests
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -1134,7 +1193,7 @@ export const leaveRequestService = {
     //
     // This still works.
     //
-    // New partial approval:
+    // Partial approval:
     //
     // leaveRequestService.approve(id, {
     //     approvedStartDate: "2026-09-10",
@@ -1143,6 +1202,7 @@ export const leaveRequestService = {
     //
     // Backend calculates approvedDays.
     // --------------------------------------------------------
+
     approve: async (
         id,
         data = {}
@@ -1174,6 +1234,7 @@ export const leaveRequestService = {
     //         "Insufficient staffing"
     // })
     // --------------------------------------------------------
+
     reject: async (
         id,
         data = {}
@@ -1191,6 +1252,7 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // PUT /api/leave-requests/:id/cancel
     // --------------------------------------------------------
+
     cancel: async (
         id
     ) => {
@@ -1214,6 +1276,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // GET /api/advances
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -1232,6 +1295,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // GET /api/advances/:id
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -1247,6 +1311,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // POST /api/advances
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -1263,6 +1328,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // PUT /api/advances/:id
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -1280,15 +1346,48 @@ export const advanceService = {
     // --------------------------------------------------------
     // PATCH /api/advances/:id/status
     // --------------------------------------------------------
+    //
+    // Approve:
+    //
+    // advanceService.updateStatus(
+    //     id,
+    //     "APPROVED",
+    //     {
+    //         approvedAmount: 1000
+    //     }
+    // )
+    //
+    // Pay:
+    //
+    // advanceService.updateStatus(
+    //     id,
+    //     "PAID",
+    //     {
+    //         paidAmount: 1500
+    //     }
+    // )
+    //
+    // Reject:
+    //
+    // advanceService.updateStatus(
+    //     id,
+    //     "REJECTED"
+    // )
+    //
+    // --------------------------------------------------------
+
     updateStatus: async (
         id,
-        status
+        status,
+        data = {}
     ) => {
+
         const response =
             await apiClient.patch(
                 API.advances.updateStatus(id),
                 {
                     status,
+                    ...data,
                 }
             );
 
@@ -1299,6 +1398,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // DELETE /api/advances/:id
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -1314,6 +1414,7 @@ export const advanceService = {
     // --------------------------------------------------------
     // Employee advances
     // --------------------------------------------------------
+
     employee: async (
         employeeId,
         params = {}
@@ -1343,6 +1444,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // GET PAYROLL
     // --------------------------------------------------------
+
     list: async (
         params = {}
     ) => {
@@ -1361,6 +1463,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // GET PAYROLL RECORD
     // --------------------------------------------------------
+
     get: async (
         id
     ) => {
@@ -1376,6 +1479,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // CREATE PAYROLL
     // --------------------------------------------------------
+
     create: async (
         data
     ) => {
@@ -1392,6 +1496,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // UPDATE PAYROLL
     // --------------------------------------------------------
+
     update: async (
         id,
         data
@@ -1409,6 +1514,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // DELETE PAYROLL
     // --------------------------------------------------------
+
     delete: async (
         id
     ) => {
@@ -1424,6 +1530,7 @@ export const payrollService = {
     // --------------------------------------------------------
     // Employee payroll
     // --------------------------------------------------------
+
     employee: async (
         employeeId,
         params = {}
@@ -1453,6 +1560,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Dashboard report
     // --------------------------------------------------------
+
     dashboard: async (
         params = {}
     ) => {
@@ -1471,6 +1579,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Attendance report
     // --------------------------------------------------------
+
     attendance: async (
         params = {}
     ) => {
@@ -1489,6 +1598,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Employees report
     // --------------------------------------------------------
+
     employees: async (
         params = {}
     ) => {
@@ -1507,6 +1617,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Payroll report
     // --------------------------------------------------------
+
     payroll: async (
         params = {}
     ) => {
@@ -1525,6 +1636,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Advances report
     // --------------------------------------------------------
+
     advances: async (
         params = {}
     ) => {
@@ -1543,6 +1655,7 @@ export const reportService = {
     // --------------------------------------------------------
     // Leaves report
     // --------------------------------------------------------
+
     leaves: async (
         params = {}
     ) => {
@@ -1569,6 +1682,7 @@ export const selfService = {
     // --------------------------------------------------------
     // Employee profile
     // --------------------------------------------------------
+
     profile: async () => {
         const response =
             await apiClient.get(
@@ -1582,6 +1696,7 @@ export const selfService = {
     // --------------------------------------------------------
     // Employee attendance
     // --------------------------------------------------------
+
     attendance: async (
         params = {}
     ) => {
@@ -1600,6 +1715,7 @@ export const selfService = {
     // --------------------------------------------------------
     // Employee attendance summary
     // --------------------------------------------------------
+
     attendanceSummary: async (
         params = {}
     ) => {
@@ -1618,6 +1734,7 @@ export const selfService = {
     // --------------------------------------------------------
     // Employee payroll
     // --------------------------------------------------------
+
     payroll: async (
         params = {}
     ) => {
@@ -1636,6 +1753,7 @@ export const selfService = {
     // --------------------------------------------------------
     // Employee advances
     // --------------------------------------------------------
+
     advances: async (
         params = {}
     ) => {
@@ -1654,6 +1772,7 @@ export const selfService = {
     // --------------------------------------------------------
     // CREATE EMPLOYEE ADVANCE
     // --------------------------------------------------------
+
     createAdvance: async (
         data
     ) => {
@@ -1828,6 +1947,7 @@ export const leaveService = {
     // })
     //
     // --------------------------------------------------------
+
     approve: async (
         id,
         data = {}
@@ -1857,6 +1977,7 @@ export const leaveService = {
     // })
     //
     // --------------------------------------------------------
+
     reject: async (
         id,
         data = {}
@@ -1871,6 +1992,7 @@ export const leaveService = {
     // --------------------------------------------------------
     // CANCEL LEAVE REQUEST
     // --------------------------------------------------------
+
     cancel: async (
         id
     ) => {

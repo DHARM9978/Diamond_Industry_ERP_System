@@ -203,11 +203,22 @@ model DeviceLog {
 model AdvancePayment {
   advanceId           Int       @id @default(autoincrement()) @map("advance_id")
   employeeId          Int
+
+  // Original amount requested by the employee
   amount              Decimal   @db.Decimal(10, 2)
+
+  // Amount approved by admin
+  approvedAmount      Decimal?  @map("approved_amount") @db.Decimal(10, 2)
+
+  // Actual amount paid by admin
+  paidAmount          Decimal?  @map("paid_amount") @db.Decimal(10, 2)
+
   reason              String?   @db.Text
   paymentDate         DateTime  @map("payment_date") @db.Date
+
   approvedBy          Int?
   status              String    @db.VarChar(20)
+
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
   deductedAt          DateTime? @map("deducted_at")

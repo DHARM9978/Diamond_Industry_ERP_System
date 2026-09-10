@@ -229,6 +229,8 @@ exports.Prisma.AdvancePaymentScalarFieldEnum = {
   advanceId: 'advanceId',
   employeeId: 'employeeId',
   amount: 'amount',
+  approvedAmount: 'approvedAmount',
+  paidAmount: 'paidAmount',
   reason: 'reason',
   paymentDate: 'paymentDate',
   approvedBy: 'approvedBy',

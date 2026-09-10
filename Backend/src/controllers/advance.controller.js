@@ -11,7 +11,7 @@ const createAdvance = async (req, res) => {
 
     const advance =
         await advanceService.createAdvance(
-            req.body,
+            req.body || {},
             req.user.companyId
         );
 
@@ -23,6 +23,7 @@ const createAdvance = async (req, res) => {
             "Advance payment created successfully",
 
         data: advance
+
     });
 };
 
@@ -47,6 +48,7 @@ const getAdvances = async (req, res) => {
             "Advance payments fetched successfully",
 
         data: advances
+
     });
 };
 
@@ -72,6 +74,7 @@ const getAdvanceById = async (req, res) => {
             "Advance payment fetched successfully",
 
         data: advance
+
     });
 };
 
@@ -97,25 +100,46 @@ const getEmployeeAdvances = async (req, res) => {
             "Employee advance payments fetched successfully",
 
         data: advances
+
     });
 };
 
 
 // ==========================================
 // Update Advance Status
+//
 // PATCH /api/advances/:id/status
-// ==========================================
-
-// ==========================================
-// Update Advance Status
-// PATCH /api/advances/:id/status
+//
+// Body examples:
+//
+// APPROVE:
+// {
+//   "status": "APPROVED",
+//   "approvedAmount": 1000
+// }
+//
+// PAY:
+// {
+//   "status": "PAID",
+//   "paidAmount": 1500
+// }
+//
+// REJECT:
+// {
+//   "status": "REJECTED"
+// }
 // ==========================================
 
 const updateAdvanceStatus = async (req, res) => {
 
+    const body =
+        req.body || {};
+
     const {
-        status
-    } = req.body;
+        status,
+        approvedAmount,
+        paidAmount
+    } = body;
 
 
     const advance =
@@ -123,18 +147,47 @@ const updateAdvanceStatus = async (req, res) => {
             req.params.id,
             status,
             req.user.adminId,
-            req.user.companyId
+            req.user.companyId,
+            {
+                approvedAmount,
+                paidAmount
+            }
         );
+
+
+    let message =
+        "Advance status updated successfully";
+
+
+    if (String(status).toUpperCase() === "APPROVED") {
+
+        message =
+            "Advance approved successfully";
+
+    } else if (
+        String(status).toUpperCase() === "PAID"
+    ) {
+
+        message =
+            "Advance payment recorded successfully";
+
+    } else if (
+        String(status).toUpperCase() === "REJECTED"
+    ) {
+
+        message =
+            "Advance rejected successfully";
+    }
 
 
     return res.status(200).json({
 
         success: true,
 
-        message:
-            "Advance status updated successfully",
+        message,
 
         data: advance
+
     });
 };
 
@@ -157,9 +210,14 @@ const deleteAdvance = async (req, res) => {
 
         message:
             "Advance payment deleted successfully"
+
     });
 };
 
+
+// ==========================================
+// Export Controller
+// ==========================================
 
 module.exports = {
 
@@ -169,4 +227,5 @@ module.exports = {
     getEmployeeAdvances,
     updateAdvanceStatus,
     deleteAdvance
+
 };

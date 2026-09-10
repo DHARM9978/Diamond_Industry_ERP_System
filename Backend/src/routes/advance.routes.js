@@ -19,6 +19,9 @@ const router = express.Router();
 // ==========================================
 // Advance Payment Protection
 // ==========================================
+// All /api/advances routes are ADMIN only
+// Employee self-service uses /api/me/advances
+// ==========================================
 
 router.use(
     authenticate,
@@ -80,7 +83,28 @@ router.get(
 
 // ==========================================
 // Update Advance Status
+//
 // PATCH /api/advances/:id/status
+//
+// Approve:
+//
+// {
+//   "status": "APPROVED",
+//   "approvedAmount": 1000
+// }
+//
+// Pay:
+//
+// {
+//   "status": "PAID",
+//   "paidAmount": 1500
+// }
+//
+// Reject:
+//
+// {
+//   "status": "REJECTED"
+// }
 // ==========================================
 
 router.patch(
@@ -103,5 +127,9 @@ router.delete(
     )
 );
 
+
+// ==========================================
+// Export Router
+// ==========================================
 
 module.exports = router;
