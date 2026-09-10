@@ -27,9 +27,9 @@ import {
 } from '@/services/apiServices';
 
 
-/* ============================================================
-   Helpers
-============================================================ */
+// ============================================================
+// Helpers
+// ============================================================
 
 const getEmployeeName = (employee) => {
   const firstName = employee?.firstName || '';
@@ -83,12 +83,39 @@ const getErrorMessage = (error) => {
 };
 
 
-/* ============================================================
-   Main Component
-============================================================ */
+const formatCurrency = (value) => {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return '₹0.00';
+  }
+
+  return `₹${number.toLocaleString('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+
+const formatNumber = (value) => {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return '0.00';
+  }
+
+  return number.toLocaleString('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+
+// ============================================================
+// Main Component
+// ============================================================
 
 export function AdminEmployees() {
-
   const { toast } = useToast();
 
   const [employees, setEmployees] = useState([]);
@@ -105,14 +132,12 @@ export function AdminEmployees() {
   const [editing, setEditing] = useState(null);
 
 
-  /* ============================================================
-     Load Employees / Branches / Departments
-  ============================================================ */
+  // ==========================================================
+  // Load Employees / Branches / Departments
+  // ==========================================================
 
   const loadData = async () => {
-
     try {
-
       setLoading(true);
 
       const [
@@ -120,15 +145,10 @@ export function AdminEmployees() {
         branchesResponse,
         departmentsResponse,
       ] = await Promise.all([
-
         employeeService.list(),
-
         branchService.list(),
-
         departmentService.list(),
-
       ]);
-
 
       console.log(
         'Employees API response:',
@@ -144,16 +164,6 @@ export function AdminEmployees() {
         'Departments API response:',
         departmentsResponse
       );
-
-
-      /*
-       * apiServices.js already unwraps:
-       *
-       * response.data.data
-       *
-       * Therefore these should normally already
-       * be arrays.
-       */
 
       const employeeData = Array.isArray(
         employeesResponse
@@ -173,16 +183,11 @@ export function AdminEmployees() {
         ? departmentsResponse
         : [];
 
-
       setEmployees(employeeData);
-
       setBranches(branchData);
-
       setDepartments(departmentData);
 
-
     } catch (error) {
-
       console.error(
         'Failed to load employee data:',
         error
@@ -194,28 +199,22 @@ export function AdminEmployees() {
       );
 
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
   useEffect(() => {
-
     loadData();
-
   }, []);
 
 
-  /* ============================================================
-     Filter Employees
-  ============================================================ */
+  // ==========================================================
+  // Filter Employees
+  // ==========================================================
 
   const filtered = employees.filter(
     (employee) => {
-
       const employeeName =
         getEmployeeName(employee);
 
@@ -225,10 +224,8 @@ export function AdminEmployees() {
       const employeeId =
         employee?.employeeId || '';
 
-
       const searchText =
         search.toLowerCase().trim();
-
 
       const matchSearch =
         !searchText ||
@@ -242,30 +239,27 @@ export function AdminEmployees() {
           .toLowerCase()
           .includes(searchText);
 
-
       const matchStatus =
         !statusFilter ||
         employee?.status === statusFilter;
-
 
       return (
         matchSearch &&
         matchStatus
       );
-
     }
   );
 
 
-  /* ============================================================
-     Table Columns
-  ============================================================ */
+  // ==========================================================
+  // Table Columns
+  // ==========================================================
 
   const columns = [
 
-    /* ----------------------------------------------------------
-       Employee ID
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Employee ID
+    // --------------------------------------------------------
 
     {
       key: 'employeeId',
@@ -273,7 +267,6 @@ export function AdminEmployees() {
       label: 'Emp ID',
 
       render: (employee) => (
-
         <span
           className="
             font-mono
@@ -282,19 +275,15 @@ export function AdminEmployees() {
             text-navy-600
           "
         >
-
           {employee?.employeeId ?? '—'}
-
         </span>
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Employee Name
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Employee Name
+    // --------------------------------------------------------
 
     {
       key: 'name',
@@ -302,7 +291,6 @@ export function AdminEmployees() {
       label: 'Name',
 
       render: (employee) => {
-
         const name =
           getEmployeeName(employee);
 
@@ -311,9 +299,7 @@ export function AdminEmployees() {
             ?.charAt(0)
             ?.toUpperCase() || 'E';
 
-
         return (
-
           <div className="flex items-center gap-3">
 
             <div
@@ -328,7 +314,6 @@ export function AdminEmployees() {
                 shrink-0
               "
             >
-
               <span
                 className="
                   text-sm
@@ -336,42 +321,29 @@ export function AdminEmployees() {
                   text-navy-700
                 "
               >
-
                 {initial}
-
               </span>
-
             </div>
 
-
             <div>
-
               <p className="font-medium text-navy-900">
-
                 {name}
-
               </p>
 
               <p className="text-xs text-navy-400">
-
                 {employee?.role || 'EMPLOYEE'}
-
               </p>
-
             </div>
 
           </div>
-
         );
-
       },
-
     },
 
 
-    /* ----------------------------------------------------------
-       Department
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Department
+    // --------------------------------------------------------
 
     {
       key: 'department',
@@ -379,21 +351,16 @@ export function AdminEmployees() {
       label: 'Department',
 
       render: (employee) => (
-
         <span className="text-navy-600">
-
           {getDepartmentName(employee)}
-
         </span>
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Branch
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Branch
+    // --------------------------------------------------------
 
     {
       key: 'branch',
@@ -401,21 +368,16 @@ export function AdminEmployees() {
       label: 'Branch',
 
       render: (employee) => (
-
         <span className="text-navy-600">
-
           {getBranchName(employee)}
-
         </span>
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Contact
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Contact
+    // --------------------------------------------------------
 
     {
       key: 'contact',
@@ -423,7 +385,6 @@ export function AdminEmployees() {
       label: 'Contact',
 
       render: (employee) => (
-
         <div className="text-xs">
 
           <p
@@ -434,13 +395,9 @@ export function AdminEmployees() {
               text-navy-600
             "
           >
-
             <Phone size={12} />
-
             {employee?.phone || '—'}
-
           </p>
-
 
           <p
             className="
@@ -450,59 +407,99 @@ export function AdminEmployees() {
               text-navy-400
             "
           >
-
             <Mail size={12} />
-
             {employee?.email || '—'}
-
           </p>
 
         </div>
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Salary Rate Per Hour
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Base Salary
+    // --------------------------------------------------------
 
     {
-      key: 'salaryRatePerHour',
+      key: 'baseSalary',
 
-      label: 'Salary',
+      label: 'Base Salary',
 
       align: 'right',
 
       render: (employee) => (
+        <span className="font-semibold text-navy-800">
 
-        <span
-          className="
-            font-semibold
-            text-navy-800
-          "
-        >
+          {formatCurrency(
+            employee?.baseSalary
+          )}
 
-          ₹
-          {Number(
-            employee?.salaryRatePerHour || 0
-          ).toLocaleString('en-IN')}
+          <span className="text-xs text-navy-400 ml-1">
+            /mo
+          </span>
+
+        </span>
+      ),
+    },
+
+
+    // --------------------------------------------------------
+    // Expected Monthly Hours
+    // --------------------------------------------------------
+
+    {
+      key: 'monthlyExpectedHours',
+
+      label: 'Expected Hours',
+
+      align: 'right',
+
+      render: (employee) => (
+        <span className="text-navy-700">
+
+          {formatNumber(
+            employee?.monthlyExpectedHours
+          )}
+
+          <span className="text-xs text-navy-400 ml-1">
+            hrs/mo
+          </span>
+
+        </span>
+      ),
+    },
+
+
+    // --------------------------------------------------------
+    // Calculated Hourly Rate
+    // --------------------------------------------------------
+
+    {
+      key: 'salaryRatePerHour',
+
+      label: 'Hourly Rate',
+
+      align: 'right',
+
+      render: (employee) => (
+        <span className="font-semibold text-navy-800">
+
+          {formatCurrency(
+            employee?.salaryRatePerHour
+          )}
 
           <span className="text-xs text-navy-400 ml-1">
             /hr
           </span>
 
         </span>
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Status
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Status
+    // --------------------------------------------------------
 
     {
       key: 'status',
@@ -512,19 +509,16 @@ export function AdminEmployees() {
       align: 'center',
 
       render: (employee) => (
-
         <StatusBadge
           status={employee?.status}
         />
-
       ),
-
     },
 
 
-    /* ----------------------------------------------------------
-       Edit
-    ---------------------------------------------------------- */
+    // --------------------------------------------------------
+    // Edit
+    // --------------------------------------------------------
 
     {
       key: 'actions',
@@ -534,16 +528,12 @@ export function AdminEmployees() {
       align: 'right',
 
       render: (employee) => (
-
         <button
           type="button"
 
           onClick={() => {
-
             setEditing(employee);
-
             setModalOpen(true);
-
           }}
 
           className="
@@ -555,56 +545,44 @@ export function AdminEmployees() {
             transition-colors
           "
         >
-
           <Pencil size={16} />
-
         </button>
-
       ),
-
     },
 
   ];
 
 
-  /* ============================================================
-     Save Employee
-  ============================================================ */
+  // ==========================================================
+  // Save Employee
+  // ==========================================================
 
   const handleSave = async (formData) => {
-
     try {
-
       setSaving(true);
-
 
       console.log(
         'Employee payload being sent to backend:',
         formData
       );
 
-
       let response;
 
-
-      /* ========================================================
-         UPDATE
-      ======================================================== */
+      // ------------------------------------------------------
+      // UPDATE
+      // ------------------------------------------------------
 
       if (editing) {
-
         response =
           await employeeService.update(
             editing.employeeId,
             formData
           );
 
-
         console.log(
           'Employee update response:',
           response
         );
-
 
         toast(
           'Employee updated successfully',
@@ -613,101 +591,77 @@ export function AdminEmployees() {
 
       }
 
-      /* ========================================================
-         CREATE
-      ======================================================== */
+      // ------------------------------------------------------
+      // CREATE
+      // ------------------------------------------------------
 
       else {
-
         response =
           await employeeService.create(
             formData
           );
-
 
         console.log(
           'Employee create response:',
           response
         );
 
-
         toast(
           'Employee added successfully',
           'success'
         );
-
       }
 
 
-      /* ========================================================
-         Close modal
-      ======================================================== */
+      // ------------------------------------------------------
+      // Close modal
+      // ------------------------------------------------------
 
       setModalOpen(false);
-
       setEditing(null);
 
 
-      /* ========================================================
-         Reload real data from backend
-         
-         This is important.
-         We do NOT create a fake employee locally.
-      ======================================================== */
+      // ------------------------------------------------------
+      // Reload actual backend data
+      // ------------------------------------------------------
 
       await loadData();
 
-
     } catch (error) {
-
       console.error(
         'Employee save failed:',
         error
       );
 
-
-      const message =
-        getErrorMessage(error);
-
-
       toast(
-        message,
+        getErrorMessage(error),
         'error'
       );
 
-
     } finally {
-
       setSaving(false);
-
     }
-
   };
 
 
-  /* ============================================================
-     Loading
-  ============================================================ */
+  // ==========================================================
+  // Loading
+  // ==========================================================
 
   if (loading) {
-
     return (
-
       <FullPageSpinner
         message="Loading employees..."
       />
-
     );
-
   }
 
 
-  /* ============================================================
-     Render
-  ============================================================ */
+  // ==========================================================
+  // Render
+  // ==========================================================
 
   return (
-
     <div>
 
       {/* ======================================================
@@ -715,7 +669,6 @@ export function AdminEmployees() {
       ====================================================== */}
 
       <PageHeader
-
         title="Employees"
 
         subtitle={`
@@ -725,17 +678,12 @@ export function AdminEmployees() {
         `}
 
         actions={
-
           <button
-
             type="button"
 
             onClick={() => {
-
               setEditing(null);
-
               setModalOpen(true);
-
             }}
 
             className="
@@ -745,15 +693,10 @@ export function AdminEmployees() {
               gap-2
             "
           >
-
             <Plus size={18} />
-
             Add Employee
-
           </button>
-
         }
-
       />
 
 
@@ -774,13 +717,9 @@ export function AdminEmployees() {
         <div className="flex-1">
 
           <SearchInput
-
             value={search}
-
             onChange={setSearch}
-
             placeholder="Search by name, email, or ID..."
-
           />
 
         </div>
@@ -789,37 +728,28 @@ export function AdminEmployees() {
         <div className="sm:w-48">
 
           <Select
-
             value={statusFilter}
-
             onChange={setStatusFilter}
-
             placeholder="All Statuses"
 
             options={[
-
               {
                 value: 'ACTIVE',
                 label: 'Active',
               },
-
               {
                 value: 'INACTIVE',
                 label: 'Inactive',
               },
-
               {
                 value: 'SUSPENDED',
                 label: 'Suspended',
               },
-
               {
                 value: 'TERMINATED',
                 label: 'Terminated',
               },
-
             ]}
-
           />
 
         </div>
@@ -834,26 +764,19 @@ export function AdminEmployees() {
       {filtered.length === 0 ? (
 
         <EmptyState
-
           icon={Users}
-
           title="No employees found"
-
           message="
             Try adjusting your search or filters,
             or add a new employee.
           "
-
         />
 
       ) : (
 
         <DataTable
-
           columns={columns}
-
           data={filtered}
-
         />
 
       )}
@@ -864,43 +787,30 @@ export function AdminEmployees() {
       ====================================================== */}
 
       <EmployeeModal
-
         open={modalOpen}
 
         onClose={() => {
-
           if (!saving) {
-
             setModalOpen(false);
-
             setEditing(null);
-
           }
-
         }}
 
         editing={editing}
-
         branches={branches}
-
         departments={departments}
-
         saving={saving}
-
         onSave={handleSave}
-
       />
 
     </div>
-
   );
-
 }
 
 
-/* =================================================================
-   Employee Modal
-================================================================= */
+// =================================================================
+// Employee Modal
+// =================================================================
 
 function EmployeeModal({
   open,
@@ -912,39 +822,33 @@ function EmployeeModal({
   onSave,
 }) {
 
-
   const [form, setForm] = useState({
-
     firstName: '',
-
     lastName: '',
-
     email: '',
-
     phone: '',
-
     gender: '',
-
     hireDate: '',
-
     role: 'EMPLOYEE',
 
+    // New salary configuration
+    baseSalary: '',
+    monthlyExpectedHours: '',
+
+    // Display only.
+    // Backend calculates and stores this.
     salaryRatePerHour: '',
 
     branchId: '',
-
     departmentId: '',
-
     managerId: null,
-
     status: 'ACTIVE',
-
   });
 
 
-  /* ============================================================
-     Reset / Load Form
-  ============================================================ */
+  // ==========================================================
+  // Reset / Load Form
+  // ==========================================================
 
   useEffect(() => {
 
@@ -971,7 +875,6 @@ function EmployeeModal({
 
 
       setForm({
-
         firstName:
           editing?.firstName || '',
 
@@ -992,6 +895,12 @@ function EmployeeModal({
         role:
           editing?.role || 'EMPLOYEE',
 
+        baseSalary:
+          editing?.baseSalary ?? '',
+
+        monthlyExpectedHours:
+          editing?.monthlyExpectedHours ?? '',
+
         salaryRatePerHour:
           editing?.salaryRatePerHour ?? '',
 
@@ -1010,37 +919,27 @@ function EmployeeModal({
 
         status:
           editing?.status || 'ACTIVE',
-
       });
 
     } else {
 
       setForm({
-
         firstName: '',
-
         lastName: '',
-
         email: '',
-
         phone: '',
-
         gender: '',
-
         hireDate: '',
-
         role: 'EMPLOYEE',
 
+        baseSalary: '',
+        monthlyExpectedHours: '',
         salaryRatePerHour: '',
 
         branchId: '',
-
         departmentId: '',
-
         managerId: null,
-
         status: 'ACTIVE',
-
       });
 
     }
@@ -1048,9 +947,31 @@ function EmployeeModal({
   }, [editing, open]);
 
 
-  /* ============================================================
-     Update Field
-  ============================================================ */
+  // ==========================================================
+  // Calculated Hourly Rate
+  // ==========================================================
+
+  const baseSalaryNumber =
+    Number(form.baseSalary);
+
+  const monthlyHoursNumber =
+    Number(form.monthlyExpectedHours);
+
+  const calculatedHourlyRate =
+    Number.isFinite(baseSalaryNumber) &&
+    baseSalaryNumber > 0 &&
+    Number.isFinite(monthlyHoursNumber) &&
+    monthlyHoursNumber > 0
+      ? (
+          baseSalaryNumber /
+          monthlyHoursNumber
+        ).toFixed(2)
+      : '';
+
+
+  // ==========================================================
+  // Update Field
+  // ==========================================================
 
   const updateField = (
     field,
@@ -1058,60 +979,80 @@ function EmployeeModal({
   ) => {
 
     setForm((previous) => ({
-
       ...previous,
-
       [field]: value,
-
     }));
 
   };
 
 
-  /* ============================================================
-     Submit
-  ============================================================ */
+  // ==========================================================
+  // Submit
+  // ==========================================================
 
   const handleSubmit = async (event) => {
 
     event.preventDefault();
 
 
-    /* ==========================================================
-       Basic Frontend Validation
-    ========================================================== */
+    // --------------------------------------------------------
+    // Basic validation
+    // --------------------------------------------------------
 
     if (!form.firstName.trim()) {
-
       return;
-
     }
-
 
     if (!form.lastName.trim()) {
-
       return;
-
     }
-
 
     if (!form.email.trim()) {
-
       return;
-
     }
-
 
     if (!form.branchId) {
-
       return;
-
     }
 
 
-    /* ==========================================================
-       Convert frontend form into EXACT backend payload
-    ========================================================== */
+    // --------------------------------------------------------
+    // Salary validation
+    // --------------------------------------------------------
+
+    const baseSalary =
+      Number(form.baseSalary);
+
+    const monthlyExpectedHours =
+      Number(form.monthlyExpectedHours);
+
+
+    if (
+      !Number.isFinite(baseSalary) ||
+      baseSalary <= 0
+    ) {
+      return;
+    }
+
+
+    if (
+      !Number.isFinite(monthlyExpectedHours) ||
+      monthlyExpectedHours <= 0
+    ) {
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // Backend payload
+    //
+    // Notice:
+    // salaryRatePerHour is NOT sent.
+    //
+    // The backend calculates it from:
+    //
+    // baseSalary / monthlyExpectedHours
+    // --------------------------------------------------------
 
     const payload = {
 
@@ -1136,12 +1077,9 @@ function EmployeeModal({
       role:
         form.role || 'EMPLOYEE',
 
-      salaryRatePerHour:
-        form.salaryRatePerHour === ''
-          ? null
-          : Number(
-              form.salaryRatePerHour
-            ),
+      baseSalary,
+
+      monthlyExpectedHours,
 
       branchId:
         Number(form.branchId),
@@ -1158,7 +1096,6 @@ function EmployeeModal({
 
       status:
         form.status || 'ACTIVE',
-
     };
 
 
@@ -1169,18 +1106,16 @@ function EmployeeModal({
 
 
     await onSave(payload);
-
   };
 
 
-  /* ============================================================
-     Department Options
-  ============================================================ */
+  // ==========================================================
+  // Department Options
+  // ==========================================================
 
   const departmentOptions =
     departments
       .map((department) => ({
-
         value:
           department?.departmentId ??
           department?.id ??
@@ -1190,22 +1125,21 @@ function EmployeeModal({
           department?.departmentName ??
           department?.name ??
           'Unknown Department',
-
       }))
+
       .filter(
         (department) =>
           department.value !== ''
       );
 
 
-  /* ============================================================
-     Branch Options
-  ============================================================ */
+  // ==========================================================
+  // Branch Options
+  // ==========================================================
 
   const branchOptions =
     branches
       .map((branch) => ({
-
         value:
           branch?.branchId ??
           branch?.id ??
@@ -1215,42 +1149,33 @@ function EmployeeModal({
           branch?.branchName ??
           branch?.name ??
           'Unknown Branch',
-
       }))
+
       .filter(
         (branch) =>
           branch.value !== ''
       );
 
 
-  /* ============================================================
-     Render
-  ============================================================ */
+  // ==========================================================
+  // Render
+  // ==========================================================
 
   return (
-
     <Modal
-
       open={open}
-
       onClose={onClose}
-
       title={
         editing
           ? 'Edit Employee'
           : 'Add Employee'
       }
-
       size="lg"
-
     >
 
       <form
-
         onSubmit={handleSubmit}
-
         className="space-y-4"
-
       >
 
         {/* ==================================================
@@ -1277,20 +1202,14 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               First Name
-
               <span className="text-error-500">
                 *
               </span>
-
             </label>
 
-
             <input
-
               className="input-field"
-
               value={form.firstName}
 
               onChange={(event) =>
@@ -1301,7 +1220,6 @@ function EmployeeModal({
               }
 
               required
-
             />
 
           </div>
@@ -1318,20 +1236,14 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Last Name
-
               <span className="text-error-500">
                 *
               </span>
-
             </label>
 
-
             <input
-
               className="input-field"
-
               value={form.lastName}
 
               onChange={(event) =>
@@ -1342,7 +1254,6 @@ function EmployeeModal({
               }
 
               required
-
             />
 
           </div>
@@ -1359,22 +1270,15 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Email
-
               <span className="text-error-500">
                 *
               </span>
-
             </label>
 
-
             <input
-
               type="email"
-
               className="input-field"
-
               value={form.email}
 
               onChange={(event) =>
@@ -1385,7 +1289,6 @@ function EmployeeModal({
               }
 
               required
-
             />
 
           </div>
@@ -1402,18 +1305,12 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Phone
-
             </label>
 
-
             <input
-
               type="tel"
-
               className="input-field"
-
               value={form.phone}
 
               onChange={(event) =>
@@ -1422,7 +1319,6 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             />
 
           </div>
@@ -1439,16 +1335,11 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Gender
-
             </label>
 
-
             <select
-
               className="input-field"
-
               value={form.gender}
 
               onChange={(event) =>
@@ -1457,7 +1348,6 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             >
 
               <option value="">
@@ -1492,18 +1382,12 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Hire Date
-
             </label>
 
-
             <input
-
               type="date"
-
               className="input-field"
-
               value={form.hireDate}
 
               onChange={(event) =>
@@ -1512,7 +1396,6 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             />
 
           </div>
@@ -1529,16 +1412,11 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Department
-
             </label>
 
-
             <select
-
               className="input-field"
-
               value={form.departmentId}
 
               onChange={(event) =>
@@ -1547,26 +1425,20 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             >
 
               <option value="">
                 Select Department
               </option>
 
-
               {departmentOptions.map(
                 (department) => (
-
                   <option
                     key={department.value}
                     value={department.value}
                   >
-
                     {department.label}
-
                   </option>
-
                 )
               )}
 
@@ -1586,20 +1458,14 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Branch
-
               <span className="text-error-500">
                 *
               </span>
-
             </label>
 
-
             <select
-
               className="input-field"
-
               value={form.branchId}
 
               onChange={(event) =>
@@ -1610,26 +1476,20 @@ function EmployeeModal({
               }
 
               required
-
             >
 
               <option value="">
                 Select Branch
               </option>
 
-
               {branchOptions.map(
                 (branch) => (
-
                   <option
                     key={branch.value}
                     value={branch.value}
                   >
-
                     {branch.label}
-
                   </option>
-
                 )
               )}
 
@@ -1638,7 +1498,9 @@ function EmployeeModal({
           </div>
 
 
-          {/* Salary Rate */}
+          {/* ==================================================
+              Base Salary
+          ================================================== */}
 
           <div className="flex flex-col gap-1.5">
 
@@ -1649,34 +1511,127 @@ function EmployeeModal({
                 text-navy-700
               "
             >
+              Base Salary / Month
 
-              Salary Rate / Hour
-
+              <span className="text-error-500">
+                *
+              </span>
             </label>
 
-
             <input
-
               type="number"
-
-              min="0"
-
+              min="0.01"
               step="0.01"
 
               className="input-field"
 
-              value={form.salaryRatePerHour}
+              value={form.baseSalary}
 
               onChange={(event) =>
                 updateField(
-                  'salaryRatePerHour',
+                  'baseSalary',
                   event.target.value
                 )
               }
 
-              placeholder="e.g. 250"
+              placeholder="e.g. 30000"
 
+              required
             />
+
+            <p className="text-xs text-navy-400">
+              Monthly salary before attendance-based calculation.
+            </p>
+
+          </div>
+
+
+          {/* ==================================================
+              Expected Monthly Hours
+          ================================================== */}
+
+          <div className="flex flex-col gap-1.5">
+
+            <label
+              className="
+                text-sm
+                font-medium
+                text-navy-700
+              "
+            >
+              Expected Hours / Month
+
+              <span className="text-error-500">
+                *
+              </span>
+            </label>
+
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+
+              className="input-field"
+
+              value={form.monthlyExpectedHours}
+
+              onChange={(event) =>
+                updateField(
+                  'monthlyExpectedHours',
+                  event.target.value
+                )
+              }
+
+              placeholder="e.g. 208"
+
+              required
+            />
+
+            <p className="text-xs text-navy-400">
+              Expected working hours for one month.
+            </p>
+
+          </div>
+
+
+          {/* ==================================================
+              Calculated Hourly Rate
+          ================================================== */}
+
+          <div className="flex flex-col gap-1.5">
+
+            <label
+              className="
+                text-sm
+                font-medium
+                text-navy-700
+              "
+            >
+              Calculated Hourly Rate
+            </label>
+
+            <div
+              className="
+                input-field
+                bg-navy-50
+                text-navy-700
+                font-semibold
+                flex
+                items-center
+              "
+            >
+
+              {calculatedHourlyRate
+                ? `${formatCurrency(
+                    calculatedHourlyRate
+                  )} / hour`
+                : 'Enter salary and expected hours'}
+
+            </div>
+
+            <p className="text-xs text-navy-400">
+              Base salary ÷ expected monthly hours.
+            </p>
 
           </div>
 
@@ -1692,16 +1647,11 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Role
-
             </label>
 
-
             <select
-
               className="input-field"
-
               value={form.role}
 
               onChange={(event) =>
@@ -1710,7 +1660,6 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             >
 
               <option value="EMPLOYEE">
@@ -1737,16 +1686,11 @@ function EmployeeModal({
                 text-navy-700
               "
             >
-
               Status
-
             </label>
 
-
             <select
-
               className="input-field"
-
               value={form.status}
 
               onChange={(event) =>
@@ -1755,7 +1699,6 @@ function EmployeeModal({
                   event.target.value
                 )
               }
-
             >
 
               <option value="ACTIVE">
@@ -1782,7 +1725,37 @@ function EmployeeModal({
 
 
         {/* ==================================================
-            Information
+            Salary Information
+        ================================================== */}
+
+        <div
+          className="
+            rounded-lg
+            bg-navy-50
+            border
+            border-navy-100
+            p-3
+            text-sm
+            text-navy-600
+          "
+        >
+
+          <p>
+            <strong>Salary calculation:</strong>{' '}
+            Base Salary ÷ Expected Monthly Hours =
+            Hourly Rate.
+          </p>
+
+          <p className="mt-1">
+            The hourly rate is calculated by the backend
+            and used for attendance-based payroll.
+          </p>
+
+        </div>
+
+
+        {/* ==================================================
+            Employee Login Information
         ================================================== */}
 
         {!editing && (
@@ -1828,11 +1801,8 @@ function EmployeeModal({
         >
 
           <button
-
             type="button"
-
             onClick={onClose}
-
             disabled={saving}
 
             className="
@@ -1846,16 +1816,12 @@ function EmployeeModal({
               disabled:opacity-50
             "
           >
-
             Cancel
-
           </button>
 
 
           <button
-
             type="submit"
-
             disabled={saving}
 
             className="
@@ -1880,7 +1846,5 @@ function EmployeeModal({
       </form>
 
     </Modal>
-
   );
-
 }

@@ -37,9 +37,7 @@ import {
 // ============================================================================
 
 export function AdminReports() {
-
   const { toast } = useToast();
-
 
   // ==========================================================================
   // STATE
@@ -72,7 +70,6 @@ export function AdminReports() {
   // ==========================================================================
 
   const reportTypes = [
-
     {
       value: 'attendance',
       label: 'Attendance Report',
@@ -102,7 +99,6 @@ export function AdminReports() {
       label: 'Leaves Report',
       icon: CalendarDays,
     },
-
   ];
 
 
@@ -117,12 +113,10 @@ export function AdminReports() {
   // EXTRACT API ARRAY
   // ==========================================================================
 
-  const extractArray = (response) => {
-
+  const extractArray = (response, possibleKeys = []) => {
     if (Array.isArray(response)) {
       return response;
     }
-
 
     if (
       Array.isArray(response?.data)
@@ -130,16 +124,29 @@ export function AdminReports() {
       return response.data;
     }
 
-
     if (
       Array.isArray(response?.data?.data)
     ) {
       return response.data.data;
     }
 
+    for (
+      const key of possibleKeys
+    ) {
+      if (
+        Array.isArray(response?.[key])
+      ) {
+        return response[key];
+      }
+
+      if (
+        Array.isArray(response?.data?.[key])
+      ) {
+        return response.data[key];
+      }
+    }
 
     return [];
-
   };
 
 
@@ -148,11 +155,9 @@ export function AdminReports() {
   // ==========================================================================
 
   const getEmployeeName = (employee) => {
-
     if (!employee) {
       return '—';
     }
-
 
     const firstName =
       employee?.firstName || '';
@@ -160,10 +165,8 @@ export function AdminReports() {
     const lastName =
       employee?.lastName || '';
 
-
     const fullName =
       `${firstName} ${lastName}`.trim();
-
 
     return (
       fullName ||
@@ -172,7 +175,6 @@ export function AdminReports() {
       employee?.fullName ||
       '—'
     );
-
   };
 
 
@@ -181,31 +183,29 @@ export function AdminReports() {
   // ==========================================================================
 
   const formatDate = (value) => {
-
     if (!value) {
       return '—';
     }
 
-
     const date =
       new Date(value);
-
 
     if (
       Number.isNaN(
         date.getTime()
       )
     ) {
-
       return String(value);
-
     }
 
-
     return date.toLocaleDateString(
-      'en-CA'
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }
     );
-
   };
 
 
@@ -214,26 +214,20 @@ export function AdminReports() {
   // ==========================================================================
 
   const formatMonth = (value) => {
-
     if (!value) {
       return '—';
     }
 
-
     const date =
       new Date(value);
-
 
     if (
       Number.isNaN(
         date.getTime()
       )
     ) {
-
       return String(value);
-
     }
-
 
     return date.toLocaleDateString(
       'en-IN',
@@ -242,7 +236,6 @@ export function AdminReports() {
         year: 'numeric',
       }
     );
-
   };
 
 
@@ -251,26 +244,20 @@ export function AdminReports() {
   // ==========================================================================
 
   const formatTime = (value) => {
-
     if (!value) {
       return '--';
     }
 
-
     const date =
       new Date(value);
-
 
     if (
       Number.isNaN(
         date.getTime()
       )
     ) {
-
       return String(value);
-
     }
-
 
     return date.toLocaleTimeString(
       'en-IN',
@@ -279,7 +266,6 @@ export function AdminReports() {
         minute: '2-digit',
       }
     );
-
   };
 
 
@@ -288,15 +274,16 @@ export function AdminReports() {
   // ==========================================================================
 
   const formatCurrency = (value) => {
-
     const amount =
       Number(value || 0);
 
-
     return amount.toLocaleString(
-      'en-IN'
+      'en-IN',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
     );
-
   };
 
 
@@ -307,26 +294,19 @@ export function AdminReports() {
   const loadReport = async (
     type
   ) => {
-
     try {
-
       setLoading(true);
-
       setError('');
 
-
       let response;
-
 
       // ======================================================================
       // ATTENDANCE
       // ======================================================================
 
       if (type === 'attendance') {
-
         response =
           await attendanceService.list();
-
       }
 
 
@@ -334,11 +314,11 @@ export function AdminReports() {
       // EMPLOYEES
       // ======================================================================
 
-      else if (type === 'employees') {
-
+      else if (
+        type === 'employees'
+      ) {
         response =
           await employeeService.list();
-
       }
 
 
@@ -346,11 +326,11 @@ export function AdminReports() {
       // PAYROLL
       // ======================================================================
 
-      else if (type === 'payroll') {
-
+      else if (
+        type === 'payroll'
+      ) {
         response =
           await payrollService.list();
-
       }
 
 
@@ -358,11 +338,11 @@ export function AdminReports() {
       // ADVANCES
       // ======================================================================
 
-      else if (type === 'advances') {
-
+      else if (
+        type === 'advances'
+      ) {
         response =
           await advanceService.list();
-
       }
 
 
@@ -370,21 +350,11 @@ export function AdminReports() {
       // LEAVE REQUESTS
       // ======================================================================
 
-      else if (type === 'leaves') {
-
-        /*
-         * IMPORTANT:
-         * Current leaveService does NOT have list().
-         *
-         * It exposes:
-         * leaveService.requests()
-         *
-         * which calls GET /api/leave-requests
-         */
-
+      else if (
+        type === 'leaves'
+      ) {
         response =
           await leaveService.requests();
-
       }
 
 
@@ -394,8 +364,23 @@ export function AdminReports() {
       );
 
 
+      // ======================================================================
+      // GET ARRAY
+      // ======================================================================
+
       const records =
-        extractArray(response);
+        extractArray(
+          response,
+          type === 'payroll'
+            ? ['payrolls']
+            : type === 'advances'
+              ? ['advances']
+              : type === 'leaves'
+                ? ['requests']
+                : type === 'employees'
+                  ? ['employees']
+                  : ['records']
+        );
 
 
       // ======================================================================
@@ -409,12 +394,12 @@ export function AdminReports() {
       // ATTENDANCE
       // ======================================================================
 
-      if (type === 'attendance') {
-
+      if (
+        type === 'attendance'
+      ) {
         normalizedData =
           records.map(
             (record) => ({
-
               employee_id:
                 record?.employeeId ??
                 record?.employee?.employeeId ??
@@ -448,10 +433,8 @@ export function AdminReports() {
               status:
                 record?.status ||
                 '—',
-
             })
           );
-
       }
 
 
@@ -459,54 +442,70 @@ export function AdminReports() {
       // EMPLOYEES
       // ======================================================================
 
-      else if (type === 'employees') {
-
+      else if (
+        type === 'employees'
+      ) {
         normalizedData =
           records.map(
-            (employee) => ({
-
-              employee_id:
-                employee?.employeeId ??
-                employee?.id ??
-                '—',
-
-              name:
-                getEmployeeName(
-                  employee
-                ),
-
-              department:
-                employee?.department
-                  ?.departmentName ??
-                employee?.departmentName ??
-                '—',
-
-              branch:
-                employee?.branch
-                  ?.branchName ??
-                employee?.branchName ??
-                '—',
-
-              designation:
-                employee?.designation ??
-                employee?.role ??
-                '—',
-
-              salary:
+            (employee) => {
+              const baseSalary =
                 Number(
-                  employee?.salary ??
-                  employee?.basicSalary ??
-                  employee?.salaryRatePerHour ??
-                  0
-                ),
+                  employee?.baseSalary || 0
+                );
 
-              status:
-                employee?.status ||
-                '—',
+              const expectedHours =
+                Number(
+                  employee?.monthlyExpectedHours || 0
+                );
 
-            })
+              const hourlyRate =
+                Number(
+                  employee?.salaryRatePerHour || 0
+                );
+
+              return {
+                employee_id:
+                  employee?.employeeId ??
+                  employee?.id ??
+                  '—',
+
+                name:
+                  getEmployeeName(
+                    employee
+                  ),
+
+                department:
+                  employee?.department
+                    ?.departmentName ??
+                  employee?.departmentName ??
+                  '—',
+
+                branch:
+                  employee?.branch
+                    ?.branchName ??
+                  employee?.branchName ??
+                  '—',
+
+                designation:
+                  employee?.designation ??
+                  employee?.role ??
+                  '—',
+
+                base_salary:
+                  baseSalary,
+
+                expected_hours:
+                  expectedHours,
+
+                hourly_rate:
+                  hourlyRate,
+
+                status:
+                  employee?.status ||
+                  '—',
+              };
+            }
           );
-
       }
 
 
@@ -514,46 +513,55 @@ export function AdminReports() {
       // PAYROLL
       // ======================================================================
 
-      else if (type === 'payroll') {
-
+      else if (
+        type === 'payroll'
+      ) {
         normalizedData =
           records.map(
             (record) => {
-
               const employee =
                 record?.employee;
 
-
               const basicSalary =
                 Number(
-                  record?.basicSalary ??
-                  record?.basic_salary ??
-                  0
+                  record?.basicSalary || 0
                 );
 
-
-              const deductions =
+              const advanceDeduction =
                 Number(
-                  record?.advanceDeduction ??
-                  record?.advance_deduction ??
-                  record?.deductions ??
-                  0
+                  record?.advanceDeduction || 0
                 );
-
 
               const netSalary =
                 Number(
-                  record?.netSalary ??
-                  record?.net_salary ??
+                  record?.netSalary ?? 
                   (
                     basicSalary -
-                    deductions
+                    advanceDeduction
                   )
                 );
 
+              const baseSalary =
+                Number(
+                  record?.baseSalary || 0
+                );
+
+              const monthlyExpectedHours =
+                Number(
+                  record?.monthlyExpectedHours || 0
+                );
+
+              const salaryRatePerHour =
+                Number(
+                  record?.salaryRatePerHour || 0
+                );
+
+              const totalWorkingHours =
+                Number(
+                  record?.totalWorkingHours || 0
+                );
 
               return {
-
                 employee_id:
                   record?.employeeId ??
                   employee?.employeeId ??
@@ -571,21 +579,35 @@ export function AdminReports() {
                         '—'
                       ),
 
-                month:
-                  record?.month
-                    ? formatMonth(
-                        record.month
-                      )
-                    : (
-                        record?.payrollMonth ||
-                        '—'
-                      ),
+                pay_period:
+                  `${formatDate(
+                    record?.payPeriodStart
+                  )} - ${formatDate(
+                    record?.payPeriodEnd
+                  )}`,
+
+                payment_date:
+                  formatDate(
+                    record?.paymentDate
+                  ),
+
+                base_salary:
+                  baseSalary,
+
+                expected_hours:
+                  monthlyExpectedHours,
+
+                hourly_rate:
+                  salaryRatePerHour,
+
+                actual_hours:
+                  totalWorkingHours,
 
                 basic_salary:
                   basicSalary,
 
-                deductions:
-                  deductions,
+                advance_deduction:
+                  advanceDeduction,
 
                 net_salary:
                   netSalary,
@@ -593,12 +615,9 @@ export function AdminReports() {
                 status:
                   record?.status ||
                   '—',
-
               };
-
             }
           );
-
       }
 
 
@@ -606,18 +625,16 @@ export function AdminReports() {
       // ADVANCES
       // ======================================================================
 
-      else if (type === 'advances') {
-
+      else if (
+        type === 'advances'
+      ) {
         normalizedData =
           records.map(
             (record) => {
-
               const employee =
                 record?.employee;
 
-
               return {
-
                 employee_id:
                   record?.employeeId ??
                   employee?.employeeId ??
@@ -635,12 +652,19 @@ export function AdminReports() {
                         '—'
                       ),
 
-                amount:
+                requested_amount:
                   Number(
-                    record?.amount ??
-                    record?.advanceAmount ??
-                    record?.advance_amount ??
-                    0
+                    record?.amount || 0
+                  ),
+
+                approved_amount:
+                  Number(
+                    record?.approvedAmount || 0
+                  ),
+
+                paid_amount:
+                  Number(
+                    record?.paidAmount || 0
                   ),
 
                 reason:
@@ -650,20 +674,16 @@ export function AdminReports() {
 
                 request_date:
                   formatDate(
-                    record?.requestDate ??
-                    record?.request_date ??
+                    record?.paymentDate ??
                     record?.createdAt
                   ),
 
                 status:
                   record?.status ||
                   '—',
-
               };
-
             }
           );
-
       }
 
 
@@ -671,22 +691,19 @@ export function AdminReports() {
       // LEAVES
       // ======================================================================
 
-      else if (type === 'leaves') {
-
+      else if (
+        type === 'leaves'
+      ) {
         normalizedData =
           records.map(
             (record) => {
-
               const employee =
                 record?.employee;
-
 
               const leaveType =
                 record?.leaveType;
 
-
               return {
-
                 employee_id:
                   record?.employeeId ??
                   employee?.employeeId ??
@@ -711,28 +728,42 @@ export function AdminReports() {
                   record?.leaveType ??
                   '—',
 
-                days:
+                requested_days:
                   Number(
-                    record?.days ??
-                    record?.totalDays ??
-                    0
+                    record?.totalDays || 0
+                  ),
+
+                approved_days:
+                  Number(
+                    record?.approvedDays || 0
                   ),
 
                 start_date:
                   formatDate(
-                    record?.startDate ??
-                    record?.start_date
+                    record?.startDate
+                  ),
+
+                end_date:
+                  formatDate(
+                    record?.endDate
+                  ),
+
+                approved_start_date:
+                  formatDate(
+                    record?.approvedStartDate
+                  ),
+
+                approved_end_date:
+                  formatDate(
+                    record?.approvedEndDate
                   ),
 
                 status:
                   record?.status ||
                   '—',
-
               };
-
             }
           );
-
       }
 
 
@@ -741,23 +772,21 @@ export function AdminReports() {
       );
 
     } catch (err) {
-
       console.error(
         `Failed to load ${type} report:`,
         err
       );
-
 
       const message =
         err?.response?.data?.message ||
         err?.message ||
         `Failed to load ${type} report`;
 
-
-      setError(message);
+      setError(
+        message
+      );
 
       setData([]);
-
 
       toast(
         message,
@@ -765,11 +794,8 @@ export function AdminReports() {
       );
 
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
@@ -779,21 +805,17 @@ export function AdminReports() {
 
   const loadFinancialSummary =
     async () => {
-
       try {
-
-        setSummaryLoading(true);
-
+        setSummaryLoading(
+          true
+        );
 
         const [
           advanceResponse,
           payrollResponse,
         ] = await Promise.all([
-
           advanceService.list(),
-
           payrollService.list(),
-
         ]);
 
 
@@ -811,18 +833,23 @@ export function AdminReports() {
 
         const advances =
           extractArray(
-            advanceResponse
+            advanceResponse,
+            ['advances']
           );
 
 
         const payroll =
           extractArray(
-            payrollResponse
+            payrollResponse,
+            ['payrolls']
           );
 
 
         // ====================================================================
-        // TOTAL ADVANCE PAYMENT
+        // TOTAL ACTUAL ADVANCE PAYMENT
+        //
+        // Only PAID advances are counted because paidAmount represents
+        // the actual amount that was given to the employee.
         // ====================================================================
 
         const advanceTotal =
@@ -831,17 +858,18 @@ export function AdminReports() {
               total,
               record
             ) => {
+              if (
+                record?.status !== 'PAID'
+              ) {
+                return total;
+              }
 
               return (
                 total +
                 Number(
-                  record?.amount ??
-                  record?.advanceAmount ??
-                  record?.advance_amount ??
-                  0
+                  record?.paidAmount || 0
                 )
               );
-
             },
             0
           );
@@ -849,6 +877,8 @@ export function AdminReports() {
 
         // ====================================================================
         // TOTAL PAYROLL AMOUNT
+        //
+        // Net salary represents the final payroll amount after deductions.
         // ====================================================================
 
         const payrollTotal =
@@ -857,25 +887,15 @@ export function AdminReports() {
               total,
               record
             ) => {
-
-              /*
-               * Net salary is used because it represents
-               * the final payroll amount after deductions.
-               */
-
               const netSalary =
                 Number(
-                  record?.netSalary ??
-                  record?.net_salary ??
-                  0
+                  record?.netSalary || 0
                 );
-
 
               return (
                 total +
                 netSalary
               );
-
             },
             0
           );
@@ -885,29 +905,29 @@ export function AdminReports() {
           advanceTotal
         );
 
-
         setTotalPayrollAmount(
           payrollTotal
         );
 
       } catch (err) {
-
         console.error(
           'Failed to load financial summary:',
           err
         );
 
+        setTotalAdvancePayment(
+          0
+        );
 
-        setTotalAdvancePayment(0);
-
-        setTotalPayrollAmount(0);
+        setTotalPayrollAmount(
+          0
+        );
 
       } finally {
-
-        setSummaryLoading(false);
-
+        setSummaryLoading(
+          false
+        );
       }
-
     };
 
 
@@ -916,22 +936,18 @@ export function AdminReports() {
   // ==========================================================================
 
   useEffect(() => {
-
     loadReport(
       reportType
     );
-
   }, [reportType]);
 
 
   // ==========================================================================
-  // LOAD FINANCIAL SUMMARY ON PAGE LOAD
+  // LOAD FINANCIAL SUMMARY
   // ==========================================================================
 
   useEffect(() => {
-
     loadFinancialSummary();
-
   }, []);
 
 
@@ -940,843 +956,564 @@ export function AdminReports() {
   // ==========================================================================
 
   const getColumns = () => {
-
     switch (reportType) {
 
-
-      // ======================================================================
+      // ========================================================================
       // ATTENDANCE
-      // ======================================================================
+      // ========================================================================
 
       case 'attendance':
-
         return [
-
           {
             key: 'employee_id',
-
             label: 'Emp ID',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-xs
-                  text-navy-600
-                "
-              >
-
+              <span className="font-mono text-xs text-navy-600">
                 {record.employee_id}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'employee_name',
-
             label: 'Name',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-medium
-                  text-navy-900
-                "
-              >
-
+              <span className="font-medium text-navy-900">
                 {record.employee_name}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'date',
-
             label: 'Date',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
+              <span className="text-navy-600">
                 {record.date}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'check_in',
-
             label: 'In',
-
             align: 'center',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-navy-700
-                "
-              >
-
+              <span className="font-mono text-navy-700">
                 {record.check_in}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'check_out',
-
             label: 'Out',
-
             align: 'center',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-navy-700
-                "
-              >
-
+              <span className="font-mono text-navy-700">
                 {record.check_out}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'work_hours',
-
             label: 'Hours',
-
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-semibold
-                  text-navy-700
-                "
-              >
-
+              <span className="font-semibold text-navy-700">
                 {record.work_hours > 0
                   ? `${record.work_hours}h`
-                  : '--'
-                }
-
+                  : '--'}
               </span>
-
             ),
-
           },
-
 
           {
             key: 'status',
-
             label: 'Status',
-
             align: 'center',
-
             render: (record) => (
-
               <StatusBadge
-                status={
-                  record.status
-                }
+                status={record.status}
               />
-
             ),
-
           },
-
         ];
 
 
-      // ======================================================================
+      // ========================================================================
       // EMPLOYEES
-      // ======================================================================
+      // ========================================================================
 
       case 'employees':
-
         return [
-
           {
             key: 'employee_id',
-
             label: 'Emp ID',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-xs
-                  text-navy-600
-                "
-              >
-
+              <span className="font-mono text-xs text-navy-600">
                 {record.employee_id}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'name',
-
             label: 'Name',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-medium
-                  text-navy-900
-                "
-              >
-
+              <span className="font-medium text-navy-900">
                 {record.name}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'department',
-
             label: 'Dept',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
+              <span className="text-navy-600">
                 {record.department}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'branch',
-
             label: 'Branch',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
+              <span className="text-navy-600">
                 {record.branch}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'designation',
-
             label: 'Designation',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
+              <span className="text-navy-600">
                 {record.designation}
-
               </span>
-
             ),
-
           },
-
 
           {
-            key: 'salary',
-
-            label: 'Salary',
-
+            key: 'base_salary',
+            label: 'Base Salary',
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-semibold
-                  text-navy-800
-                "
-              >
-
-                ₹
-                {formatCurrency(
-                  record.salary
+              <span className="font-semibold text-navy-800">
+                ₹{formatCurrency(
+                  record.base_salary
                 )}
-
               </span>
-
             ),
-
           },
 
+          {
+            key: 'expected_hours',
+            label: 'Expected Hrs',
+            align: 'right',
+            render: (record) => (
+              <span className="text-navy-700">
+                {Number(
+                  record.expected_hours || 0
+                ).toFixed(2)}
+              </span>
+            ),
+          },
+
+          {
+            key: 'hourly_rate',
+            label: 'Hourly Rate',
+            align: 'right',
+            render: (record) => (
+              <span className="text-navy-700">
+                ₹{formatCurrency(
+                  record.hourly_rate
+                )}
+              </span>
+            ),
+          },
 
           {
             key: 'status',
-
             label: 'Status',
-
             align: 'center',
-
             render: (record) => (
-
               <StatusBadge
-                status={
-                  record.status
-                }
+                status={record.status}
               />
-
             ),
-
           },
-
         ];
 
 
-      // ======================================================================
+      // ========================================================================
       // PAYROLL
-      // ======================================================================
+      // ========================================================================
 
       case 'payroll':
-
         return [
-
           {
             key: 'employee_id',
-
             label: 'Emp ID',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-xs
-                  text-navy-600
-                "
-              >
-
+              <span className="font-mono text-xs text-navy-600">
                 {record.employee_id}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'employee_name',
-
             label: 'Name',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-medium
-                  text-navy-900
-                "
-              >
-
+              <span className="font-medium text-navy-900">
                 {record.employee_name}
-
               </span>
-
             ),
-
           },
-
 
           {
-            key: 'month',
-
-            label: 'Month',
-
+            key: 'pay_period',
+            label: 'Pay Period',
             render: (record) => (
+              <div>
+                <div className="text-sm text-navy-700">
+                  {record.pay_period}
+                </div>
 
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
-                {record.month}
-
-              </span>
-
+                {record.payment_date !== '—' && (
+                  <div className="text-xs text-navy-400 mt-1">
+                    Paid: {record.payment_date}
+                  </div>
+                )}
+              </div>
             ),
-
           },
 
+          {
+            key: 'base_salary',
+            label: 'Base Salary',
+            align: 'right',
+            render: (record) => (
+              <span className="text-navy-700">
+                ₹{formatCurrency(
+                  record.base_salary
+                )}
+              </span>
+            ),
+          },
+
+          {
+            key: 'expected_hours',
+            label: 'Expected Hrs',
+            align: 'right',
+            render: (record) => (
+              <span className="text-navy-700">
+                {Number(
+                  record.expected_hours || 0
+                ).toFixed(2)}
+              </span>
+            ),
+          },
+
+          {
+            key: 'hourly_rate',
+            label: 'Hourly Rate',
+            align: 'right',
+            render: (record) => (
+              <span className="text-navy-700">
+                ₹{formatCurrency(
+                  record.hourly_rate
+                )}
+              </span>
+            ),
+          },
+
+          {
+            key: 'actual_hours',
+            label: 'Actual Hrs',
+            align: 'right',
+            render: (record) => (
+              <span className="font-semibold text-navy-800">
+                {Number(
+                  record.actual_hours || 0
+                ).toFixed(2)}
+              </span>
+            ),
+          },
 
           {
             key: 'basic_salary',
-
-            label: 'Basic',
-
+            label: 'Earned Salary',
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
-                ₹
-                {formatCurrency(
+              <span className="text-navy-700">
+                ₹{formatCurrency(
                   record.basic_salary
                 )}
-
               </span>
-
             ),
-
           },
-
 
           {
-            key: 'deductions',
-
-            label: 'Deductions',
-
+            key: 'advance_deduction',
+            label: 'Advance',
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-red-600
-                "
-              >
-
-                ₹
-                {formatCurrency(
-                  record.deductions
-                )}
-
-              </span>
-
+              record.advance_deduction > 0 ? (
+                <span className="text-red-600">
+                  -₹{formatCurrency(
+                    record.advance_deduction
+                  )}
+                </span>
+              ) : (
+                <span className="text-navy-400">
+                  —
+                </span>
+              )
             ),
-
           },
-
 
           {
             key: 'net_salary',
-
-            label: 'Net',
-
+            label: 'Net Pay',
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-bold
-                  text-navy-900
-                "
-              >
-
-                ₹
-                {formatCurrency(
+              <span className="font-bold text-navy-900">
+                ₹{formatCurrency(
                   record.net_salary
                 )}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'status',
-
             label: 'Status',
-
             align: 'center',
-
             render: (record) => (
-
               <StatusBadge
-                status={
-                  record.status
-                }
+                status={record.status}
               />
-
             ),
-
           },
-
         ];
 
 
-      // ======================================================================
+      // ========================================================================
       // ADVANCES
-      // ======================================================================
+      // ========================================================================
 
       case 'advances':
-
         return [
-
           {
             key: 'employee_id',
-
             label: 'Emp ID',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-xs
-                  text-navy-600
-                "
-              >
-
+              <span className="font-mono text-xs text-navy-600">
                 {record.employee_id}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'employee_name',
-
             label: 'Name',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-medium
-                  text-navy-900
-                "
-              >
-
+              <span className="font-medium text-navy-900">
                 {record.employee_name}
-
               </span>
-
             ),
-
           },
-
 
           {
-            key: 'amount',
-
-            label: 'Amount',
-
+            key: 'requested_amount',
+            label: 'Requested',
             align: 'right',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-bold
-                  text-navy-900
-                "
-              >
-
-                ₹
-                {formatCurrency(
-                  record.amount
+              <span className="text-navy-700">
+                ₹{formatCurrency(
+                  record.requested_amount
                 )}
-
               </span>
-
             ),
-
           },
 
+          {
+            key: 'approved_amount',
+            label: 'Approved',
+            align: 'right',
+            render: (record) => (
+              record.approved_amount > 0 ? (
+                <span className="text-navy-700">
+                  ₹{formatCurrency(
+                    record.approved_amount
+                  )}
+                </span>
+              ) : (
+                <span className="text-navy-400">
+                  —
+                </span>
+              )
+            ),
+          },
+
+          {
+            key: 'paid_amount',
+            label: 'Paid',
+            align: 'right',
+            render: (record) => (
+              record.paid_amount > 0 ? (
+                <span className="font-semibold text-navy-900">
+                  ₹{formatCurrency(
+                    record.paid_amount
+                  )}
+                </span>
+              ) : (
+                <span className="text-navy-400">
+                  —
+                </span>
+              )
+            ),
+          },
 
           {
             key: 'reason',
-
             label: 'Reason',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-sm
-                  text-navy-500
-                "
-              >
-
+              <span className="text-sm text-navy-500">
                 {record.reason}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'request_date',
-
             label: 'Date',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-sm
-                  text-navy-500
-                "
-              >
-
+              <span className="text-sm text-navy-500">
                 {record.request_date}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'status',
-
             label: 'Status',
-
             align: 'center',
-
             render: (record) => (
-
               <StatusBadge
-                status={
-                  record.status
-                }
+                status={record.status}
               />
-
             ),
-
           },
-
         ];
 
 
-      // ======================================================================
+      // ========================================================================
       // LEAVES
-      // ======================================================================
+      // ========================================================================
 
       case 'leaves':
-
         return [
-
           {
             key: 'employee_id',
-
             label: 'Emp ID',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-mono
-                  text-xs
-                  text-navy-600
-                "
-              >
-
+              <span className="font-mono text-xs text-navy-600">
                 {record.employee_id}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'employee_name',
-
             label: 'Name',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-medium
-                  text-navy-900
-                "
-              >
-
+              <span className="font-medium text-navy-900">
                 {record.employee_name}
-
               </span>
-
             ),
-
           },
-
 
           {
             key: 'leave_type',
-
             label: 'Type',
-
             render: (record) => (
-
-              <span
-                className="
-                  text-navy-600
-                "
-              >
-
+              <span className="text-navy-600">
                 {record.leave_type}
-
               </span>
-
             ),
-
           },
-
 
           {
-            key: 'days',
-
-            label: 'Days',
-
+            key: 'requested_days',
+            label: 'Requested',
             align: 'center',
-
             render: (record) => (
-
-              <span
-                className="
-                  font-semibold
-                  text-navy-700
-                "
-              >
-
-                {record.days}
-
+              <span className="font-semibold text-navy-700">
+                {Number(
+                  record.requested_days || 0
+                ).toFixed(2)}
               </span>
-
             ),
-
           },
 
+          {
+            key: 'approved_days',
+            label: 'Approved',
+            align: 'center',
+            render: (record) => (
+              <span className="font-semibold text-navy-700">
+                {record.approved_days > 0
+                  ? Number(
+                      record.approved_days
+                    ).toFixed(2)
+                  : '—'}
+              </span>
+            ),
+          },
 
           {
             key: 'start_date',
-
-            label: 'Start',
-
+            label: 'Requested Start',
             render: (record) => (
-
-              <span
-                className="
-                  text-sm
-                  text-navy-500
-                "
-              >
-
+              <span className="text-sm text-navy-500">
                 {record.start_date}
-
               </span>
-
             ),
-
           },
 
+          {
+            key: 'approved_start_date',
+            label: 'Approved Start',
+            render: (record) => (
+              <span className="text-sm text-navy-500">
+                {record.approved_start_date}
+              </span>
+            ),
+          },
 
           {
             key: 'status',
-
             label: 'Status',
-
             align: 'center',
-
             render: (record) => (
-
               <StatusBadge
-                status={
-                  record.status
-                }
+                status={record.status}
               />
-
             ),
-
           },
-
         ];
 
 
       default:
-
         return [];
-
     }
-
   };
 
 
@@ -1787,37 +1524,28 @@ export function AdminReports() {
   const escapeCsvValue = (
     value
   ) => {
-
     if (
       value === null ||
       value === undefined
     ) {
-
       return '';
-
     }
-
 
     const stringValue =
       String(value);
-
 
     if (
       stringValue.includes(',') ||
       stringValue.includes('"') ||
       stringValue.includes('\n')
     ) {
-
       return `"${stringValue.replace(
         /"/g,
         '""'
       )}"`;
-
     }
 
-
     return stringValue;
-
   };
 
 
@@ -1826,21 +1554,16 @@ export function AdminReports() {
   // ==========================================================================
 
   const handleExportCSV = () => {
-
     if (!data.length) {
-
       toast(
         'There is no data to export',
         'error'
       );
 
       return;
-
     }
 
-
     let headers = [];
-
     let rows = [];
 
 
@@ -1851,47 +1574,28 @@ export function AdminReports() {
     if (
       reportType === 'attendance'
     ) {
-
       headers = [
-
         'Employee ID',
-
         'Employee Name',
-
         'Date',
-
         'Check In',
-
         'Check Out',
-
         'Work Hours',
-
         'Status',
-
       ];
-
 
       rows =
         data.map(
           (record) => [
-
             record.employee_id,
-
             record.employee_name,
-
             record.date,
-
             record.check_in,
-
             record.check_out,
-
             record.work_hours,
-
             record.status,
-
           ]
         );
-
     }
 
 
@@ -1902,47 +1606,32 @@ export function AdminReports() {
     else if (
       reportType === 'employees'
     ) {
-
       headers = [
-
         'Employee ID',
-
         'Name',
-
         'Department',
-
         'Branch',
-
         'Designation',
-
-        'Salary',
-
+        'Base Salary',
+        'Expected Hours',
+        'Hourly Rate',
         'Status',
-
       ];
-
 
       rows =
         data.map(
           (record) => [
-
             record.employee_id,
-
             record.name,
-
             record.department,
-
             record.branch,
-
             record.designation,
-
-            record.salary,
-
+            record.base_salary,
+            record.expected_hours,
+            record.hourly_rate,
             record.status,
-
           ]
         );
-
     }
 
 
@@ -1953,47 +1642,38 @@ export function AdminReports() {
     else if (
       reportType === 'payroll'
     ) {
-
       headers = [
-
         'Employee ID',
-
         'Employee Name',
-
-        'Month',
-
-        'Basic Salary',
-
-        'Deductions',
-
+        'Pay Period',
+        'Base Salary',
+        'Expected Hours',
+        'Hourly Rate',
+        'Actual Working Hours',
+        'Earned Salary',
+        'Advance Deduction',
         'Net Salary',
-
+        'Payment Date',
         'Status',
-
       ];
-
 
       rows =
         data.map(
           (record) => [
-
             record.employee_id,
-
             record.employee_name,
-
-            record.month,
-
+            record.pay_period,
+            record.base_salary,
+            record.expected_hours,
+            record.hourly_rate,
+            record.actual_hours,
             record.basic_salary,
-
-            record.deductions,
-
+            record.advance_deduction,
             record.net_salary,
-
+            record.payment_date,
             record.status,
-
           ]
         );
-
     }
 
 
@@ -2004,43 +1684,30 @@ export function AdminReports() {
     else if (
       reportType === 'advances'
     ) {
-
       headers = [
-
         'Employee ID',
-
         'Employee Name',
-
-        'Amount',
-
+        'Requested Amount',
+        'Approved Amount',
+        'Paid Amount',
         'Reason',
-
-        'Request Date',
-
+        'Date',
         'Status',
-
       ];
-
 
       rows =
         data.map(
           (record) => [
-
             record.employee_id,
-
             record.employee_name,
-
-            record.amount,
-
+            record.requested_amount,
+            record.approved_amount,
+            record.paid_amount,
             record.reason,
-
             record.request_date,
-
             record.status,
-
           ]
         );
-
     }
 
 
@@ -2051,43 +1718,34 @@ export function AdminReports() {
     else if (
       reportType === 'leaves'
     ) {
-
       headers = [
-
         'Employee ID',
-
         'Employee Name',
-
         'Leave Type',
-
-        'Days',
-
-        'Start Date',
-
+        'Requested Days',
+        'Approved Days',
+        'Requested Start',
+        'Requested End',
+        'Approved Start',
+        'Approved End',
         'Status',
-
       ];
-
 
       rows =
         data.map(
           (record) => [
-
             record.employee_id,
-
             record.employee_name,
-
             record.leave_type,
-
-            record.days,
-
+            record.requested_days,
+            record.approved_days,
             record.start_date,
-
+            record.end_date,
+            record.approved_start_date,
+            record.approved_end_date,
             record.status,
-
           ]
         );
-
     }
 
 
@@ -2096,7 +1754,6 @@ export function AdminReports() {
     // ========================================================================
 
     const csv = [
-
       headers
         .map(
           escapeCsvValue
@@ -2111,7 +1768,6 @@ export function AdminReports() {
             )
             .join(',')
       ),
-
     ].join('\n');
 
 
@@ -2121,7 +1777,7 @@ export function AdminReports() {
 
     const blob =
       new Blob(
-        [csv],
+        ['\uFEFF' + csv],
         {
           type:
             'text/csv;charset=utf-8;',
@@ -2172,7 +1828,6 @@ export function AdminReports() {
       `${current?.label || 'Report'} exported successfully`,
       'success'
     );
-
   };
 
 
@@ -2181,9 +1836,7 @@ export function AdminReports() {
   // ==========================================================================
 
   if (loading) {
-
     return (
-
       <FullPageSpinner
         message={
           `Loading ${
@@ -2192,9 +1845,7 @@ export function AdminReports() {
           }...`
         }
       />
-
     );
-
   }
 
 
@@ -2203,7 +1854,6 @@ export function AdminReports() {
   // ==========================================================================
 
   return (
-
     <div>
 
       {/* ====================================================================
@@ -2211,44 +1861,31 @@ export function AdminReports() {
       ===================================================================== */}
 
       <PageHeader
-
         title="Reports"
-
         subtitle="
           Generate and export workforce reports
         "
-
         actions={
-
           <button
-
             type="button"
-
             onClick={
               handleExportCSV
             }
-
             disabled={
               data.length === 0
             }
-
             className="
               btn-secondary
               flex
               items-center
               gap-2
             "
-
           >
-
             <Download size={18} />
 
             Export CSV
-
           </button>
-
         }
-
       />
 
 
@@ -2267,7 +1904,7 @@ export function AdminReports() {
       >
 
         {/* ==================================================================
-            TOTAL ADVANCE PAYMENT
+            TOTAL ACTUAL ADVANCE PAYMENT
         =================================================================== */}
 
         <div
@@ -2293,9 +1930,7 @@ export function AdminReports() {
                 mb-1
               "
             >
-
               Total Advance Payment
-
             </p>
 
 
@@ -2306,17 +1941,11 @@ export function AdminReports() {
                 text-navy-900
               "
             >
-
               {summaryLoading
-
                 ? 'Loading...'
-
                 : `₹${formatCurrency(
                     totalAdvancePayment
-                  )}`
-
-              }
-
+                  )}`}
             </h2>
 
 
@@ -2327,9 +1956,7 @@ export function AdminReports() {
                 mt-1
               "
             >
-
-              Total employee advances
-
+              Actual amount paid to employees
             </p>
 
           </div>
@@ -2346,12 +1973,10 @@ export function AdminReports() {
               justify-center
             "
           >
-
             <Banknote
               size={24}
               className="text-navy-600"
             />
-
           </div>
 
         </div>
@@ -2384,9 +2009,7 @@ export function AdminReports() {
                 mb-1
               "
             >
-
               Total Payroll Amount
-
             </p>
 
 
@@ -2397,17 +2020,11 @@ export function AdminReports() {
                 text-navy-900
               "
             >
-
               {summaryLoading
-
                 ? 'Loading...'
-
                 : `₹${formatCurrency(
                     totalPayrollAmount
-                  )}`
-
-              }
-
+                  )}`}
             </h2>
 
 
@@ -2418,9 +2035,7 @@ export function AdminReports() {
                 mt-1
               "
             >
-
               Total net payroll
-
             </p>
 
           </div>
@@ -2437,12 +2052,10 @@ export function AdminReports() {
               justify-center
             "
           >
-
             <Wallet
               size={24}
               className="text-navy-600"
             />
-
           </div>
 
         </div>
@@ -2467,32 +2080,24 @@ export function AdminReports() {
 
         {reportTypes.map(
           (report) => {
-
             const Icon =
               report.icon;
-
 
             const active =
               reportType ===
               report.value;
 
-
             return (
-
               <button
-
                 key={
                   report.value
                 }
-
                 type="button"
-
                 onClick={() =>
                   setReportType(
                     report.value
                   )
                 }
-
                 className={`
                   card-hover
                   p-4
@@ -2504,7 +2109,6 @@ export function AdminReports() {
                       : ''
                   }
                 `}
-
               >
 
                 <div
@@ -2523,9 +2127,9 @@ export function AdminReports() {
                     }
                   `}
                 >
-
-                  <Icon size={20} />
-
+                  <Icon
+                    size={20}
+                  />
                 </div>
 
 
@@ -2540,15 +2144,11 @@ export function AdminReports() {
                     }
                   `}
                 >
-
                   {report.label}
-
                 </p>
 
               </button>
-
             );
-
           }
         )}
 
@@ -2560,7 +2160,6 @@ export function AdminReports() {
       ===================================================================== */}
 
       {error && (
-
         <div
           className="
             mb-4
@@ -2574,11 +2173,8 @@ export function AdminReports() {
             text-red-700
           "
         >
-
           {error}
-
         </div>
-
       )}
 
 
@@ -2607,9 +2203,7 @@ export function AdminReports() {
             text-navy-900
           "
         >
-
           {current?.label}
-
         </h3>
 
       </div>
@@ -2620,39 +2214,25 @@ export function AdminReports() {
       ===================================================================== */}
 
       {data.length === 0 ? (
-
         <EmptyState
-
           icon={FileBarChart}
-
           title="No data"
-
           message="
             No data is available for this report.
           "
-
         />
-
       ) : (
-
         <DataTable
-
           columns={
             getColumns()
           }
-
           data={data}
-
           emptyMessage="
             No data for this report
           "
-
         />
-
       )}
 
     </div>
-
   );
-
 }

@@ -1,5 +1,6 @@
 const prisma = require("../config/database");
 
+
 // ======================================================
 // HELPERS
 // ======================================================
@@ -9,7 +10,9 @@ const parseDate = (value, fieldName) => {
         return null;
     }
 
-    const date = new Date(`${value}T00:00:00.000Z`);
+    const date = new Date(
+        `${value}T00:00:00.000Z`
+    );
 
     if (Number.isNaN(date.getTime())) {
         const error = new Error(
@@ -17,16 +20,22 @@ const parseDate = (value, fieldName) => {
         );
 
         error.statusCode = 400;
+
         throw error;
     }
 
     return date;
 };
 
-const getDateRange = (from, to) => {
-    const startDate = from ? parseDate(from, "from") : null;
 
-    let endDate = to ? parseDate(to, "to") : null;
+const getDateRange = (from, to) => {
+    const startDate = from
+        ? parseDate(from, "from")
+        : null;
+
+    let endDate = to
+        ? parseDate(to, "to")
+        : null;
 
     if (endDate) {
         endDate = new Date(
@@ -36,12 +45,17 @@ const getDateRange = (from, to) => {
         );
     }
 
-    if (startDate && endDate && startDate > endDate) {
+    if (
+        startDate &&
+        endDate &&
+        startDate > endDate
+    ) {
         const error = new Error(
             "from cannot be after to"
         );
 
         error.statusCode = 400;
+
         throw error;
     }
 
@@ -50,6 +64,7 @@ const getDateRange = (from, to) => {
         endDate
     };
 };
+
 
 const toNumber = (value) => {
     if (
@@ -62,6 +77,7 @@ const toNumber = (value) => {
     return Number(value);
 };
 
+
 const safeBigInt = (value) => {
     if (typeof value === "bigint") {
         return value.toString();
@@ -69,6 +85,7 @@ const safeBigInt = (value) => {
 
     return value;
 };
+
 
 const sanitizePunches = (records) => {
     return records.map((record) => ({
@@ -85,7 +102,8 @@ const sanitizePunches = (records) => {
 
 const getDashboardSummary = async (companyId) => {
 
-    const numericCompanyId = Number(companyId);
+    const numericCompanyId =
+        Number(companyId);
 
     const today = new Date();
 
@@ -93,7 +111,9 @@ const getDashboardSummary = async (companyId) => {
         today.toISOString().slice(0, 10);
 
     const todayStart =
-        new Date(`${todayDateString}T00:00:00.000Z`);
+        new Date(
+            `${todayDateString}T00:00:00.000Z`
+        );
 
     const todayEnd =
         new Date(
@@ -108,24 +128,33 @@ const getDashboardSummary = async (companyId) => {
     const totalEmployees =
         await prisma.employee.count({
             where: {
-                companyId: numericCompanyId
+                companyId:
+                    numericCompanyId
             }
         });
+
 
     const activeEmployees =
         await prisma.employee.count({
             where: {
-                companyId: numericCompanyId,
-                status: "ACTIVE"
+                companyId:
+                    numericCompanyId,
+
+                status:
+                    "ACTIVE"
             }
         });
+
 
     const inactiveEmployees =
         await prisma.employee.count({
             where: {
-                companyId: numericCompanyId,
+                companyId:
+                    numericCompanyId,
+
                 status: {
-                    not: "ACTIVE"
+                    not:
+                        "ACTIVE"
                 }
             }
         });
@@ -137,13 +166,14 @@ const getDashboardSummary = async (companyId) => {
 
     const todayAttendance =
         await prisma.attendance.findMany({
-
             where: {
                 employee: {
-                    companyId: numericCompanyId
+                    companyId:
+                        numericCompanyId
                 },
 
-                date: todayStart
+                date:
+                    todayStart
             },
 
             select: {
@@ -189,22 +219,23 @@ const getDashboardSummary = async (companyId) => {
 
         onLeaveToday =
             await prisma.leaveRequest.count({
-
                 where: {
-
                     employee: {
                         companyId:
                             numericCompanyId
                     },
 
-                    status: "APPROVED",
+                    status:
+                        "APPROVED",
 
                     startDate: {
-                        lte: todayStart
+                        lte:
+                            todayStart
                     },
 
                     endDate: {
-                        gte: todayStart
+                        gte:
+                            todayStart
                     }
                 }
             });
@@ -221,15 +252,14 @@ const getDashboardSummary = async (companyId) => {
 
         pendingLeaveRequests =
             await prisma.leaveRequest.count({
-
                 where: {
-
                     employee: {
                         companyId:
                             numericCompanyId
                     },
 
-                    status: "PENDING"
+                    status:
+                        "PENDING"
                 }
             });
     }
@@ -241,15 +271,14 @@ const getDashboardSummary = async (companyId) => {
 
     const pendingAdvanceRequests =
         await prisma.advancePayment.count({
-
             where: {
-
                 employee: {
                     companyId:
                         numericCompanyId
                 },
 
-                status: "PENDING"
+                status:
+                    "PENDING"
             }
         });
 
@@ -260,9 +289,7 @@ const getDashboardSummary = async (companyId) => {
 
     const payrollRecords =
         await prisma.payroll.findMany({
-
             where: {
-
                 employee: {
                     companyId:
                         numericCompanyId
@@ -270,6 +297,7 @@ const getDashboardSummary = async (companyId) => {
             },
 
             select: {
+                totalWorkingHours: true,
                 basicSalary: true,
                 advanceDeduction: true,
                 netSalary: true
@@ -277,21 +305,36 @@ const getDashboardSummary = async (companyId) => {
         });
 
 
+    let totalWorkingHours = 0;
     let totalBasicSalary = 0;
     let totalAdvanceDeduction = 0;
     let totalNetSalary = 0;
 
 
-    for (const payroll of payrollRecords) {
+    for (
+        const payroll
+        of payrollRecords
+    ) {
+
+        totalWorkingHours +=
+            Number(
+                payroll.totalWorkingHours || 0
+            );
 
         totalBasicSalary +=
-            Number(payroll.basicSalary);
+            Number(
+                payroll.basicSalary || 0
+            );
 
         totalAdvanceDeduction +=
-            Number(payroll.advanceDeduction);
+            Number(
+                payroll.advanceDeduction || 0
+            );
 
         totalNetSalary +=
-            Number(payroll.netSalary);
+            Number(
+                payroll.netSalary || 0
+            );
     }
 
 
@@ -299,7 +342,8 @@ const getDashboardSummary = async (companyId) => {
 
         employees: {
 
-            total: totalEmployees,
+            total:
+                totalEmployees,
 
             active:
                 activeEmployees,
@@ -307,6 +351,7 @@ const getDashboardSummary = async (companyId) => {
             inactive:
                 inactiveEmployees
         },
+
 
         attendance: {
 
@@ -329,11 +374,13 @@ const getDashboardSummary = async (companyId) => {
             }
         },
 
+
         leave: {
 
             pendingRequests:
                 pendingLeaveRequests
         },
+
 
         advances: {
 
@@ -341,7 +388,13 @@ const getDashboardSummary = async (companyId) => {
                 pendingAdvanceRequests
         },
 
+
         payroll: {
+
+            totalWorkingHours:
+                Number(
+                    totalWorkingHours.toFixed(2)
+                ),
 
             totalBasicSalary:
                 Number(
@@ -386,7 +439,10 @@ const getAttendanceReport = async (
         startDate,
         endDate
     } =
-        getDateRange(from, to);
+        getDateRange(
+            from,
+            to
+        );
 
 
     const where = {
@@ -399,16 +455,21 @@ const getAttendanceReport = async (
     };
 
 
-    if (startDate || endDate) {
+    if (
+        startDate ||
+        endDate
+    ) {
 
         where.date = {};
 
         if (startDate) {
-            where.date.gte = startDate;
+            where.date.gte =
+                startDate;
         }
 
         if (endDate) {
-            where.date.lte = endDate;
+            where.date.lte =
+                endDate;
         }
     }
 
@@ -423,7 +484,8 @@ const getAttendanceReport = async (
     if (status) {
 
         where.status =
-            String(status).toUpperCase();
+            String(status)
+                .toUpperCase();
     }
 
 
@@ -448,10 +510,13 @@ const getAttendanceReport = async (
 
             orderBy: [
                 {
-                    date: "desc"
+                    date:
+                        "desc"
                 },
+
                 {
-                    employeeId: "asc"
+                    employeeId:
+                        "asc"
                 }
             ],
 
@@ -490,23 +555,39 @@ const getAttendanceReport = async (
 
     let totalHours = 0;
 
-    for (const record of records) {
+
+    for (
+        const record
+        of records
+    ) {
 
         totalHours +=
-            Number(record.totalHours || 0);
+            Number(
+                record.totalHours || 0
+            );
     }
 
 
     const statusSummary = {};
 
-    for (const record of records) {
+
+    for (
+        const record
+        of records
+    ) {
 
         const currentStatus =
-            record.status || "UNKNOWN";
+            record.status ||
+            "UNKNOWN";
 
-        if (!statusSummary[currentStatus]) {
-            statusSummary[currentStatus] = 0;
+
+        if (
+            !statusSummary[currentStatus]
+        ) {
+            statusSummary[currentStatus] =
+                0;
         }
+
 
         statusSummary[currentStatus]++;
     }
@@ -574,7 +655,8 @@ const getEmployeeReport = async (
     if (status) {
 
         where.status =
-            String(status).toUpperCase();
+            String(status)
+                .toUpperCase();
     }
 
 
@@ -593,7 +675,12 @@ const getEmployeeReport = async (
                 phone: true,
                 hireDate: true,
                 role: true,
+
+                // Current salary configuration
+                baseSalary: true,
+                monthlyExpectedHours: true,
                 salaryRatePerHour: true,
+
                 status: true,
 
                 branch: {
@@ -616,21 +703,33 @@ const getEmployeeReport = async (
             },
 
             orderBy: {
-                employeeId: "asc"
+
+                employeeId:
+                    "asc"
             }
         });
 
 
     const statusSummary = {};
 
-    for (const employee of employees) {
+
+    for (
+        const employee
+        of employees
+    ) {
 
         const employeeStatus =
-            employee.status || "UNKNOWN";
+            employee.status ||
+            "UNKNOWN";
 
-        if (!statusSummary[employeeStatus]) {
-            statusSummary[employeeStatus] = 0;
+
+        if (
+            !statusSummary[employeeStatus]
+        ) {
+            statusSummary[employeeStatus] =
+                0;
         }
+
 
         statusSummary[employeeStatus]++;
     }
@@ -673,7 +772,10 @@ const getPayrollReport = async (
         startDate,
         endDate
     } =
-        getDateRange(from, to);
+        getDateRange(
+            from,
+            to
+        );
 
 
     const where = {
@@ -693,7 +795,10 @@ const getPayrollReport = async (
     }
 
 
-    if (startDate || endDate) {
+    if (
+        startDate ||
+        endDate
+    ) {
 
         where.payPeriodStart = {};
 
@@ -715,7 +820,9 @@ const getPayrollReport = async (
             where,
 
             orderBy: {
-                payPeriodStart: "desc"
+
+                payPeriodStart:
+                    "desc"
             },
 
             include: {
@@ -737,8 +844,20 @@ const getPayrollReport = async (
                     select: {
 
                         advanceId: true,
+
+                        // Original employee request
                         amount: true,
+
+                        // Admin-approved amount
+                        approvedAmount: true,
+
+                        // Actual amount paid
+                        paidAmount: true,
+
                         status: true,
+
+                        paymentDate: true,
+
                         deductedAt: true
                     }
                 }
@@ -752,26 +871,48 @@ const getPayrollReport = async (
     let totalNetSalary = 0;
 
 
-    for (const payroll of payrolls) {
+    let totalBaseSalary = 0;
+    let totalExpectedHours = 0;
+
+
+    for (
+        const payroll
+        of payrolls
+    ) {
 
         totalWorkingHours +=
             Number(
                 payroll.totalWorkingHours || 0
             );
 
+
         totalBasicSalary +=
             Number(
                 payroll.basicSalary || 0
             );
+
 
         totalAdvanceDeduction +=
             Number(
                 payroll.advanceDeduction || 0
             );
 
+
         totalNetSalary +=
             Number(
                 payroll.netSalary || 0
+            );
+
+
+        totalBaseSalary +=
+            Number(
+                payroll.baseSalary || 0
+            );
+
+
+        totalExpectedHours +=
+            Number(
+                payroll.monthlyExpectedHours || 0
             );
     }
 
@@ -783,20 +924,36 @@ const getPayrollReport = async (
             totalRecords:
                 payrolls.length,
 
+
+            totalBaseSalary:
+                Number(
+                    totalBaseSalary.toFixed(2)
+                ),
+
+
+            totalExpectedHours:
+                Number(
+                    totalExpectedHours.toFixed(2)
+                ),
+
+
             totalWorkingHours:
                 Number(
                     totalWorkingHours.toFixed(2)
                 ),
+
 
             totalBasicSalary:
                 Number(
                     totalBasicSalary.toFixed(2)
                 ),
 
+
             totalAdvanceDeduction:
                 Number(
                     totalAdvanceDeduction.toFixed(2)
                 ),
+
 
             totalNetSalary:
                 Number(
@@ -831,7 +988,10 @@ const getAdvanceReport = async (
         startDate,
         endDate
     } =
-        getDateRange(from, to);
+        getDateRange(
+            from,
+            to
+        );
 
 
     const where = {
@@ -854,20 +1014,26 @@ const getAdvanceReport = async (
     if (status) {
 
         where.status =
-            String(status).toUpperCase();
+            String(status)
+                .toUpperCase();
     }
 
 
-    if (startDate || endDate) {
+    if (
+        startDate ||
+        endDate
+    ) {
 
         where.paymentDate = {};
 
         if (startDate) {
-            where.paymentDate.gte = startDate;
+            where.paymentDate.gte =
+                startDate;
         }
 
         if (endDate) {
-            where.paymentDate.lte = endDate;
+            where.paymentDate.lte =
+                endDate;
         }
     }
 
@@ -878,7 +1044,9 @@ const getAdvanceReport = async (
             where,
 
             orderBy: {
-                paymentDate: "desc"
+
+                paymentDate:
+                    "desc"
             },
 
             include: {
@@ -918,30 +1086,90 @@ const getAdvanceReport = async (
         });
 
 
-    let totalAmount = 0;
-    let approvedAmount = 0;
-    let pendingAmount = 0;
-    let rejectedAmount = 0;
+    // --------------------------------------------------
+    // Separate requested / approved / paid amounts
+    // --------------------------------------------------
+
+    let totalRequestedAmount = 0;
+    let totalApprovedAmount = 0;
+    let totalPaidAmount = 0;
+
+    let pendingRequestedAmount = 0;
+    let pendingApprovedAmount = 0;
+
+    let rejectedRequestedAmount = 0;
+    let paidRequestedAmount = 0;
+    let paidActualAmount = 0;
 
 
-    for (const advance of advances) {
+    for (
+        const advance
+        of advances
+    ) {
 
-        const amount =
-            Number(advance.amount || 0);
+        const requested =
+            Number(
+                advance.amount || 0
+            );
 
-        totalAmount += amount;
+
+        const approved =
+            Number(
+                advance.approvedAmount || 0
+            );
 
 
-        if (advance.status === "APPROVED") {
-            approvedAmount += amount;
+        const paid =
+            Number(
+                advance.paidAmount || 0
+            );
+
+
+        totalRequestedAmount +=
+            requested;
+
+
+        totalApprovedAmount +=
+            approved;
+
+
+        totalPaidAmount +=
+            paid;
+
+
+        if (
+            advance.status ===
+            "PENDING"
+        ) {
+
+            pendingRequestedAmount +=
+                requested;
+
+            pendingApprovedAmount +=
+                approved;
         }
 
-        if (advance.status === "PENDING") {
-            pendingAmount += amount;
+
+        if (
+            advance.status ===
+            "REJECTED"
+        ) {
+
+            rejectedRequestedAmount +=
+                requested;
         }
 
-        if (advance.status === "REJECTED") {
-            rejectedAmount += amount;
+
+        if (
+            advance.status ===
+            "PAID"
+        ) {
+
+            paidRequestedAmount +=
+                requested;
+
+            paidActualAmount +=
+                paid;
         }
     }
 
@@ -953,24 +1181,55 @@ const getAdvanceReport = async (
             totalRecords:
                 advances.length,
 
-            totalAmount:
+
+            // Original requested amount
+            totalRequestedAmount:
                 Number(
-                    totalAmount.toFixed(2)
+                    totalRequestedAmount.toFixed(2)
                 ),
 
-            approvedAmount:
+
+            // Admin-approved amounts
+            totalApprovedAmount:
                 Number(
-                    approvedAmount.toFixed(2)
+                    totalApprovedAmount.toFixed(2)
                 ),
 
-            pendingAmount:
+
+            // Actual paid amounts
+            totalPaidAmount:
                 Number(
-                    pendingAmount.toFixed(2)
+                    totalPaidAmount.toFixed(2)
                 ),
 
-            rejectedAmount:
+
+            pendingRequestedAmount:
                 Number(
-                    rejectedAmount.toFixed(2)
+                    pendingRequestedAmount.toFixed(2)
+                ),
+
+
+            pendingApprovedAmount:
+                Number(
+                    pendingApprovedAmount.toFixed(2)
+                ),
+
+
+            rejectedRequestedAmount:
+                Number(
+                    rejectedRequestedAmount.toFixed(2)
+                ),
+
+
+            paidRequestedAmount:
+                Number(
+                    paidRequestedAmount.toFixed(2)
+                ),
+
+
+            paidActualAmount:
+                Number(
+                    paidActualAmount.toFixed(2)
                 )
         },
 
@@ -1015,7 +1274,10 @@ const getLeaveReport = async (
         startDate,
         endDate
     } =
-        getDateRange(from, to);
+        getDateRange(
+            from,
+            to
+        );
 
 
     const where = {
@@ -1045,11 +1307,15 @@ const getLeaveReport = async (
     if (status) {
 
         where.status =
-            String(status).toUpperCase();
+            String(status)
+                .toUpperCase();
     }
 
 
-    if (startDate || endDate) {
+    if (
+        startDate ||
+        endDate
+    ) {
 
         where.startDate = {};
 
@@ -1071,7 +1337,9 @@ const getLeaveReport = async (
             where,
 
             orderBy: {
-                startDate: "desc"
+
+                startDate:
+                    "desc"
             },
 
             include: {
@@ -1102,21 +1370,43 @@ const getLeaveReport = async (
         });
 
 
-    let totalDays = 0;
+    let totalRequestedDays = 0;
+    let totalApprovedDays = 0;
+
 
     const statusSummary = {};
 
-    for (const request of requests) {
 
-        totalDays +=
-            Number(request.totalDays || 0);
+    for (
+        const request
+        of requests
+    ) {
+
+        totalRequestedDays +=
+            Number(
+                request.totalDays || 0
+            );
+
+
+        totalApprovedDays +=
+            Number(
+                request.approvedDays || 0
+            );
+
 
         const requestStatus =
-            request.status || "UNKNOWN";
+            request.status ||
+            "UNKNOWN";
 
-        if (!statusSummary[requestStatus]) {
-            statusSummary[requestStatus] = 0;
+
+        if (
+            !statusSummary[requestStatus]
+        ) {
+
+            statusSummary[requestStatus] =
+                0;
         }
+
 
         statusSummary[requestStatus]++;
     }
@@ -1129,10 +1419,20 @@ const getLeaveReport = async (
             totalRequests:
                 requests.length,
 
-            totalDays:
+
+            // Original requested days
+            totalRequestedDays:
                 Number(
-                    totalDays.toFixed(2)
+                    totalRequestedDays.toFixed(2)
                 ),
+
+
+            // Days actually approved
+            totalApprovedDays:
+                Number(
+                    totalApprovedDays.toFixed(2)
+                ),
+
 
             status:
                 statusSummary
@@ -1150,9 +1450,14 @@ const getLeaveReport = async (
 module.exports = {
 
     getDashboardSummary,
+
     getAttendanceReport,
+
     getEmployeeReport,
+
     getPayrollReport,
+
     getAdvanceReport,
+
     getLeaveReport
 };

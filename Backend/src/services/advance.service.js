@@ -1,113 +1,301 @@
-const prisma = require("../config/database");
+const prisma =
+    require("../config/database");
 
-// ==========================================
-// Create Advance Payment
-// POST /api/advances
-// Admin creates advance on behalf of employee
-// ==========================================
 
-const createAdvance = async (data, companyId) => {
-    const {
-        employeeId,
-        amount,
-        reason,
-        paymentDate
-    } = data || {};
+// ==========================================================
+// Helper: Positive Number
+// ==========================================================
 
-    // ==========================================
-    // Verify employee belongs to company
-    // ==========================================
+const validatePositiveAmount = (
+    value,
+    fieldName
+) => {
 
-    const employee =
-        await prisma.employee.findFirst({
-            where: {
-                employeeId: Number(employeeId),
-                companyId: Number(companyId)
-            }
-        });
-
-    if (!employee) {
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
         const error =
-            new Error("Employee not found");
+            new Error(
+                `${fieldName} is required`
+            );
 
-        error.statusCode = 404;
+        error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Only active employees can receive advances
-    // ==========================================
 
-    if (employee.status !== "ACTIVE") {
+    const numericValue =
+        Number(value);
+
+
+    if (
+        !Number.isFinite(
+            numericValue
+        ) ||
+        numericValue <= 0
+    ) {
+        const error =
+            new Error(
+                `${fieldName} must be greater than 0`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    return Number(
+        numericValue.toFixed(2)
+    );
+};
+
+
+// ==========================================================
+// Helper: Valid Date
+// ==========================================================
+
+const parseDate = (
+    value,
+    fieldName
+) => {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        const error =
+            new Error(
+                `${fieldName} is required`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        const error =
+            new Error(
+                `${fieldName} is invalid`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    return date;
+};
+
+
+// ==========================================================
+// Helper: Include Employee + Approver
+// ==========================================================
+
+const advanceInclude = {
+
+    employee: {
+
+        select: {
+
+            employeeId: true,
+
+            firstName: true,
+
+            lastName: true,
+
+            email: true,
+
+            status: true
+        }
+    },
+
+    approver: {
+
+        select: {
+
+            adminId: true,
+
+            adminName: true,
+
+            email: true,
+
+            phone: true
+        }
+    }
+};
+
+
+// ==========================================================
+// Create Advance Payment
+//
+// POST /api/advances
+//
+// Admin creates advance on behalf of employee.
+//
+// amount        = original requested amount
+// approvedAmount = null
+// paidAmount     = null
+// status         = PENDING
+// ==========================================================
+
+const createAdvance = async (
+    data,
+    companyId
+) => {
+
+    const {
+
+        employeeId,
+
+        amount,
+
+        reason,
+
+        paymentDate
+
+    } = data || {};
+
+
+    // ======================================================
+    // Validate Employee ID
+    // ======================================================
+
+    const parsedEmployeeId =
+        Number(employeeId);
+
+
+    if (
+        !Number.isInteger(
+            parsedEmployeeId
+        ) ||
+        parsedEmployeeId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid employee ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Verify Employee Belongs To Company
+    // ======================================================
+
+    const employee =
+        await prisma.employee.findFirst({
+
+            where: {
+
+                employeeId:
+                    parsedEmployeeId,
+
+                companyId:
+                    Number(companyId)
+            }
+        });
+
+
+    if (!employee) {
+
+        const error =
+            new Error(
+                "Employee not found"
+            );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Only ACTIVE Employees Can Receive Advances
+    // ======================================================
+
+    if (
+        employee.status !==
+        "ACTIVE"
+    ) {
+
         const error =
             new Error(
                 "Cannot create advance for inactive employee"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Validate amount
-    // ==========================================
 
-    if (
-        amount === undefined ||
-        amount === null ||
-        Number(amount) <= 0
-    ) {
-        const error =
-            new Error(
-                "Advance amount must be greater than 0"
-            );
+    // ======================================================
+    // Validate Requested Amount
+    // ======================================================
 
-        error.statusCode = 400;
-        throw error;
-    }
+    const requestedAmount =
+        validatePositiveAmount(
+            amount,
+            "Advance amount"
+        );
 
-    // ==========================================
-    // Validate payment date
-    // ==========================================
 
-    if (!paymentDate) {
-        const error =
-            new Error("Payment date is required");
-
-        error.statusCode = 400;
-        throw error;
-    }
+    // ======================================================
+    // Validate Payment Date
+    // ======================================================
 
     const parsedPaymentDate =
-        new Date(paymentDate);
+        parseDate(
+            paymentDate,
+            "Payment date"
+        );
 
-    if (
-        Number.isNaN(
-            parsedPaymentDate.getTime()
-        )
-    ) {
-        const error =
-            new Error("Invalid payment date");
 
-        error.statusCode = 400;
-        throw error;
-    }
-
-    // ==========================================
-    // Create advance
-    // ==========================================
+    // ======================================================
+    // Create Advance
+    //
+    // Important:
+    //
+    // amount = ORIGINAL REQUEST
+    //
+    // approvedAmount = null
+    //
+    // paidAmount = null
+    //
+    // status = PENDING
+    // ======================================================
 
     const advance =
         await prisma.advancePayment.create({
+
             data: {
+
                 employeeId:
-                    Number(employeeId),
+                    parsedEmployeeId,
 
-                // Original amount requested
                 amount:
-                    Number(amount),
+                    requestedAmount,
 
-                // No approval/payment yet
                 approvedAmount:
                     null,
 
@@ -120,188 +308,259 @@ const createAdvance = async (data, companyId) => {
                 paymentDate:
                     parsedPaymentDate,
 
+                approvedBy:
+                    null,
+
                 status:
                     "PENDING"
             },
 
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                }
-            }
+            include:
+                advanceInclude
         });
+
 
     return advance;
 };
 
 
-// ==========================================
+// ==========================================================
 // Get All Advances
+//
 // GET /api/advances
-// ==========================================
+// ==========================================================
 
-const getAllAdvances = async (companyId) => {
+const getAllAdvances = async (
+    companyId
+) => {
+
     const advances =
         await prisma.advancePayment.findMany({
+
             where: {
+
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             },
 
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                },
-
-                approver: {
-                    select: {
-                        adminId: true,
-                        adminName: true,
-                        email: true,
-                        phone: true
-                    }
-                }
-            },
+            include:
+                advanceInclude,
 
             orderBy: {
-                paymentDate: "desc"
+
+                paymentDate:
+                    "desc"
             }
         });
+
 
     return advances;
 };
 
 
-// ==========================================
+// ==========================================================
 // Get Advance By ID
+//
 // GET /api/advances/:id
-// ==========================================
+// ==========================================================
 
 const getAdvanceById = async (
     advanceId,
     companyId
 ) => {
 
+    const parsedAdvanceId =
+        Number(advanceId);
+
+
+    if (
+        !Number.isInteger(
+            parsedAdvanceId
+        ) ||
+        parsedAdvanceId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid advance ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
     const advance =
         await prisma.advancePayment.findFirst({
+
             where: {
+
                 advanceId:
-                    Number(advanceId),
+                    parsedAdvanceId,
 
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             },
 
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                },
-
-                approver: {
-                    select: {
-                        adminId: true,
-                        adminName: true,
-                        email: true,
-                        phone: true
-                    }
-                }
-            }
+            include:
+                advanceInclude
         });
 
+
     if (!advance) {
+
         const error =
             new Error(
                 "Advance payment not found"
             );
 
         error.statusCode = 404;
+
         throw error;
     }
+
 
     return advance;
 };
 
 
-// ==========================================
+// ==========================================================
 // Get Employee Advances
+//
 // GET /api/advances/employee/:employeeId
-// ==========================================
+// ==========================================================
 
 const getEmployeeAdvances = async (
     employeeId,
     companyId
 ) => {
 
+    const parsedEmployeeId =
+        Number(employeeId);
+
+
+    if (
+        !Number.isInteger(
+            parsedEmployeeId
+        ) ||
+        parsedEmployeeId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid employee ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Verify Employee Belongs To Company
+    // ======================================================
+
+    const employee =
+        await prisma.employee.findFirst({
+
+            where: {
+
+                employeeId:
+                    parsedEmployeeId,
+
+                companyId:
+                    Number(companyId)
+            },
+
+            select: {
+
+                employeeId:
+                    true
+            }
+        });
+
+
+    if (!employee) {
+
+        const error =
+            new Error(
+                "Employee not found"
+            );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+
     const advances =
         await prisma.advancePayment.findMany({
+
             where: {
+
                 employeeId:
-                    Number(employeeId),
+                    parsedEmployeeId,
 
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             },
 
             include: {
+
                 approver: {
+
                     select: {
+
                         adminId: true,
+
                         adminName: true,
+
                         email: true,
+
                         phone: true
                     }
                 }
             },
 
             orderBy: {
-                paymentDate: "desc"
+
+                paymentDate:
+                    "desc"
             }
         });
+
 
     return advances;
 };
 
 
-// ==========================================
+// ==========================================================
 // Update Advance Status
 //
 // PATCH /api/advances/:id/status
 //
-// Supported workflow:
+// Allowed workflow:
 //
 // PENDING  -> APPROVED
 // PENDING  -> REJECTED
+// APPROVED -> APPROVED   (change approved amount)
 // APPROVED -> PAID
 //
-// APPROVED can receive approvedAmount
-// PAID can receive paidAmount
+// REJECTED -> locked
+// PAID     -> locked
 //
-// Once PAID, no further changes are allowed.
-// ==========================================
+// ==========================================================
 
 const updateAdvanceStatus = async (
     advanceId,
@@ -311,275 +570,370 @@ const updateAdvanceStatus = async (
     data = {}
 ) => {
 
+    const parsedAdvanceId =
+        Number(advanceId);
+
+    const parsedAdminId =
+        Number(adminId);
+
+
+    // ======================================================
+    // Validate IDs
+    // ======================================================
+
+    if (
+        !Number.isInteger(
+            parsedAdvanceId
+        ) ||
+        parsedAdvanceId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid advance ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    if (
+        !Number.isInteger(
+            parsedAdminId
+        ) ||
+        parsedAdminId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid admin ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Normalize Status
+    // ======================================================
+
     const normalizedStatus =
-        String(status || "")
+        String(
+            status || ""
+        )
             .trim()
             .toUpperCase();
+
 
     const {
         approvedAmount,
         paidAmount
     } = data || {};
 
-    // ==========================================
-    // Valid statuses
-    // ==========================================
+
+    // ======================================================
+    // Valid Statuses
+    // ======================================================
 
     const validStatuses = [
+
         "PENDING",
+
         "APPROVED",
+
         "REJECTED",
+
         "PAID"
+
     ];
+
 
     if (
         !validStatuses.includes(
             normalizedStatus
         )
     ) {
+
         const error =
             new Error(
                 "Invalid advance status"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Verify advance belongs to company
-    // ==========================================
+
+    // ======================================================
+    // Get Advance
+    // ======================================================
 
     const advance =
         await prisma.advancePayment.findFirst({
+
             where: {
+
                 advanceId:
-                    Number(advanceId),
+                    parsedAdvanceId,
 
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             }
         });
 
+
     if (!advance) {
+
         const error =
             new Error(
                 "Advance payment not found"
             );
 
         error.statusCode = 404;
+
         throw error;
     }
 
-    // ==========================================
-    // PAID records are permanently locked
-    // ==========================================
 
-    if (advance.status === "PAID") {
+    // ======================================================
+    // PAID = Permanently Locked
+    // ======================================================
+
+    if (
+        advance.status ===
+        "PAID"
+    ) {
+
         const error =
             new Error(
                 "Paid advance cannot be modified"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Prevent changing rejected advances
-    // ==========================================
+
+    // ======================================================
+    // REJECTED = Permanently Locked
+    // ======================================================
 
     if (
-        advance.status === "REJECTED" &&
-        normalizedStatus !== "REJECTED"
+        advance.status ===
+        "REJECTED"
     ) {
+
         const error =
             new Error(
                 "Rejected advance cannot be modified"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Prevent invalid workflow transitions
-    // ==========================================
 
-    if (
-        normalizedStatus === "APPROVED" &&
-        advance.status !== "PENDING" &&
-        advance.status !== "APPROVED"
-    ) {
-        const error =
-            new Error(
-                "Only pending or already approved advances can be approved"
-            );
-
-        error.statusCode = 400;
-        throw error;
-    }
-
-    if (
-        normalizedStatus === "PAID" &&
-        advance.status !== "APPROVED"
-    ) {
-        const error =
-            new Error(
-                "Only approved advances can be marked as paid"
-            );
-
-        error.statusCode = 400;
-        throw error;
-    }
-
-    if (
-        normalizedStatus === "PENDING" &&
-        advance.status !== "PENDING"
-    ) {
-        const error =
-            new Error(
-                "Advance cannot be moved back to pending"
-            );
-
-        error.statusCode = 400;
-        throw error;
-    }
-
-    // ==========================================
+    // ======================================================
     // APPROVE
-    // ==========================================
+    //
+    // PENDING -> APPROVED
+    //
+    // APPROVED -> APPROVED
+    //
+    // approvedAmount must:
+    //
+    // > 0
+    // <= requested amount
+    //
+    // ======================================================
 
-    if (normalizedStatus === "APPROVED") {
-
-        let finalApprovedAmount;
-
-        // Admin supplied approvedAmount
-        if (
-            approvedAmount !== undefined &&
-            approvedAmount !== null &&
-            approvedAmount !== ""
-        ) {
-            finalApprovedAmount =
-                Number(approvedAmount);
-        }
-        // Existing approved amount
-        else if (
-            advance.approvedAmount !== null &&
-            advance.approvedAmount !== undefined
-        ) {
-            finalApprovedAmount =
-                Number(
-                    advance.approvedAmount
-                );
-        }
-        // Default approval = requested amount
-        else {
-            finalApprovedAmount =
-                Number(advance.amount);
-        }
-
-        // ==========================================
-        // Validate approved amount
-        // ==========================================
+    if (
+        normalizedStatus ===
+        "APPROVED"
+    ) {
 
         if (
-            !Number.isFinite(
-                finalApprovedAmount
-            ) ||
-            finalApprovedAmount <= 0
+            advance.status !==
+            "PENDING" &&
+            advance.status !==
+            "APPROVED"
         ) {
+
             const error =
                 new Error(
-                    "Approved amount must be greater than 0"
+                    "Only pending or already approved advances can be approved"
                 );
 
             error.statusCode = 400;
+
             throw error;
         }
 
-        // ==========================================
-        // Cannot approve more than requested
-        // ==========================================
+
+        let finalApprovedAmount;
+
+
+        // --------------------------------------------------
+        // New approved amount supplied by admin
+        // --------------------------------------------------
+
+        if (
+            approvedAmount !==
+                undefined &&
+            approvedAmount !==
+                null &&
+            approvedAmount !==
+                ""
+        ) {
+
+            finalApprovedAmount =
+                validatePositiveAmount(
+                    approvedAmount,
+                    "Approved amount"
+                );
+
+        } else if (
+            advance.approvedAmount !==
+                null &&
+            advance.approvedAmount !==
+                undefined
+        ) {
+
+            // ------------------------------------------------
+            // Keep existing approval amount
+            // ------------------------------------------------
+
+            finalApprovedAmount =
+                validatePositiveAmount(
+                    advance.approvedAmount,
+                    "Approved amount"
+                );
+
+        } else {
+
+            // ------------------------------------------------
+            // Default:
+            // Approve full requested amount
+            // ------------------------------------------------
+
+            finalApprovedAmount =
+                validatePositiveAmount(
+                    advance.amount,
+                    "Approved amount"
+                );
+        }
+
+
+        // ==================================================
+        // Cannot Approve More Than Requested
+        // ==================================================
 
         if (
             finalApprovedAmount >
             Number(advance.amount)
         ) {
+
             const error =
                 new Error(
                     "Approved amount cannot be greater than requested amount"
                 );
 
             error.statusCode = 400;
+
             throw error;
         }
 
+
+        // ==================================================
+        // Update Approval
+        // ==================================================
+
         const updatedAdvance =
             await prisma.advancePayment.update({
+
                 where: {
+
                     advanceId:
-                        Number(advanceId)
+                        parsedAdvanceId
                 },
 
                 data: {
+
                     status:
                         "APPROVED",
 
                     approvedAmount:
                         finalApprovedAmount,
 
-                    // Keep existing paid amount if
-                    // one already exists
+                    // Payment must still be empty
+                    // until PAID state.
+
                     paidAmount:
-                        advance.paidAmount ?? null,
+                        advance.paidAmount ??
+                        null,
 
                     approvedBy:
-                        Number(adminId)
+                        parsedAdminId
                 },
 
-                include: {
-                    employee: {
-                        select: {
-                            employeeId: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            status: true
-                        }
-                    },
-
-                    approver: {
-                        select: {
-                            adminId: true,
-                            adminName: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                }
+                include:
+                    advanceInclude
             });
+
 
         return updatedAdvance;
     }
 
 
-    // ==========================================
+    // ======================================================
     // REJECT
-    // ==========================================
+    //
+    // PENDING -> REJECTED
+    //
+    // ======================================================
 
-    if (normalizedStatus === "REJECTED") {
+    if (
+        normalizedStatus ===
+        "REJECTED"
+    ) {
+
+        if (
+            advance.status !==
+            "PENDING"
+        ) {
+
+            const error =
+                new Error(
+                    "Only pending advances can be rejected"
+                );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
 
         const updatedAdvance =
             await prisma.advancePayment.update({
+
                 where: {
+
                     advanceId:
-                        Number(advanceId)
+                        parsedAdvanceId
                 },
 
                 data: {
+
                     status:
                         "REJECTED",
 
@@ -590,213 +944,185 @@ const updateAdvanceStatus = async (
                         null,
 
                     approvedBy:
-                        null
+                        parsedAdminId
                 },
 
-                include: {
-                    employee: {
-                        select: {
-                            employeeId: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            status: true
-                        }
-                    },
-
-                    approver: {
-                        select: {
-                            adminId: true,
-                            adminName: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                }
+                include:
+                    advanceInclude
             });
+
 
         return updatedAdvance;
     }
 
 
-    // ==========================================
-    // PAY
-    // ==========================================
+    // ======================================================
+    // PAID
+    //
+    // APPROVED -> PAID
+    //
+    // paidAmount:
+    //
+    // > 0
+    //
+    // It may be different from approvedAmount.
+    //
+    // Example:
+    //
+    // Requested  = 2000
+    // Approved   = 1000
+    // Paid       = 1500
+    //
+    // ======================================================
 
-    if (normalizedStatus === "PAID") {
-
-        // ==========================================
-        // Paid amount is required
-        // ==========================================
+    if (
+        normalizedStatus ===
+        "PAID"
+    ) {
 
         if (
-            paidAmount === undefined ||
-            paidAmount === null ||
-            paidAmount === ""
+            advance.status !==
+            "APPROVED"
         ) {
+
             const error =
                 new Error(
-                    "Paid amount is required"
+                    "Only approved advances can be marked as paid"
                 );
 
             error.statusCode = 400;
+
             throw error;
         }
 
-        const finalPaidAmount =
-            Number(paidAmount);
 
-        // ==========================================
-        // Validate paid amount
-        // ==========================================
+        // ==================================================
+        // Approved Amount Must Exist
+        // ==================================================
 
         if (
-            !Number.isFinite(
-                finalPaidAmount
-            ) ||
-            finalPaidAmount <= 0
+            advance.approvedAmount ===
+                null ||
+            advance.approvedAmount ===
+                undefined
         ) {
-            const error =
-                new Error(
-                    "Paid amount must be greater than 0"
-                );
 
-            error.statusCode = 400;
-            throw error;
-        }
-
-        // ==========================================
-        // Approved amount must exist first
-        // ==========================================
-
-        if (
-            advance.approvedAmount === null ||
-            advance.approvedAmount === undefined
-        ) {
             const error =
                 new Error(
                     "Advance must have an approved amount before payment"
                 );
 
             error.statusCode = 400;
+
             throw error;
         }
 
-        // ==========================================
-        // Mark as PAID
+
+        // ==================================================
+        // Validate Paid Amount
+        // ==================================================
+
+        const finalPaidAmount =
+            validatePositiveAmount(
+                paidAmount,
+                "Paid amount"
+            );
+
+
+        // ==================================================
+        // Mark As Paid
         //
-        // paidAmount may be different from
-        // approvedAmount as per your requirement.
-        // ==========================================
+        // IMPORTANT:
+        //
+        // amount         -> original request
+        // approvedAmount -> approved value
+        // paidAmount     -> actual amount paid
+        //
+        // All three remain separate.
+        // ==================================================
 
         const updatedAdvance =
             await prisma.advancePayment.update({
+
                 where: {
+
                     advanceId:
-                        Number(advanceId)
+                        parsedAdvanceId
                 },
 
                 data: {
+
                     status:
                         "PAID",
 
                     paidAmount:
                         finalPaidAmount,
 
-                    // Preserve approved amount
                     approvedAmount:
                         advance.approvedAmount,
 
-                    // Preserve original approver
                     approvedBy:
                         advance.approvedBy
+                        ??
+                        parsedAdminId
                 },
 
-                include: {
-                    employee: {
-                        select: {
-                            employeeId: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            status: true
-                        }
-                    },
-
-                    approver: {
-                        select: {
-                            adminId: true,
-                            adminName: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                }
+                include:
+                    advanceInclude
             });
+
 
         return updatedAdvance;
     }
 
 
-    // ==========================================
+    // ======================================================
     // PENDING
     //
-    // Normally an advance is already PENDING
-    // when created, so this is only a fallback.
-    // ==========================================
+    // We do not allow a completed workflow to be moved
+    // back to PENDING.
+    //
+    // A newly created record is already PENDING.
+    // ======================================================
 
-    if (normalizedStatus === "PENDING") {
+    if (
+        normalizedStatus ===
+        "PENDING"
+    ) {
 
-        const updatedAdvance =
-            await prisma.advancePayment.update({
-                where: {
-                    advanceId:
-                        Number(advanceId)
-                },
+        if (
+            advance.status !==
+            "PENDING"
+        ) {
 
-                data: {
-                    status:
-                        "PENDING",
+            const error =
+                new Error(
+                    "Advance cannot be moved back to pending"
+                );
 
-                    approvedAmount:
-                        advance.approvedAmount,
+            error.statusCode = 400;
 
-                    paidAmount:
-                        advance.paidAmount,
+            throw error;
+        }
 
-                    approvedBy:
-                        null
-                },
 
-                include: {
-                    employee: {
-                        select: {
-                            employeeId: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            status: true
-                        }
-                    },
+        return prisma.advancePayment.findUnique({
 
-                    approver: {
-                        select: {
-                            adminId: true,
-                            adminName: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                }
-            });
+            where: {
 
-        return updatedAdvance;
+                advanceId:
+                    parsedAdvanceId
+            },
+
+            include:
+                advanceInclude
+        });
     }
 
 
-    // ==========================================
+    // ======================================================
     // Fallback
-    // ==========================================
+    // ======================================================
 
     const error =
         new Error(
@@ -804,130 +1130,233 @@ const updateAdvanceStatus = async (
         );
 
     error.statusCode = 400;
+
     throw error;
 };
 
 
-// ==========================================
+// ==========================================================
 // Delete Advance
+//
 // DELETE /api/advances/:id
-// ==========================================
+//
+// Restrictions:
+//
+// PAID advances cannot be deleted.
+//
+// Payroll-linked advances cannot be deleted.
+//
+// REJECTED advances may be deleted unless business rules
+// later require keeping them permanently.
+//
+// ==========================================================
 
 const deleteAdvance = async (
     advanceId,
     companyId
 ) => {
 
+    const parsedAdvanceId =
+        Number(advanceId);
+
+
+    if (
+        !Number.isInteger(
+            parsedAdvanceId
+        ) ||
+        parsedAdvanceId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid advance ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Find Advance
+    // ======================================================
+
     const advance =
         await prisma.advancePayment.findFirst({
+
             where: {
+
                 advanceId:
-                    Number(advanceId),
+                    parsedAdvanceId,
 
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             }
         });
 
+
     if (!advance) {
+
         const error =
             new Error(
                 "Advance payment not found"
             );
 
         error.statusCode = 404;
+
         throw error;
     }
 
-    // ==========================================
-    // Paid advances cannot be deleted
-    // ==========================================
 
-    if (advance.status === "PAID") {
+    // ======================================================
+    // PAID Cannot Be Deleted
+    // ======================================================
+
+    if (
+        advance.status ===
+        "PAID"
+    ) {
+
         const error =
             new Error(
                 "Paid advance cannot be deleted"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Payroll-linked advances cannot be deleted
-    // ==========================================
+
+    // ======================================================
+    // Payroll-Linked Advance Cannot Be Deleted
+    // ======================================================
 
     if (
         advance.deductedInPayrollId
     ) {
+
         const error =
             new Error(
                 "Advance linked to payroll cannot be deleted"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
+
+    // ======================================================
+    // Delete
+    // ======================================================
+
     await prisma.advancePayment.delete({
+
         where: {
+
             advanceId:
-                Number(advanceId)
+                parsedAdvanceId
         }
     });
 };
 
 
-// ==========================================
+// ==========================================================
 // Get My Advances
-// Employee Self-Service
+//
 // GET /api/me/advances
-// ==========================================
+//
+// Employee can only see their own records.
+// ==========================================================
 
 const getMyAdvances = async (
     employeeId,
     companyId
 ) => {
 
+    const parsedEmployeeId =
+        Number(employeeId);
+
+
+    if (
+        !Number.isInteger(
+            parsedEmployeeId
+        ) ||
+        parsedEmployeeId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid employee ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
     const advances =
         await prisma.advancePayment.findMany({
+
             where: {
+
                 employeeId:
-                    Number(employeeId),
+                    parsedEmployeeId,
 
                 employee: {
+
                     companyId:
                         Number(companyId)
                 }
             },
 
             include: {
+
                 approver: {
+
                     select: {
+
                         adminId: true,
+
                         adminName: true,
+
                         email: true,
+
                         phone: true
                     }
                 }
             },
 
             orderBy: {
-                paymentDate: "desc"
+
+                paymentDate:
+                    "desc"
             }
         });
+
 
     return advances;
 };
 
 
-// ==========================================
+// ==========================================================
 // Create My Advance
-// Employee Self-Service
+//
 // POST /api/me/advances
-// ==========================================
+//
+// Employee can create only their own request.
+//
+// amount         = original requested amount
+// approvedAmount = null
+// paidAmount     = null
+// status         = PENDING
+// ==========================================================
 
 const createMyAdvance = async (
     data,
@@ -936,116 +1365,126 @@ const createMyAdvance = async (
 ) => {
 
     const {
+
         amount,
+
         reason,
+
         paymentDate
+
     } = data || {};
 
-    // ==========================================
-    // Verify logged-in employee
-    // ==========================================
+
+    const parsedEmployeeId =
+        Number(employeeId);
+
+
+    if (
+        !Number.isInteger(
+            parsedEmployeeId
+        ) ||
+        parsedEmployeeId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid employee ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // Verify Logged-In Employee
+    // ======================================================
 
     const employee =
         await prisma.employee.findFirst({
+
             where: {
+
                 employeeId:
-                    Number(employeeId),
+                    parsedEmployeeId,
 
                 companyId:
                     Number(companyId)
             }
         });
 
+
     if (!employee) {
+
         const error =
             new Error(
                 "Employee not found"
             );
 
         error.statusCode = 404;
+
         throw error;
     }
 
-    // ==========================================
-    // Only active employees can request advances
-    // ==========================================
+
+    // ======================================================
+    // Only Active Employees Can Request
+    // ======================================================
 
     if (
-        employee.status !== "ACTIVE"
+        employee.status !==
+        "ACTIVE"
     ) {
+
         const error =
             new Error(
                 "Cannot request advance as inactive employee"
             );
 
         error.statusCode = 400;
+
         throw error;
     }
 
-    // ==========================================
-    // Validate amount
-    // ==========================================
 
-    if (
-        amount === undefined ||
-        amount === null ||
-        Number(amount) <= 0
-    ) {
-        const error =
-            new Error(
-                "Advance amount must be greater than 0"
-            );
+    // ======================================================
+    // Validate Requested Amount
+    // ======================================================
 
-        error.statusCode = 400;
-        throw error;
-    }
+    const requestedAmount =
+        validatePositiveAmount(
+            amount,
+            "Advance amount"
+        );
 
-    // ==========================================
-    // Validate payment date
-    // ==========================================
 
-    if (!paymentDate) {
-        const error =
-            new Error(
-                "Payment date is required"
-            );
-
-        error.statusCode = 400;
-        throw error;
-    }
+    // ======================================================
+    // Validate Payment Date
+    // ======================================================
 
     const parsedPaymentDate =
-        new Date(paymentDate);
+        parseDate(
+            paymentDate,
+            "Payment date"
+        );
 
-    if (
-        Number.isNaN(
-            parsedPaymentDate.getTime()
-        )
-    ) {
-        const error =
-            new Error(
-                "Invalid payment date"
-            );
 
-        error.statusCode = 400;
-        throw error;
-    }
-
-    // ==========================================
-    // Create employee advance request
-    // ==========================================
+    // ======================================================
+    // Create Request
+    // ======================================================
 
     const advance =
         await prisma.advancePayment.create({
+
             data: {
+
                 employeeId:
-                    Number(employeeId),
+                    parsedEmployeeId,
 
-                // Original requested amount
                 amount:
-                    Number(amount),
+                    requestedAmount,
 
-                // Employee cannot set these
                 approvedAmount:
                     null,
 
@@ -1058,43 +1497,62 @@ const createMyAdvance = async (
                 paymentDate:
                     parsedPaymentDate,
 
-                // New request always starts PENDING
+                approvedBy:
+                    null,
+
                 status:
                     "PENDING"
             },
 
             include: {
+
                 employee: {
+
                     select: {
+
                         employeeId: true,
+
                         firstName: true,
+
                         lastName: true,
+
                         email: true,
+
                         status: true
                     }
                 }
             }
         });
 
+
     return advance;
 };
 
 
-// ==========================================
-// Export Services
-// ==========================================
+// ==========================================================
+// EXPORT
+// ==========================================================
 
 module.exports = {
 
-    // Admin advance operations
+    // Admin operations
+
     createAdvance,
+
     getAllAdvances,
+
     getAdvanceById,
+
     getEmployeeAdvances,
+
     updateAdvanceStatus,
+
     deleteAdvance,
 
-    // Employee self-service operations
+
+    // Employee self-service
+
     getMyAdvances,
+
     createMyAdvance
 };

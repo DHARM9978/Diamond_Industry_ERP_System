@@ -1,16 +1,24 @@
-const prisma = require("../config/database");
+const prisma =
+    require("../config/database");
 
 
 // ==========================================
 // Helper: Validate Date
 // ==========================================
 
-const parseDate = (value, fieldName) => {
+const parseDate = (
+    value,
+    fieldName
+) => {
 
-    const date = new Date(value);
+    const date =
+        new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
-
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
         const error =
             new Error(
                 `${fieldName} must be a valid date`
@@ -29,11 +37,47 @@ const parseDate = (value, fieldName) => {
 // Helper: Round Money
 // ==========================================
 
-const roundMoney = (value) => {
+const roundMoney = (
+    value
+) => {
 
     return Number(
         Number(value).toFixed(2)
     );
+};
+
+
+// ==========================================
+// Helper: Positive Number
+// ==========================================
+
+const validatePositiveNumber = (
+    value,
+    fieldName
+) => {
+
+    const numberValue =
+        Number(value);
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        !Number.isFinite(numberValue) ||
+        numberValue <= 0
+    ) {
+
+        const error =
+            new Error(
+                `${fieldName} must be greater than 0`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    return numberValue;
 };
 
 
@@ -53,6 +97,17 @@ const roundMoney = (value) => {
 // basicSalary
 // advanceDeduction
 // netSalary
+//
+// Salary calculation:
+//
+// baseSalary / monthlyExpectedHours
+// = salaryRatePerHour
+//
+// totalWorkingHours × salaryRatePerHour
+// = basicSalary
+//
+// basicSalary - paid advance
+// = netSalary
 // ==========================================
 
 const createPayroll = async (
@@ -65,7 +120,7 @@ const createPayroll = async (
         payPeriodStart,
         payPeriodEnd,
         paymentDate
-    } = data;
+    } = data || {};
 
 
     // ==========================================
@@ -76,7 +131,9 @@ const createPayroll = async (
         Number(employeeId);
 
     if (
-        !Number.isInteger(parsedEmployeeId) ||
+        !Number.isInteger(
+            parsedEmployeeId
+        ) ||
         parsedEmployeeId < 1
     ) {
 
@@ -135,7 +192,9 @@ const createPayroll = async (
         );
 
 
-    if (startDate > endDate) {
+    if (
+        startDate > endDate
+    ) {
 
         const error =
             new Error(
@@ -147,6 +206,10 @@ const createPayroll = async (
         throw error;
     }
 
+
+    // ==========================================
+    // Payment Date
+    // ==========================================
 
     let parsedPaymentDate = null;
 
@@ -188,6 +251,10 @@ const createPayroll = async (
 
                 status: true,
 
+                baseSalary: true,
+
+                monthlyExpectedHours: true,
+
                 salaryRatePerHour: true
             }
         });
@@ -210,7 +277,10 @@ const createPayroll = async (
     // Only Active Employees
     // ==========================================
 
-    if (employee.status !== "ACTIVE") {
+    if (
+        employee.status !==
+        "ACTIVE"
+    ) {
 
         const error =
             new Error(
@@ -224,17 +294,21 @@ const createPayroll = async (
 
 
     // ==========================================
-    // Verify Salary Rate
+    // Validate Salary Configuration
+    //
+    // Salary is based on:
+    //
+    // baseSalary / monthlyExpectedHours
     // ==========================================
 
     if (
-        employee.salaryRatePerHour === null ||
-        employee.salaryRatePerHour === undefined
+        employee.baseSalary === null ||
+        employee.baseSalary === undefined
     ) {
 
         const error =
             new Error(
-                "Employee salary rate per hour is not configured"
+                "Employee base salary is not configured"
             );
 
         error.statusCode = 400;
@@ -243,20 +317,57 @@ const createPayroll = async (
     }
 
 
-    const salaryRatePerHour =
-        Number(
-            employee.salaryRatePerHour
-        );
-
-
     if (
-        Number.isNaN(salaryRatePerHour) ||
-        salaryRatePerHour < 0
+        employee.monthlyExpectedHours === null ||
+        employee.monthlyExpectedHours === undefined
     ) {
 
         const error =
             new Error(
-                "Employee salary rate per hour is invalid"
+                "Employee monthly expected hours are not configured"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    const baseSalary =
+        validatePositiveNumber(
+            employee.baseSalary,
+            "Employee base salary"
+        );
+
+
+    const monthlyExpectedHours =
+        validatePositiveNumber(
+            employee.monthlyExpectedHours,
+            "Employee monthly expected hours"
+        );
+
+
+    // ==========================================
+    // Calculate Hourly Rate
+    // ==========================================
+
+    const calculatedSalaryRatePerHour =
+        roundMoney(
+            baseSalary /
+            monthlyExpectedHours
+        );
+
+
+    if (
+        !Number.isFinite(
+            calculatedSalaryRatePerHour
+        ) ||
+        calculatedSalaryRatePerHour <= 0
+    ) {
+
+        const error =
+            new Error(
+                "Calculated employee hourly salary is invalid"
             );
 
         error.statusCode = 400;
@@ -302,7 +413,7 @@ const createPayroll = async (
     // ==========================================
     // Get Attendance
     //
-    // Only attendance records inside the
+    // Only PRESENT records inside the
     // requested payroll period are considered.
     // ==========================================
 
@@ -352,19 +463,23 @@ const createPayroll = async (
 
     const totalWorkingHours =
         attendance.reduce(
-
-            (total, record) => {
+            (
+                total,
+                record
+            ) => {
 
                 return (
                     total +
                     (
                         record.totalHours
-                            ? Number(record.totalHours)
+                            ? Number(
+                                record.totalHours
+                            )
                             : 0
                     )
                 );
-            },
 
+            },
             0
         );
 
@@ -376,16 +491,15 @@ const createPayroll = async (
 
 
     // ==========================================
-    // Calculate Basic Salary
+    // Calculate Basic / Earned Salary
     //
-    // Basic Salary =
-    // Total Working Hours × Hourly Rate
+    // Actual Working Hours × Hourly Rate
     // ==========================================
 
     const basicSalary =
         roundMoney(
             roundedWorkingHours *
-            salaryRatePerHour
+            calculatedSalaryRatePerHour
         );
 
 
@@ -398,12 +512,14 @@ const createPayroll = async (
 
     const payroll =
         await prisma.$transaction(
-
             async (tx) => {
 
 
                 // ==================================
-                // Find Oldest Approved Unused Advance
+                // Find Oldest PAID Unused Advance
+                //
+                // Payroll deduction uses the actual
+                // amount paid to the employee.
                 // ==================================
 
                 const advance =
@@ -415,7 +531,13 @@ const createPayroll = async (
                                 parsedEmployeeId,
 
                             status:
-                                "APPROVED",
+                                "PAID",
+
+                            paidAmount: {
+
+                                not:
+                                    null
+                            },
 
                             deductedInPayrollId:
                                 null
@@ -438,11 +560,33 @@ const createPayroll = async (
 
                 if (advance) {
 
+                    const paidAmount =
+                        Number(
+                            advance.paidAmount
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            paidAmount
+                        ) ||
+                        paidAmount <= 0
+                    ) {
+
+                        const error =
+                            new Error(
+                                "Paid advance amount is invalid"
+                            );
+
+                        error.statusCode = 400;
+
+                        throw error;
+                    }
+
+
                     advanceDeduction =
                         roundMoney(
-                            Number(
-                                advance.amount
-                            )
+                            paidAmount
                         );
                 }
 
@@ -476,17 +620,42 @@ const createPayroll = async (
                             payPeriodEnd:
                                 endDate,
 
+
+                            // Historical salary snapshot
+
+                            baseSalary:
+                                baseSalary,
+
+                            monthlyExpectedHours:
+                                monthlyExpectedHours,
+
+                            salaryRatePerHour:
+                                calculatedSalaryRatePerHour,
+
+
+                            // Attendance calculation
+
                             totalWorkingHours:
                                 roundedWorkingHours,
+
+
+                            // Earned salary
 
                             basicSalary:
                                 basicSalary,
 
+
+                            // Advance deduction
+
                             advanceDeduction:
                                 advanceDeduction,
 
+
+                            // Final salary
+
                             netSalary:
                                 netSalary,
+
 
                             paymentDate:
                                 parsedPaymentDate
@@ -528,7 +697,13 @@ const createPayroll = async (
                                     advance.advanceId,
 
                                 status:
-                                    "APPROVED",
+                                    "PAID",
+
+                                paidAmount: {
+
+                                    not:
+                                        null
+                                },
 
                                 deductedInPayrollId:
                                     null
@@ -550,7 +725,8 @@ const createPayroll = async (
                     // ==================================
 
                     if (
-                        updatedAdvance.count !== 1
+                        updatedAdvance.count !==
+                        1
                     ) {
 
                         const error =
@@ -858,10 +1034,13 @@ const getEmployeePayroll = async (
 // ==========================================
 // Update Payroll
 // PUT /api/payroll/:id
-// ==========================================
 //
-// Manual changes are allowed for corrections.
-// Automatic calculation happens during creation.
+// Manual correction is still supported.
+//
+// Automatic calculation happens during
+// payroll creation.
+//
+// Salary snapshot values are also supported.
 // ==========================================
 
 const updatePayroll = async (
@@ -927,12 +1106,15 @@ const updatePayroll = async (
     const {
         payPeriodStart,
         payPeriodEnd,
+        baseSalary,
+        monthlyExpectedHours,
+        salaryRatePerHour,
         totalWorkingHours,
         basicSalary,
         advanceDeduction,
         netSalary,
         paymentDate
-    } = data;
+    } = data || {};
 
 
     // ==========================================
@@ -942,8 +1124,13 @@ const updatePayroll = async (
     const updateData = {};
 
 
+    // ==========================================
+    // Pay Period Start
+    // ==========================================
+
     if (
-        payPeriodStart !== undefined
+        payPeriodStart !==
+        undefined
     ) {
 
         updateData.payPeriodStart =
@@ -954,8 +1141,13 @@ const updatePayroll = async (
     }
 
 
+    // ==========================================
+    // Pay Period End
+    // ==========================================
+
     if (
-        payPeriodEnd !== undefined
+        payPeriodEnd !==
+        undefined
     ) {
 
         updateData.payPeriodEnd =
@@ -966,8 +1158,81 @@ const updatePayroll = async (
     }
 
 
+    // ==========================================
+    // Salary Snapshot: Base Salary
+    // ==========================================
+
     if (
-        totalWorkingHours !== undefined
+        baseSalary !==
+        undefined
+    ) {
+
+        const salary =
+            validatePositiveNumber(
+                baseSalary,
+                "baseSalary"
+            );
+
+        updateData.baseSalary =
+            roundMoney(
+                salary
+            );
+    }
+
+
+    // ==========================================
+    // Salary Snapshot:
+    // Monthly Expected Hours
+    // ==========================================
+
+    if (
+        monthlyExpectedHours !==
+        undefined
+    ) {
+
+        const expectedHours =
+            validatePositiveNumber(
+                monthlyExpectedHours,
+                "monthlyExpectedHours"
+            );
+
+        updateData.monthlyExpectedHours =
+            roundMoney(
+                expectedHours
+            );
+    }
+
+
+    // ==========================================
+    // Salary Snapshot:
+    // Hourly Rate
+    // ==========================================
+
+    if (
+        salaryRatePerHour !==
+        undefined
+    ) {
+
+        const hourlyRate =
+            validatePositiveNumber(
+                salaryRatePerHour,
+                "salaryRatePerHour"
+            );
+
+        updateData.salaryRatePerHour =
+            roundMoney(
+                hourlyRate
+            );
+    }
+
+
+    // ==========================================
+    // Total Working Hours
+    // ==========================================
+
+    if (
+        totalWorkingHours !==
+        undefined
     ) {
 
         const hours =
@@ -977,7 +1242,7 @@ const updatePayroll = async (
 
 
         if (
-            Number.isNaN(hours) ||
+            !Number.isFinite(hours) ||
             hours < 0
         ) {
 
@@ -993,12 +1258,19 @@ const updatePayroll = async (
 
 
         updateData.totalWorkingHours =
-            roundMoney(hours);
+            roundMoney(
+                hours
+            );
     }
 
 
+    // ==========================================
+    // Basic Salary
+    // ==========================================
+
     if (
-        basicSalary !== undefined
+        basicSalary !==
+        undefined
     ) {
 
         const salary =
@@ -1008,7 +1280,7 @@ const updatePayroll = async (
 
 
         if (
-            Number.isNaN(salary) ||
+            !Number.isFinite(salary) ||
             salary < 0
         ) {
 
@@ -1024,12 +1296,19 @@ const updatePayroll = async (
 
 
         updateData.basicSalary =
-            roundMoney(salary);
+            roundMoney(
+                salary
+            );
     }
 
 
+    // ==========================================
+    // Advance Deduction
+    // ==========================================
+
     if (
-        advanceDeduction !== undefined
+        advanceDeduction !==
+        undefined
     ) {
 
         const deduction =
@@ -1039,7 +1318,7 @@ const updatePayroll = async (
 
 
         if (
-            Number.isNaN(deduction) ||
+            !Number.isFinite(deduction) ||
             deduction < 0
         ) {
 
@@ -1055,12 +1334,19 @@ const updatePayroll = async (
 
 
         updateData.advanceDeduction =
-            roundMoney(deduction);
+            roundMoney(
+                deduction
+            );
     }
 
 
+    // ==========================================
+    // Net Salary
+    // ==========================================
+
     if (
-        netSalary !== undefined
+        netSalary !==
+        undefined
     ) {
 
         const salary =
@@ -1070,7 +1356,7 @@ const updatePayroll = async (
 
 
         if (
-            Number.isNaN(salary)
+            !Number.isFinite(salary)
         ) {
 
             const error =
@@ -1085,12 +1371,19 @@ const updatePayroll = async (
 
 
         updateData.netSalary =
-            roundMoney(salary);
+            roundMoney(
+                salary
+            );
     }
 
 
+    // ==========================================
+    // Payment Date
+    // ==========================================
+
     if (
-        paymentDate !== undefined
+        paymentDate !==
+        undefined
     ) {
 
         updateData.paymentDate =
@@ -1100,6 +1393,36 @@ const updatePayroll = async (
                     "paymentDate"
                 )
                 : null;
+    }
+
+
+    // ==========================================
+    // Validate Final Pay Period
+    // ==========================================
+
+    const finalStartDate =
+        updateData.payPeriodStart ||
+        existingPayroll.payPeriodStart;
+
+
+    const finalEndDate =
+        updateData.payPeriodEnd ||
+        existingPayroll.payPeriodEnd;
+
+
+    if (
+        finalStartDate >
+        finalEndDate
+    ) {
+
+        const error =
+            new Error(
+                "payPeriodStart cannot be after payPeriodEnd"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
     }
 
 
@@ -1216,10 +1539,11 @@ const deletePayroll = async (
     // ==========================================
 
     await prisma.$transaction(
-
         async (tx) => {
 
-            // Release advance deduction first
+            // ----------------------------------
+            // Release linked advance first
+            // ----------------------------------
 
             await tx.advancePayment.updateMany({
 
@@ -1240,7 +1564,9 @@ const deletePayroll = async (
             });
 
 
+            // ----------------------------------
             // Delete payroll
+            // ----------------------------------
 
             await tx.payroll.delete({
 

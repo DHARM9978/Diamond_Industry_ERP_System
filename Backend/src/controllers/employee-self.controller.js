@@ -1,7 +1,14 @@
-const prisma = require("../config/database");
-const attendanceService = require("../services/attendance.service");
-const payrollService = require("../services/payroll.service");
-const advanceService = require("../services/advance.service");
+const prisma =
+    require("../config/database");
+
+const attendanceService =
+    require("../services/attendance.service");
+
+const payrollService =
+    require("../services/payroll.service");
+
+const advanceService =
+    require("../services/advance.service");
 
 
 // ==========================================
@@ -9,51 +16,93 @@ const advanceService = require("../services/advance.service");
 // GET /api/me/profile
 // ==========================================
 
-const getMyProfile = async (req, res) => {
+const getMyProfile = async (
+    req,
+    res
+) => {
 
     const employee =
         await prisma.employee.findFirst({
 
             where: {
-                employeeId: req.user.employeeId,
-                companyId: req.user.companyId
+
+                employeeId:
+                    req.user.employeeId,
+
+                companyId:
+                    req.user.companyId
             },
 
             select: {
 
                 employeeId: true,
+
                 firstName: true,
+
                 lastName: true,
+
                 gender: true,
+
                 email: true,
+
                 phone: true,
+
                 hireDate: true,
+
                 role: true,
+
+
+                // ==================================
+                // Salary Information
+                // ==================================
+
+                baseSalary: true,
+
+                monthlyExpectedHours: true,
+
                 salaryRatePerHour: true,
+
+
                 companyId: true,
+
                 branchId: true,
+
                 departmentId: true,
+
                 managerId: true,
+
                 status: true,
+
                 createdAt: true,
+
                 updatedAt: true,
 
+
                 branch: {
+
                     select: {
+
                         branchId: true,
+
                         branchName: true,
+
                         location: true
                     }
                 },
 
+
                 department: {
+
                     select: {
+
                         departmentId: true,
+
                         departmentName: true
                     }
                 }
             }
         });
+
 
     if (!employee) {
 
@@ -66,6 +115,7 @@ const getMyProfile = async (req, res) => {
         });
     }
 
+
     return res.status(200).json({
 
         success: true,
@@ -73,7 +123,8 @@ const getMyProfile = async (req, res) => {
         message:
             "Employee profile fetched successfully",
 
-        data: employee
+        data:
+            employee
     });
 };
 
@@ -83,12 +134,16 @@ const getMyProfile = async (req, res) => {
 // GET /api/me/attendance
 // ==========================================
 
-const getMyAttendance = async (req, res) => {
+const getMyAttendance = async (
+    req,
+    res
+) => {
 
     const {
         from,
         to
     } = req.query;
+
 
     const attendance =
         await attendanceService.getEmployeeAttendance(
@@ -100,6 +155,7 @@ const getMyAttendance = async (req, res) => {
                 to
             }
         );
+
 
     return res.status(200).json({
 
@@ -128,12 +184,16 @@ const getMyAttendance = async (req, res) => {
 // GET /api/me/attendance/summary
 // ==========================================
 
-const getMyAttendanceSummary = async (req, res) => {
+const getMyAttendanceSummary = async (
+    req,
+    res
+) => {
 
     const {
         from,
         to
     } = req.query;
+
 
     const summary =
         await attendanceService.getEmployeeAttendanceSummary(
@@ -145,6 +205,7 @@ const getMyAttendanceSummary = async (req, res) => {
                 to
             }
         );
+
 
     return res.status(200).json({
 
@@ -173,7 +234,10 @@ const getMyAttendanceSummary = async (req, res) => {
 // GET /api/me/payroll
 // ==========================================
 
-const getMyPayroll = async (req, res) => {
+const getMyPayroll = async (
+    req,
+    res
+) => {
 
     const payrolls =
         await payrollService.getMyPayroll(
@@ -182,6 +246,7 @@ const getMyPayroll = async (req, res) => {
 
             req.user.companyId
         );
+
 
     return res.status(200).json({
 
@@ -201,7 +266,10 @@ const getMyPayroll = async (req, res) => {
 // GET /api/me/advances
 // ==========================================
 
-const getMyAdvances = async (req, res) => {
+const getMyAdvances = async (
+    req,
+    res
+) => {
 
     const advances =
         await advanceService.getMyAdvances(
@@ -210,6 +278,7 @@ const getMyAdvances = async (req, res) => {
 
             req.user.companyId
         );
+
 
     return res.status(200).json({
 
@@ -229,17 +298,21 @@ const getMyAdvances = async (req, res) => {
 // POST /api/me/advances
 // ==========================================
 
-const createMyAdvance = async (req, res) => {
+const createMyAdvance = async (
+    req,
+    res
+) => {
 
     const advance =
         await advanceService.createMyAdvance(
 
-            req.body,
+            req.body || {},
 
             req.user.employeeId,
 
             req.user.companyId
         );
+
 
     return res.status(201).json({
 
@@ -261,9 +334,14 @@ const createMyAdvance = async (req, res) => {
 module.exports = {
 
     getMyProfile,
+
     getMyAttendance,
+
     getMyAttendanceSummary,
+
     getMyPayroll,
+
     getMyAdvances,
+
     createMyAdvance
 };

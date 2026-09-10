@@ -5870,6 +5870,8 @@ export namespace Prisma {
 
   export type EmployeeAvgAggregateOutputType = {
     employeeId: number | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     companyId: number | null
     branchId: number | null
@@ -5879,6 +5881,8 @@ export namespace Prisma {
 
   export type EmployeeSumAggregateOutputType = {
     employeeId: number | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     companyId: number | null
     branchId: number | null
@@ -5895,6 +5899,8 @@ export namespace Prisma {
     phone: string | null
     hireDate: Date | null
     role: string | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     companyId: number | null
     branchId: number | null
@@ -5915,6 +5921,8 @@ export namespace Prisma {
     phone: string | null
     hireDate: Date | null
     role: string | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     companyId: number | null
     branchId: number | null
@@ -5935,6 +5943,8 @@ export namespace Prisma {
     phone: number
     hireDate: number
     role: number
+    baseSalary: number
+    monthlyExpectedHours: number
     salaryRatePerHour: number
     companyId: number
     branchId: number
@@ -5950,6 +5960,8 @@ export namespace Prisma {
 
   export type EmployeeAvgAggregateInputType = {
     employeeId?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
     salaryRatePerHour?: true
     companyId?: true
     branchId?: true
@@ -5959,6 +5971,8 @@ export namespace Prisma {
 
   export type EmployeeSumAggregateInputType = {
     employeeId?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
     salaryRatePerHour?: true
     companyId?: true
     branchId?: true
@@ -5975,6 +5989,8 @@ export namespace Prisma {
     phone?: true
     hireDate?: true
     role?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
     salaryRatePerHour?: true
     companyId?: true
     branchId?: true
@@ -5995,6 +6011,8 @@ export namespace Prisma {
     phone?: true
     hireDate?: true
     role?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
     salaryRatePerHour?: true
     companyId?: true
     branchId?: true
@@ -6015,6 +6033,8 @@ export namespace Prisma {
     phone?: true
     hireDate?: true
     role?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
     salaryRatePerHour?: true
     companyId?: true
     branchId?: true
@@ -6122,6 +6142,8 @@ export namespace Prisma {
     phone: string | null
     hireDate: Date | null
     role: string
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     companyId: number
     branchId: number
@@ -6161,6 +6183,8 @@ export namespace Prisma {
     phone?: boolean
     hireDate?: boolean
     role?: boolean
+    baseSalary?: boolean
+    monthlyExpectedHours?: boolean
     salaryRatePerHour?: boolean
     companyId?: boolean
     branchId?: boolean
@@ -6199,6 +6223,8 @@ export namespace Prisma {
     phone?: boolean
     hireDate?: boolean
     role?: boolean
+    baseSalary?: boolean
+    monthlyExpectedHours?: boolean
     salaryRatePerHour?: boolean
     companyId?: boolean
     branchId?: boolean
@@ -6210,7 +6236,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"employeeId" | "firstName" | "lastName" | "gender" | "email" | "phone" | "hireDate" | "role" | "salaryRatePerHour" | "companyId" | "branchId" | "departmentId" | "managerId" | "status" | "passwordHash" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"employeeId" | "firstName" | "lastName" | "gender" | "email" | "phone" | "hireDate" | "role" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "companyId" | "branchId" | "departmentId" | "managerId" | "status" | "passwordHash" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
   export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     activityLogs?: boolean | Employee$activityLogsArgs<ExtArgs>
     advancePayments?: boolean | Employee$advancePaymentsArgs<ExtArgs>
@@ -6258,6 +6284,8 @@ export namespace Prisma {
       phone: string | null
       hireDate: Date | null
       role: string
+      baseSalary: Prisma.Decimal | null
+      monthlyExpectedHours: Prisma.Decimal | null
       salaryRatePerHour: Prisma.Decimal | null
       companyId: number
       branchId: number
@@ -6659,6 +6687,8 @@ export namespace Prisma {
     readonly phone: FieldRef<"Employee", 'String'>
     readonly hireDate: FieldRef<"Employee", 'DateTime'>
     readonly role: FieldRef<"Employee", 'String'>
+    readonly baseSalary: FieldRef<"Employee", 'Decimal'>
+    readonly monthlyExpectedHours: FieldRef<"Employee", 'Decimal'>
     readonly salaryRatePerHour: FieldRef<"Employee", 'Decimal'>
     readonly companyId: FieldRef<"Employee", 'Int'>
     readonly branchId: FieldRef<"Employee", 'Int'>
@@ -13588,6 +13618,9 @@ export namespace Prisma {
   export type PayrollAvgAggregateOutputType = {
     payrollId: number | null
     employeeId: number | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
+    salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
@@ -13597,6 +13630,9 @@ export namespace Prisma {
   export type PayrollSumAggregateOutputType = {
     payrollId: number | null
     employeeId: number | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
+    salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
@@ -13608,6 +13644,9 @@ export namespace Prisma {
     employeeId: number | null
     payPeriodStart: Date | null
     payPeriodEnd: Date | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
+    salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
@@ -13622,6 +13661,9 @@ export namespace Prisma {
     employeeId: number | null
     payPeriodStart: Date | null
     payPeriodEnd: Date | null
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
+    salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
@@ -13636,6 +13678,9 @@ export namespace Prisma {
     employeeId: number
     payPeriodStart: number
     payPeriodEnd: number
+    baseSalary: number
+    monthlyExpectedHours: number
+    salaryRatePerHour: number
     totalWorkingHours: number
     basicSalary: number
     advanceDeduction: number
@@ -13650,6 +13695,9 @@ export namespace Prisma {
   export type PayrollAvgAggregateInputType = {
     payrollId?: true
     employeeId?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
+    salaryRatePerHour?: true
     totalWorkingHours?: true
     basicSalary?: true
     advanceDeduction?: true
@@ -13659,6 +13707,9 @@ export namespace Prisma {
   export type PayrollSumAggregateInputType = {
     payrollId?: true
     employeeId?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
+    salaryRatePerHour?: true
     totalWorkingHours?: true
     basicSalary?: true
     advanceDeduction?: true
@@ -13670,6 +13721,9 @@ export namespace Prisma {
     employeeId?: true
     payPeriodStart?: true
     payPeriodEnd?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
+    salaryRatePerHour?: true
     totalWorkingHours?: true
     basicSalary?: true
     advanceDeduction?: true
@@ -13684,6 +13738,9 @@ export namespace Prisma {
     employeeId?: true
     payPeriodStart?: true
     payPeriodEnd?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
+    salaryRatePerHour?: true
     totalWorkingHours?: true
     basicSalary?: true
     advanceDeduction?: true
@@ -13698,6 +13755,9 @@ export namespace Prisma {
     employeeId?: true
     payPeriodStart?: true
     payPeriodEnd?: true
+    baseSalary?: true
+    monthlyExpectedHours?: true
+    salaryRatePerHour?: true
     totalWorkingHours?: true
     basicSalary?: true
     advanceDeduction?: true
@@ -13799,6 +13859,9 @@ export namespace Prisma {
     employeeId: number
     payPeriodStart: Date
     payPeriodEnd: Date
+    baseSalary: Decimal | null
+    monthlyExpectedHours: Decimal | null
+    salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal
     basicSalary: Decimal
     advanceDeduction: Decimal
@@ -13832,6 +13895,9 @@ export namespace Prisma {
     employeeId?: boolean
     payPeriodStart?: boolean
     payPeriodEnd?: boolean
+    baseSalary?: boolean
+    monthlyExpectedHours?: boolean
+    salaryRatePerHour?: boolean
     totalWorkingHours?: boolean
     basicSalary?: boolean
     advanceDeduction?: boolean
@@ -13850,6 +13916,9 @@ export namespace Prisma {
     employeeId?: boolean
     payPeriodStart?: boolean
     payPeriodEnd?: boolean
+    baseSalary?: boolean
+    monthlyExpectedHours?: boolean
+    salaryRatePerHour?: boolean
     totalWorkingHours?: boolean
     basicSalary?: boolean
     advanceDeduction?: boolean
@@ -13859,7 +13928,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "totalWorkingHours" | "basicSalary" | "advanceDeduction" | "netSalary" | "paymentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
+  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "basicSalary" | "advanceDeduction" | "netSalary" | "paymentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
   export type PayrollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
@@ -13876,6 +13945,9 @@ export namespace Prisma {
       employeeId: number
       payPeriodStart: Date
       payPeriodEnd: Date
+      baseSalary: Prisma.Decimal | null
+      monthlyExpectedHours: Prisma.Decimal | null
+      salaryRatePerHour: Prisma.Decimal | null
       totalWorkingHours: Prisma.Decimal
       basicSalary: Prisma.Decimal
       advanceDeduction: Prisma.Decimal
@@ -14258,6 +14330,9 @@ export namespace Prisma {
     readonly employeeId: FieldRef<"Payroll", 'Int'>
     readonly payPeriodStart: FieldRef<"Payroll", 'DateTime'>
     readonly payPeriodEnd: FieldRef<"Payroll", 'DateTime'>
+    readonly baseSalary: FieldRef<"Payroll", 'Decimal'>
+    readonly monthlyExpectedHours: FieldRef<"Payroll", 'Decimal'>
+    readonly salaryRatePerHour: FieldRef<"Payroll", 'Decimal'>
     readonly totalWorkingHours: FieldRef<"Payroll", 'Decimal'>
     readonly basicSalary: FieldRef<"Payroll", 'Decimal'>
     readonly advanceDeduction: FieldRef<"Payroll", 'Decimal'>
@@ -22180,6 +22255,8 @@ export namespace Prisma {
     phone: 'phone',
     hireDate: 'hireDate',
     role: 'role',
+    baseSalary: 'baseSalary',
+    monthlyExpectedHours: 'monthlyExpectedHours',
     salaryRatePerHour: 'salaryRatePerHour',
     companyId: 'companyId',
     branchId: 'branchId',
@@ -22288,6 +22365,9 @@ export namespace Prisma {
     employeeId: 'employeeId',
     payPeriodStart: 'payPeriodStart',
     payPeriodEnd: 'payPeriodEnd',
+    baseSalary: 'baseSalary',
+    monthlyExpectedHours: 'monthlyExpectedHours',
+    salaryRatePerHour: 'salaryRatePerHour',
     totalWorkingHours: 'totalWorkingHours',
     basicSalary: 'basicSalary',
     advanceDeduction: 'advanceDeduction',
@@ -22860,6 +22940,8 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Employee"> | string | null
     hireDate?: DateTimeNullableFilter<"Employee"> | Date | string | null
     role?: StringFilter<"Employee"> | string
+    baseSalary?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFilter<"Employee"> | number
     branchId?: IntFilter<"Employee"> | number
@@ -22895,6 +22977,8 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     hireDate?: SortOrderInput | SortOrder
     role?: SortOrder
+    baseSalary?: SortOrderInput | SortOrder
+    monthlyExpectedHours?: SortOrderInput | SortOrder
     salaryRatePerHour?: SortOrderInput | SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -22934,6 +23018,8 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Employee"> | string | null
     hireDate?: DateTimeNullableFilter<"Employee"> | Date | string | null
     role?: StringFilter<"Employee"> | string
+    baseSalary?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFilter<"Employee"> | number
     branchId?: IntFilter<"Employee"> | number
@@ -22969,6 +23055,8 @@ export namespace Prisma {
     phone?: SortOrderInput | SortOrder
     hireDate?: SortOrderInput | SortOrder
     role?: SortOrder
+    baseSalary?: SortOrderInput | SortOrder
+    monthlyExpectedHours?: SortOrderInput | SortOrder
     salaryRatePerHour?: SortOrderInput | SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -22997,6 +23085,8 @@ export namespace Prisma {
     phone?: StringNullableWithAggregatesFilter<"Employee"> | string | null
     hireDate?: DateTimeNullableWithAggregatesFilter<"Employee"> | Date | string | null
     role?: StringWithAggregatesFilter<"Employee"> | string
+    baseSalary?: DecimalNullableWithAggregatesFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableWithAggregatesFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableWithAggregatesFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     companyId?: IntWithAggregatesFilter<"Employee"> | number
     branchId?: IntWithAggregatesFilter<"Employee"> | number
@@ -23498,6 +23588,9 @@ export namespace Prisma {
     employeeId?: IntFilter<"Payroll"> | number
     payPeriodStart?: DateTimeFilter<"Payroll"> | Date | string
     payPeriodEnd?: DateTimeFilter<"Payroll"> | Date | string
+    baseSalary?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -23514,6 +23607,9 @@ export namespace Prisma {
     employeeId?: SortOrder
     payPeriodStart?: SortOrder
     payPeriodEnd?: SortOrder
+    baseSalary?: SortOrderInput | SortOrder
+    monthlyExpectedHours?: SortOrderInput | SortOrder
+    salaryRatePerHour?: SortOrderInput | SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -23533,6 +23629,9 @@ export namespace Prisma {
     employeeId?: IntFilter<"Payroll"> | number
     payPeriodStart?: DateTimeFilter<"Payroll"> | Date | string
     payPeriodEnd?: DateTimeFilter<"Payroll"> | Date | string
+    baseSalary?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -23549,6 +23648,9 @@ export namespace Prisma {
     employeeId?: SortOrder
     payPeriodStart?: SortOrder
     payPeriodEnd?: SortOrder
+    baseSalary?: SortOrderInput | SortOrder
+    monthlyExpectedHours?: SortOrderInput | SortOrder
+    salaryRatePerHour?: SortOrderInput | SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -23571,6 +23673,9 @@ export namespace Prisma {
     employeeId?: IntWithAggregatesFilter<"Payroll"> | number
     payPeriodStart?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
     payPeriodEnd?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
+    baseSalary?: DecimalNullableWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: DecimalNullableWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -24398,6 +24503,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -24429,6 +24536,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -24459,6 +24568,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -24490,6 +24601,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -24521,6 +24634,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -24540,6 +24655,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -24556,6 +24673,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -25053,6 +25172,9 @@ export namespace Prisma {
   export type PayrollCreateInput = {
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -25069,6 +25191,9 @@ export namespace Prisma {
     employeeId: number
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -25082,6 +25207,9 @@ export namespace Prisma {
   export type PayrollUpdateInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25098,6 +25226,9 @@ export namespace Prisma {
     employeeId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25113,6 +25244,9 @@ export namespace Prisma {
     employeeId: number
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -25125,6 +25259,9 @@ export namespace Prisma {
   export type PayrollUpdateManyMutationInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -25139,6 +25276,9 @@ export namespace Prisma {
     employeeId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -26236,6 +26376,8 @@ export namespace Prisma {
     phone?: SortOrder
     hireDate?: SortOrder
     role?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -26249,6 +26391,8 @@ export namespace Prisma {
 
   export type EmployeeAvgOrderByAggregateInput = {
     employeeId?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -26265,6 +26409,8 @@ export namespace Prisma {
     phone?: SortOrder
     hireDate?: SortOrder
     role?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -26285,6 +26431,8 @@ export namespace Prisma {
     phone?: SortOrder
     hireDate?: SortOrder
     role?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -26298,6 +26446,8 @@ export namespace Prisma {
 
   export type EmployeeSumOrderByAggregateInput = {
     employeeId?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     companyId?: SortOrder
     branchId?: SortOrder
@@ -26763,6 +26913,9 @@ export namespace Prisma {
     employeeId?: SortOrder
     payPeriodStart?: SortOrder
     payPeriodEnd?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
+    salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -26775,6 +26928,9 @@ export namespace Prisma {
   export type PayrollAvgOrderByAggregateInput = {
     payrollId?: SortOrder
     employeeId?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
+    salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -26786,6 +26942,9 @@ export namespace Prisma {
     employeeId?: SortOrder
     payPeriodStart?: SortOrder
     payPeriodEnd?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
+    salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -26800,6 +26959,9 @@ export namespace Prisma {
     employeeId?: SortOrder
     payPeriodStart?: SortOrder
     payPeriodEnd?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
+    salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -26812,6 +26974,9 @@ export namespace Prisma {
   export type PayrollSumOrderByAggregateInput = {
     payrollId?: SortOrder
     employeeId?: SortOrder
+    baseSalary?: SortOrder
+    monthlyExpectedHours?: SortOrder
+    salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
@@ -29427,6 +29592,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -29457,6 +29624,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     departmentId?: number | null
@@ -29626,6 +29795,8 @@ export namespace Prisma {
     phone?: StringNullableFilter<"Employee"> | string | null
     hireDate?: DateTimeNullableFilter<"Employee"> | Date | string | null
     role?: StringFilter<"Employee"> | string
+    baseSalary?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Employee"> | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFilter<"Employee"> | number
     branchId?: IntFilter<"Employee"> | number
@@ -29740,6 +29911,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -29770,6 +29943,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -29804,6 +29979,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -29834,6 +30011,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -29958,6 +30137,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -29988,6 +30169,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -30270,6 +30453,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -30300,6 +30485,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -30334,6 +30521,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -30364,6 +30553,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -30536,6 +30727,9 @@ export namespace Prisma {
   export type PayrollCreateWithoutEmployeeInput = {
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -30550,6 +30744,9 @@ export namespace Prisma {
     payrollId?: number
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -30812,6 +31009,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -30842,6 +31041,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -31034,6 +31235,9 @@ export namespace Prisma {
     employeeId?: IntFilter<"Payroll"> | number
     payPeriodStart?: DateTimeFilter<"Payroll"> | Date | string
     payPeriodEnd?: DateTimeFilter<"Payroll"> | Date | string
+    baseSalary?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -31282,6 +31486,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -31312,6 +31518,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -31357,6 +31565,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -31387,6 +31597,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -31450,6 +31662,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -31480,6 +31694,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -31565,6 +31781,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -31595,6 +31813,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -31624,6 +31844,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -31654,6 +31876,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -31699,6 +31923,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -31729,6 +31955,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -31853,6 +32081,9 @@ export namespace Prisma {
   export type PayrollCreateWithoutAdvanceDeductionRecordInput = {
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -31868,6 +32099,9 @@ export namespace Prisma {
     employeeId: number
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -31890,6 +32124,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -31920,6 +32156,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -31992,6 +32230,9 @@ export namespace Prisma {
   export type PayrollUpdateWithoutAdvanceDeductionRecordInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32007,6 +32248,9 @@ export namespace Prisma {
     employeeId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -32035,6 +32279,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -32065,6 +32311,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -32128,6 +32376,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -32158,6 +32408,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -32243,6 +32495,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -32273,6 +32527,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -32302,6 +32558,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -32332,6 +32590,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -32377,6 +32637,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -32407,6 +32669,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -32605,6 +32869,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -32635,6 +32901,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     branchId: number
     departmentId?: number | null
@@ -33136,6 +33404,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -33166,6 +33436,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -33249,6 +33521,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -33279,6 +33553,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -33352,6 +33628,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -33382,6 +33660,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -33465,6 +33745,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -33495,6 +33777,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -33568,6 +33852,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     status: string
     passwordHash: string
@@ -33598,6 +33884,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -33643,6 +33931,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -33673,6 +33963,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -33771,6 +34063,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     departmentId?: number | null
@@ -33830,6 +34124,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -33860,6 +34156,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     departmentId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33890,6 +34188,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     departmentId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33951,6 +34251,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -33969,6 +34271,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -33999,6 +34303,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -34029,6 +34335,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -34099,6 +34407,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     companyId: number
     branchId: number
@@ -34164,6 +34474,9 @@ export namespace Prisma {
     payrollId?: number
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -34333,6 +34646,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -34363,6 +34678,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -34393,6 +34710,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
@@ -34555,6 +34874,9 @@ export namespace Prisma {
   export type PayrollUpdateWithoutEmployeeInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -34569,6 +34891,9 @@ export namespace Prisma {
     payrollId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -34583,6 +34908,9 @@ export namespace Prisma {
     payrollId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -34692,6 +35020,8 @@ export namespace Prisma {
     phone?: string | null
     hireDate?: Date | string | null
     role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     branchId: number
     departmentId?: number | null
@@ -34834,6 +35164,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -34864,6 +35196,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     branchId?: IntFieldUpdateOperationsInput | number
     departmentId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -34894,6 +35228,8 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     branchId?: IntFieldUpdateOperationsInput | number
     departmentId?: NullableIntFieldUpdateOperationsInput | number | null

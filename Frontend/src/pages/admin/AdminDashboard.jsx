@@ -35,7 +35,8 @@ export function AdminDashboard() {
   // STATE
   // ==========================================================
 
-  const [data, setData] = useState(null);
+  const [data, setData] =
+    useState(null);
 
   const [totalAdvancePayment, setTotalAdvancePayment] =
     useState(0);
@@ -43,16 +44,45 @@ export function AdminDashboard() {
   const [totalPayrollAmount, setTotalPayrollAmount] =
     useState(0);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [error, setError] = useState(null);
+  const [error, setError] =
+    useState(null);
 
 
   // ==========================================================
-  // LOAD DASHBOARD DATA
+  // HELPER
+  // ==========================================================
+
+  const normalizeArrayResponse = (
+    response
+  ) => {
+
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (
+      Array.isArray(
+        response?.data
+      )
+    ) {
+      return response.data;
+    }
+
+    return [];
+  };
+
+
+  // ==========================================================
+  // LOAD DASHBOARD
   // ==========================================================
 
   useEffect(() => {
+
+    let mounted = true;
+
 
     const loadDashboard = async () => {
 
@@ -63,166 +93,224 @@ export function AdminDashboard() {
 
 
         // ======================================================
-        // DASHBOARD API
+        // LOAD DASHBOARD + ADVANCES + PAYROLL
+        //
+        // These are independent APIs.
+        // Failure of one should not destroy the whole dashboard.
         // ======================================================
 
-        const dashboardResponse =
-          await reportService.dashboard();
+        const results =
+          await Promise.allSettled([
+
+            reportService.dashboard(),
+
+            advanceService.list(),
+
+            payrollService.list(),
+
+          ]);
 
 
-        console.log(
-          'Dashboard API response:',
-          dashboardResponse
-        );
+        // ======================================================
+        // DASHBOARD RESULT
+        // ======================================================
 
-
-        /*
-         * The service layer may already unwrap the API response.
-         *
-         * Therefore support both:
-         *
-         * 1. dashboardResponse.data
-         *
-         * 2. dashboardResponse
-         */
-
-        const dashboardData =
-          dashboardResponse?.data ??
-          dashboardResponse;
+        const dashboardResult =
+          results[0];
 
 
         if (
-          !dashboardData ||
-          typeof dashboardData !== 'object'
+          dashboardResult.status ===
+          'fulfilled'
         ) {
 
-          throw new Error(
-            'Dashboard data was not returned by the server'
-          );
+          const dashboardResponse =
+            dashboardResult.value;
 
+
+          const dashboardData =
+            dashboardResponse?.data ??
+            dashboardResponse;
+
+
+          if (
+            dashboardData &&
+            typeof dashboardData ===
+            'object'
+          ) {
+
+            if (mounted) {
+
+              setData(
+                dashboardData
+              );
+            }
+
+          } else {
+
+            throw new Error(
+              'Dashboard data was not returned by the server'
+            );
+          }
+
+        } else {
+
+          throw dashboardResult.reason ||
+            new Error(
+              'Unable to load dashboard data'
+            );
         }
 
 
-        setData(dashboardData);
-
-
         // ======================================================
-        // TOTAL ADVANCE PAYMENT
+        // ADVANCE RESULT
+        //
+        // IMPORTANT:
+        //
+        // Dashboard "Total Advance Payment" represents the
+        // actual amount paid to employees.
+        //
+        // Therefore:
+        //
+        // status === PAID
+        // AND paidAmount != null
+        //
+        // We DO NOT use:
+        //
+        // amount
+        //
+        // because amount is the original employee request.
         // ======================================================
 
-        try {
-
-          const advanceResponse =
-            await advanceService.list();
+        const advanceResult =
+          results[1];
 
 
-          console.log(
-            'Advance API response:',
-            advanceResponse
-          );
-
-
-          /*
-           * Depending on apiServices.js, the response can be:
-           *
-           * [
-           *   {
-           *     amount: 5000
-           *   }
-           * ]
-           *
-           * OR:
-           *
-           * {
-           *   data: [...]
-           * }
-           */
+        if (
+          advanceResult.status ===
+          'fulfilled'
+        ) {
 
           const advances =
-            Array.isArray(advanceResponse)
-              ? advanceResponse
-              : Array.isArray(advanceResponse?.data)
-                ? advanceResponse.data
-                : [];
+            normalizeArrayResponse(
+              advanceResult.value
+            );
 
 
-          const advanceTotal =
+          const paidAdvanceTotal =
             advances.reduce(
-              (total, advance) => {
+              (
+                total,
+                advance
+              ) => {
 
-                const amount =
+                const status =
+                  String(
+                    advance?.status ||
+                    ''
+                  )
+                    .trim()
+                    .toUpperCase();
+
+
+                if (
+                  status !==
+                  'PAID'
+                ) {
+
+                  return total;
+                }
+
+
+                const paidAmount =
                   Number(
-                    advance?.amount ??
-                    advance?.advanceAmount ??
-                    advance?.advance_amount ??
+                    advance?.paidAmount ??
+                    advance?.paid_amount ??
                     0
                   );
 
 
-                return total + amount;
+                if (
+                  !Number.isFinite(
+                    paidAmount
+                  ) ||
+                  paidAmount <= 0
+                ) {
+
+                  return total;
+                }
+
+
+                return (
+                  total +
+                  paidAmount
+                );
 
               },
               0
             );
 
 
-          setTotalAdvancePayment(
-            advanceTotal
-          );
+          if (mounted) {
 
-        } catch (advanceError) {
+            setTotalAdvancePayment(
+              Number(
+                paidAdvanceTotal.toFixed(2)
+              )
+            );
+          }
+
+        } else {
 
           console.error(
             'Advance data loading failed:',
-            advanceError
+            advanceResult.reason
           );
 
 
           /*
-           * Do not break the dashboard if the
-           * advance endpoint fails.
+           * Keep dashboard usable.
+           *
+           * We intentionally do not calculate advance totals
+           * from requested or approved amounts.
            */
 
-          setTotalAdvancePayment(0);
+          if (mounted) {
 
+            setTotalAdvancePayment(
+              0
+            );
+          }
         }
 
 
         // ======================================================
-        // TOTAL PAYROLL AMOUNT
+        // PAYROLL RESULT
+        //
+        // Use actual payroll netSalary values.
         // ======================================================
 
-        try {
-
-          const payrollResponse =
-            await payrollService.list();
+        const payrollResult =
+          results[2];
 
 
-          console.log(
-            'Payroll API response:',
-            payrollResponse
-          );
-
+        if (
+          payrollResult.status ===
+          'fulfilled'
+        ) {
 
           const payrollRecords =
-            Array.isArray(payrollResponse)
-              ? payrollResponse
-              : Array.isArray(payrollResponse?.data)
-                ? payrollResponse.data
-                : [];
+            normalizeArrayResponse(
+              payrollResult.value
+            );
 
-
-          /*
-           * Payroll records normally contain:
-           *
-           * basicSalary
-           * advanceDeduction
-           * netSalary
-           */
 
           const payrollTotal =
             payrollRecords.reduce(
-              (total, payroll) => {
+              (
+                total,
+                payroll
+              ) => {
 
                 const netSalary =
                   Number(
@@ -232,82 +320,101 @@ export function AdminDashboard() {
                   );
 
 
-                return total + netSalary;
+                if (
+                  !Number.isFinite(
+                    netSalary
+                  )
+                ) {
+
+                  return total;
+                }
+
+
+                return (
+                  total +
+                  netSalary
+                );
 
               },
               0
             );
 
 
-          /*
-           * If payroll records are unavailable,
-           * use the value already supplied by
-           * the dashboard API.
-           */
-
-          if (
-            payrollRecords.length === 0 &&
-            dashboardData?.payroll?.totalNetSalary != null
-          ) {
+          if (mounted) {
 
             setTotalPayrollAmount(
               Number(
-                dashboardData.payroll.totalNetSalary
+                payrollTotal.toFixed(2)
               )
             );
-
-          } else {
-
-            setTotalPayrollAmount(
-              payrollTotal
-            );
-
           }
 
-        } catch (payrollError) {
+        } else {
 
           console.error(
             'Payroll data loading failed:',
-            payrollError
+            payrollResult.reason
           );
 
 
           /*
-           * Dashboard API already provides totalNetSalary,
-           * so use it as a fallback.
+           * The dashboard report also contains totalNetSalary.
+           * Use that as a fallback.
            */
 
-          setTotalPayrollAmount(
-            Number(
-              dashboardData?.payroll?.totalNetSalary ?? 0
-            )
-          );
+          const dashboardResponse =
+            results[0]?.value;
 
+
+          const dashboardData =
+            dashboardResponse?.data ??
+            dashboardResponse;
+
+
+          if (mounted) {
+
+            setTotalPayrollAmount(
+              Number(
+                dashboardData?.payroll?.totalNetSalary ??
+                0
+              )
+            );
+          }
         }
 
-      } catch (error) {
+      } catch (dashboardError) {
 
         console.error(
           'Dashboard loading failed:',
-          error
+          dashboardError
         );
 
 
-        setError(
-          error?.message ||
-          'Unable to load dashboard data'
-        );
+        if (mounted) {
+
+          setError(
+            dashboardError?.message ||
+            'Unable to load dashboard data'
+          );
+        }
 
       } finally {
 
-        setLoading(false);
+        if (mounted) {
 
+          setLoading(false);
+        }
       }
-
     };
 
 
     loadDashboard();
+
+
+    return () => {
+
+      mounted = false;
+    };
 
   }, []);
 
@@ -323,7 +430,6 @@ export function AdminDashboard() {
         message="Loading dashboard..."
       />
     );
-
   }
 
 
@@ -378,9 +484,7 @@ export function AdminDashboard() {
         </div>
 
       </div>
-
     );
-
   }
 
 
@@ -388,7 +492,8 @@ export function AdminDashboard() {
   // DASHBOARD DATA
   // ==========================================================
 
-  const d = data;
+  const d =
+    data || {};
 
 
   // ==========================================================
@@ -397,53 +502,55 @@ export function AdminDashboard() {
 
   const totalEmployees =
     Number(
-      d?.employees?.total ?? 0
+      d?.employees?.total ??
+      0
     );
 
 
   const activeEmployees =
     Number(
-      d?.employees?.active ?? 0
+      d?.employees?.active ??
+      0
     );
 
 
   // ==========================================================
-  // TODAY'S ATTENDANCE
+  // TODAY ATTENDANCE
   // ==========================================================
 
   const presentToday =
     Number(
-      d?.attendance?.today?.present ?? 0
+      d?.attendance?.today?.present ??
+      0
     );
 
 
   const checkedOutToday =
     Number(
-      d?.attendance?.today?.checkedOut ?? 0
+      d?.attendance?.today?.checkedOut ??
+      0
     );
 
 
   const currentlyWorking =
     Number(
-      d?.attendance?.today?.currentlyWorking ?? 0
+      d?.attendance?.today?.currentlyWorking ??
+      0
     );
 
 
   const onLeaveToday =
     Number(
-      d?.attendance?.today?.onLeave ?? 0
+      d?.attendance?.today?.onLeave ??
+      0
     );
 
 
   // ==========================================================
   // ABSENT TODAY
+  //
+  // Active Employees - Present - On Leave
   // ==========================================================
-
-  /*
-   * Active Employees
-   * - Present
-   * - On Leave
-   */
 
   const absentToday =
     Math.max(
@@ -456,39 +563,37 @@ export function AdminDashboard() {
 
   // ==========================================================
   // ATTENDANCE RATE
+  //
+  // Present / Active Employees × 100
   // ==========================================================
-
-  /*
-   * Present / Active Employees × 100
-   */
 
   const attendanceRate =
     activeEmployees > 0
-
       ? Number(
           (
-            (presentToday /
-              activeEmployees) *
+            (
+              presentToday /
+              activeEmployees
+            ) *
             100
           ).toFixed(2)
         )
-
       : 0;
 
 
   // ==========================================================
   // LATE TODAY
   // ==========================================================
+  //
+  // The current dashboard backend does not expose a separate
+  // late-arrival count.
+  //
+  // Do not invent late-arrival information.
+  //
+  // ==========================================================
 
-  /*
-   * The current dashboard API does not provide
-   * late-arrival information.
-   *
-   * Keep this at 0 until the backend exposes
-   * the actual late calculation.
-   */
-
-  const lateToday = 0;
+  const lateToday =
+    0;
 
 
   // ==========================================================
@@ -497,7 +602,8 @@ export function AdminDashboard() {
 
   const pendingLeaves =
     Number(
-      d?.leave?.pendingRequests ?? 0
+      d?.leave?.pendingRequests ??
+      0
     );
 
 
@@ -507,7 +613,8 @@ export function AdminDashboard() {
 
   const pendingAdvances =
     Number(
-      d?.advances?.pendingRequests ?? 0
+      d?.advances?.pendingRequests ??
+      0
     );
 
 
@@ -521,12 +628,14 @@ export function AdminDashboard() {
 
 
   // ==========================================================
-  // MONTHLY PAYROLL
+  // MONTHLY / PAYROLL SUMMARY
   // ==========================================================
 
   const monthlyPayroll =
     Number(
-      d?.payroll?.totalNetSalary ?? 0
+      d?.payroll?.totalNetSalary ??
+      totalPayrollAmount ??
+      0
     );
 
 
@@ -534,17 +643,26 @@ export function AdminDashboard() {
   // CURRENCY FORMATTER
   // ==========================================================
 
-  const formatCurrency = (value) => {
+  const formatCurrency = (
+    value
+  ) => {
 
-    return `₹${Number(
-      value || 0
-    ).toLocaleString('en-IN')}`;
+    const numericValue =
+      Number(value || 0);
 
+
+    return `₹${numericValue.toLocaleString(
+      'en-IN',
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }
+    )}`;
   };
 
 
   // ==========================================================
-  // RENDER DASHBOARD
+  // RENDER
   // ==========================================================
 
   return (
@@ -792,15 +910,11 @@ export function AdminDashboard() {
           </div>
 
 
-          {/* ==================================================
-              SUMMARY ITEMS
-          ================================================== */}
-
           <div className="space-y-4">
 
-            {/* ------------------------------------------------
+            {/* ==================================================
                 MONTHLY PAYROLL
-            ------------------------------------------------ */}
+            ================================================== */}
 
             <div
               className="
@@ -845,15 +959,25 @@ export function AdminDashboard() {
                   text-navy-900
                 "
               >
-                {formatCurrency(monthlyPayroll)}
+                {formatCurrency(
+                  monthlyPayroll
+                )}
               </span>
 
             </div>
 
 
-            {/* ------------------------------------------------
+            {/* ==================================================
                 TOTAL ADVANCE PAYMENT
-            ------------------------------------------------ */}
+            ==================================================
+            
+                IMPORTANT:
+                This is actual PAID advance amount.
+                
+                It is NOT:
+                - requested amount
+                - approved amount
+            ================================================== */}
 
             <div
               className="
@@ -906,11 +1030,11 @@ export function AdminDashboard() {
             </div>
 
 
-            {/* ------------------------------------------------
+            {/* ==================================================
                 TOTAL PAYROLL AMOUNT
-            ------------------------------------------------ */}
+            ================================================== */}
 
-            {/* <div
+            <div
               className="
                 flex
                 items-center
@@ -958,12 +1082,12 @@ export function AdminDashboard() {
                 )}
               </span>
 
-            </div> */}
+            </div>
 
 
-            {/* ------------------------------------------------
+            {/* ==================================================
                 ATTENDANCE RATE
-            ------------------------------------------------ */}
+            ================================================== */}
 
             <div
               className="
@@ -998,9 +1122,83 @@ export function AdminDashboard() {
             </div>
 
 
-            {/* ------------------------------------------------
+            {/* ==================================================
+                CURRENTLY WORKING
+            ================================================== */}
+
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                p-3
+                rounded-lg
+                bg-navy-50
+              "
+            >
+
+              <span
+                className="
+                  text-sm
+                  text-navy-600
+                "
+              >
+                Currently Working
+              </span>
+
+
+              <span
+                className="
+                  font-bold
+                  text-navy-900
+                "
+              >
+                {currentlyWorking}
+              </span>
+
+            </div>
+
+
+            {/* ==================================================
+                CHECKED OUT TODAY
+            ================================================== */}
+
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                p-3
+                rounded-lg
+                bg-accent-50
+              "
+            >
+
+              <span
+                className="
+                  text-sm
+                  text-accent-700
+                "
+              >
+                Checked Out Today
+              </span>
+
+
+              <span
+                className="
+                  font-bold
+                  text-accent-800
+                "
+              >
+                {checkedOutToday}
+              </span>
+
+            </div>
+
+
+            {/* ==================================================
                 PENDING APPROVALS
-            ------------------------------------------------ */}
+            ================================================== */}
 
             <div
               className="
@@ -1035,9 +1233,9 @@ export function AdminDashboard() {
             </div>
 
 
-            {/* ------------------------------------------------
+            {/* ==================================================
                 TOTAL EMPLOYEES
-            ------------------------------------------------ */}
+            ================================================== */}
 
             <div
               className="
@@ -1078,7 +1276,5 @@ export function AdminDashboard() {
       </div>
 
     </div>
-
   );
-
 }

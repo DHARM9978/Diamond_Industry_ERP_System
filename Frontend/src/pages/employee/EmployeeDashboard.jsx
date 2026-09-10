@@ -17,128 +17,325 @@ import {
 } from '@/components/ui/PageComponents';
 
 import { StatusBadge } from '@/components/ui/Badge';
+
 import { FullPageSpinner } from '@/components/ui/Spinner';
 
 import {
   selfService,
 } from '@/services/apiServices';
 
-import {
-  mockEmployeeAttendanceSummary,
-  mockEmployeeLeaves,
-  mockEmployeeAdvances,
-  mockEmployeePayroll,
-} from '@/services/mockData';
-
 
 export function EmployeeDashboard() {
 
-  const [profile, setProfile] = useState(null);
-  const [summary, setSummary] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  const [profile, setProfile] =
+    useState(null);
+
+  const [summary, setSummary] =
+    useState(null);
+
+  const [payroll, setPayroll] =
+    useState([]);
+
+  const [advances, setAdvances] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
 
 
   // ============================================================
-  // Load Employee Dashboard Data
+  // Helper
+  // ============================================================
+
+  const normalizeArray = (
+    response
+  ) => {
+
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (
+      Array.isArray(
+        response?.data
+      )
+    ) {
+      return response.data;
+    }
+
+    return [];
+  };
+
+
+  const toNumber = (
+    value
+  ) => {
+
+    const numberValue =
+      Number(value);
+
+    return Number.isFinite(
+      numberValue
+    )
+      ? numberValue
+      : 0;
+  };
+
+
+  const formatCurrency = (
+    value
+  ) => {
+
+    return `₹${toNumber(
+      value
+    ).toLocaleString(
+      'en-IN',
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
+
+
+  const formatDate = (
+    value
+  ) => {
+
+    if (!value) {
+      return 'N/A';
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return 'N/A';
+    }
+
+    return date.toLocaleDateString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }
+    );
+  };
+
+
+  // ============================================================
+  // Load Employee Dashboard
   // ============================================================
 
   useEffect(() => {
 
-    const load = async () => {
+    let mounted = true;
 
-      try {
 
-        const [
-          profileResponse,
-          summaryResponse,
-        ] = await Promise.all([
+    const loadDashboard =
+      async () => {
 
-          // ======================================================
-          // REAL API
-          // GET /api/me/profile
-          //
-          // selfService.profile() already unwraps:
-          // response.data.data
-          // ======================================================
+        try {
 
-          selfService.profile(),
+          setLoading(true);
+
+          setError(null);
 
 
           // ======================================================
-          // REAL API
-          // Employee Attendance Summary
+          // Load all real employee data
           // ======================================================
 
-          selfService.attendanceSummary(),
+          const results =
+            await Promise.allSettled([
 
-        ]);
+              selfService.profile(),
 
+              selfService.attendanceSummary(),
 
-        console.log(
-          'Employee Profile:',
-          profileResponse
-        );
+              selfService.payroll(),
 
-        console.log(
-          'Employee Attendance Summary:',
-          summaryResponse
-        );
+              selfService.advances(),
+
+            ]);
 
 
-        // ======================================================
-        // REAL PROFILE DATA
-        // ======================================================
+          // ======================================================
+          // Profile
+          // ======================================================
 
-        setProfile(profileResponse);
+          if (
+            results[0].status ===
+            'fulfilled'
+          ) {
 
+            if (mounted) {
 
-        // ======================================================
-        // REAL ATTENDANCE SUMMARY
-        // ======================================================
+              setProfile(
+                results[0].value
+              );
+            }
 
-        setSummary(summaryResponse);
+          } else {
 
-      } catch (error) {
-
-        console.error(
-          'Failed to load employee dashboard:',
-          error
-        );
-
-
-        // ======================================================
-        // IMPORTANT
-        //
-        // Profile is now connected to the REAL API.
-        // Do NOT fall back to mockEmployeeProfile.
-        // ======================================================
-
-        setProfile(null);
+            throw (
+              results[0].reason ||
+              new Error(
+                'Unable to load employee profile'
+              )
+            );
+          }
 
 
-        // ======================================================
-        // Attendance summary is still allowed to use the
-        // temporary mock until its API response is finalized.
-        // ======================================================
+          // ======================================================
+          // Attendance Summary
+          // ======================================================
 
-        setSummary(mockEmployeeAttendanceSummary);
+          if (
+            results[1].status ===
+            'fulfilled'
+          ) {
 
-      } finally {
+            if (mounted) {
 
-        setLoading(false);
+              setSummary(
+                results[1].value
+              );
+            }
 
-      }
+          } else {
+
+            console.error(
+              'Attendance summary failed:',
+              results[1].reason
+            );
+
+            if (mounted) {
+
+              setSummary(
+                {}
+              );
+            }
+          }
+
+
+          // ======================================================
+          // Payroll
+          // ======================================================
+
+          if (
+            results[2].status ===
+            'fulfilled'
+          ) {
+
+            if (mounted) {
+
+              setPayroll(
+                normalizeArray(
+                  results[2].value
+                )
+              );
+            }
+
+          } else {
+
+            console.error(
+              'Payroll loading failed:',
+              results[2].reason
+            );
+
+            if (mounted) {
+
+              setPayroll([]);
+            }
+          }
+
+
+          // ======================================================
+          // Advances
+          // ======================================================
+
+          if (
+            results[3].status ===
+            'fulfilled'
+          ) {
+
+            if (mounted) {
+
+              setAdvances(
+                normalizeArray(
+                  results[3].value
+                )
+              );
+            }
+
+          } else {
+
+            console.error(
+              'Advance loading failed:',
+              results[3].reason
+            );
+
+            if (mounted) {
+
+              setAdvances([]);
+            }
+          }
+
+        } catch (loadError) {
+
+          console.error(
+            'Failed to load employee dashboard:',
+            loadError
+          );
+
+
+          if (mounted) {
+
+            setError(
+              loadError?.message ||
+              'Unable to load employee dashboard'
+            );
+
+          }
+
+        } finally {
+
+          if (mounted) {
+
+            setLoading(false);
+
+          }
+        }
+      };
+
+
+    loadDashboard();
+
+
+    return () => {
+
+      mounted = false;
 
     };
-
-
-    load();
 
   }, []);
 
 
   // ============================================================
-  // Loading State
+  // Loading
   // ============================================================
 
   if (loading) {
@@ -153,49 +350,95 @@ export function EmployeeDashboard() {
 
 
   // ============================================================
+  // Error
+  // ============================================================
+
+  if (error) {
+
+    return (
+
+      <div>
+
+        <PageHeader
+          title="Employee Dashboard"
+          subtitle="Overview of your attendance, salary and advance information"
+        />
+
+        <div className="card p-6">
+
+          <div
+            className="
+              rounded-lg
+              bg-error-50
+              p-4
+            "
+          >
+
+            <p
+              className="
+                font-semibold
+                text-error-800
+              "
+            >
+              Unable to load dashboard
+            </p>
+
+
+            <p
+              className="
+                mt-1
+                text-sm
+                text-error-700
+              "
+            >
+              {error}
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    );
+  }
+
+
+  // ============================================================
   // Raw Data
   // ============================================================
 
-  // REAL /api/me/profile data
-  const rawProfile = profile || {};
+  const rawProfile =
+    profile || {};
 
-
-  // Attendance summary
-  const s = summary || {};
+  const s =
+    summary || {};
 
 
   // ============================================================
-  // Employee Name
+  // Employee Identity
   // ============================================================
 
   const firstName =
-    rawProfile?.firstName || '';
+    rawProfile?.firstName ||
+    '';
 
   const lastName =
-    rawProfile?.lastName || '';
+    rawProfile?.lastName ||
+    '';
 
   const fullName =
     `${firstName} ${lastName}`.trim() ||
     'Employee';
 
 
-  // ============================================================
-  // Employee ID
-  // ============================================================
-
   const employeeId =
-    rawProfile?.employeeId ?? 'N/A';
+    rawProfile?.employeeId ??
+    'N/A';
 
 
   // ============================================================
   // Department
-  //
-  // API:
-  //
-  // "department": {
-  //   "departmentId": 1,
-  //   "departmentName": "Information Technology"
-  // }
   // ============================================================
 
   const department =
@@ -205,14 +448,6 @@ export function EmployeeDashboard() {
 
   // ============================================================
   // Branch
-  //
-  // API:
-  //
-  // "branch": {
-  //   "branchId": 1,
-  //   "branchName": "Main Branch",
-  //   "location": "Bangalore"
-  // }
   // ============================================================
 
   const branch =
@@ -231,31 +466,16 @@ export function EmployeeDashboard() {
 
   // ============================================================
   // Hire Date
-  //
-  // API field:
-  // hireDate
-  //
-  // Currently:
-  // "hireDate": null
   // ============================================================
 
   const joinDate =
-    rawProfile?.hireDate
-      ? new Date(
-          rawProfile.hireDate
-        ).toLocaleDateString(
-          'en-IN',
-          {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-          }
-        )
-      : 'N/A';
+    formatDate(
+      rawProfile?.hireDate
+    );
 
 
   // ============================================================
-  // Employee Role
+  // Role
   // ============================================================
 
   const role =
@@ -273,17 +493,29 @@ export function EmployeeDashboard() {
 
 
   // ============================================================
-  // Salary Rate Per Hour
+  // Salary Configuration
   // ============================================================
 
+  const baseSalary =
+    toNumber(
+      rawProfile?.baseSalary
+    );
+
+
+  const monthlyExpectedHours =
+    toNumber(
+      rawProfile?.monthlyExpectedHours
+    );
+
+
   const salaryRatePerHour =
-    Number(
-      rawProfile?.salaryRatePerHour || 0
+    toNumber(
+      rawProfile?.salaryRatePerHour
     );
 
 
   // ============================================================
-  // Employee Initial
+  // Initial
   // ============================================================
 
   const employeeInitial =
@@ -294,56 +526,231 @@ export function EmployeeDashboard() {
 
 
   // ============================================================
-  // Latest Existing Records
+  // Attendance Summary
   //
-  // TEMPORARY MOCK DATA
+  // Service returns:
   //
-  // These will be replaced with real APIs when we integrate:
-  //
-  // GET /api/me/payroll
-  // GET /api/me/advances
-  // GET /api/leave-requests
-  //
-  // ============================================================
-
-  const latestPayroll =
-    mockEmployeePayroll?.[0];
-
-
-  const latestAdvance =
-    mockEmployeeAdvances?.[0];
-
-
-  const latestLeave =
-    mockEmployeeLeaves?.[0];
-
-
-  // ============================================================
-  // Safe Attendance Values
+  // presentDays
+  // absentDays
+  // totalHours
+  // averageHours
   // ============================================================
 
   const present =
-    s?.present ?? 0;
+    toNumber(
+      s?.presentDays ??
+      s?.present ??
+      0
+    );
 
 
   const absent =
-    s?.absent ?? 0;
-
-
-  const late =
-    s?.late ?? 0;
-
-
-  const attendanceRate =
-    s?.attendance_rate ??
-    s?.attendanceRate ??
-    0;
+    toNumber(
+      s?.absentDays ??
+      s?.absent ??
+      0
+    );
 
 
   const totalHours =
-    s?.total_hours ??
-    s?.totalHours ??
-    0;
+    toNumber(
+      s?.totalHours ??
+      s?.total_hours ??
+      0
+    );
+
+
+  const averageHours =
+    toNumber(
+      s?.averageHours ??
+      s?.average_hours ??
+      0
+    );
+
+
+  // ============================================================
+  // Attendance Rate
+  //
+  // The current attendance summary service returns counts rather
+  // than attendanceRate, so calculate it from total days.
+  // ============================================================
+
+  const totalAttendanceDays =
+    toNumber(
+      s?.totalDays ??
+      (
+        present +
+        absent
+      )
+    );
+
+
+  const attendanceRate =
+    totalAttendanceDays > 0
+      ? Number(
+          (
+            (
+              present /
+              totalAttendanceDays
+            ) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
+
+  // ============================================================
+  // Late
+  //
+  // The current employee attendance summary does not expose
+  // a separate late count.
+  //
+  // Therefore we do not invent a value.
+  // ============================================================
+
+  const late = 0;
+
+
+  // ============================================================
+  // Latest Payroll
+  // ============================================================
+
+  const latestPayroll =
+    payroll.length > 0
+      ? payroll[0]
+      : null;
+
+
+  // ============================================================
+  // Latest Advance
+  // ============================================================
+
+  const latestAdvance =
+    advances.length > 0
+      ? advances[0]
+      : null;
+
+
+  // ============================================================
+  // Advance Amounts
+  //
+  // requested = amount
+  // approved = approvedAmount
+  // paid = paidAmount
+  // ============================================================
+
+  const latestAdvanceRequested =
+    toNumber(
+      latestAdvance?.amount
+    );
+
+
+  const latestAdvanceApproved =
+    toNumber(
+      latestAdvance?.approvedAmount
+    );
+
+
+  const latestAdvancePaid =
+    toNumber(
+      latestAdvance?.paidAmount
+    );
+
+
+  // ============================================================
+  // Payroll Fields
+  // ============================================================
+
+  const payrollBaseSalary =
+    toNumber(
+      latestPayroll?.baseSalary
+    );
+
+
+  const payrollExpectedHours =
+    toNumber(
+      latestPayroll?.monthlyExpectedHours
+    );
+
+
+  const payrollHourlyRate =
+    toNumber(
+      latestPayroll?.salaryRatePerHour
+    );
+
+
+  const payrollWorkingHours =
+    toNumber(
+      latestPayroll?.totalWorkingHours
+    );
+
+
+  const payrollBasicSalary =
+    toNumber(
+      latestPayroll?.basicSalary
+    );
+
+
+  const payrollAdvanceDeduction =
+    toNumber(
+      latestPayroll?.advanceDeduction
+    );
+
+
+  const payrollNetSalary =
+    toNumber(
+      latestPayroll?.netSalary
+    );
+
+
+  // ============================================================
+  // Payroll Status
+  // ============================================================
+
+  const payrollStatus =
+    latestPayroll?.status ||
+    'PROCESSED';
+
+
+  // ============================================================
+  // Payroll Period
+  // ============================================================
+
+  const payrollPeriodStart =
+    formatDate(
+      latestPayroll?.payPeriodStart
+    );
+
+
+  const payrollPeriodEnd =
+    formatDate(
+      latestPayroll?.payPeriodEnd
+    );
+
+
+  const payrollPaymentDate =
+    formatDate(
+      latestPayroll?.paymentDate
+    );
+
+
+  // ============================================================
+  // Salary Used For Dashboard
+  // ============================================================
+
+  const displayBaseSalary =
+    payrollBaseSalary ||
+    baseSalary;
+
+
+  const displayExpectedHours =
+    payrollExpectedHours ||
+    monthlyExpectedHours;
+
+
+  const displayHourlyRate =
+    payrollHourlyRate ||
+    salaryRatePerHour;
 
 
   // ============================================================
@@ -355,7 +762,7 @@ export function EmployeeDashboard() {
     <div>
 
       {/* ======================================================
-          Page Header
+          PAGE HEADER
       ====================================================== */}
 
       <PageHeader
@@ -365,10 +772,19 @@ export function EmployeeDashboard() {
 
 
       {/* ======================================================
-          Attendance Statistics
+          ATTENDANCE STATISTICS
       ====================================================== */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div
+        className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-4
+          gap-4
+          mb-6
+        "
+      >
 
         <StatCard
           icon={UserCheck}
@@ -405,40 +821,67 @@ export function EmployeeDashboard() {
 
 
       {/* ======================================================
-          Main Dashboard
+          MAIN DASHBOARD
       ====================================================== */}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+      <div
+        className="
+          grid
+          grid-cols-1
+          lg:grid-cols-3
+          gap-6
+        "
+      >
 
         {/* ====================================================
-            My Profile
+            PROFILE
         ==================================================== */}
 
         <div className="card p-6">
 
-          <h3 className="font-semibold text-navy-900 mb-4">
+          <h3
+            className="
+              font-semibold
+              text-navy-900
+              mb-4
+            "
+          >
             My Profile
           </h3>
 
 
           {/* Employee Identity */}
 
-          <div className="flex items-center gap-4 mb-4">
+          <div
+            className="
+              flex
+              items-center
+              gap-4
+              mb-5
+            "
+          >
 
             <div
               className="
-                w-16 h-16
+                w-16
+                h-16
                 rounded-full
                 bg-gradient-to-br
                 from-navy-700
                 to-navy-900
-                flex items-center
+                flex
+                items-center
                 justify-center
               "
             >
 
-              <span className="text-2xl font-bold text-white">
+              <span
+                className="
+                  text-2xl
+                  font-bold
+                  text-white
+                "
+              >
                 {employeeInitial}
               </span>
 
@@ -447,13 +890,23 @@ export function EmployeeDashboard() {
 
             <div>
 
-              <p className="font-semibold text-navy-900">
+              <p
+                className="
+                  font-semibold
+                  text-navy-900
+                "
+              >
                 {fullName}
               </p>
 
 
-              <p className="text-sm text-navy-500">
-                {employeeId}
+              <p
+                className="
+                  text-sm
+                  text-navy-500
+                "
+              >
+                Employee ID: {employeeId}
               </p>
 
             </div>
@@ -463,135 +916,344 @@ export function EmployeeDashboard() {
 
           {/* Profile Details */}
 
-          <div className="space-y-2 text-sm">
+          <div
+            className="
+              space-y-3
+              text-sm
+            "
+          >
 
-
-            {/* Department */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Department
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {department}
               </span>
 
             </div>
 
 
-            {/* Branch */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Branch
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {branch}
               </span>
 
             </div>
 
 
-            {/* Location */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Location
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {branchLocation}
               </span>
 
             </div>
 
 
-            {/* Join Date */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Join Date
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {joinDate}
               </span>
 
             </div>
 
 
-            {/* Role */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Role
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {role}
               </span>
 
             </div>
 
 
-            {/* Status */}
-
-            <div className="flex justify-between gap-4">
+            <div
+              className="
+                flex
+                justify-between
+                gap-4
+              "
+            >
 
               <span className="text-navy-500">
                 Status
               </span>
 
-
-              <span className="font-medium text-navy-800 text-right">
+              <span
+                className="
+                  font-medium
+                  text-navy-800
+                  text-right
+                "
+              >
                 {employeeStatus}
               </span>
 
             </div>
 
-
-            {/* Hourly Rate */}
-
-            <div className="flex justify-between gap-4">
-
-              <span className="text-navy-500">
-                Hourly Rate
-              </span>
+          </div>
 
 
-              <span className="font-medium text-navy-800 text-right">
-                ₹{salaryRatePerHour.toLocaleString('en-IN')}/h
-              </span>
+          {/* ==================================================
+              SALARY CONFIGURATION
+          ================================================== */}
+
+          <div
+            className="
+              mt-6
+              pt-5
+              border-t
+              border-navy-100
+            "
+          >
+
+            <h4
+              className="
+                font-semibold
+                text-navy-900
+                mb-3
+              "
+            >
+              Salary Configuration
+            </h4>
+
+
+            <div className="space-y-3 text-sm">
+
+
+              {/* Base Salary */}
+
+              <div
+                className="
+                  flex
+                  justify-between
+                  gap-4
+                "
+              >
+
+                <span className="text-navy-500">
+                  Base / Monthly Salary
+                </span>
+
+                <span
+                  className="
+                    font-semibold
+                    text-navy-900
+                  "
+                >
+                  {formatCurrency(
+                    displayBaseSalary
+                  )}
+                </span>
+
+              </div>
+
+
+              {/* Expected Hours */}
+
+              <div
+                className="
+                  flex
+                  justify-between
+                  gap-4
+                "
+              >
+
+                <span className="text-navy-500">
+                  Expected Hours / Month
+                </span>
+
+                <span
+                  className="
+                    font-semibold
+                    text-navy-900
+                  "
+                >
+                  {displayExpectedHours
+                    ? `${displayExpectedHours} hrs`
+                    : 'N/A'}
+                </span>
+
+              </div>
+
+
+              {/* Hourly Rate */}
+
+              <div
+                className="
+                  flex
+                  justify-between
+                  gap-4
+                "
+              >
+
+                <span className="text-navy-500">
+                  Hourly Rate
+                </span>
+
+                <span
+                  className="
+                    font-semibold
+                    text-accent-700
+                  "
+                >
+                  {displayHourlyRate
+                    ? `${formatCurrency(
+                        displayHourlyRate
+                      )}/hr`
+                    : 'N/A'}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* ==================================================
+              CURRENT HOURS
+          ================================================== */}
+
+          <div
+            className="
+              mt-6
+              rounded-lg
+              bg-navy-50
+              p-4
+            "
+          >
+
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+              "
+            >
+
+              <div>
+
+                <p
+                  className="
+                    text-xs
+                    text-navy-500
+                  "
+                >
+                  Total Hours Worked
+                </p>
+
+                <p
+                  className="
+                    text-xl
+                    font-bold
+                    text-navy-900
+                  "
+                >
+                  {totalHours} hrs
+                </p>
+
+              </div>
+
+
+              <Clock
+                size={24}
+                className="text-navy-600"
+              />
 
             </div>
 
 
-            {/* Total Hours */}
-
-            <div className="flex justify-between gap-4">
-
-              <span className="text-navy-500">
-                Total Hours
-              </span>
-
-
-              <span className="font-medium text-navy-800 text-right">
-                {totalHours}h
-              </span>
-
-            </div>
+            <p
+              className="
+                mt-1
+                text-xs
+                text-navy-500
+              "
+            >
+              Average: {averageHours} hrs/day
+            </p>
 
           </div>
 
@@ -599,28 +1261,50 @@ export function EmployeeDashboard() {
 
 
         {/* ====================================================
-            Right Side
+            RIGHT SIDE
         ==================================================== */}
 
-        <div className="lg:col-span-2 space-y-6">
-
+        <div
+          className="
+            lg:col-span-2
+            space-y-6
+          "
+        >
 
           {/* ==================================================
-              Latest Payroll
+              LATEST PAYROLL
           ================================================== */}
 
           <div className="card p-6">
 
-            <div className="flex items-center justify-between mb-4">
+            <div
+              className="
+                flex
+                items-center
+                justify-between
+                mb-4
+              "
+            >
 
-              <div className="flex items-center gap-2">
+              <div
+                className="
+                  flex
+                  items-center
+                  gap-2
+                "
+              >
 
                 <Wallet
                   size={20}
                   className="text-navy-600"
                 />
 
-                <h3 className="font-semibold text-navy-900">
+                <h3
+                  className="
+                    font-semibold
+                    text-navy-900
+                  "
+                >
                   Latest Payslip
                 </h3>
 
@@ -630,7 +1314,9 @@ export function EmployeeDashboard() {
               {latestPayroll && (
 
                 <StatusBadge
-                  status={latestPayroll.status}
+                  status={
+                    payrollStatus
+                  }
                 />
 
               )}
@@ -638,86 +1324,570 @@ export function EmployeeDashboard() {
             </div>
 
 
-            {latestPayroll && (
+            {!latestPayroll ? (
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div
+                className="
+                  rounded-lg
+                  bg-navy-50
+                  p-4
+                  text-sm
+                  text-navy-500
+                "
+              >
+                No payroll record available yet.
+              </div>
+
+            ) : (
+
+              <div className="space-y-5">
 
 
-                {/* Month */}
+                {/* ==================================================
+                    PAY PERIOD
+                ================================================== */}
 
-                <div>
+                <div
+                  className="
+                    rounded-lg
+                    bg-navy-50
+                    p-4
+                  "
+                >
 
-                  <p className="text-xs text-navy-400">
-                    Month
+                  <p
+                    className="
+                      text-xs
+                      text-navy-400
+                    "
+                  >
+                    Pay Period
                   </p>
 
 
-                  <p className="text-sm font-medium text-navy-800">
-                    {latestPayroll.month}
+                  <p
+                    className="
+                      text-sm
+                      font-semibold
+                      text-navy-800
+                      mt-1
+                    "
+                  >
+                    {payrollPeriodStart}
+                    {' '}
+                    -
+                    {' '}
+                    {payrollPeriodEnd}
+                  </p>
+
+
+                  <p
+                    className="
+                      text-xs
+                      text-navy-500
+                      mt-1
+                    "
+                  >
+                    Payment Date:
+                    {' '}
+                    {payrollPaymentDate}
                   </p>
 
                 </div>
 
 
-                {/* Basic */}
+                {/* ==================================================
+                    PAYROLL SUMMARY CARDS
+                ================================================== */}
 
-                <div>
+                <div
+                  className="
+                    grid
+                    grid-cols-2
+                    md:grid-cols-4
+                    gap-4
+                  "
+                >
 
-                  <p className="text-xs text-navy-400">
-                    Basic
-                  </p>
+                  {/* Base Salary */}
+
+                  <div>
+
+                    <p className="text-xs text-navy-400">
+                      Base Salary
+                    </p>
+
+                    <p
+                      className="
+                        text-sm
+                        font-semibold
+                        text-navy-800
+                        mt-1
+                      "
+                    >
+                      {formatCurrency(
+                        displayBaseSalary
+                      )}
+                    </p>
+
+                  </div>
 
 
-                  <p className="text-sm font-medium text-navy-800">
+                  {/* Expected Hours */}
 
-                    ₹
-                    {Number(
-                      latestPayroll.basic_salary || 0
-                    ).toLocaleString('en-IN')}
+                  <div>
 
-                  </p>
+                    <p className="text-xs text-navy-400">
+                      Expected Hrs
+                    </p>
+
+                    <p
+                      className="
+                        text-sm
+                        font-semibold
+                        text-navy-800
+                        mt-1
+                      "
+                    >
+                      {displayExpectedHours} hrs
+                    </p>
+
+                  </div>
+
+
+                  {/* Hourly Rate */}
+
+                  <div>
+
+                    <p className="text-xs text-navy-400">
+                      Hourly Rate
+                    </p>
+
+                    <p
+                      className="
+                        text-sm
+                        font-semibold
+                        text-navy-800
+                        mt-1
+                      "
+                    >
+                      {formatCurrency(
+                        displayHourlyRate
+                      )}
+                    </p>
+
+                  </div>
+
+
+                  {/* Actual Hours */}
+
+                  <div>
+
+                    <p className="text-xs text-navy-400">
+                      Actual Hrs
+                    </p>
+
+                    <p
+                      className="
+                        text-sm
+                        font-semibold
+                        text-navy-800
+                        mt-1
+                      "
+                    >
+                      {payrollWorkingHours} hrs
+                    </p>
+
+                  </div>
 
                 </div>
 
 
-                {/* Deductions */}
+                {/* ==================================================
+                    EARNED / DEDUCTION / NET
+                ================================================== */}
 
-                <div>
+                <div
+                  className="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-3
+                    gap-4
+                  "
+                >
 
-                  <p className="text-xs text-navy-400">
-                    Deductions
-                  </p>
+                  {/* Earned Salary */}
+
+                  <div
+                    className="
+                      rounded-lg
+                      bg-success-50
+                      p-4
+                    "
+                  >
+
+                    <p
+                      className="
+                        text-xs
+                        text-success-700
+                      "
+                    >
+                      Earned Salary
+                    </p>
 
 
-                  <p className="text-sm font-medium text-error-600">
+                    <p
+                      className="
+                        mt-1
+                        text-lg
+                        font-bold
+                        text-success-800
+                      "
+                    >
+                      {formatCurrency(
+                        payrollBasicSalary
+                      )}
+                    </p>
 
-                    ₹
-                    {Number(
-                      (latestPayroll.deductions || 0) +
-                      (latestPayroll.advance_deduction || 0)
-                    ).toLocaleString('en-IN')}
+                  </div>
 
-                  </p>
+
+                  {/* Advance Deduction */}
+
+                  <div
+                    className="
+                      rounded-lg
+                      bg-error-50
+                      p-4
+                    "
+                  >
+
+                    <p
+                      className="
+                        text-xs
+                        text-error-700
+                      "
+                    >
+                      Advance Deduction
+                    </p>
+
+
+                    <p
+                      className="
+                        mt-1
+                        text-lg
+                        font-bold
+                        text-error-800
+                      "
+                    >
+                      {formatCurrency(
+                        payrollAdvanceDeduction
+                      )}
+                    </p>
+
+                  </div>
+
+
+                  {/* Net Salary */}
+
+                  <div
+                    className="
+                      rounded-lg
+                      bg-accent-50
+                      p-4
+                    "
+                  >
+
+                    <p
+                      className="
+                        text-xs
+                        text-accent-700
+                      "
+                    >
+                      Net Salary
+                    </p>
+
+
+                    <p
+                      className="
+                        mt-1
+                        text-lg
+                        font-bold
+                        text-accent-800
+                      "
+                    >
+                      {formatCurrency(
+                        payrollNetSalary
+                      )}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            )}
+
+          </div>
+
+
+          {/* ==================================================
+              LATEST ADVANCE
+          ================================================== */}
+
+          <div className="card p-6">
+
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+                mb-4
+              "
+            >
+
+              <Banknote
+                size={20}
+                className="text-navy-600"
+              />
+
+              <h3
+                className="
+                  font-semibold
+                  text-navy-900
+                "
+              >
+                Latest Advance
+              </h3>
+
+            </div>
+
+
+            {!latestAdvance ? (
+
+              <div
+                className="
+                  rounded-lg
+                  bg-navy-50
+                  p-4
+                  text-sm
+                  text-navy-500
+                "
+              >
+                No advance request found.
+              </div>
+
+            ) : (
+
+              <div className="space-y-4">
+
+
+                {/* Advance Status */}
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      text-navy-500
+                    "
+                  >
+                    Status
+                  </span>
+
+
+                  <StatusBadge
+                    status={
+                      latestAdvance?.status ||
+                      'PENDING'
+                    }
+                  />
 
                 </div>
 
 
-                {/* Net Pay */}
+                {/* Requested */}
 
-                <div>
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
 
-                  <p className="text-xs text-navy-400">
-                    Net Pay
+                  <span
+                    className="
+                      text-sm
+                      text-navy-500
+                    "
+                  >
+                    Requested Amount
+                  </span>
+
+
+                  <span
+                    className="
+                      font-semibold
+                      text-navy-900
+                    "
+                  >
+                    {formatCurrency(
+                      latestAdvanceRequested
+                    )}
+                  </span>
+
+                </div>
+
+
+                {/* Approved */}
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      text-navy-500
+                    "
+                  >
+                    Approved Amount
+                  </span>
+
+
+                  <span
+                    className="
+                      font-semibold
+                      text-navy-900
+                    "
+                  >
+                    {latestAdvance?.approvedAmount !==
+                    null &&
+                    latestAdvance?.approvedAmount !==
+                    undefined
+                      ? formatCurrency(
+                          latestAdvanceApproved
+                        )
+                      : 'Not approved'}
+                  </span>
+
+                </div>
+
+
+                {/* Paid */}
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      text-navy-500
+                    "
+                  >
+                    Paid Amount
+                  </span>
+
+
+                  <span
+                    className="
+                      font-semibold
+                      text-success-700
+                    "
+                  >
+                    {latestAdvance?.paidAmount !==
+                    null &&
+                    latestAdvance?.paidAmount !==
+                    undefined
+                      ? formatCurrency(
+                          latestAdvancePaid
+                        )
+                      : 'Not paid'}
+                  </span>
+
+                </div>
+
+
+                {/* Request Date */}
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      text-navy-500
+                    "
+                  >
+                    Request Date
+                  </span>
+
+
+                  <span
+                    className="
+                      font-medium
+                      text-navy-800
+                    "
+                  >
+                    {formatDate(
+                      latestAdvance?.paymentDate
+                    )}
+                  </span>
+
+                </div>
+
+
+                {/* Reason */}
+
+                <div
+                  className="
+                    rounded-lg
+                    bg-navy-50
+                    p-4
+                  "
+                >
+
+                  <p
+                    className="
+                      text-xs
+                      text-navy-400
+                    "
+                  >
+                    Reason
                   </p>
 
 
-                  <p className="text-sm font-bold text-navy-900">
-
-                    ₹
-                    {Number(
-                      latestPayroll.net_salary || 0
-                    ).toLocaleString('en-IN')}
-
+                  <p
+                    className="
+                      mt-1
+                      text-sm
+                      text-navy-800
+                    "
+                  >
+                    {latestAdvance?.reason ||
+                      'No reason provided'}
                   </p>
 
                 </div>
@@ -730,94 +1900,184 @@ export function EmployeeDashboard() {
 
 
           {/* ==================================================
-              Quick Links
+              QUICK OVERVIEW
           ================================================== */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
+          <div
+            className="
+              grid
+              grid-cols-1
+              sm:grid-cols-3
+              gap-4
+            "
+          >
 
             {/* ==================================================
-                My Attendance
+                ATTENDANCE
             ================================================== */}
 
-            <div className="card-hover p-5">
+            <div
+              className="
+                card-hover
+                p-5
+              "
+            >
 
               <CalendarCheck
                 size={22}
-                className="text-accent-600 mb-2"
+                className="
+                  text-accent-600
+                  mb-2
+                "
               />
 
 
-              <p className="font-medium text-navy-900 text-sm">
+              <p
+                className="
+                  font-medium
+                  text-navy-900
+                  text-sm
+                "
+              >
                 My Attendance
               </p>
 
 
-              <p className="text-xs text-navy-500 mt-1">
-                {present} present, {late} late this month
+              <p
+                className="
+                  text-xs
+                  text-navy-500
+                  mt-1
+                "
+              >
+                {present} present days,
+                {' '}
+                {absent} absent days
+              </p>
+
+
+              <p
+                className="
+                  text-xs
+                  text-navy-500
+                  mt-1
+                "
+              >
+                {totalHours} total hours
               </p>
 
             </div>
 
 
             {/* ==================================================
-                My Leaves
+                LEAVES
             ================================================== */}
 
-            <div className="card-hover p-5">
+            <div
+              className="
+                card-hover
+                p-5
+              "
+            >
 
               <CalendarDays
                 size={22}
-                className="text-success-600 mb-2"
+                className="
+                  text-success-600
+                  mb-2
+                "
               />
 
 
-              <p className="font-medium text-navy-900 text-sm">
+              <p
+                className="
+                  font-medium
+                  text-navy-900
+                  text-sm
+                "
+              >
                 My Leaves
               </p>
 
 
-              <p className="text-xs text-navy-500 mt-1">
-
-                {
-                  latestLeave?.status === 'approved'
-                    ? 'Latest leave approved'
-                    : 'No active leaves'
-                }
-
+              <p
+                className="
+                  text-xs
+                  text-navy-500
+                  mt-1
+                "
+              >
+                Open My Leaves to view your
+                leave requests and approvals.
               </p>
 
             </div>
 
 
             {/* ==================================================
-                My Advances
+                ADVANCES
             ================================================== */}
 
-            <div className="card-hover p-5">
+            <div
+              className="
+                card-hover
+                p-5
+              "
+            >
 
               <Banknote
                 size={22}
-                className="text-warning-600 mb-2"
+                className="
+                  text-warning-600
+                  mb-2
+                "
               />
 
 
-              <p className="font-medium text-navy-900 text-sm">
+              <p
+                className="
+                  font-medium
+                  text-navy-900
+                  text-sm
+                "
+              >
                 My Advances
               </p>
 
 
-              <p className="text-xs text-navy-500 mt-1">
-
-                {
-                  latestAdvance
-                    ? `₹${Number(
-                        latestAdvance.remaining || 0
-                      ).toLocaleString('en-IN')} remaining`
-                    : 'No active advances'
-                }
-
+              <p
+                className="
+                  text-xs
+                  text-navy-500
+                  mt-1
+                "
+              >
+                {advances.length}
+                {' '}
+                advance record
+                {advances.length === 1
+                  ? ''
+                  : 's'}
               </p>
+
+
+              {latestAdvance?.status && (
+
+                <p
+                  className="
+                    text-xs
+                    text-navy-500
+                    mt-1
+                  "
+                >
+                  Latest:
+                  {' '}
+                  {String(
+                    latestAdvance.status
+                  ).toUpperCase()}
+                </p>
+
+              )}
 
             </div>
 
@@ -830,5 +2090,4 @@ export function EmployeeDashboard() {
     </div>
 
   );
-
 }
