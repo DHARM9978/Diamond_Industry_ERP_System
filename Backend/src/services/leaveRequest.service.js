@@ -1,11 +1,16 @@
 const prisma = require("../config/database");
 
+const {
+    ensureCompanyLeaveBalances
+} = require("./leaveBalance.service");
+
 const VALID_STATUSES = [
     "PENDING",
     "APPROVED",
     "REJECTED",
     "CANCELLED"
 ];
+
 
 /**
  * Validate positive integer ID
@@ -14,13 +19,40 @@ function validateId(value, fieldName) {
     const id = Number(value);
 
     if (!Number.isInteger(id) || id <= 0) {
-        const error = new Error(`Invalid ${fieldName}`);
+        const error = new Error(
+            `Invalid ${fieldName}`
+        );
+
         error.statusCode = 400;
         throw error;
     }
 
     return id;
 }
+
+
+/**
+ * Validate year
+ */
+function validateYear(year) {
+    const parsedYear = Number(year);
+
+    if (
+        !Number.isInteger(parsedYear) ||
+        parsedYear < 2000 ||
+        parsedYear > 2100
+    ) {
+        const error = new Error(
+            "Invalid year"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return parsedYear;
+}
+
 
 /**
  * Parse date safely
@@ -41,7 +73,9 @@ function parseDate(value, fieldName) {
         throw error;
     }
 
-    const date = new Date(`${value}T00:00:00`);
+    const date = new Date(
+        `${value}T00:00:00`
+    );
 
     if (Number.isNaN(date.getTime())) {
         const error = new Error(
@@ -55,44 +89,107 @@ function parseDate(value, fieldName) {
     return date;
 }
 
+
 /**
- * Calculate inclusive leave days
+ * Get the calendar date portion from a Date.
+ *
+ * This keeps comparisons consistent when
+ * Prisma returns Date objects.
+ */
+function normalizeDate(date) {
+    const result = new Date(date);
+
+    result.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return result;
+}
+
+
+/**
+ * Calculate inclusive leave days.
  *
  * Example:
- * 2026-09-04 → 2026-09-04 = 1 day
- * 2026-09-04 → 2026-09-05 = 2 days
+ *
+ * 2026-09-04 -> 2026-09-04 = 1
+ * 2026-09-04 -> 2026-09-05 = 2
  */
-function calculateTotalDays(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+function calculateTotalDays(
+    startDate,
+    endDate
+) {
+    const start =
+        normalizeDate(startDate);
 
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
+    const end =
+        normalizeDate(endDate);
 
     return (
-        (end.getTime() - start.getTime()) /
-            (1000 * 60 * 60 * 24)
+        (
+            end.getTime() -
+            start.getTime()
+        ) /
+        (1000 * 60 * 60 * 24)
     ) + 1;
 }
+
+
+/**
+ * Check whether two date ranges overlap.
+ */
+function dateRangesOverlap(
+    firstStart,
+    firstEnd,
+    secondStart,
+    secondEnd
+) {
+    const firstStartDate =
+        normalizeDate(firstStart);
+
+    const firstEndDate =
+        normalizeDate(firstEnd);
+
+    const secondStartDate =
+        normalizeDate(secondStart);
+
+    const secondEndDate =
+        normalizeDate(secondEnd);
+
+    return (
+        firstStartDate <= secondEndDate &&
+        firstEndDate >= secondStartDate
+    );
+}
+
 
 /**
  * Verify employee belongs to the company
  * and is active.
  */
-async function verifyEmployee(employeeId, companyId) {
-    const employee = await prisma.employee.findFirst({
-        where: {
-            employeeId,
-            companyId
-        },
-        select: {
-            employeeId: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            status: true
-        }
-    });
+async function verifyEmployee(
+    employeeId,
+    companyId,
+    transactionClient = prisma
+) {
+    const employee =
+        await transactionClient.employee.findFirst({
+            where: {
+                employeeId,
+                companyId
+            },
+
+            select: {
+                employeeId: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                status: true
+            }
+        });
 
     if (!employee) {
         const error = new Error(
@@ -115,6 +212,7 @@ async function verifyEmployee(employeeId, companyId) {
     return employee;
 }
 
+
 /**
  * Create Leave Request
  */
@@ -133,7 +231,10 @@ async function createLeaveRequest(
         "employee ID"
     );
 
-    if (!data || typeof data !== "object") {
+    if (
+        !data ||
+        typeof data !== "object"
+    ) {
         const error = new Error(
             "Leave request data is required"
         );
@@ -142,10 +243,12 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     const leaveTypeId = validateId(
         data.leaveTypeId,
         "leave type ID"
     );
+
 
     /**
      * Validate start date
@@ -159,6 +262,7 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
      * Validate end date
      */
@@ -171,6 +275,7 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     const startDate = parseDate(
         data.startDate,
         "startDate"
@@ -181,8 +286,9 @@ async function createLeaveRequest(
         "endDate"
     );
 
+
     /**
-     * End date cannot be before start date
+     * End date cannot be before start date.
      */
     if (endDate < startDate) {
         const error = new Error(
@@ -193,19 +299,27 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * Calculate total days.
+     * Calculate requested days.
      *
-     * Normally the backend calculates this.
-     * If totalDays is supplied, validate it.
+     * Backend calculates the value from
+     * the requested date range.
+     *
+     * If totalDays is supplied, it is still
+     * validated for compatibility.
      */
+    const calculatedTotalDays =
+        calculateTotalDays(
+            startDate,
+            endDate
+        );
+
     const totalDays =
         data.totalDays !== undefined
             ? Number(data.totalDays)
-            : calculateTotalDays(
-                  startDate,
-                  endDate
-              );
+            : calculatedTotalDays;
+
 
     if (
         !Number.isFinite(totalDays) ||
@@ -219,16 +333,40 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * Verify employee
+     * Make sure the requested totalDays
+     * is consistent with the selected dates
+     * for normal full-day requests.
+     */
+    if (
+        Number.isInteger(
+            calculatedTotalDays
+        ) &&
+        Number.isInteger(totalDays) &&
+        totalDays !== calculatedTotalDays
+    ) {
+        const error = new Error(
+            "totalDays does not match the selected date range"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    /**
+     * Verify employee.
      */
     await verifyEmployee(
         employee,
         company
     );
 
+
     /**
-     * Verify leave type belongs to company
+     * Verify leave type belongs
+     * to the same company.
      */
     const leaveType =
         await prisma.leaveType.findFirst({
@@ -237,6 +375,7 @@ async function createLeaveRequest(
                 companyId: company
             }
         });
+
 
     if (!leaveType) {
         const error = new Error(
@@ -247,10 +386,13 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * Leave type must be active
+     * Leave type must be active.
      */
-    if (leaveType.status !== "ACTIVE") {
+    if (
+        leaveType.status !== "ACTIVE"
+    ) {
         const error = new Error(
             "Leave type is inactive"
         );
@@ -259,8 +401,12 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * Half-day validation
+     * Half-day validation.
+     *
+     * This keeps compatibility with the existing
+     * allowHalfDay field.
      */
     if (
         totalDays % 1 !== 0 &&
@@ -274,24 +420,39 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * ----------------------------------------------------
+     * --------------------------------------------------------
      * CHECK OVERLAPPING LEAVE
-     * ----------------------------------------------------
+     * --------------------------------------------------------
      *
-     * Only PENDING and APPROVED leaves block
-     * another leave request.
+     * PENDING:
+     *     requested dates are used.
      *
-     * REJECTED and CANCELLED leaves do not block.
+     * APPROVED:
+     *     approved dates are used when available.
      *
-     * Overlap condition:
+     * REJECTED / CANCELLED:
+     *     do not block.
      *
-     * existing.startDate <= new.endDate
-     * AND
-     * existing.endDate >= new.startDate
+     * This is important for partial approval.
+     *
+     * Example:
+     *
+     * Requested:
+     * 10 Sep -> 13 Sep
+     *
+     * Approved:
+     * 10 Sep -> 11 Sep
+     *
+     * Another request on:
+     * 12 Sep -> 13 Sep
+     *
+     * should NOT conflict with the approved
+     * portion of the previous request.
      */
-    const overlapping =
-        await prisma.leaveRequest.findFirst({
+    const existingRequests =
+        await prisma.leaveRequest.findMany({
             where: {
                 employeeId: employee,
 
@@ -300,21 +461,47 @@ async function createLeaveRequest(
                         "PENDING",
                         "APPROVED"
                     ]
-                },
-
-                startDate: {
-                    lte: endDate
-                },
-
-                endDate: {
-                    gte: startDate
                 }
             },
 
-            include: {
-                leaveType: true
+            select: {
+                leaveRequestId: true,
+                leaveTypeId: true,
+                status: true,
+                startDate: true,
+                endDate: true,
+                approvedStartDate: true,
+                approvedEndDate: true
             }
         });
+
+
+    const overlapping =
+        existingRequests.find(
+            (existing) => {
+
+                const existingStart =
+                    existing.status === "APPROVED" &&
+                    existing.approvedStartDate
+                        ? existing.approvedStartDate
+                        : existing.startDate;
+
+                const existingEnd =
+                    existing.status === "APPROVED" &&
+                    existing.approvedEndDate
+                        ? existing.approvedEndDate
+                        : existing.endDate;
+
+
+                return dateRangesOverlap(
+                    existingStart,
+                    existingEnd,
+                    startDate,
+                    endDate
+                );
+            }
+        );
+
 
     if (overlapping) {
         const error = new Error(
@@ -323,10 +510,8 @@ async function createLeaveRequest(
 
         error.statusCode = 409;
 
-        /**
-         * Extra information for controller/frontend.
-         */
-        error.code = "LEAVE_DATE_OVERLAP";
+        error.code =
+            "LEAVE_DATE_OVERLAP";
 
         error.details = {
             conflictingLeaveRequestId:
@@ -341,6 +526,12 @@ async function createLeaveRequest(
             endDate:
                 overlapping.endDate,
 
+            approvedStartDate:
+                overlapping.approvedStartDate,
+
+            approvedEndDate:
+                overlapping.approvedEndDate,
+
             leaveTypeId:
                 overlapping.leaveTypeId
         };
@@ -348,10 +539,14 @@ async function createLeaveRequest(
         throw error;
     }
 
+
     /**
-     * ----------------------------------------------------
-     * CREATE REQUEST
-     * ----------------------------------------------------
+     * Create the request.
+     *
+     * approvedStartDate,
+     * approvedEndDate and
+     * approvedDays remain NULL until
+     * an admin approves the request.
      */
     return await prisma.leaveRequest.create({
         data: {
@@ -370,7 +565,13 @@ async function createLeaveRequest(
                     ? data.reason.trim() || null
                     : null,
 
-            status: "PENDING"
+            status: "PENDING",
+
+            approvedStartDate: null,
+
+            approvedEndDate: null,
+
+            approvedDays: null
         },
 
         include: {
@@ -387,6 +588,7 @@ async function createLeaveRequest(
         }
     });
 }
+
 
 /**
  * Get Leave Requests
@@ -406,8 +608,9 @@ async function getLeaveRequests(
         }
     };
 
+
     /**
-     * Optional employee filter
+     * Optional employee filter.
      */
     if (
         filters.employeeId !== undefined &&
@@ -419,8 +622,9 @@ async function getLeaveRequests(
         );
     }
 
+
     /**
-     * Optional status filter
+     * Optional status filter.
      */
     if (
         filters.status !== undefined &&
@@ -439,8 +643,10 @@ async function getLeaveRequests(
             throw error;
         }
 
-        where.status = filters.status;
+        where.status =
+            filters.status;
     }
+
 
     return await prisma.leaveRequest.findMany({
         where,
@@ -464,6 +670,7 @@ async function getLeaveRequests(
     });
 }
 
+
 /**
  * Get Leave Request by ID
  */
@@ -480,6 +687,7 @@ async function getLeaveRequestById(
         leaveRequestId,
         "leave request ID"
     );
+
 
     const request =
         await prisma.leaveRequest.findFirst({
@@ -505,6 +713,7 @@ async function getLeaveRequestById(
             }
         });
 
+
     if (!request) {
         const error = new Error(
             "Leave request not found"
@@ -514,22 +723,45 @@ async function getLeaveRequestById(
         throw error;
     }
 
+
     return request;
 }
+
 
 /**
  * Approve Leave Request
  *
- * Approval performs two operations inside
- * one database transaction:
+ * Supports:
  *
- * 1. Request → APPROVED
- * 2. Leave balance is updated
+ * 1. Full approval
+ *
+ * approveLeaveRequest(
+ *     companyId,
+ *     requestId,
+ *     adminId
+ * )
+ *
+ * 2. Partial approval
+ *
+ * approveLeaveRequest(
+ *     companyId,
+ *     requestId,
+ *     adminId,
+ *     {
+ *         approvedStartDate: "2026-09-10",
+ *         approvedEndDate: "2026-09-11"
+ *     }
+ * )
+ *
+ * Original requested dates remain unchanged.
+ *
+ * Balance is deducted using approvedDays.
  */
 async function approveLeaveRequest(
     companyId,
     leaveRequestId,
-    adminId
+    adminId,
+    approvalData = {}
 ) {
     const company = validateId(
         companyId,
@@ -546,6 +778,33 @@ async function approveLeaveRequest(
         "admin ID"
     );
 
+
+    /**
+     * Validate approvalData.
+     */
+    if (
+        approvalData === null ||
+        approvalData === undefined
+    ) {
+        approvalData = {};
+    }
+
+    if (
+        typeof approvalData !== "object" ||
+        Array.isArray(approvalData)
+    ) {
+        const error = new Error(
+            "Approval data must be an object"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    /**
+     * Get request.
+     */
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
@@ -557,6 +816,7 @@ async function approveLeaveRequest(
             }
         });
 
+
     if (!request) {
         const error = new Error(
             "Leave request not found"
@@ -566,10 +826,13 @@ async function approveLeaveRequest(
         throw error;
     }
 
+
     /**
      * Only pending requests can be approved.
      */
-    if (request.status !== "PENDING") {
+    if (
+        request.status !== "PENDING"
+    ) {
         const error = new Error(
             `Leave request cannot be approved because its current status is ${request.status}`
         );
@@ -578,61 +841,412 @@ async function approveLeaveRequest(
         throw error;
     }
 
+
+    /**
+     * Original requested date range.
+     */
+    const requestedStart =
+        normalizeDate(
+            request.startDate
+        );
+
+    const requestedEnd =
+        normalizeDate(
+            request.endDate
+        );
+
+
+    /**
+     * --------------------------------------------------------
+     * DETERMINE APPROVED DATE RANGE
+     * --------------------------------------------------------
+     *
+     * No dates supplied:
+     *     approve entire request.
+     *
+     * Dates supplied:
+     *     approve only the specified range.
+     */
+    let approvedStartDate;
+    let approvedEndDate;
+
+
+    const hasApprovedStart =
+        approvalData.approvedStartDate !==
+            undefined &&
+        approvalData.approvedStartDate !==
+            null &&
+        approvalData.approvedStartDate !==
+            "";
+
+
+    const hasApprovedEnd =
+        approvalData.approvedEndDate !==
+            undefined &&
+        approvalData.approvedEndDate !==
+            null &&
+        approvalData.approvedEndDate !==
+            "";
+
+
+    if (
+        !hasApprovedStart &&
+        !hasApprovedEnd
+    ) {
+        approvedStartDate =
+            requestedStart;
+
+        approvedEndDate =
+            requestedEnd;
+
+    } else {
+
+        /**
+         * Both dates are required for
+         * an explicit partial approval.
+         */
+        if (
+            !hasApprovedStart ||
+            !hasApprovedEnd
+        ) {
+            const error = new Error(
+                "Both approvedStartDate and approvedEndDate are required"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
+
+        approvedStartDate =
+            parseDate(
+                approvalData.approvedStartDate,
+                "approvedStartDate"
+            );
+
+        approvedEndDate =
+            parseDate(
+                approvalData.approvedEndDate,
+                "approvedEndDate"
+            );
+
+
+        /**
+         * Approved end date cannot be before
+         * approved start date.
+         */
+        if (
+            approvedEndDate <
+            approvedStartDate
+        ) {
+            const error = new Error(
+                "approvedEndDate cannot be before approvedStartDate"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+    }
+
+
+    approvedStartDate =
+        normalizeDate(
+            approvedStartDate
+        );
+
+    approvedEndDate =
+        normalizeDate(
+            approvedEndDate
+        );
+
+
+    /**
+     * --------------------------------------------------------
+     * APPROVED RANGE MUST BE INSIDE REQUESTED RANGE
+     * --------------------------------------------------------
+     */
+    if (
+        approvedStartDate <
+            requestedStart ||
+        approvedEndDate >
+            requestedEnd
+    ) {
+        const error = new Error(
+            "Approved leave dates must be within the originally requested dates"
+        );
+
+        error.statusCode = 400;
+        error.code =
+            "APPROVED_DATES_OUTSIDE_REQUEST";
+
+        throw error;
+    }
+
+
+    /**
+     * Calculate approved days.
+     *
+     * Inclusive:
+     *
+     * 10 -> 10 = 1
+     * 10 -> 11 = 2
+     */
+    const approvedDays =
+        calculateTotalDays(
+            approvedStartDate,
+            approvedEndDate
+        );
+
+
+    if (
+        !Number.isFinite(
+            approvedDays
+        ) ||
+        approvedDays <= 0
+    ) {
+        const error = new Error(
+            "Approved leave days must be greater than zero"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    /**
+     * --------------------------------------------------------
+     * PREVENT CROSS-YEAR APPROVAL
+     * --------------------------------------------------------
+     *
+     * Current LeaveBalance is keyed by:
+     *
+     * employee + leaveType + year
+     *
+     * Therefore one approved leave cannot span
+     * two calendar years.
+     */
+    const requestedStartYear =
+        requestedStart.getFullYear();
+
+    const requestedEndYear =
+        requestedEnd.getFullYear();
+
+    const approvedStartYear =
+        approvedStartDate.getFullYear();
+
+    const approvedEndYear =
+        approvedEndDate.getFullYear();
+
+
+    if (
+        requestedStartYear !==
+        requestedEndYear
+    ) {
+        const error = new Error(
+            "Leave requests cannot currently span multiple calendar years"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    if (
+        approvedStartYear !==
+        approvedEndYear
+    ) {
+        const error = new Error(
+            "Approved leave cannot span multiple calendar years"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    if (
+        approvedStartYear !==
+        requestedStartYear
+    ) {
+        const error = new Error(
+            "Approved leave must remain in the same year as the requested leave"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    const year =
+        validateYear(
+            requestedStartYear
+        );
+
+
+    /**
+     * --------------------------------------------------------
+     * TRANSACTION
+     * --------------------------------------------------------
+     */
     return await prisma.$transaction(
         async (tx) => {
-            const year =
-                new Date(
-                    request.startDate
-                ).getFullYear();
 
             /**
-             * Find employee's balance for
-             * this leave type and year.
+             * Re-read the request inside the transaction.
+             *
+             * This avoids approving a request that
+             * another operation already changed.
+             */
+            const currentRequest =
+                await tx.leaveRequest.findFirst({
+                    where: {
+                        leaveRequestId:
+                            requestId,
+
+                        employee: {
+                            companyId: company
+                        }
+                    }
+                });
+
+
+            if (!currentRequest) {
+                const error = new Error(
+                    "Leave request not found"
+                );
+
+                error.statusCode = 404;
+                throw error;
+            }
+
+
+            if (
+                currentRequest.status !==
+                "PENDING"
+            ) {
+                const error = new Error(
+                    `Leave request cannot be approved because its current status is ${currentRequest.status}`
+                );
+
+                error.statusCode = 409;
+                throw error;
+            }
+
+
+            /**
+             * ------------------------------------------------
+             * ENSURE LEAVE BALANCES EXIST
+             * ------------------------------------------------
+             *
+             * This creates missing balances for active
+             * employees using the active LeaveType annualQuota.
+             *
+             * Existing used values are preserved.
+             */
+            await ensureCompanyLeaveBalances(
+                company,
+                year,
+                tx
+            );
+
+
+            /**
+             * Find the employee's balance.
              */
             const balance =
                 await tx.leaveBalance.findUnique({
                     where: {
                         employeeId_leaveTypeId_year: {
                             employeeId:
-                                request.employeeId,
+                                currentRequest.employeeId,
 
                             leaveTypeId:
-                                request.leaveTypeId,
+                                currentRequest.leaveTypeId,
 
                             year
                         }
                     }
                 });
 
+
             if (!balance) {
                 const error = new Error(
-                    "Leave balance does not exist for this employee and leave type"
+                    "Leave balance could not be created for this employee and leave type"
                 );
 
                 error.statusCode = 400;
                 throw error;
             }
 
-            const remaining =
-                Number(balance.remaining);
 
-            const totalDays =
-                Number(request.totalDays);
+            const remaining =
+                Number(
+                    balance.remaining
+                );
+
 
             /**
-             * Prevent negative balance.
+             * ------------------------------------------------
+             * PREVENT NEGATIVE BALANCE
+             * ------------------------------------------------
+             *
+             * IMPORTANT:
+             * Deduct approvedDays, NOT totalDays.
              */
-            if (remaining < totalDays) {
+            if (
+                remaining <
+                approvedDays
+            ) {
                 const error = new Error(
                     "Insufficient leave balance"
                 );
 
                 error.statusCode = 400;
+                error.code =
+                    "INSUFFICIENT_LEAVE_BALANCE";
+
+                error.details = {
+                    allocated:
+                        Number(
+                            balance.allocated
+                        ),
+
+                    used:
+                        Number(
+                            balance.used
+                        ),
+
+                    remaining,
+
+                    requestedDays:
+                        Number(
+                            currentRequest.totalDays
+                        ),
+
+                    approvedDays
+                };
+
                 throw error;
             }
 
+
             /**
-             * Update request to APPROVED.
+             * ------------------------------------------------
+             * UPDATE LEAVE REQUEST
+             * ------------------------------------------------
+             *
+             * Original:
+             *
+             * startDate
+             * endDate
+             * totalDays
+             *
+             * remain unchanged.
+             *
+             * Approved values are stored separately.
              */
             const updatedRequest =
                 await tx.leaveRequest.update({
@@ -644,10 +1258,17 @@ async function approveLeaveRequest(
                     data: {
                         status: "APPROVED",
 
-                        approvedBy: admin,
+                        approvedBy:
+                            admin,
 
                         approvedAt:
-                            new Date()
+                            new Date(),
+
+                        approvedStartDate,
+
+                        approvedEndDate,
+
+                        approvedDays
                     },
 
                     include: {
@@ -664,8 +1285,13 @@ async function approveLeaveRequest(
                     }
                 });
 
+
             /**
-             * Update leave balance.
+             * ------------------------------------------------
+             * UPDATE LEAVE BALANCE
+             * ------------------------------------------------
+             *
+             * Deduct ONLY approved days.
              */
             await tx.leaveBalance.update({
                 where: {
@@ -675,22 +1301,33 @@ async function approveLeaveRequest(
 
                 data: {
                     used:
-                        Number(balance.used) +
-                        totalDays,
+                        Number(
+                            balance.used
+                        ) +
+                        approvedDays,
 
                     remaining:
                         remaining -
-                        totalDays
+                        approvedDays
                 }
             });
+
 
             return updatedRequest;
         }
     );
 }
 
+
 /**
  * Reject Leave Request
+ *
+ * Rejection:
+ *
+ * - changes status to REJECTED
+ * - stores rejection reason
+ * - clears approval fields
+ * - does not affect leave balance
  */
 async function rejectLeaveRequest(
     companyId,
@@ -713,6 +1350,10 @@ async function rejectLeaveRequest(
         "admin ID"
     );
 
+
+    /**
+     * Get request and verify company.
+     */
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
@@ -724,6 +1365,7 @@ async function rejectLeaveRequest(
             }
         });
 
+
     if (!request) {
         const error = new Error(
             "Leave request not found"
@@ -733,10 +1375,13 @@ async function rejectLeaveRequest(
         throw error;
     }
 
+
     /**
      * Only pending requests can be rejected.
      */
-    if (request.status !== "PENDING") {
+    if (
+        request.status !== "PENDING"
+    ) {
         const error = new Error(
             `Leave request cannot be rejected because its current status is ${request.status}`
         );
@@ -744,6 +1389,7 @@ async function rejectLeaveRequest(
         error.statusCode = 409;
         throw error;
     }
+
 
     return await prisma.leaveRequest.update({
         where: {
@@ -753,7 +1399,8 @@ async function rejectLeaveRequest(
         data: {
             status: "REJECTED",
 
-            approvedBy: admin,
+            approvedBy:
+                admin,
 
             approvedAt:
                 new Date(),
@@ -761,7 +1408,17 @@ async function rejectLeaveRequest(
             rejectionReason:
                 typeof rejectionReason === "string"
                     ? rejectionReason.trim() || null
-                    : null
+                    : null,
+
+            /**
+             * A rejected request must not
+             * contain approval information.
+             */
+            approvedStartDate: null,
+
+            approvedEndDate: null,
+
+            approvedDays: null
         },
 
         include: {
@@ -779,8 +1436,19 @@ async function rejectLeaveRequest(
     });
 }
 
+
 /**
  * Cancel Leave Request
+ *
+ * PENDING:
+ *     Just cancel.
+ *
+ * APPROVED:
+ *     Cancel and refund ONLY approvedDays.
+ *
+ * For old records that were approved before
+ * approvedDays existed, totalDays is used
+ * as a backwards-compatible fallback.
  */
 async function cancelLeaveRequest(
     companyId,
@@ -802,6 +1470,10 @@ async function cancelLeaveRequest(
         "employee ID"
     );
 
+
+    /**
+     * Get employee's request.
+     */
     const request =
         await prisma.leaveRequest.findFirst({
             where: {
@@ -815,6 +1487,7 @@ async function cancelLeaveRequest(
             }
         });
 
+
     if (!request) {
         const error = new Error(
             "Leave request not found"
@@ -824,6 +1497,7 @@ async function cancelLeaveRequest(
         throw error;
     }
 
+
     /**
      * Only PENDING and APPROVED requests
      * can be cancelled.
@@ -832,7 +1506,9 @@ async function cancelLeaveRequest(
         ![
             "PENDING",
             "APPROVED"
-        ].includes(request.status)
+        ].includes(
+            request.status
+        )
     ) {
         const error = new Error(
             `Leave request cannot be cancelled because its current status is ${request.status}`
@@ -842,13 +1518,21 @@ async function cancelLeaveRequest(
         throw error;
     }
 
+
     return await prisma.$transaction(
         async (tx) => {
+
             /**
-             * Change request status.
+             * ------------------------------------------------
+             * PENDING CANCELLATION
+             * ------------------------------------------------
+             *
+             * Nothing was deducted, so simply cancel.
              */
-            const updatedRequest =
-                await tx.leaveRequest.update({
+            if (
+                request.status === "PENDING"
+            ) {
+                return await tx.leaveRequest.update({
                     where: {
                         leaveRequestId:
                             requestId
@@ -871,75 +1555,150 @@ async function cancelLeaveRequest(
                         leaveType: true
                     }
                 });
-
-            /**
-             * If the request was already approved,
-             * restore the leave balance.
-             *
-             * PENDING cancellation does not affect
-             * the balance because it was never deducted.
-             */
-            if (request.status === "APPROVED") {
-                const year =
-                    new Date(
-                        request.startDate
-                    ).getFullYear();
-
-                const balance =
-                    await tx.leaveBalance.findUnique({
-                        where: {
-                            employeeId_leaveTypeId_year: {
-                                employeeId:
-                                    request.employeeId,
-
-                                leaveTypeId:
-                                    request.leaveTypeId,
-
-                                year
-                            }
-                        }
-                    });
-
-                if (balance) {
-                    const used =
-                        Number(balance.used);
-
-                    const remaining =
-                        Number(
-                            balance.remaining
-                        );
-
-                    const totalDays =
-                        Number(
-                            request.totalDays
-                        );
-
-                    await tx.leaveBalance.update({
-                        where: {
-                            leaveBalanceId:
-                                balance.leaveBalanceId
-                        },
-
-                        data: {
-                            used:
-                                Math.max(
-                                    0,
-                                    used -
-                                        totalDays
-                                ),
-
-                            remaining:
-                                remaining +
-                                totalDays
-                        }
-                    });
-                }
             }
 
-            return updatedRequest;
+
+            /**
+             * ------------------------------------------------
+             * APPROVED CANCELLATION
+             * ------------------------------------------------
+             */
+            const year =
+                new Date(
+                    request.startDate
+                ).getFullYear();
+
+
+            /**
+             * Find balance.
+             */
+            const balance =
+                await tx.leaveBalance.findUnique({
+                    where: {
+                        employeeId_leaveTypeId_year: {
+                            employeeId:
+                                request.employeeId,
+
+                            leaveTypeId:
+                                request.leaveTypeId,
+
+                            year
+                        }
+                    }
+                });
+
+
+            /**
+             * Determine how many days were
+             * actually deducted.
+             *
+             * New records:
+             *     approvedDays
+             *
+             * Legacy records:
+             *     totalDays
+             */
+            const approvedDays =
+                request.approvedDays !== null &&
+                request.approvedDays !== undefined
+                    ? Number(
+                        request.approvedDays
+                    )
+                    : Number(
+                        request.totalDays
+                    );
+
+
+            if (
+                !Number.isFinite(
+                    approvedDays
+                ) ||
+                approvedDays < 0
+            ) {
+                const error = new Error(
+                    "Invalid approved leave days"
+                );
+
+                error.statusCode = 400;
+                throw error;
+            }
+
+
+            /**
+             * Refund the balance when
+             * the balance record exists.
+             */
+            if (balance) {
+
+                const used =
+                    Number(
+                        balance.used
+                    );
+
+                const remaining =
+                    Number(
+                        balance.remaining
+                    );
+
+
+                await tx.leaveBalance.update({
+                    where: {
+                        leaveBalanceId:
+                            balance.leaveBalanceId
+                    },
+
+                    data: {
+                        used:
+                            Math.max(
+                                0,
+                                used -
+                                approvedDays
+                            ),
+
+                        remaining:
+                            remaining +
+                            approvedDays
+                    }
+                });
+            }
+
+
+            /**
+             * Mark request as cancelled.
+             *
+             * Keep original request dates/days.
+             *
+             * Keep approved information for historical
+             * reference. The status tells us that the
+             * approved leave was cancelled.
+             */
+            return await tx.leaveRequest.update({
+                where: {
+                    leaveRequestId:
+                        requestId
+                },
+
+                data: {
+                    status: "CANCELLED"
+                },
+
+                include: {
+                    employee: {
+                        select: {
+                            employeeId: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true
+                        }
+                    },
+
+                    leaveType: true
+                }
+            });
         }
     );
 }
+
 
 /**
  * Export service functions

@@ -5,23 +5,28 @@
  * After create/cancel, this component reloads requests and balances.
  * Duplicate balance rows are defensively collapsed by leave type + year
  * so the employee never sees two cards for the same leave type.
+ *
+ * Partial approval support:
+ * - Employee's original requested dates/days remain unchanged.
+ * - Approved dates/days are displayed separately when admin approves
+ *   fewer days than requested.
+ * - Full approval shows only APPROVED without a partial-approval message.
+ * - Approved leave overlap checks use the approved range instead of the
+ *   original requested range.
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import {
   CalendarDays,
   Plus,
   X,
   Clock3,
-  CheckCircle2,
-  XCircle,
-  Ban,
 } from 'lucide-react';
 
 import {
   PageHeader,
   DataTable,
-  StatCard,
 } from '@/components/ui/PageComponents';
 
 import { StatusBadge } from '@/components/ui/Badge';
@@ -36,6 +41,7 @@ import {
   leaveTypeService,
 } from '@/services/apiServices';
 
+
 /*
 |--------------------------------------------------------------------------
 | Helper functions
@@ -45,9 +51,13 @@ import {
 const unwrapArray = (value) => {
   let current = value;
 
-  // Handle axios/service wrappers such as:
-  // response -> data -> data -> [...]
-  // response -> data -> [...]
+  /*
+   * Handle wrappers such as:
+   *
+   * response -> data -> data -> [...]
+   * response -> data -> [...]
+   * response -> [...]
+   */
   for (let i = 0; i < 4; i += 1) {
     if (Array.isArray(current)) {
       return current;
@@ -65,16 +75,23 @@ const unwrapArray = (value) => {
     break;
   }
 
-  return Array.isArray(current) ? current : [];
+  return Array.isArray(current)
+    ? current
+    : [];
 };
 
-const toNumber = (value, fallback = 0) => {
+
+const toNumber = (
+  value,
+  fallback = 0
+) => {
   const number = Number(value);
 
   return Number.isFinite(number)
     ? number
     : fallback;
 };
+
 
 const formatDate = (value) => {
   if (!value) {
@@ -87,12 +104,16 @@ const formatDate = (value) => {
     return value;
   }
 
-  return date.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  return date.toLocaleDateString(
+    'en-IN',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }
+  );
 };
+
 
 const getRequestId = (request) => {
   return (
@@ -103,6 +124,7 @@ const getRequestId = (request) => {
   );
 };
 
+
 const getLeaveTypeId = (item) => {
   return (
     item?.leaveTypeId ??
@@ -110,6 +132,7 @@ const getLeaveTypeId = (item) => {
     item?.leaveType?.id
   );
 };
+
 
 const getLeaveTypeName = (item) => {
   return (
@@ -123,52 +146,252 @@ const getLeaveTypeName = (item) => {
   );
 };
 
+
 const getRequestStatus = (request) => {
   return String(
     request?.status ??
-    request?.leaveStatus ??
-    'PENDING'
+      request?.leaveStatus ??
+      'PENDING'
   ).toUpperCase();
 };
+
 
 const getRequestDays = (request) => {
   return toNumber(
     request?.days ??
-    request?.numberOfDays ??
-    request?.totalDays ??
-    request?.leaveDays,
+      request?.numberOfDays ??
+      request?.totalDays ??
+      request?.leaveDays,
     0
   );
 };
 
+
+/*
+|--------------------------------------------------------------------------
+| Requested date helpers
+|--------------------------------------------------------------------------
+*/
+
 const getRequestStartDate = (request) =>
-  request?.startDate ?? request?.start_date;
+  request?.startDate ??
+  request?.start_date ??
+  null;
+
 
 const getRequestEndDate = (request) =>
-  request?.endDate ?? request?.end_date;
+  request?.endDate ??
+  request?.end_date ??
+  null;
 
-const isBlockingLeaveStatus = (request) =>
-  ['PENDING', 'APPROVED'].includes(getRequestStatus(request));
 
-const datesOverlap = (startA, endA, startB, endB) => {
-  if (!startA || !endA || !startB || !endB) {
-    return false;
+/*
+|--------------------------------------------------------------------------
+| Approved date/day helpers
+|--------------------------------------------------------------------------
+*/
+
+const getApprovedDays = (request) => {
+  if (
+    request?.approvedDays !== undefined &&
+    request?.approvedDays !== null
+  ) {
+    return toNumber(
+      request.approvedDays,
+      0
+    );
   }
 
-  const aStart = new Date(`${startA}T00:00:00`);
-  const aEnd = new Date(`${endA}T00:00:00`);
-  const bStart = new Date(`${startB}T00:00:00`);
-  const bEnd = new Date(`${endB}T00:00:00`);
-
-  if ([aStart, aEnd, bStart, bEnd].some((date) => Number.isNaN(date.getTime()))) {
-    return false;
+  if (
+    request?.approved_days !== undefined &&
+    request?.approved_days !== null
+  ) {
+    return toNumber(
+      request.approved_days,
+      0
+    );
   }
 
-  return aStart <= bEnd && aEnd >= bStart;
+  return 0;
 };
 
-const getApiErrorMessage = (error) => {
-  const responseData = error?.response?.data;
+
+const getApprovedStartDate = (request) => {
+  return (
+    request?.approvedStartDate ??
+    request?.approved_start_date ??
+    null
+  );
+};
+
+
+const getApprovedEndDate = (request) => {
+  return (
+    request?.approvedEndDate ??
+    request?.approved_end_date ??
+    null
+  );
+};
+
+
+const isPartialApproval = (request) => {
+  const status =
+    getRequestStatus(request);
+
+  if (status !== 'APPROVED') {
+    return false;
+  }
+
+  const requestedDays =
+    getRequestDays(request);
+
+  const approvedDays =
+    getApprovedDays(request);
+
+  return (
+    approvedDays > 0 &&
+    requestedDays > 0 &&
+    approvedDays < requestedDays
+  );
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Blocking leave status
+|--------------------------------------------------------------------------
+*/
+
+const isBlockingLeaveStatus = (
+  request
+) =>
+  [
+    'PENDING',
+    'APPROVED',
+  ].includes(
+    getRequestStatus(request)
+  );
+
+
+/*
+|--------------------------------------------------------------------------
+| Date overlap
+|--------------------------------------------------------------------------
+*/
+
+const datesOverlap = (
+  startA,
+  endA,
+  startB,
+  endB
+) => {
+  if (
+    !startA ||
+    !endA ||
+    !startB ||
+    !endB
+  ) {
+    return false;
+  }
+
+  const aStart = new Date(
+    `${startA}T00:00:00`
+  );
+
+  const aEnd = new Date(
+    `${endA}T00:00:00`
+  );
+
+  const bStart = new Date(
+    `${startB}T00:00:00`
+  );
+
+  const bEnd = new Date(
+    `${endB}T00:00:00`
+  );
+
+  if (
+    [
+      aStart,
+      aEnd,
+      bStart,
+      bEnd,
+    ].some(
+      (date) =>
+        Number.isNaN(
+          date.getTime()
+        )
+    )
+  ) {
+    return false;
+  }
+
+  return (
+    aStart <= bEnd &&
+    aEnd >= bStart
+  );
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Get the effective blocking date range
+|--------------------------------------------------------------------------
+|
+| PENDING:
+|   Use original requested dates.
+|
+| APPROVED:
+|   Use approved dates when available.
+|
+| This is necessary because a request may have been
+| originally submitted for 4 days but approved for
+| only 2 days.
+*/
+
+const getBlockingStartDate = (
+  request
+) => {
+  if (
+    getRequestStatus(request) ===
+      'APPROVED' &&
+    getApprovedStartDate(request)
+  ) {
+    return getApprovedStartDate(
+      request
+    );
+  }
+
+  return getRequestStartDate(
+    request
+  );
+};
+
+
+const getBlockingEndDate = (
+  request
+) => {
+  if (
+    getRequestStatus(request) ===
+      'APPROVED' &&
+    getApprovedEndDate(request)
+  ) {
+    return getApprovedEndDate(
+      request
+    );
+  }
+
+  return getRequestEndDate(
+    request
+  );
+};
+
+
+const getApiErrorMessage = (
+  error
+) => {
+  const responseData =
+    error?.response?.data;
 
   return (
     responseData?.message ??
@@ -178,28 +401,43 @@ const getApiErrorMessage = (error) => {
   );
 };
 
-const getBalanceTotal = (balance) => {
+
+/*
+|--------------------------------------------------------------------------
+| Balance helpers
+|--------------------------------------------------------------------------
+*/
+
+const getBalanceTotal = (
+  balance
+) => {
   return toNumber(
     balance?.allocated ??
-    balance?.allocatedDays ??
-    balance?.total ??
-    balance?.totalDays ??
-    balance?.annualQuota,
+      balance?.allocatedDays ??
+      balance?.total ??
+      balance?.totalDays ??
+      balance?.annualQuota,
     0
   );
 };
 
-const getBalanceUsed = (balance) => {
+
+const getBalanceUsed = (
+  balance
+) => {
   return toNumber(
     balance?.used ??
-    balance?.usedDays ??
-    balance?.consumed ??
-    balance?.consumedDays,
+      balance?.usedDays ??
+      balance?.consumed ??
+      balance?.consumedDays,
     0
   );
 };
 
-const getBalanceRemaining = (balance) => {
+
+const getBalanceRemaining = (
+  balance
+) => {
   const explicitRemaining =
     balance?.remaining ??
     balance?.remainingDays ??
@@ -210,81 +448,139 @@ const getBalanceRemaining = (balance) => {
     explicitRemaining !== undefined &&
     explicitRemaining !== null
   ) {
-    return toNumber(explicitRemaining, 0);
+    return toNumber(
+      explicitRemaining,
+      0
+    );
   }
 
-  const total = getBalanceTotal(balance);
-  const used = getBalanceUsed(balance);
+  const total =
+    getBalanceTotal(balance);
 
-  return Math.max(total - used, 0);
+  const used =
+    getBalanceUsed(balance);
+
+  return Math.max(
+    total - used,
+    0
+  );
 };
 
-const getBalanceYear = (balance) =>
+
+const getBalanceYear = (
+  balance
+) =>
   balance?.year ??
   balance?.leaveYear ??
   balance?.financialYear ??
   new Date().getFullYear();
 
-const getBalanceKey = (balance) => {
-  const leaveTypeId = getLeaveTypeId(balance);
 
-  if (leaveTypeId !== undefined && leaveTypeId !== null) {
-    return `${leaveTypeId}-${getBalanceYear(balance)}`;
+const getBalanceKey = (
+  balance
+) => {
+  const leaveTypeId =
+    getLeaveTypeId(balance);
+
+  if (
+    leaveTypeId !== undefined &&
+    leaveTypeId !== null
+  ) {
+    return `${leaveTypeId}-${getBalanceYear(
+      balance
+    )}`;
   }
 
-  return String(
-    balance?.leaveType?.name ??
-      balance?.leaveTypeName ??
-      balance?.type ??
-      balance?.code ??
-      'leave'
-  ).trim().toLowerCase() + `-${getBalanceYear(balance)}`;
+  return (
+    String(
+      balance?.leaveType?.name ??
+        balance?.leaveTypeName ??
+        balance?.type ??
+        balance?.code ??
+        'leave'
+    )
+      .trim()
+      .toLowerCase() +
+    `-${getBalanceYear(balance)}`
+  );
 };
 
-const normalizeBalances = (items) => {
+
+const normalizeBalances = (
+  items
+) => {
   const byKey = new Map();
 
   items.forEach((balance) => {
-    const key = getBalanceKey(balance);
-    const existing = byKey.get(key);
+    const key =
+      getBalanceKey(balance);
+
+    const existing =
+      byKey.get(key);
 
     if (!existing) {
-      byKey.set(key, {
-        ...balance,
-        _sourceCount: 1,
-      });
+      byKey.set(
+        key,
+        {
+          ...balance,
+          _sourceCount: 1,
+        }
+      );
+
       return;
     }
 
     /*
-     * There should normally be exactly one balance row for an
-     * employee + leave type + year. If duplicate rows are returned,
-     * do not render duplicate cards.
+     * There should normally be exactly one balance row
+     * for employee + leave type + year.
      *
-     * Prefer the row that contains an explicit remaining/used value
-     * and has the larger amount of consumed leave. This prevents a
-     * stale zero-used duplicate from hiding the actual used balance.
+     * If duplicates are returned, do not render duplicates.
+     *
+     * Prefer the row with the larger consumed amount.
      */
-    const existingUsed = getBalanceUsed(existing);
-    const currentUsed = getBalanceUsed(balance);
-    const existingRemaining = getBalanceRemaining(existing);
-    const currentRemaining = getBalanceRemaining(balance);
+    const existingUsed =
+      getBalanceUsed(existing);
+
+    const currentUsed =
+      getBalanceUsed(balance);
+
+    const existingRemaining =
+      getBalanceRemaining(
+        existing
+      );
+
+    const currentRemaining =
+      getBalanceRemaining(
+        balance
+      );
 
     const preferred =
       currentUsed > existingUsed ||
-      (currentUsed === existingUsed &&
-        currentRemaining < existingRemaining)
+      (
+        currentUsed ===
+          existingUsed &&
+        currentRemaining <
+          existingRemaining
+      )
         ? balance
         : existing;
 
-    byKey.set(key, {
-      ...preferred,
-      _sourceCount: (existing._sourceCount || 1) + 1,
-    });
+    byKey.set(
+      key,
+      {
+        ...preferred,
+        _sourceCount:
+          (existing._sourceCount || 1) +
+          1,
+      }
+    );
   });
 
-  return Array.from(byKey.values());
+  return Array.from(
+    byKey.values()
+  );
 };
+
 
 /*
 |--------------------------------------------------------------------------
@@ -293,17 +589,33 @@ const normalizeBalances = (items) => {
 */
 
 export function EmployeeLeaves() {
-  const { toast } = useToast();
+  const { toast } =
+    useToast();
 
-  const [leaves, setLeaves] = useState([]);
-  const [balances, setBalances] = useState([]);
-  const [leaveTypes, setLeaveTypes] = useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [cancellingId, setCancellingId] = useState(null);
+  const [leaves, setLeaves] =
+    useState([]);
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [balances, setBalances] =
+    useState([]);
+
+  const [leaveTypes, setLeaveTypes] =
+    useState([]);
+
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const [cancellingId, setCancellingId] =
+    useState(null);
+
+
+  const [modalOpen, setModalOpen] =
+    useState(false);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -311,50 +623,81 @@ export function EmployeeLeaves() {
   |--------------------------------------------------------------------------
   */
 
-  const loadLeaveData = useCallback(async () => {
-    setLoading(true);
+  const loadLeaveData =
+    useCallback(
+      async () => {
+        setLoading(true);
 
-    try {
-      const [
-        requestsResponse,
-        balancesResponse,
-        leaveTypesResponse,
-      ] = await Promise.all([
-        leaveService.requests(),
-        leaveBalanceService.list(),
-        leaveTypeService.list(),
-      ]);
+        try {
+          const [
+            requestsResponse,
+            balancesResponse,
+            leaveTypesResponse,
+          ] = await Promise.all([
+            leaveService.requests(),
+            leaveBalanceService.list(),
+            leaveTypeService.list(),
+          ]);
 
-      const requestData = unwrapArray(requestsResponse);
-      const balanceData = unwrapArray(balancesResponse);
-      const typeData = unwrapArray(leaveTypesResponse);
 
-      setLeaves(requestData);
-      setBalances(normalizeBalances(balanceData));
-      setLeaveTypes(typeData);
-    } catch (error) {
-      console.error(
-        'Failed to load employee leave data:',
-        error
-      );
+          const requestData =
+            unwrapArray(
+              requestsResponse
+            );
 
-      setLeaves([]);
-      setBalances([]);
-      setLeaveTypes([]);
+          const balanceData =
+            unwrapArray(
+              balancesResponse
+            );
 
-      toast(
-        error?.response?.data?.message ||
-          'Unable to load leave information',
-        'error'
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+          const typeData =
+            unwrapArray(
+              leaveTypesResponse
+            );
+
+
+          setLeaves(
+            requestData
+          );
+
+          setBalances(
+            normalizeBalances(
+              balanceData
+            )
+          );
+
+          setLeaveTypes(
+            typeData
+          );
+        } catch (error) {
+          console.error(
+            'Failed to load employee leave data:',
+            error
+          );
+
+          setLeaves([]);
+
+          setBalances([]);
+
+          setLeaveTypes([]);
+
+          toast(
+            error?.response?.data?.message ||
+              'Unable to load leave information',
+            'error'
+          );
+        } finally {
+          setLoading(false);
+        }
+      },
+      [toast]
+    );
+
 
   useEffect(() => {
     loadLeaveData();
   }, [loadLeaveData]);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -362,93 +705,154 @@ export function EmployeeLeaves() {
   |--------------------------------------------------------------------------
   */
 
-  const handleApply = async (formData) => {
-    setSubmitting(true);
+  const handleApply =
+    async (
+      formData
+    ) => {
+      setSubmitting(true);
 
-    try {
-      const payload = {
-        leaveTypeId: Number(formData.leaveTypeId),
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        reason: formData.reason.trim(),
-      };
+      try {
+        const payload = {
+          leaveTypeId:
+            Number(
+              formData.leaveTypeId
+            ),
 
-      /*
-       * Give the employee immediate feedback for a date conflict that is
-       * already visible on this page. The backend performs the authoritative
-       * check again, so this is only a UX improvement and never a substitute
-       * for backend validation.
-       */
-      const localOverlap = leaves.find((request) =>
-        isBlockingLeaveStatus(request) &&
-        datesOverlap(
-          payload.startDate,
-          payload.endDate,
-          getRequestStartDate(request),
-          getRequestEndDate(request)
-        )
-      );
+          startDate:
+            formData.startDate,
 
-      if (localOverlap) {
-        const existingStart = getRequestStartDate(localOverlap);
-        const existingEnd = getRequestEndDate(localOverlap);
+          endDate:
+            formData.endDate,
+
+          reason:
+            formData.reason.trim(),
+        };
+
+
+        /*
+         * Frontend overlap check.
+         *
+         * This is only a UX improvement.
+         * Backend remains authoritative.
+         */
+        const localOverlap =
+          leaves.find(
+            (request) => {
+              if (
+                !isBlockingLeaveStatus(
+                  request
+                )
+              ) {
+                return false;
+              }
+
+              /*
+               * IMPORTANT:
+               *
+               * For APPROVED requests,
+               * use approved dates.
+               *
+               * For PENDING requests,
+               * use original requested dates.
+               */
+              return datesOverlap(
+                payload.startDate,
+                payload.endDate,
+                getBlockingStartDate(
+                  request
+                ),
+                getBlockingEndDate(
+                  request
+                )
+              );
+            }
+          );
+
+
+        if (localOverlap) {
+          const existingStart =
+            getBlockingStartDate(
+              localOverlap
+            );
+
+          const existingEnd =
+            getBlockingEndDate(
+              localOverlap
+            );
+
+          const status =
+            getRequestStatus(
+              localOverlap
+            ).toLowerCase();
+
+
+          toast(
+            `Leave dates overlap an existing ${status} leave (${formatDate(
+              existingStart
+            )} - ${formatDate(
+              existingEnd
+            )}).`,
+            'error'
+          );
+
+          return;
+        }
+
+
+        await leaveService.createRequest(
+          payload
+        );
+
+
+        /*
+         * Backend remains source of truth.
+         */
+        setModalOpen(false);
+
 
         toast(
-          `Leave dates overlap an existing ${getRequestStatus(localOverlap).toLowerCase()} leave (${formatDate(existingStart)} - ${formatDate(existingEnd)}).`,
+          'Leave request submitted successfully',
+          'success'
+        );
+
+
+        /*
+         * Reload after successful submission.
+         */
+        try {
+          await loadLeaveData();
+        } catch (reloadError) {
+          console.error(
+            'Leave was submitted, but refreshing leave data failed:',
+            reloadError
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Failed to submit leave request:',
+          error
+        );
+
+        console.error(
+          'Leave request status:',
+          error?.response?.status
+        );
+
+        console.error(
+          'Leave request backend response:',
+          error?.response?.data
+        );
+
+
+        toast(
+          getApiErrorMessage(error),
           'error'
         );
-        return;
+      } finally {
+        setSubmitting(false);
       }
+    };
 
-      await leaveService.createRequest(payload);
-
-      /*
-       * The backend is the source of truth. Never manufacture a new request
-       * or change the balance locally.
-       */
-      setModalOpen(false);
-
-      toast(
-        'Leave request submitted successfully',
-        'success'
-      );
-
-      /*
-       * Reload after the successful POST. If GET temporarily fails, do not
-       * turn an already-successful submission into a false error message.
-       */
-      try {
-        await loadLeaveData();
-      } catch (reloadError) {
-        console.error(
-          'Leave was submitted, but refreshing leave data failed:',
-          reloadError
-        );
-      }
-    } catch (error) {
-      console.error(
-        'Failed to submit leave request:',
-        error
-      );
-
-      console.error(
-        'Leave request status:',
-        error?.response?.status
-      );
-
-      console.error(
-        'Leave request backend response:',
-        error?.response?.data
-      );
-
-      toast(
-        getApiErrorMessage(error),
-        'error'
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   /*
   |--------------------------------------------------------------------------
@@ -456,45 +860,49 @@ export function EmployeeLeaves() {
   |--------------------------------------------------------------------------
   */
 
-  const handleCancel = async (id) => {
-    if (!id) {
-      return;
-    }
+  const handleCancel =
+    async (
+      id
+    ) => {
+      if (!id) {
+        return;
+      }
 
-    setCancellingId(id);
+      setCancellingId(id);
 
-    try {
-      await leaveService.cancel(id);
+      try {
+        await leaveService.cancel(
+          id
+        );
 
-      /*
-       * Reload from backend instead of changing
-       * the local object manually.
-       *
-       * This keeps leave request status and balance
-       * synchronized with the database.
-       */
 
-      await loadLeaveData();
+        /*
+         * Reload from backend instead of
+         * changing the local object manually.
+         */
+        await loadLeaveData();
 
-      toast(
-        'Leave request cancelled successfully',
-        'warning'
-      );
-    } catch (error) {
-      console.error(
-        'Failed to cancel leave request:',
-        error
-      );
 
-      toast(
-        error?.response?.data?.message ||
-          'Failed to cancel leave request',
-        'error'
-      );
-    } finally {
-      setCancellingId(null);
-    }
-  };
+        toast(
+          'Leave request cancelled successfully',
+          'warning'
+        );
+      } catch (error) {
+        console.error(
+          'Failed to cancel leave request:',
+          error
+        );
+
+        toast(
+          error?.response?.data?.message ||
+            'Failed to cancel leave request',
+          'error'
+        );
+      } finally {
+        setCancellingId(null);
+      }
+    };
+
 
   /*
   |--------------------------------------------------------------------------
@@ -502,25 +910,42 @@ export function EmployeeLeaves() {
   |--------------------------------------------------------------------------
   */
 
-  const balanceCards = balances.map((balance) => {
-    const total = getBalanceTotal(balance);
-    const used = getBalanceUsed(balance);
-    const remaining = getBalanceRemaining(balance);
+  const balanceCards =
+    balances.map(
+      (balance) => {
+        const total =
+          getBalanceTotal(
+            balance
+          );
 
-    const leaveTypeName =
-      balance?.leaveType?.name ??
-      balance?.leaveTypeName ??
-      balance?.type ??
-      'Leave';
+        const used =
+          getBalanceUsed(
+            balance
+          );
 
-    return {
-      ...balance,
-      cardName: leaveTypeName,
-      total,
-      used,
-      remaining,
-    };
-  });
+        const remaining =
+          getBalanceRemaining(
+            balance
+          );
+
+        const leaveTypeName =
+          balance?.leaveType?.name ??
+          balance?.leaveTypeName ??
+          balance?.type ??
+          'Leave';
+
+
+        return {
+          ...balance,
+          cardName:
+            leaveTypeName,
+          total,
+          used,
+          remaining,
+        };
+      }
+    );
+
 
   /*
   |--------------------------------------------------------------------------
@@ -531,86 +956,286 @@ export function EmployeeLeaves() {
   const columns = [
     {
       key: 'leaveType',
+
       label: 'Type',
-      render: (request) => (
+
+      render: (
+        request
+      ) => (
         <span className="font-medium text-navy-800">
-          {getLeaveTypeName(request)}
+          {getLeaveTypeName(
+            request
+          )}
         </span>
       ),
     },
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Requested dates
+    |--------------------------------------------------------------------------
+    */
 
     {
       key: 'startDate',
+
       label: 'Start',
-      render: (request) => (
+
+      render: (
+        request
+      ) => (
         <span className="text-navy-600">
           {formatDate(
-            request?.startDate ??
-              request?.start_date
+            getRequestStartDate(
+              request
+            )
           )}
         </span>
       ),
     },
+
 
     {
       key: 'endDate',
+
       label: 'End',
-      render: (request) => (
+
+      render: (
+        request
+      ) => (
         <span className="text-navy-600">
           {formatDate(
-            request?.endDate ??
-              request?.end_date
+            getRequestEndDate(
+              request
+            )
           )}
         </span>
       ),
     },
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Days
+    |--------------------------------------------------------------------------
+    |
+    | Full approval:
+    |     4
+    |
+    | Partial approval:
+    |     4
+    |     2 approved
+    |--------------------------------------------------------------------------
+    */
+
     {
       key: 'days',
+
       label: 'Days',
+
       align: 'center',
-      render: (request) => (
-        <span className="font-semibold text-navy-700">
-          {getRequestDays(request)}
-        </span>
-      ),
+
+      render: (
+        request
+      ) => {
+        const requestedDays =
+          getRequestDays(
+            request
+          );
+
+        const approvedDays =
+          getApprovedDays(
+            request
+          );
+
+        const partial =
+          isPartialApproval(
+            request
+          );
+
+
+        if (partial) {
+          return (
+            <div className="text-center">
+              <div className="font-semibold text-navy-700">
+                {requestedDays}
+              </div>
+
+              <div className="mt-1 text-xs font-semibold text-success-700">
+                {approvedDays} approved
+              </div>
+            </div>
+          );
+        }
+
+
+        return (
+          <span className="font-semibold text-navy-700">
+            {requestedDays}
+          </span>
+        );
+      },
     },
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reason
+    |--------------------------------------------------------------------------
+    */
 
     {
       key: 'reason',
+
       label: 'Reason',
-      render: (request) => (
+
+      render: (
+        request
+      ) => (
         <span
           className="text-navy-600 max-w-xs truncate block"
-          title={request?.reason || ''}
+          title={
+            request?.reason || ''
+          }
         >
-          {request?.reason || 'N/A'}
+          {request?.reason ||
+            'N/A'}
         </span>
       ),
     },
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Status
+    |--------------------------------------------------------------------------
+    |
+    | Full approval:
+    |     APPROVED
+    |
+    | Partial approval:
+    |     APPROVED
+    |     Only 2 of 4 requested days approved
+    |     Approved: 10 Sep 2026 → 11 Sep 2026
+    |--------------------------------------------------------------------------
+    */
+
     {
       key: 'status',
+
       label: 'Status',
+
       align: 'center',
-      render: (request) => (
-        <StatusBadge
-          status={getRequestStatus(request)}
-        />
-      ),
+
+      render: (
+        request
+      ) => {
+        const status =
+          getRequestStatus(
+            request
+          );
+
+        const requestedDays =
+          getRequestDays(
+            request
+          );
+
+        const approvedDays =
+          getApprovedDays(
+            request
+          );
+
+        const approvedStartDate =
+          getApprovedStartDate(
+            request
+          );
+
+        const approvedEndDate =
+          getApprovedEndDate(
+            request
+          );
+
+        const partial =
+          isPartialApproval(
+            request
+          );
+
+
+        return (
+          <div className="flex flex-col items-center gap-1.5">
+
+            <StatusBadge
+              status={status}
+            />
+
+
+            {partial && (
+              <div className="max-w-[230px] rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center">
+
+                <p className="text-xs font-semibold text-amber-800">
+                  Only {approvedDays} of {requestedDays}{' '}
+                  requested day
+                  {requestedDays === 1
+                    ? ''
+                    : 's'} approved
+                </p>
+
+
+                {(approvedStartDate ||
+                  approvedEndDate) && (
+                  <p className="mt-1 text-[11px] text-amber-700">
+                    Approved:{' '}
+                    {formatDate(
+                      approvedStartDate
+                    )}
+                    {' → '}
+                    {formatDate(
+                      approvedEndDate
+                    )}
+                  </p>
+                )}
+
+              </div>
+            )}
+
+          </div>
+        );
+      },
     },
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Action
+    |--------------------------------------------------------------------------
+    */
 
     {
       key: 'action',
+
       label: 'Action',
+
       align: 'center',
-      render: (request) => {
+
+      render: (
+        request
+      ) => {
         const status =
-          getRequestStatus(request);
+          getRequestStatus(
+            request
+          );
 
         const requestId =
-          getRequestId(request);
+          getRequestId(
+            request
+          );
 
+
+        /*
+         * Only pending requests can be
+         * cancelled from the employee side.
+         */
         if (
           status !== 'PENDING' ||
           !requestId
@@ -622,14 +1247,18 @@ export function EmployeeLeaves() {
           );
         }
 
+
         return (
           <button
             type="button"
             onClick={() =>
-              handleCancel(requestId)
+              handleCancel(
+                requestId
+              )
             }
             disabled={
-              cancellingId === requestId
+              cancellingId ===
+              requestId
             }
             className="
               inline-flex items-center gap-1.5
@@ -646,7 +1275,8 @@ export function EmployeeLeaves() {
           >
             <X size={14} />
 
-            {cancellingId === requestId
+            {cancellingId ===
+            requestId
               ? 'Cancelling...'
               : 'Cancel'}
           </button>
@@ -654,6 +1284,7 @@ export function EmployeeLeaves() {
       },
     },
   ];
+
 
   /*
   |--------------------------------------------------------------------------
@@ -669,6 +1300,7 @@ export function EmployeeLeaves() {
     );
   }
 
+
   /*
   |--------------------------------------------------------------------------
   | Render
@@ -683,7 +1315,9 @@ export function EmployeeLeaves() {
         actions={
           <button
             type="button"
-            onClick={() => setModalOpen(true)}
+            onClick={() =>
+              setModalOpen(true)
+            }
             className="
               inline-flex items-center gap-2
               px-4 py-2.5
@@ -696,10 +1330,12 @@ export function EmployeeLeaves() {
             "
           >
             <Plus size={17} />
+
             Apply Leave
           </button>
         }
       />
+
 
       {/*
       |--------------------------------------------------------------------------
@@ -708,144 +1344,177 @@ export function EmployeeLeaves() {
       */}
 
       {balanceCards.length > 0 ? (
-        <div className="
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          lg:grid-cols-3
-          xl:grid-cols-4
-          gap-4
-          mb-8
-        ">
-          {balanceCards.map((balance) => {
-            const usedPercent =
-              balance.total > 0
-                ? Math.min(
-                    (balance.used /
-                      balance.total) *
-                      100,
-                    100
-                  )
-                : 0;
+        <div
+          className="
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4
+            gap-4
+            mb-8
+          "
+        >
+          {balanceCards.map(
+            (balance) => {
+              const usedPercent =
+                balance.total > 0
+                  ? Math.min(
+                      (
+                        balance.used /
+                        balance.total
+                      ) * 100,
+                      100
+                    )
+                  : 0;
 
-            return (
-              <div
-                key={
-                  balance.leaveBalanceId ??
-                  balance.id ??
-                  getBalanceKey(balance)
-                }
-                className="
-                  bg-white
-                  border border-navy-100
-                  rounded-xl
-                  p-5
-                  shadow-sm
-                "
-              >
-                <div className="
-                  flex
-                  items-start
-                  justify-between
-                  gap-3
-                  mb-4
-                ">
-                  <div>
-                    <p className="
-                      text-xs
-                      font-semibold
-                      uppercase
-                      tracking-wide
-                      text-navy-400
-                    ">
-                      {balance.cardName}
-                    </p>
 
-                    <p className="
-                      mt-1
-                      text-2xl
-                      font-bold
-                      text-navy-800
-                    ">
-                      {balance.remaining}
-                    </p>
+              return (
+                <div
+                  key={
+                    balance.leaveBalanceId ??
+                    balance.id ??
+                    getBalanceKey(
+                      balance
+                    )
+                  }
+                  className="
+                    bg-white
+                    border border-navy-100
+                    rounded-xl
+                    p-5
+                    shadow-sm
+                  "
+                >
+                  <div
+                    className="
+                      flex
+                      items-start
+                      justify-between
+                      gap-3
+                      mb-4
+                    "
+                  >
+                    <div>
+                      <p
+                        className="
+                          text-xs
+                          font-semibold
+                          uppercase
+                          tracking-wide
+                          text-navy-400
+                        "
+                      >
+                        {balance.cardName}
+                      </p>
 
-                    <p className="
-                      text-xs
-                      text-navy-400
-                      mt-0.5
-                    ">
-                      days remaining
-                    </p>
+
+                      <p
+                        className="
+                          mt-1
+                          text-2xl
+                          font-bold
+                          text-navy-800
+                        "
+                      >
+                        {balance.remaining}
+                      </p>
+
+
+                      <p
+                        className="
+                          text-xs
+                          text-navy-400
+                          mt-0.5
+                        "
+                      >
+                        days remaining
+                      </p>
+                    </div>
+
+
+                    <div
+                      className="
+                        w-10 h-10
+                        rounded-lg
+                        bg-navy-50
+                        flex
+                        items-center
+                        justify-center
+                      "
+                    >
+                      <CalendarDays
+                        size={20}
+                        className="text-navy-600"
+                      />
+                    </div>
                   </div>
 
-                  <div className="
-                    w-10 h-10
-                    rounded-lg
-                    bg-navy-50
-                    flex
-                    items-center
-                    justify-center
-                  ">
-                    <CalendarDays
-                      size={20}
-                      className="text-navy-600"
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      justify-between
+                      text-xs
+                      mb-2
+                    "
+                  >
+                    <span className="text-navy-500">
+                      Used
+                    </span>
+
+
+                    <span
+                      className="
+                        font-semibold
+                        text-navy-700
+                      "
+                    >
+                      {balance.used} /{' '}
+                      {balance.total}
+                    </span>
+                  </div>
+
+
+                  <div
+                    className="
+                      h-2
+                      rounded-full
+                      bg-navy-100
+                      overflow-hidden
+                    "
+                  >
+                    <div
+                      className="
+                        h-full
+                        rounded-full
+                        bg-navy-600
+                        transition-all
+                        duration-500
+                      "
+                      style={{
+                        width: `${usedPercent}%`,
+                      }}
                     />
                   </div>
                 </div>
-
-                <div className="
-                  flex
-                  items-center
-                  justify-between
-                  text-xs
-                  mb-2
-                ">
-                  <span className="text-navy-500">
-                    Used
-                  </span>
-
-                  <span className="
-                    font-semibold
-                    text-navy-700
-                  ">
-                    {balance.used} / {balance.total}
-                  </span>
-                </div>
-
-                <div className="
-                  h-2
-                  rounded-full
-                  bg-navy-100
-                  overflow-hidden
-                ">
-                  <div
-                    className="
-                      h-full
-                      rounded-full
-                      bg-navy-600
-                      transition-all
-                      duration-500
-                    "
-                    style={{
-                      width: `${usedPercent}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            }
+          )}
         </div>
       ) : (
-        <div className="
-          mb-8
-          rounded-xl
-          border border-dashed
-          border-navy-200
-          bg-navy-50/30
-          p-6
-          text-center
-        ">
+        <div
+          className="
+            mb-8
+            rounded-xl
+            border border-dashed
+            border-navy-200
+            bg-navy-50/30
+            p-6
+            text-center
+          "
+        >
           <CalendarDays
             size={28}
             className="
@@ -855,24 +1524,29 @@ export function EmployeeLeaves() {
             "
           />
 
-          <p className="
-            text-sm
-            font-medium
-            text-navy-600
-          ">
+          <p
+            className="
+              text-sm
+              font-medium
+              text-navy-600
+            "
+          >
             No leave balances available
           </p>
 
-          <p className="
-            text-xs
-            text-navy-400
-            mt-1
-          ">
+          <p
+            className="
+              text-xs
+              text-navy-400
+              mt-1
+            "
+          >
             Your leave balances will appear
             here when they are assigned.
           </p>
         </div>
       )}
+
 
       {/*
       |--------------------------------------------------------------------------
@@ -881,22 +1555,27 @@ export function EmployeeLeaves() {
       */}
 
       <div className="mb-4">
-        <h2 className="
-          text-lg
-          font-semibold
-          text-navy-800
-        ">
+        <h2
+          className="
+            text-lg
+            font-semibold
+            text-navy-800
+          "
+        >
           Leave Requests
         </h2>
 
-        <p className="
-          text-sm
-          text-navy-500
-          mt-1
-        ">
+        <p
+          className="
+            text-sm
+            text-navy-500
+            mt-1
+          "
+        >
           Track your submitted leave requests
         </p>
       </div>
+
 
       {leaves.length === 0 ? (
         <EmptyState
@@ -910,6 +1589,7 @@ export function EmployeeLeaves() {
           data={leaves}
         />
       )}
+
 
       {/*
       |--------------------------------------------------------------------------
@@ -942,6 +1622,7 @@ export function EmployeeLeaves() {
   );
 }
 
+
 /*
 |--------------------------------------------------------------------------
 | Leave Form
@@ -955,14 +1636,18 @@ function LeaveForm({
   onSubmit,
   onCancel,
 }) {
-  const [form, setForm] = useState({
-    leaveTypeId: '',
-    startDate: '',
-    endDate: '',
-    reason: '',
-  });
+  const [form, setForm] =
+    useState({
+      leaveTypeId: '',
+      startDate: '',
+      endDate: '',
+      reason: '',
+    });
 
-  const [error, setError] = useState('');
+
+  const [error, setError] =
+    useState('');
+
 
   /*
   |--------------------------------------------------------------------------
@@ -978,6 +1663,7 @@ function LeaveForm({
       return 0;
     }
 
+
     const start = new Date(
       `${form.startDate}T00:00:00`
     );
@@ -986,20 +1672,28 @@ function LeaveForm({
       `${form.endDate}T00:00:00`
     );
 
+
     if (
-      Number.isNaN(start.getTime()) ||
-      Number.isNaN(end.getTime())
+      Number.isNaN(
+        start.getTime()
+      ) ||
+      Number.isNaN(
+        end.getTime()
+      )
     ) {
       return 0;
     }
+
 
     if (end < start) {
       return 0;
     }
 
+
     const difference =
       end.getTime() -
       start.getTime();
+
 
     return (
       Math.floor(
@@ -1009,8 +1703,10 @@ function LeaveForm({
     );
   };
 
+
   const requestedDays =
     calculateDays();
+
 
   /*
   |--------------------------------------------------------------------------
@@ -1022,10 +1718,15 @@ function LeaveForm({
     balances.find(
       (balance) =>
         String(
-          getLeaveTypeId(balance)
+          getLeaveTypeId(
+            balance
+          )
         ) ===
-        String(form.leaveTypeId)
+        String(
+          form.leaveTypeId
+        )
     );
+
 
   const availableDays =
     selectedBalance
@@ -1034,25 +1735,33 @@ function LeaveForm({
         )
       : null;
 
+
   /*
   |--------------------------------------------------------------------------
   | Change handler
   |--------------------------------------------------------------------------
   */
 
-  const handleChange = (event) => {
+  const handleChange = (
+    event
+  ) => {
     const {
       name,
       value,
     } = event.target;
 
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
+
+    setForm(
+      (previous) => ({
+        ...previous,
+        [name]: value,
+      })
+    );
+
 
     setError('');
   };
+
 
   /*
   |--------------------------------------------------------------------------
@@ -1060,67 +1769,95 @@ function LeaveForm({
   |--------------------------------------------------------------------------
   */
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit =
+    async (
+      event
+    ) => {
+      event.preventDefault();
 
-    setError('');
+      setError('');
 
-    if (!form.leaveTypeId) {
-      setError(
-        'Please select a leave type.'
+
+      if (
+        !form.leaveTypeId
+      ) {
+        setError(
+          'Please select a leave type.'
+        );
+
+        return;
+      }
+
+
+      if (
+        !form.startDate
+      ) {
+        setError(
+          'Please select a start date.'
+        );
+
+        return;
+      }
+
+
+      if (
+        !form.endDate
+      ) {
+        setError(
+          'Please select an end date.'
+        );
+
+        return;
+      }
+
+
+      if (
+        requestedDays <= 0
+      ) {
+        setError(
+          'End date must be on or after the start date.'
+        );
+
+        return;
+      }
+
+
+      /*
+       * Validate against current balance.
+       */
+      if (
+        availableDays !== null &&
+        requestedDays >
+          availableDays
+      ) {
+        setError(
+          `You only have ${availableDays} day${
+            availableDays === 1
+              ? ''
+              : 's'
+          } remaining for this leave type.`
+        );
+
+        return;
+      }
+
+
+      if (
+        !form.reason.trim()
+      ) {
+        setError(
+          'Please enter a reason for the leave.'
+        );
+
+        return;
+      }
+
+
+      await onSubmit(
+        form
       );
-      return;
-    }
+    };
 
-    if (!form.startDate) {
-      setError(
-        'Please select a start date.'
-      );
-      return;
-    }
-
-    if (!form.endDate) {
-      setError(
-        'Please select an end date.'
-      );
-      return;
-    }
-
-    if (requestedDays <= 0) {
-      setError(
-        'End date must be on or after the start date.'
-      );
-      return;
-    }
-
-    /*
-     * If a balance exists for this leave type,
-     * validate against the real backend balance.
-     */
-
-    if (
-      availableDays !== null &&
-      requestedDays > availableDays
-    ) {
-      setError(
-        `You only have ${availableDays} day${
-          availableDays === 1
-            ? ''
-            : 's'
-        } remaining for this leave type.`
-      );
-      return;
-    }
-
-    if (!form.reason.trim()) {
-      setError(
-        'Please enter a reason for the leave.'
-      );
-      return;
-    }
-
-    await onSubmit(form);
-  };
 
   /*
   |--------------------------------------------------------------------------
@@ -1130,7 +1867,9 @@ function LeaveForm({
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={
+        handleSubmit
+      }
       className="space-y-5"
     >
       {/*
@@ -1140,21 +1879,30 @@ function LeaveForm({
       */}
 
       <div>
-        <label className="
-          block
-          text-sm
-          font-medium
-          text-navy-700
-          mb-1.5
-        ">
+        <label
+          className="
+            block
+            text-sm
+            font-medium
+            text-navy-700
+            mb-1.5
+          "
+        >
           Leave Type
         </label>
 
+
         <select
           name="leaveTypeId"
-          value={form.leaveTypeId}
-          onChange={handleChange}
-          disabled={submitting}
+          value={
+            form.leaveTypeId
+          }
+          onChange={
+            handleChange
+          }
+          disabled={
+            submitting
+          }
           className="
             w-full
             rounded-lg
@@ -1174,34 +1922,42 @@ function LeaveForm({
             Select leave type
           </option>
 
-          {leaveTypes.map((type) => (
-            <option
-              key={
-                type.leaveTypeId ??
-                type.id
-              }
-              value={
-                type.leaveTypeId ??
-                type.id
-              }
-            >
-              {type.name ??
-                type.leaveTypeName ??
-                type.code ??
-                'Leave'}
-            </option>
-          ))}
+
+          {leaveTypes.map(
+            (type) => (
+              <option
+                key={
+                  type.leaveTypeId ??
+                  type.id
+                }
+                value={
+                  type.leaveTypeId ??
+                  type.id
+                }
+              >
+                {type.name ??
+                  type.leaveTypeName ??
+                  type.code ??
+                  'Leave'}
+              </option>
+            )
+          )}
         </select>
 
+
         {selectedBalance && (
-          <p className="
-            mt-1.5
-            text-xs
-            text-navy-500
-          ">
+          <p
+            className="
+              mt-1.5
+              text-xs
+              text-navy-500
+            "
+          >
             Available:{' '}
+
             <span className="font-semibold">
-              {availableDays} day
+              {availableDays}{' '}
+              day
               {availableDays === 1
                 ? ''
                 : 's'}
@@ -1210,35 +1966,47 @@ function LeaveForm({
         )}
       </div>
 
+
       {/*
       |--------------------------------------------------------------------------
       | Dates
       |--------------------------------------------------------------------------
       */}
 
-      <div className="
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        gap-4
-      ">
+      <div
+        className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          gap-4
+        "
+      >
         <div>
-          <label className="
-            block
-            text-sm
-            font-medium
-            text-navy-700
-            mb-1.5
-          ">
+          <label
+            className="
+              block
+              text-sm
+              font-medium
+              text-navy-700
+              mb-1.5
+            "
+          >
             Start Date
           </label>
+
 
           <input
             type="date"
             name="startDate"
-            value={form.startDate}
-            onChange={handleChange}
-            disabled={submitting}
+            value={
+              form.startDate
+            }
+            onChange={
+              handleChange
+            }
+            disabled={
+              submitting
+            }
             className="
               w-full
               rounded-lg
@@ -1256,24 +2024,37 @@ function LeaveForm({
           />
         </div>
 
+
         <div>
-          <label className="
-            block
-            text-sm
-            font-medium
-            text-navy-700
-            mb-1.5
-          ">
+          <label
+            className="
+              block
+              text-sm
+              font-medium
+              text-navy-700
+              mb-1.5
+            "
+          >
             End Date
           </label>
+
 
           <input
             type="date"
             name="endDate"
-            value={form.endDate}
-            min={form.startDate || undefined}
-            onChange={handleChange}
-            disabled={submitting}
+            value={
+              form.endDate
+            }
+            min={
+              form.startDate ||
+              undefined
+            }
+            onChange={
+              handleChange
+            }
+            disabled={
+              submitting
+            }
             className="
               w-full
               rounded-lg
@@ -1292,6 +2073,7 @@ function LeaveForm({
         </div>
       </div>
 
+
       {/*
       |--------------------------------------------------------------------------
       | Requested Days
@@ -1299,34 +2081,40 @@ function LeaveForm({
       */}
 
       {requestedDays > 0 && (
-        <div className="
-          flex
-          items-center
-          gap-3
-          rounded-lg
-          bg-navy-50
-          border border-navy-100
-          px-4
-          py-3
-        ">
+        <div
+          className="
+            flex
+            items-center
+            gap-3
+            rounded-lg
+            bg-navy-50
+            border border-navy-100
+            px-4
+            py-3
+          "
+        >
           <Clock3
             size={18}
             className="text-navy-600"
           />
 
           <div>
-            <p className="
-              text-xs
-              text-navy-500
-            ">
+            <p
+              className="
+                text-xs
+                text-navy-500
+              "
+            >
               Requested duration
             </p>
 
-            <p className="
-              text-sm
-              font-semibold
-              text-navy-800
-            ">
+            <p
+              className="
+                text-sm
+                font-semibold
+                text-navy-800
+              "
+            >
               {requestedDays} day
               {requestedDays === 1
                 ? ''
@@ -1336,6 +2124,7 @@ function LeaveForm({
         </div>
       )}
 
+
       {/*
       |--------------------------------------------------------------------------
       | Reason
@@ -1343,21 +2132,30 @@ function LeaveForm({
       */}
 
       <div>
-        <label className="
-          block
-          text-sm
-          font-medium
-          text-navy-700
-          mb-1.5
-        ">
+        <label
+          className="
+            block
+            text-sm
+            font-medium
+            text-navy-700
+            mb-1.5
+          "
+        >
           Reason
         </label>
 
+
         <textarea
           name="reason"
-          value={form.reason}
-          onChange={handleChange}
-          disabled={submitting}
+          value={
+            form.reason
+          }
+          onChange={
+            handleChange
+          }
+          disabled={
+            submitting
+          }
           rows={4}
           placeholder="Enter the reason for your leave..."
           className="
@@ -1378,6 +2176,7 @@ function LeaveForm({
         />
       </div>
 
+
       {/*
       |--------------------------------------------------------------------------
       | Error
@@ -1385,18 +2184,21 @@ function LeaveForm({
       */}
 
       {error && (
-        <div className="
-          rounded-lg
-          border border-red-200
-          bg-red-50
-          px-4
-          py-3
-          text-sm
-          text-red-700
-        ">
+        <div
+          className="
+            rounded-lg
+            border border-red-200
+            bg-red-50
+            px-4
+            py-3
+            text-sm
+            text-red-700
+          "
+        >
           {error}
         </div>
       )}
+
 
       {/*
       |--------------------------------------------------------------------------
@@ -1404,17 +2206,23 @@ function LeaveForm({
       |--------------------------------------------------------------------------
       */}
 
-      <div className="
-        flex
-        items-center
-        justify-end
-        gap-3
-        pt-2
-      ">
+      <div
+        className="
+          flex
+          items-center
+          justify-end
+          gap-3
+          pt-2
+        "
+      >
         <button
           type="button"
-          onClick={onCancel}
-          disabled={submitting}
+          onClick={
+            onCancel
+          }
+          disabled={
+            submitting
+          }
           className="
             px-4
             py-2.5
@@ -1432,9 +2240,12 @@ function LeaveForm({
           Cancel
         </button>
 
+
         <button
           type="submit"
-          disabled={submitting}
+          disabled={
+            submitting
+          }
           className="
             px-4
             py-2.5
@@ -1456,4 +2267,4 @@ function LeaveForm({
       </div>
     </form>
   );
-} 
+}

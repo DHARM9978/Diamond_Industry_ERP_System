@@ -319,6 +319,9 @@ exports.Prisma.LeaveRequestScalarFieldEnum = {
   status: 'status',
   approvedBy: 'approvedBy',
   approvedAt: 'approvedAt',
+  approvedStartDate: 'approvedStartDate',
+  approvedEndDate: 'approvedEndDate',
+  approvedDays: 'approvedDays',
   rejectionReason: 'rejectionReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

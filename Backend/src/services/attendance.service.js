@@ -155,6 +155,141 @@ const formatTimeValue = (timeValue) => {
 };
 
 
+// ======================================================
+// CONVERT REAL TIMESTAMP TO IST MYSQL TIME
+// ======================================================
+//
+// AttendancePunch.punchedAt is a real DateTime instant.
+// Attendance.checkInTime/checkOutTime are MySQL TIME values.
+// Convert the instant to the Indian clock and keep only HH:mm:ss.
+// ======================================================
+
+const createMySQLTimeFromIST = (dateValue) => {
+    if (!dateValue) {
+        return null;
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    const istDate = new Date(
+        date.getTime() + IST_OFFSET_MS
+    );
+
+    return new Date(
+        Date.UTC(
+            1970,
+            0,
+            1,
+            istDate.getUTCHours(),
+            istDate.getUTCMinutes(),
+            istDate.getUTCSeconds(),
+            0
+        )
+    );
+};
+
+
+// ======================================================
+// BUILD TODAY'S ATTENDANCE VIEW FROM RAW PUNCHES
+// ======================================================
+//
+// AttendancePunch.punchedAt is the source of truth.
+// If the last punch is IN, hours continue up to the current time.
+// Checkout stays null until an OUT punch is recorded.
+// ======================================================
+
+const buildTodayAttendanceFromPunches = (punches, now) => {
+    const groups = new Map();
+
+    for (const punch of punches) {
+        const key =
+            `${punch.employeeId}|${getISTDateString(punch.punchedAt)}`;
+
+        if (!groups.has(key)) {
+            groups.set(key, {
+                employeeId: punch.employeeId,
+                employee: punch.employee || null,
+                date: getStartOfDay(punch.punchedAt),
+                punches: []
+            });
+        }
+
+        groups.get(key).punches.push(punch);
+    }
+
+    const result = [];
+
+    for (const group of groups.values()) {
+        let firstIn = null;
+        let lastOut = null;
+        let openIn = null;
+        let totalMilliseconds = 0;
+
+        for (const punch of group.punches) {
+            if (punch.punchType === "IN") {
+                if (firstIn === null) {
+                    firstIn = new Date(punch.punchedAt);
+                }
+
+                if (openIn === null) {
+                    openIn = new Date(punch.punchedAt);
+                }
+            }
+            else if (punch.punchType === "OUT") {
+                lastOut = new Date(punch.punchedAt);
+
+                if (openIn !== null) {
+                    const duration =
+                        lastOut.getTime() - openIn.getTime();
+
+                    if (duration > 0) {
+                        totalMilliseconds += duration;
+                    }
+
+                    openIn = null;
+                }
+            }
+        }
+
+        // Still checked in: count time from the unmatched IN until now.
+        if (openIn !== null) {
+            const ongoingDuration =
+                now.getTime() - openIn.getTime();
+
+            if (ongoingDuration > 0) {
+                totalMilliseconds += ongoingDuration;
+            }
+        }
+
+        const totalHours =
+            totalMilliseconds /
+            (1000 * 60 * 60);
+
+        result.push({
+            employeeId: group.employeeId,
+            date: group.date,
+            checkInTime: firstIn
+                ? createMySQLTimeFromIST(firstIn)
+                : null,
+            checkOutTime: lastOut
+                ? createMySQLTimeFromIST(lastOut)
+                : null,
+            totalHours: totalHours > 0
+                ? Number(totalHours.toFixed(2))
+                : null,
+            status: "PRESENT",
+            employee: group.employee
+        });
+    }
+
+    return result;
+};
+
+
 const parseTime = (
     value,
     fieldName
@@ -876,12 +1011,16 @@ const processDevicePunch = async (data) => {
 
                                 checkInTime:
                                     punchType === "IN"
-                                        ? punchedAt
+                                        ? createMySQLTimeFromIST(
+                                            punchedAt
+                                        )
                                         : null,
 
                                 checkOutTime:
                                     punchType === "OUT"
-                                        ? punchedAt
+                                        ? createMySQLTimeFromIST(
+                                            punchedAt
+                                        )
                                         : null,
 
                                 totalHours:
@@ -916,7 +1055,9 @@ const processDevicePunch = async (data) => {
                                 firstInTime === null
                             ) {
                                 firstInTime =
-                                    currentPunch.punchedAt;
+                                    createMySQLTimeFromIST(
+                                        currentPunch.punchedAt
+                                    );
                             }
                         }
 
@@ -925,7 +1066,9 @@ const processDevicePunch = async (data) => {
                         ) {
 
                             lastOutTime =
-                                currentPunch.punchedAt;
+                                createMySQLTimeFromIST(
+                                    currentPunch.punchedAt
+                                );
                         }
                     }
 
@@ -1724,7 +1867,6 @@ const getAttendancePaginated = async (
         );
 
         error.statusCode = 400;
-
         throw error;
     }
 
@@ -1743,7 +1885,6 @@ const getAttendancePaginated = async (
         );
 
         error.statusCode = 400;
-
         throw error;
     }
 
@@ -1759,9 +1900,7 @@ const getAttendancePaginated = async (
         employeeId !== undefined &&
         employeeId !== ""
     ) {
-
-        const id =
-            Number(employeeId);
+        const id = Number(employeeId);
 
         if (
             !Number.isInteger(id) ||
@@ -1772,7 +1911,6 @@ const getAttendancePaginated = async (
             );
 
             error.statusCode = 400;
-
             throw error;
         }
 
@@ -1785,12 +1923,8 @@ const getAttendancePaginated = async (
     // ==============================================
 
     if (date) {
-
         const selectedDate =
-            new Date(
-                `${date}T00:00:00`
-            );
-
+            new Date(`${date}T00:00:00`);
 
         if (
             Number.isNaN(
@@ -1802,39 +1936,22 @@ const getAttendancePaginated = async (
             );
 
             error.statusCode = 400;
-
             throw error;
         }
 
-
         where.date = {
             gte:
-                getStartOfDay(
-                    selectedDate
-                ),
-
+                getStartOfDay(selectedDate),
             lt:
-                getEndOfDay(
-                    selectedDate
-                )
+                getEndOfDay(selectedDate)
         };
     }
-
-    else if (
-        from ||
-        to
-    ) {
-
+    else if (from || to) {
         where.date = {};
 
-
         if (from) {
-
             const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
+                new Date(`${from}T00:00:00`);
 
             if (
                 Number.isNaN(
@@ -1846,25 +1963,16 @@ const getAttendancePaginated = async (
                 );
 
                 error.statusCode = 400;
-
                 throw error;
             }
 
-
             where.date.gte =
-                getStartOfDay(
-                    fromDate
-                );
+                getStartOfDay(fromDate);
         }
 
-
         if (to) {
-
             const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
+                new Date(`${to}T00:00:00`);
 
             if (
                 Number.isNaN(
@@ -1876,40 +1984,74 @@ const getAttendancePaginated = async (
                 );
 
                 error.statusCode = 400;
-
                 throw error;
             }
 
-
             where.date.lt =
-                getEndOfDay(
-                    toDate
-                );
+                getEndOfDay(toDate);
         }
     }
 
 
-    // ==============================================
-    // PAGINATION
-    // ==============================================
-
     const skip =
-        (parsedPage - 1) *
-        parsedLimit;
+        (parsedPage - 1) * parsedLimit;
 
 
     // ==============================================
-    // QUERY
+    // LOAD STORED ATTENDANCE
     // ==============================================
 
-    const [
-        attendance,
-        total
-    ] =
-        await prisma.$transaction([
+    const attendance =
+        await prisma.attendance.findMany({
+            where,
 
-            prisma.attendance.findMany({
-                where,
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
+                }
+            }
+        });
+
+
+    // ==============================================
+    // LOAD TODAY'S RAW PUNCHES
+    // ==============================================
+    //
+    // When no historical date filter is selected, include today's
+    // punches so the Attendance page behaves like a current-day view.
+    // ==============================================
+
+    const now = new Date();
+    const todayStart = getStartOfDay(now);
+    const todayEnd = getEndOfDay(now);
+
+    const includeToday =
+        !date &&
+        !from &&
+        !to;
+
+    const todayPunches =
+        includeToday
+            ? await prisma.attendancePunch.findMany({
+                where: {
+                    punchedAt: {
+                        gte: todayStart,
+                        lte: todayEnd
+                    },
+
+                    ...(employeeId !== undefined &&
+                    employeeId !== ""
+                        ? {
+                            employeeId: Number(employeeId)
+                        }
+                        : {})
+                },
 
                 include: {
                     employee: {
@@ -1923,27 +2065,126 @@ const getAttendancePaginated = async (
                     }
                 },
 
-                orderBy: [
-                    {
-                        date: "desc"
-                    },
-
-                    {
-                        employeeId: "asc"
-                    }
-                ],
-
-                skip,
-
-                take:
-                    parsedLimit
-            }),
-
-
-            prisma.attendance.count({
-                where
+                orderBy: {
+                    punchedAt: "asc"
+                }
             })
-        ]);
+            : [];
+
+
+    const todayViews =
+        buildTodayAttendanceFromPunches(
+            todayPunches,
+            now
+        );
+
+
+    // ==============================================
+    // MERGE TODAY'S RAW DATA INTO ATTENDANCE DATA
+    // ==============================================
+
+    const merged = new Map();
+
+
+    for (const record of attendance) {
+        const key =
+            `${record.employeeId}|${getISTDateString(
+                record.date
+            )}`;
+
+        merged.set(key, record);
+    }
+
+
+    for (const todayView of todayViews) {
+        const key =
+            `${todayView.employeeId}|${getISTDateString(
+                todayView.date
+            )}`;
+
+        const existing = merged.get(key);
+
+        if (existing) {
+            merged.set(key, {
+                ...existing,
+                checkInTime:
+                    todayView.checkInTime,
+                checkOutTime:
+                    todayView.checkOutTime,
+                totalHours:
+                    todayView.totalHours,
+                status: "PRESENT",
+                employee:
+                    existing.employee ||
+                    todayView.employee
+            });
+        }
+        else {
+            // Defensive fallback: a raw IN punch must be visible even
+            // when its summary Attendance row has not been created.
+            merged.set(key, {
+                attendanceId: null,
+                employeeId:
+                    todayView.employeeId,
+                date:
+                    todayView.date,
+                checkInTime:
+                    todayView.checkInTime,
+                checkOutTime:
+                    todayView.checkOutTime,
+                totalHours:
+                    todayView.totalHours,
+                status:
+                    "PRESENT",
+                createdAt:
+                    now,
+                updatedAt:
+                    now,
+                employee:
+                    todayView.employee
+            });
+        }
+    }
+
+
+    // ==============================================
+    // SORT ALL RECORDS
+    // ==============================================
+
+    const mergedAttendance =
+        Array.from(merged.values()).sort(
+            (a, b) => {
+                const aTime =
+                    new Date(a.date).getTime();
+
+                const bTime =
+                    new Date(b.date).getTime();
+
+                if (aTime !== bTime) {
+                    return bTime - aTime;
+                }
+
+                return (
+                    Number(a.employeeId) -
+                    Number(b.employeeId)
+                );
+            }
+        );
+
+
+    const total =
+        mergedAttendance.length;
+
+
+    // ==============================================
+    // PAGINATION
+    // ==============================================
+
+    const pagedAttendance =
+        mergedAttendance.slice(
+            skip,
+            skip + parsedLimit
+        );
 
 
     // ==============================================
@@ -1951,14 +2192,10 @@ const getAttendancePaginated = async (
     // ==============================================
 
     const serializedAttendance =
-        attendance.map(
+        pagedAttendance.map(
             serializeAttendance
         );
 
-
-    // ==============================================
-    // PAGINATION INFO
-    // ==============================================
 
     const totalPages =
         Math.ceil(
@@ -1983,8 +2220,7 @@ const getAttendancePaginated = async (
             totalPages,
 
             hasNextPage:
-                parsedPage <
-                totalPages,
+                parsedPage < totalPages,
 
             hasPreviousPage:
                 parsedPage > 1

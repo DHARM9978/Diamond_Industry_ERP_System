@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Admin {
-  adminId          Int              @id @default(autoincrement()) @map("admin_id")
-  adminName        String           @map("admin_name") @db.VarChar(100)
-  email            String           @unique @db.VarChar(150)
-  phone            String?          @db.VarChar(20)
-  passwordHash     String           @map("password_hash") @db.Text
-  companyId        Int
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
+  adminId      Int      @id @default(autoincrement()) @map("admin_id")
+  adminName    String   @map("admin_name") @db.VarChar(100)
+  email        String   @unique @db.VarChar(150)
+  phone        String?  @db.VarChar(20)
+  passwordHash String   @map("password_hash") @db.Text
+  companyId    Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
   company          companies        @relation(fields: [companyId], references: [company_id])
   approvedAdvances AdvancePayment[] @relation("ApprovedAdvances")
 
@@ -24,12 +25,13 @@ model Admin {
 }
 
 model Branch {
-  branchId    Int          @id @default(autoincrement()) @map("branch_id")
-  branchName  String       @map("branch_name") @db.VarChar(100)
-  location    String       @db.VarChar(150)
-  companyId   Int
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
+  branchId   Int      @id @default(autoincrement()) @map("branch_id")
+  branchName String   @map("branch_name") @db.VarChar(100)
+  location   String   @db.VarChar(150)
+  companyId  Int
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
   company     companies    @relation(fields: [companyId], references: [company_id])
   departments Department[]
   employees   Employee[]
@@ -40,17 +42,18 @@ model Branch {
 }
 
 model Department {
-  departmentId   Int        @id @default(autoincrement()) @map("department_id")
-  departmentName String     @map("department_name") @db.VarChar(100)
+  departmentId   Int      @id @default(autoincrement()) @map("department_id")
+  departmentName String   @map("department_name") @db.VarChar(100)
   branchId       Int
   companyId      Int
   managerId      Int?
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
-  branch         Branch     @relation(fields: [branchId], references: [branchId])
-  company        companies  @relation(fields: [companyId], references: [company_id])
-  manager        Employee?  @relation("DepartmentManager", fields: [managerId], references: [employeeId])
-  employees      Employee[] @relation("EmployeeDepartment")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  branch    Branch     @relation(fields: [branchId], references: [branchId])
+  company   companies  @relation(fields: [companyId], references: [company_id])
+  manager   Employee?  @relation("DepartmentManager", fields: [managerId], references: [employeeId])
+  employees Employee[] @relation("EmployeeDepartment")
 
   @@index([branchId])
   @@index([companyId])
@@ -59,38 +62,43 @@ model Department {
 }
 
 model Employee {
-  employeeId             Int                     @id @default(autoincrement()) @map("employee_id")
-  firstName              String                  @map("first_name") @db.VarChar(100)
-  lastName               String                  @map("last_name") @db.VarChar(100)
-  gender                 String?                 @db.VarChar(20)
-  email                  String                  @unique @db.VarChar(150)
-  phone                  String?                 @db.VarChar(20)
-  hireDate               DateTime?               @map("hire_date") @db.Date
-  role                   String                  @db.VarChar(30)
-  salaryRatePerHour      Decimal?                @map("salary_rate_per_hour") @db.Decimal(10, 2)
-  companyId              Int
-  branchId               Int
-  departmentId           Int?
-  managerId              Int?
-  status                 String                  @db.VarChar(20)
-  passwordHash           String                  @map("password_hash") @db.Text
-  createdAt              DateTime                @default(now()) @map("created_at")
-  updatedAt              DateTime                @updatedAt @map("updated_at")
-  activityLogs           ActivityLog[]
-  advancePayments        AdvancePayment[]        @relation("EmployeeAdvances")
-  attendance             Attendance[]
-  attendancePunches      AttendancePunch[]
-  managedDepartments     Department[]            @relation("DepartmentManager")
-  branch                 Branch                  @relation(fields: [branchId], references: [branchId])
-  company                companies               @relation(fields: [companyId], references: [company_id])
-  department             Department?             @relation("EmployeeDepartment", fields: [departmentId], references: [departmentId])
-  manager                Employee?               @relation("EmployeeManager", fields: [managerId], references: [employeeId])
-  subordinates           Employee[]              @relation("EmployeeManager")
-  fingerprintTemplates   FingerprintTemplate[]
+  employeeId        Int       @id @default(autoincrement()) @map("employee_id")
+  firstName         String    @map("first_name") @db.VarChar(100)
+  lastName          String    @map("last_name") @db.VarChar(100)
+  gender            String?   @db.VarChar(20)
+  email             String    @unique @db.VarChar(150)
+  phone             String?   @db.VarChar(20)
+  hireDate          DateTime? @map("hire_date") @db.Date
+  role              String    @db.VarChar(30)
+  salaryRatePerHour Decimal?  @map("salary_rate_per_hour") @db.Decimal(10, 2)
+  companyId         Int
+  branchId          Int
+  departmentId      Int?
+  managerId         Int?
+  status            String    @db.VarChar(20)
+  passwordHash      String    @map("password_hash") @db.Text
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  activityLogs       ActivityLog[]
+  advancePayments    AdvancePayment[]  @relation("EmployeeAdvances")
+  attendance         Attendance[]
+  attendancePunches  AttendancePunch[]
+  managedDepartments Department[]      @relation("DepartmentManager")
+
+  branch       Branch      @relation(fields: [branchId], references: [branchId])
+  company      companies   @relation(fields: [companyId], references: [company_id])
+  department   Department? @relation("EmployeeDepartment", fields: [departmentId], references: [departmentId])
+  manager      Employee?   @relation("EmployeeManager", fields: [managerId], references: [employeeId])
+  subordinates Employee[]  @relation("EmployeeManager")
+
   fingerprintEnrollments FingerprintEnrollment[]
-  leaveBalances          LeaveBalance[]
-  leaveRequests          LeaveRequest[]
-  payrolls               Payroll[]
+  fingerprintTemplates   FingerprintTemplate[]
+
+  leaveBalances LeaveBalance[]
+  leaveRequests LeaveRequest[]
+
+  payrolls Payroll[]
 
   @@index([companyId])
   @@index([branchId])
@@ -100,21 +108,23 @@ model Employee {
 }
 
 model IotDevice {
-  deviceId          Int               @id @default(autoincrement()) @map("device_id")
-  deviceCode        String            @unique @map("device_code") @db.VarChar(50)
-  deviceName        String            @map("device_name") @db.VarChar(100)
-  branchId          Int
-  companyId         Int
-  location          String?           @db.VarChar(150)
-  status            String            @db.VarChar(20)
-  lastSeenAt        DateTime?         @map("last_seen_at")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
-  deviceSecretHash  String?           @map("device_secret_hash") @db.VarChar(255)
+  deviceId         Int       @id @default(autoincrement()) @map("device_id")
+  deviceCode       String    @unique @map("device_code") @db.VarChar(50)
+  deviceName       String    @map("device_name") @db.VarChar(100)
+  branchId         Int
+  companyId        Int
+  location         String?   @db.VarChar(150)
+  status           String    @db.VarChar(20)
+  lastSeenAt       DateTime? @map("last_seen_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deviceSecretHash String?   @map("device_secret_hash") @db.VarChar(255)
+
   attendancePunches AttendancePunch[]
   deviceLogs        DeviceLog[]
-  branch            Branch            @relation(fields: [branchId], references: [branchId])
-  company           companies         @relation(fields: [companyId], references: [company_id])
+
+  branch  Branch    @relation(fields: [branchId], references: [branchId])
+  company companies @relation(fields: [companyId], references: [company_id])
 
   @@index([branchId])
   @@index([companyId])
@@ -130,22 +140,24 @@ model FingerprintTemplate {
   enrolledAt DateTime @map("enrolled_at")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-  employee   Employee @relation(fields: [employeeId], references: [employeeId])
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
 
   @@index([employeeId])
   @@map("fingerprint_templates")
 }
 
 model AttendancePunch {
-  punchId    BigInt    @id @default(autoincrement()) @map("punch_id")
+  punchId    BigInt   @id @default(autoincrement()) @map("punch_id")
   employeeId Int
   deviceId   Int
-  sensorSlot Int       @map("sensor_slot")
-  punchType  String    @map("punch_type") @db.VarChar(10)
-  punchedAt  DateTime  @map("punched_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  device     IotDevice @relation(fields: [deviceId], references: [deviceId])
-  employee   Employee  @relation(fields: [employeeId], references: [employeeId])
+  sensorSlot Int      @map("sensor_slot")
+  punchType  String   @map("punch_type") @db.VarChar(10)
+  punchedAt  DateTime @map("punched_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  device   IotDevice @relation(fields: [deviceId], references: [deviceId])
+  employee Employee  @relation(fields: [employeeId], references: [employeeId])
 
   @@index([employeeId])
   @@index([deviceId])
@@ -164,7 +176,8 @@ model Attendance {
   status       String    @db.VarChar(20)
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
-  employee     Employee  @relation(fields: [employeeId], references: [employeeId])
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
 
   @@unique([employeeId, date])
   @@index([employeeId])
@@ -173,12 +186,13 @@ model Attendance {
 }
 
 model DeviceLog {
-  logId     BigInt    @id @default(autoincrement()) @map("log_id")
+  logId     BigInt   @id @default(autoincrement()) @map("log_id")
   deviceId  Int
-  eventType String    @map("event_type") @db.VarChar(50)
-  message   String?   @db.Text
-  createdAt DateTime  @default(now()) @map("created_at")
-  device    IotDevice @relation(fields: [deviceId], references: [deviceId])
+  eventType String   @map("event_type") @db.VarChar(50)
+  message   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  device IotDevice @relation(fields: [deviceId], references: [deviceId])
 
   @@index([deviceId])
   @@index([eventType])
@@ -198,9 +212,10 @@ model AdvancePayment {
   updatedAt           DateTime  @updatedAt @map("updated_at")
   deductedAt          DateTime? @map("deducted_at")
   deductedInPayrollId Int?      @unique @map("deducted_in_payroll_id")
-  approver            Admin?    @relation("ApprovedAdvances", fields: [approvedBy], references: [adminId])
-  deductedInPayroll   Payroll?  @relation("AdvancePayroll", fields: [deductedInPayrollId], references: [payrollId])
-  employee            Employee  @relation("EmployeeAdvances", fields: [employeeId], references: [employeeId])
+
+  approver          Admin?   @relation("ApprovedAdvances", fields: [approvedBy], references: [adminId])
+  deductedInPayroll Payroll? @relation("AdvancePayroll", fields: [deductedInPayrollId], references: [payrollId])
+  employee          Employee @relation("EmployeeAdvances", fields: [employeeId], references: [employeeId])
 
   @@index([employeeId])
   @@index([approvedBy])
@@ -208,17 +223,18 @@ model AdvancePayment {
 }
 
 model Payroll {
-  payrollId              Int             @id @default(autoincrement()) @map("payroll_id")
-  employeeId             Int
-  payPeriodStart         DateTime        @map("pay_period_start") @db.Date
-  payPeriodEnd           DateTime        @map("pay_period_end") @db.Date
-  totalWorkingHours      Decimal         @map("total_working_hours") @db.Decimal(8, 2)
-  basicSalary            Decimal         @map("basic_salary") @db.Decimal(12, 2)
-  advanceDeduction       Decimal         @default(0.00) @map("advance_deduction") @db.Decimal(12, 2)
-  netSalary              Decimal         @map("net_salary") @db.Decimal(12, 2)
-  paymentDate            DateTime?       @map("payment_date") @db.Date
-  createdAt              DateTime        @default(now()) @map("created_at")
-  updatedAt              DateTime        @updatedAt @map("updated_at")
+  payrollId         Int       @id @default(autoincrement()) @map("payroll_id")
+  employeeId        Int
+  payPeriodStart    DateTime  @map("pay_period_start") @db.Date
+  payPeriodEnd      DateTime  @map("pay_period_end") @db.Date
+  totalWorkingHours Decimal   @map("total_working_hours") @db.Decimal(8, 2)
+  basicSalary       Decimal   @map("basic_salary") @db.Decimal(12, 2)
+  advanceDeduction  Decimal   @default(0.00) @map("advance_deduction") @db.Decimal(12, 2)
+  netSalary         Decimal   @map("net_salary") @db.Decimal(12, 2)
+  paymentDate       DateTime? @map("payment_date") @db.Date
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
   advanceDeductionRecord AdvancePayment? @relation("AdvancePayroll")
   employee               Employee        @relation(fields: [employeeId], references: [employeeId])
 
@@ -228,12 +244,13 @@ model Payroll {
 }
 
 model ActivityLog {
-  logId       BigInt    @id @default(autoincrement()) @map("log_id")
+  logId       BigInt   @id @default(autoincrement()) @map("log_id")
   employeeId  Int?
-  actionType  String    @map("action_type") @db.VarChar(50)
-  description String?   @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at")
-  employee    Employee? @relation(fields: [employeeId], references: [employeeId])
+  actionType  String   @map("action_type") @db.VarChar(50)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  employee Employee? @relation(fields: [employeeId], references: [employeeId])
 
   @@index([employeeId])
   @@index([actionType])
@@ -242,13 +259,14 @@ model ActivityLog {
 }
 
 model Setting {
-  settingId Int       @id @default(autoincrement()) @map("setting_id")
+  settingId Int      @id @default(autoincrement()) @map("setting_id")
   companyId Int
-  key       String    @db.VarChar(100)
-  value     String?   @db.Text
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  company   companies @relation(fields: [companyId], references: [company_id])
+  key       String   @db.VarChar(100)
+  value     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company companies @relation(fields: [companyId], references: [company_id])
 
   @@unique([companyId, key])
   @@index([companyId])
@@ -256,39 +274,41 @@ model Setting {
 }
 
 model companies {
-  company_id    Int          @id @default(autoincrement())
-  company_name  String       @db.VarChar(150)
-  address       String?      @db.Text
-  contact_email String?      @db.VarChar(150)
-  contact_phone String?      @db.VarChar(20)
-  created_at    DateTime     @default(now())
+  company_id    Int      @id @default(autoincrement())
+  company_name  String   @db.VarChar(150)
+  address       String?  @db.Text
+  contact_email String?  @db.VarChar(150)
+  contact_phone String?  @db.VarChar(20)
+  created_at    DateTime @default(now())
   updated_at    DateTime
-  admins        Admin[]
-  branches      Branch[]
-  departments   Department[]
-  employees     Employee[]
-  devices       IotDevice[]
-  leaveTypes    LeaveType[]
-  settings      Setting[]
+
+  admins      Admin[]
+  branches    Branch[]
+  departments Department[]
+  employees   Employee[]
+  devices     IotDevice[]
+  leaveTypes  LeaveType[]
+  settings    Setting[]
 }
 
 model LeaveType {
-  leaveTypeId       Int            @id @default(autoincrement()) @map("leave_type_id")
-  companyId         Int            @map("company_id")
-  name              String         @db.VarChar(100)
-  code              String         @db.VarChar(30)
-  description       String?        @db.Text
-  annualQuota       Decimal?       @map("annual_quota") @db.Decimal(6, 2)
-  isPaid            Boolean        @default(true) @map("is_paid")
-  requiresApproval  Boolean        @default(true) @map("requires_approval")
-  allowHalfDay      Boolean        @default(true) @map("allow_half_day")
-  allowCarryForward Boolean        @default(false) @map("allow_carry_forward")
-  status            String         @default("ACTIVE") @db.VarChar(20)
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
-  balances          LeaveBalance[]
-  requests          LeaveRequest[]
-  company           companies      @relation(fields: [companyId], references: [company_id])
+  leaveTypeId       Int      @id @default(autoincrement()) @map("leave_type_id")
+  companyId         Int      @map("company_id")
+  name              String   @db.VarChar(100)
+  code              String   @db.VarChar(30)
+  description       String?  @db.Text
+  annualQuota       Decimal? @map("annual_quota") @db.Decimal(6, 2)
+  isPaid            Boolean  @default(true) @map("is_paid")
+  requiresApproval  Boolean  @default(true) @map("requires_approval")
+  allowHalfDay      Boolean  @default(true) @map("allow_half_day")
+  allowCarryForward Boolean  @default(false) @map("allow_carry_forward")
+  status            String   @default("ACTIVE") @db.VarChar(20)
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  balances LeaveBalance[]
+  requests LeaveRequest[]
+  company  companies      @relation(fields: [companyId], references: [company_id])
 
   @@unique([companyId, code])
   @@unique([companyId, name])
@@ -298,17 +318,18 @@ model LeaveType {
 }
 
 model LeaveBalance {
-  leaveBalanceId Int       @id @default(autoincrement()) @map("leave_balance_id")
-  employeeId     Int       @map("employee_id")
-  leaveTypeId    Int       @map("leave_type_id")
+  leaveBalanceId Int      @id @default(autoincrement()) @map("leave_balance_id")
+  employeeId     Int      @map("employee_id")
+  leaveTypeId    Int      @map("leave_type_id")
   year           Int
-  allocated      Decimal   @default(0.00) @db.Decimal(6, 2)
-  used           Decimal   @default(0.00) @db.Decimal(6, 2)
-  remaining      Decimal   @default(0.00) @db.Decimal(6, 2)
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
-  employee       Employee  @relation(fields: [employeeId], references: [employeeId])
-  leaveType      LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
+  allocated      Decimal  @default(0.00) @db.Decimal(6, 2)
+  used           Decimal  @default(0.00) @db.Decimal(6, 2)
+  remaining      Decimal  @default(0.00) @db.Decimal(6, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  employee  Employee  @relation(fields: [employeeId], references: [employeeId])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
 
   @@unique([employeeId, leaveTypeId, year])
   @@index([employeeId])
@@ -318,26 +339,46 @@ model LeaveBalance {
 }
 
 model LeaveRequest {
-  leaveRequestId  Int       @id @default(autoincrement()) @map("leave_request_id")
-  employeeId      Int       @map("employee_id")
-  leaveTypeId     Int       @map("leave_type_id")
-  startDate       DateTime  @map("start_date") @db.Date
-  endDate         DateTime  @map("end_date") @db.Date
-  totalDays       Decimal   @map("total_days") @db.Decimal(6, 2)
-  reason          String?   @db.Text
-  status          String    @default("PENDING") @db.VarChar(20)
-  approvedBy      Int?      @map("approved_by")
-  approvedAt      DateTime? @map("approved_at")
-  rejectionReason String?   @map("rejection_reason") @db.Text
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  employee        Employee  @relation(fields: [employeeId], references: [employeeId])
-  leaveType       LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
+  leaveRequestId Int @id @default(autoincrement()) @map("leave_request_id")
+  employeeId     Int @map("employee_id")
+  leaveTypeId    Int @map("leave_type_id")
+
+  // Original leave request dates
+  startDate DateTime @map("start_date") @db.Date
+  endDate   DateTime @map("end_date") @db.Date
+  totalDays Decimal  @map("total_days") @db.Decimal(6, 2)
+
+  // Employee's reason
+  reason String? @db.Text
+
+  // Request status
+  status String @default("PENDING") @db.VarChar(20)
+
+  // Approval information
+  approvedBy Int?      @map("approved_by")
+  approvedAt DateTime? @map("approved_at")
+
+  // Approved leave period.
+  // These can be different from startDate/endDate when admin
+  // approves only part of the requested leave.
+  approvedStartDate DateTime? @map("approved_start_date") @db.Date
+  approvedEndDate   DateTime? @map("approved_end_date") @db.Date
+  approvedDays      Decimal?  @map("approved_days") @db.Decimal(6, 2)
+
+  // Rejection information
+  rejectionReason String? @map("rejection_reason") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employee  Employee  @relation(fields: [employeeId], references: [employeeId])
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [leaveTypeId])
 
   @@index([employeeId])
   @@index([leaveTypeId])
   @@index([status])
   @@index([startDate, endDate])
+  @@index([approvedStartDate, approvedEndDate])
   @@map("leave_requests")
 }
 

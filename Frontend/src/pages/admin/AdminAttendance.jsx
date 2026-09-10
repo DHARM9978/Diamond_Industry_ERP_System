@@ -1,7 +1,7 @@
 import {
-  useState,
   useEffect,
   useMemo,
+  useState,
 } from 'react';
 
 import {
@@ -17,13 +17,9 @@ import {
 
 import { StatusBadge } from '@/components/ui/Badge';
 
-import {
-  FullPageSpinner,
-} from '@/components/ui/Spinner';
+import { FullPageSpinner } from '@/components/ui/Spinner';
 
-import {
-  EmptyState,
-} from '@/components/ui/EmptyState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 import {
   SearchInput,
@@ -41,92 +37,49 @@ import {
 
 export function AdminAttendance() {
 
-  const [records, setRecords] =
-    useState([]);
+  const [records, setRecords] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [refreshing, setRefreshing] =
-    useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [search, setSearch] =
-    useState('');
+  const [search, setSearch] = useState('');
 
-  const [statusFilter, setStatusFilter] =
-    useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const [dateFilter, setDateFilter] =
-    useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
 
   // ============================================================
   // FORMAT DATE
   // ============================================================
-  //
-  // Backend now returns:
-  //
-  // YYYY-MM-DD
-  //
-  // Therefore we DO NOT use:
-  //
-  // new Date(dateString)
-  //
-  // because that can introduce timezone shifts.
-  // ============================================================
 
   const formatDate = (dateValue) => {
-
     if (!dateValue) {
       return '--';
     }
 
-
-    // Backend format:
-    // YYYY-MM-DD
-
+    // Backend format: YYYY-MM-DD.
     if (
       typeof dateValue === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test(
-        dateValue
-      )
+      /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
     ) {
-
-      const [
-        year,
-        month,
-        day
-      ] =
-        dateValue.split('-');
-
+      const [year, month, day] = dateValue.split('-');
 
       return `${day}/${month}/${year}`;
     }
 
+    const date = new Date(dateValue);
 
-    // Fallback for old API data
-
-    const date =
-      new Date(dateValue);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
+    if (Number.isNaN(date.getTime())) {
       return '--';
     }
 
-
-    return date.toLocaleDateString(
-      'en-GB',
-      {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }
-    );
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
   };
 
 
@@ -134,41 +87,22 @@ export function AdminAttendance() {
   // FORMAT TIME
   // ============================================================
   //
-  // Backend now returns:
-  //
-  // HH:mm:ss
-  //
-  // We treat it as a CLOCK TIME, not a DateTime.
+  // The backend returns clock values as HH:mm:ss.
+  // A missing checkout is rendered as --.
   // ============================================================
 
   const formatTime = (timeValue) => {
-
     if (!timeValue) {
       return '--';
     }
 
-
-    // ==========================================
-    // New API format
-    // HH:mm:ss
-    // ==========================================
-
     if (
       typeof timeValue === 'string' &&
-      /^\d{2}:\d{2}(:\d{2})?$/.test(
-        timeValue
-      )
+      /^\d{2}:\d{2}(:\d{2})?$/.test(timeValue)
     ) {
-
-      const parts =
-        timeValue.split(':');
-
-      const hours =
-        Number(parts[0]);
-
-      const minutes =
-        Number(parts[1]);
-
+      const [hours, minutes] = timeValue
+        .split(':')
+        .map(Number);
 
       if (
         Number.isNaN(hours) ||
@@ -177,54 +111,28 @@ export function AdminAttendance() {
         return '--';
       }
 
+      const date = new Date();
 
-      const date =
-        new Date();
+      date.setHours(hours, minutes, 0, 0);
 
-      date.setHours(
-        hours,
-        minutes,
-        0,
-        0
-      );
-
-
-      return date.toLocaleTimeString(
-        'en-IN',
-        {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true,
-        }
-      );
-    }
-
-
-    // ==========================================
-    // Fallback for old API response
-    // ==========================================
-
-    const date =
-      new Date(timeValue);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return '--';
-    }
-
-
-    return date.toLocaleTimeString(
-      'en-IN',
-      {
+      return date.toLocaleTimeString('en-IN', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
-      }
-    );
+      });
+    }
+
+    const date = new Date(timeValue);
+
+    if (Number.isNaN(date.getTime())) {
+      return '--';
+    }
+
+    return date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
   };
 
 
@@ -232,55 +140,27 @@ export function AdminAttendance() {
   // DATE FILTER VALUE
   // ============================================================
 
-  const getDateForFilter = (
-    dateValue
-  ) => {
-
+  const getDateForFilter = (dateValue) => {
     if (!dateValue) {
       return '';
     }
 
-
-    // New backend format
-
     if (
       typeof dateValue === 'string' &&
-      /^\d{4}-\d{2}-\d{2}$/.test(
-        dateValue
-      )
+      /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
     ) {
       return dateValue;
     }
 
+    const date = new Date(dateValue);
 
-    // Fallback
-
-    const date =
-      new Date(dateValue);
-
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
+    if (Number.isNaN(date.getTime())) {
       return '';
     }
 
-
-    const year =
-      date.getFullYear();
-
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, '0');
-
-    const day =
-      String(
-        date.getDate()
-      ).padStart(2, '0');
-
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
   };
@@ -289,142 +169,152 @@ export function AdminAttendance() {
   // ============================================================
   // LOAD ATTENDANCE
   // ============================================================
+  //
+  // The backend now includes today's raw punch state in the
+  // attendance response. That gives us:
+  //
+  //   IN punch only  -> check-in shown, check-out = --,
+  //                    hours calculated up to current time.
+  //
+  //   IN + OUT       -> both times shown, completed hours shown.
+  //
+  // The polling below makes a newly scanned attendance record
+  // appear automatically without a manual page refresh.
+  // ============================================================
 
   const loadAttendance = async (
-    showRefresh = false
+    showRefresh = false,
+    showPageLoading = false
   ) => {
-
     try {
-
       if (showRefresh) {
         setRefreshing(true);
-      } else {
+      }
+
+      if (showPageLoading) {
         setLoading(true);
       }
 
-
-      const response =
-        await attendanceService.list();
-
+      const response = await attendanceService.list();
 
       console.log(
         'Attendance API response:',
         response
       );
 
-
-      // ========================================================
-      // EXTRACT DATA
-      // ========================================================
-
       const apiData =
         Array.isArray(response)
           ? response
-          : Array.isArray(
-              response?.data
-            )
+          : Array.isArray(response?.data)
             ? response.data
             : [];
 
+      const normalizedRecords = apiData.map((record) => {
+        const firstName =
+          record.employee?.firstName || '';
 
-      // ========================================================
-      // NORMALIZE
-      // ========================================================
+        const lastName =
+          record.employee?.lastName || '';
 
-      const normalizedRecords =
-        apiData.map(
-          (record) => {
+        const employeeName =
+          `${firstName} ${lastName}`.trim();
 
-            const firstName =
-              record.employee?.firstName ||
-              '';
+        return {
+          attendanceId:
+            record.attendanceId,
 
-            const lastName =
-              record.employee?.lastName ||
-              '';
+          employeeId:
+            record.employeeId,
 
-            const employeeName =
-              `${firstName} ${lastName}`
-                .trim();
+          employeeName:
+            employeeName ||
+            `Employee ${record.employeeId}`,
 
+          employeeEmail:
+            record.employee?.email || '',
 
-            return {
-              attendanceId:
-                record.attendanceId,
+          employeeStatus:
+            record.employee?.status || '',
 
-              employeeId:
-                record.employeeId,
+          date:
+            record.date,
 
-              employeeName:
-                employeeName ||
-                `Employee ${record.employeeId}`,
+          checkInTime:
+            record.checkInTime || null,
 
-              employeeEmail:
-                record.employee?.email ||
-                '',
+          checkOutTime:
+            record.checkOutTime || null,
 
-              employeeStatus:
-                record.employee?.status ||
-                '',
+          totalHours:
+            record.totalHours !== null &&
+            record.totalHours !== undefined
+              ? Number(record.totalHours)
+              : null,
 
-              date:
-                record.date,
+          status:
+            record.status,
 
-              checkInTime:
-                record.checkInTime,
+          createdAt:
+            record.createdAt,
 
-              checkOutTime:
-                record.checkOutTime,
+          updatedAt:
+            record.updatedAt,
+        };
+      });
 
-              totalHours:
-                record.totalHours,
-
-              status:
-                record.status,
-
-              createdAt:
-                record.createdAt,
-
-              updatedAt:
-                record.updatedAt,
-            };
-          }
-        );
-
-
-      console.log(
-        'Normalized attendance records:',
-        normalizedRecords
-      );
-
-
-      setRecords(
-        normalizedRecords
-      );
-
+      setRecords(normalizedRecords);
     } catch (error) {
-
       console.error(
         'Failed to fetch attendance:',
         error
       );
 
-      setRecords([]);
-
+      if (showPageLoading) {
+        setRecords([]);
+      }
     } finally {
+      if (showPageLoading) {
+        setLoading(false);
+      }
 
-      setLoading(false);
-      setRefreshing(false);
+      if (showRefresh) {
+        setRefreshing(false);
+      }
     }
   };
 
 
   // ============================================================
-  // INITIAL LOAD
+  // INITIAL LOAD + LIVE ATTENDANCE REFRESH
+  // ============================================================
+  //
+  // Five seconds is enough to make a new IN/OUT punch appear
+  // promptly while keeping the request rate reasonable.
   // ============================================================
 
   useEffect(() => {
-    loadAttendance();
+    let mounted = true;
+
+    const initialLoad = async () => {
+      if (!mounted) {
+        return;
+      }
+
+      await loadAttendance(false, true);
+    };
+
+    initialLoad();
+
+    const intervalId = setInterval(() => {
+      if (mounted) {
+        loadAttendance(false, false);
+      }
+    }, 5000);
+
+    return () => {
+      mounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
 
@@ -432,76 +322,40 @@ export function AdminAttendance() {
   // FILTER RECORDS
   // ============================================================
 
-  const filtered =
-    useMemo(() => {
+  const filtered = useMemo(() => {
+    return records.filter((record) => {
+      const searchValue =
+        search.trim().toLowerCase();
 
-      return records.filter(
-        (record) => {
+      const matchSearch =
+        !searchValue ||
+        record.employeeName
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        String(record.employeeId)
+          .toLowerCase()
+          .includes(searchValue);
 
-          // ========================================
-          // SEARCH
-          // ========================================
+      const matchStatus =
+        !statusFilter ||
+        record.status === statusFilter;
 
-          const searchValue =
-            search
-              .trim()
-              .toLowerCase();
+      const matchDate =
+        !dateFilter ||
+        getDateForFilter(record.date) === dateFilter;
 
-
-          const matchSearch =
-            !searchValue ||
-
-            record.employeeName
-              ?.toLowerCase()
-              .includes(
-                searchValue
-              ) ||
-
-            String(
-              record.employeeId
-            )
-              .toLowerCase()
-              .includes(
-                searchValue
-              );
-
-
-          // ========================================
-          // STATUS
-          // ========================================
-
-          const matchStatus =
-            !statusFilter ||
-            record.status ===
-              statusFilter;
-
-
-          // ========================================
-          // DATE
-          // ========================================
-
-          const matchDate =
-            !dateFilter ||
-
-            getDateForFilter(
-              record.date
-            ) === dateFilter;
-
-
-          return (
-            matchSearch &&
-            matchStatus &&
-            matchDate
-          );
-        }
+      return (
+        matchSearch &&
+        matchStatus &&
+        matchDate
       );
-
-    }, [
-      records,
-      search,
-      statusFilter,
-      dateFilter,
-    ]);
+    });
+  }, [
+    records,
+    search,
+    statusFilter,
+    dateFilter,
+  ]);
 
 
   // ============================================================
@@ -509,17 +363,13 @@ export function AdminAttendance() {
   // ============================================================
 
   const handleExport = () => {
-
-    if (
-      filtered.length === 0
-    ) {
+    if (filtered.length === 0) {
       alert(
         'No attendance records available to export.'
       );
 
       return;
     }
-
 
     const headers = [
       'Employee ID',
@@ -532,54 +382,21 @@ export function AdminAttendance() {
       'Status',
     ];
 
+    const rows = filtered.map((record) => [
+      record.employeeId,
+      record.employeeName || '',
+      record.employeeEmail || '',
+      formatDate(record.date),
+      formatTime(record.checkInTime),
+      formatTime(record.checkOutTime),
+      record.totalHours !== null &&
+      record.totalHours !== undefined
+        ? Number(record.totalHours).toFixed(2)
+        : '',
+      record.status || '',
+    ]);
 
-    const rows =
-      filtered.map(
-        (record) => [
-
-          record.employeeId,
-
-          record.employeeName ||
-            '',
-
-          record.employeeEmail ||
-            '',
-
-          formatDate(
-            record.date
-          ),
-
-          formatTime(
-            record.checkInTime
-          ),
-
-          formatTime(
-            record.checkOutTime
-          ),
-
-          record.totalHours !==
-            null &&
-          record.totalHours !==
-            undefined
-            ? Number(
-                record.totalHours
-              ).toFixed(2)
-            : '',
-
-          record.status ||
-            '',
-        ]
-      );
-
-
-    // ========================================================
-    // CSV ESCAPE
-    // ========================================================
-
-    const escapeCsvValue = (
-      value
-    ) => {
-
+    const escapeCsvValue = (value) => {
       if (
         value === null ||
         value === undefined
@@ -587,101 +404,56 @@ export function AdminAttendance() {
         return '';
       }
 
-
-      const stringValue =
-        String(value);
-
+      const stringValue = String(value);
 
       if (
         stringValue.includes(',') ||
         stringValue.includes('"') ||
         stringValue.includes('\n')
       ) {
-
-        return `"${stringValue.replace(
-          /"/g,
-          '""'
-        )}"`;
+        return `"${stringValue.replace(/"/g, '""')}"`;
       }
-
 
       return stringValue;
     };
 
-
     const csvContent = [
       headers
-        .map(
-          escapeCsvValue
-        )
+        .map(escapeCsvValue)
         .join(','),
 
-      ...rows.map(
-        (row) =>
-          row
-            .map(
-              escapeCsvValue
-            )
-            .join(',')
+      ...rows.map((row) =>
+        row
+          .map(escapeCsvValue)
+          .join(',')
       ),
-
     ].join('\n');
 
+    const blob = new Blob(
+      ['\uFEFF' + csvContent],
+      {
+        type: 'text/csv;charset=utf-8;',
+      }
+    );
 
-    const blob =
-      new Blob(
-        [
-          '\uFEFF' +
-            csvContent
-        ],
-        {
-          type:
-            'text/csv;charset=utf-8;',
-        }
-      );
-
-
-    const url =
-      URL.createObjectURL(
-        blob
-      );
-
-
-    const link =
-      document.createElement(
-        'a'
-      );
-
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
 
     link.href = url;
-
 
     const today =
       new Date()
         .toISOString()
         .split('T')[0];
 
-
     link.download =
       `attendance_${today}.csv`;
 
-
-    document.body.appendChild(
-      link
-    );
-
-
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 
-
-    document.body.removeChild(
-      link
-    );
-
-
-    URL.revokeObjectURL(
-      url
-    );
+    URL.revokeObjectURL(url);
   };
 
 
@@ -690,7 +462,6 @@ export function AdminAttendance() {
   // ============================================================
 
   if (loading) {
-
     return (
       <FullPageSpinner
         message="Loading attendance..."
@@ -714,14 +485,13 @@ export function AdminAttendance() {
             : ''
         }`}
         actions={
-
           <div className="flex items-center gap-2">
 
             <button
               type="button"
               className="btn-secondary"
               onClick={() =>
-                loadAttendance(true)
+                loadAttendance(true, false)
               }
               disabled={refreshing}
             >
@@ -741,17 +511,10 @@ export function AdminAttendance() {
             <button
               type="button"
               className="btn-secondary"
-              onClick={
-                handleExport
-              }
-              disabled={
-                filtered.length === 0
-              }
+              onClick={handleExport}
+              disabled={filtered.length === 0}
             >
-              <Download
-                size={18}
-              />
-
+              <Download size={18} />
               Export
             </button>
 
@@ -775,26 +538,21 @@ export function AdminAttendance() {
 
         <Select
           value={statusFilter}
-          onChange={
-            setStatusFilter
-          }
+          onChange={setStatusFilter}
           placeholder="All Statuses"
           options={[
             {
               value: 'PRESENT',
               label: 'Present',
             },
-
             {
               value: 'ABSENT',
               label: 'Absent',
             },
-
             {
               value: 'LATE',
               label: 'Late',
             },
-
             {
               value: 'ON_LEAVE',
               label: 'On Leave',
@@ -808,9 +566,7 @@ export function AdminAttendance() {
           className="input-field"
           value={dateFilter}
           onChange={(e) =>
-            setDateFilter(
-              e.target.value
-            )
+            setDateFilter(e.target.value)
           }
         />
 
@@ -822,7 +578,6 @@ export function AdminAttendance() {
       ======================================================== */}
 
       {filtered.length === 0 ? (
-
         <EmptyState
           icon={CalendarCheck}
           title="No attendance records"
@@ -832,92 +587,52 @@ export function AdminAttendance() {
               : 'No records match your filters.'
           }
         />
-
       ) : (
-
         <DataTable
           columns={[
             {
               key: 'employeeId',
               label: 'Emp ID',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <span className="font-mono text-xs font-semibold text-navy-600">
-                  {
-                    record.employeeId
-                  }
+                  {record.employeeId}
                 </span>
-
               ),
             },
-
 
             {
               key: 'employeeName',
               label: 'Employee',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <div>
-
                   <span className="font-medium text-navy-900">
-                    {
-                      record.employeeName ||
-                      '--'
-                    }
+                    {record.employeeName || '--'}
                   </span>
 
-
                   {record.employeeEmail && (
-
                     <div className="text-xs text-navy-400 mt-1">
-                      {
-                        record.employeeEmail
-                      }
+                      {record.employeeEmail}
                     </div>
-
                   )}
-
                 </div>
-
               ),
             },
-
 
             {
               key: 'date',
               label: 'Date',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <span className="text-navy-600">
-                  {
-                    formatDate(
-                      record.date
-                    )
-                  }
+                  {formatDate(record.date)}
                 </span>
-
               ),
             },
-
 
             {
               key: 'checkInTime',
               label: 'Check In',
               align: 'center',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <span
                   className={`font-mono ${
                     record.checkInTime
@@ -925,26 +640,16 @@ export function AdminAttendance() {
                       : 'text-navy-300'
                   }`}
                 >
-                  {
-                    formatTime(
-                      record.checkInTime
-                    )
-                  }
+                  {formatTime(record.checkInTime)}
                 </span>
-
               ),
             },
-
 
             {
               key: 'checkOutTime',
               label: 'Check Out',
               align: 'center',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <span
                   className={`font-mono ${
                     record.checkOutTime
@@ -952,74 +657,42 @@ export function AdminAttendance() {
                       : 'text-navy-300'
                   }`}
                 >
-                  {
-                    formatTime(
-                      record.checkOutTime
-                    )
-                  }
+                  {formatTime(record.checkOutTime)}
                 </span>
-
               ),
             },
-
 
             {
               key: 'totalHours',
               label: 'Hours',
               align: 'right',
-
-              render: (
-                record
-              ) => {
-
+              render: (record) => {
                 const hours =
-                  Number(
-                    record.totalHours
-                  );
-
+                  Number(record.totalHours);
 
                 return (
-
                   <span className="font-semibold text-navy-700">
-
-                    {!Number.isNaN(
-                      hours
-                    ) &&
-                    hours > 0
-                      ? `${hours.toFixed(
-                          2
-                        )}h`
+                    {!Number.isNaN(hours) && hours > 0
+                      ? `${hours.toFixed(2)}h`
                       : '--'}
-
                   </span>
-
                 );
               },
             },
-
 
             {
               key: 'status',
               label: 'Status',
               align: 'center',
-
-              render: (
-                record
-              ) => (
-
+              render: (record) => (
                 <StatusBadge
-                  status={
-                    record.status
-                  }
+                  status={record.status}
                 />
-
               ),
             },
-
           ]}
           data={filtered}
         />
-
       )}
 
     </div>

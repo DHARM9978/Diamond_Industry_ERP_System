@@ -23,15 +23,12 @@ import API from "./apiRegistry";
  *
  * {...}
  */
-
 const unwrap = (response) => {
-
     return (
         response?.data?.data ??
         response?.data ??
         response
     );
-
 };
 
 
@@ -40,13 +37,11 @@ const unwrap = (response) => {
 // ============================================================
 
 const getApiError = (error) => {
-
     return (
         error?.response?.data?.message ||
         error?.message ||
         "Something went wrong"
     );
-
 };
 
 
@@ -59,14 +54,11 @@ export const authService = {
     // --------------------------------------------------------
     // Admin Login
     // --------------------------------------------------------
-
     adminLogin: async (
         email,
         password
     ) => {
-
         try {
-
             const response =
                 await apiClient.post(
                     API.auth.adminLogin,
@@ -79,7 +71,6 @@ export const authService = {
             return unwrap(response);
 
         } catch (error) {
-
             console.error(
                 "Admin login failed:",
                 getApiError(error)
@@ -93,14 +84,11 @@ export const authService = {
     // --------------------------------------------------------
     // Employee Login
     // --------------------------------------------------------
-
     employeeLogin: async (
         email,
         password
     ) => {
-
         try {
-
             const response =
                 await apiClient.post(
                     API.auth.employeeLogin,
@@ -113,7 +101,6 @@ export const authService = {
             return unwrap(response);
 
         } catch (error) {
-
             console.error(
                 "Employee login failed:",
                 getApiError(error)
@@ -127,9 +114,7 @@ export const authService = {
     // --------------------------------------------------------
     // Current User
     // --------------------------------------------------------
-
     me: async () => {
-
         const response =
             await apiClient.get(
                 API.auth.me
@@ -142,9 +127,7 @@ export const authService = {
     // --------------------------------------------------------
     // Admin Test
     // --------------------------------------------------------
-
     adminTest: async () => {
-
         const response =
             await apiClient.get(
                 API.auth.adminTest
@@ -166,9 +149,7 @@ export const companyService = {
     // GET ALL COMPANIES
     // GET /api/companies
     // --------------------------------------------------------
-
     list: async () => {
-
         const response =
             await apiClient.get(
                 API.companies.list
@@ -182,9 +163,9 @@ export const companyService = {
     // GET COMPANY
     // GET /api/companies/:id
     // --------------------------------------------------------
-
-    get: async (id) => {
-
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.companies.get(id)
@@ -198,9 +179,9 @@ export const companyService = {
     // CREATE COMPANY
     // POST /api/companies
     // --------------------------------------------------------
-
-    create: async (data) => {
-
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.companies.create,
@@ -215,12 +196,10 @@ export const companyService = {
     // UPDATE COMPANY
     // PUT /api/companies/:id
     // --------------------------------------------------------
-
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.companies.update(id),
@@ -235,9 +214,9 @@ export const companyService = {
     // DELETE COMPANY
     // DELETE /api/companies/:id
     // --------------------------------------------------------
-
-    delete: async (id) => {
-
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.companies.delete(id)
@@ -255,10 +234,12 @@ export const companyService = {
 
 export const employeeService = {
 
+    // --------------------------------------------------------
+    // GET EMPLOYEES
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.employees.list,
@@ -271,8 +252,12 @@ export const employeeService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET EMPLOYEE
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.employees.get(id)
@@ -282,8 +267,12 @@ export const employeeService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE EMPLOYEE
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.employees.create,
@@ -294,11 +283,13 @@ export const employeeService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE EMPLOYEE
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.employees.update(id),
@@ -309,8 +300,12 @@ export const employeeService = {
     },
 
 
-    delete: async (id) => {
-
+    // --------------------------------------------------------
+    // DELETE EMPLOYEE
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.employees.delete(id)
@@ -328,10 +323,12 @@ export const employeeService = {
 
 export const branchService = {
 
+    // --------------------------------------------------------
+    // GET BRANCHES
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.branches.list,
@@ -344,8 +341,12 @@ export const branchService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET BRANCH
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.branches.get(id)
@@ -355,8 +356,12 @@ export const branchService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE BRANCH
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.branches.create,
@@ -367,11 +372,13 @@ export const branchService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE BRANCH
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.branches.update(id),
@@ -382,8 +389,12 @@ export const branchService = {
     },
 
 
-    delete: async (id) => {
-
+    // --------------------------------------------------------
+    // DELETE BRANCH
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.branches.delete(id)
@@ -401,10 +412,12 @@ export const branchService = {
 
 export const departmentService = {
 
+    // --------------------------------------------------------
+    // GET DEPARTMENTS
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.departments.list,
@@ -417,8 +430,12 @@ export const departmentService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET DEPARTMENT
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.departments.get(id)
@@ -428,8 +445,12 @@ export const departmentService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE DEPARTMENT
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.departments.create,
@@ -440,11 +461,13 @@ export const departmentService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE DEPARTMENT
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.departments.update(id),
@@ -455,8 +478,12 @@ export const departmentService = {
     },
 
 
-    delete: async (id) => {
-
+    // --------------------------------------------------------
+    // DELETE DEPARTMENT
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.departments.delete(id)
@@ -477,11 +504,9 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance
     // --------------------------------------------------------
-
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.list,
@@ -493,10 +518,13 @@ export const attendanceService = {
         return unwrap(response);
     },
 
+
+    // --------------------------------------------------------
+    // GET /api/attendance/live
+    // --------------------------------------------------------
     live: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.live,
@@ -508,12 +536,13 @@ export const attendanceService = {
         return unwrap(response);
     },
 
+
     // --------------------------------------------------------
     // GET /api/attendance/:id
     // --------------------------------------------------------
-
-    get: async (id) => {
-
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.attendance.get(id)
@@ -526,11 +555,9 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/punches
     // --------------------------------------------------------
-
     punches: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.punches,
@@ -546,9 +573,9 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET /api/attendance/punches/:id
     // --------------------------------------------------------
-
-    getPunch: async (id) => {
-
+    getPunch: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.attendance.punch(id)
@@ -561,12 +588,10 @@ export const attendanceService = {
     // --------------------------------------------------------
     // GET employee attendance
     // --------------------------------------------------------
-
     employee: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.employee(
@@ -584,12 +609,10 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Employee punch history
     // --------------------------------------------------------
-
     employeePunches: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.employeePunches(
@@ -607,12 +630,10 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Employee attendance summary
     // --------------------------------------------------------
-
     employeeSummary: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.employeeSummary(
@@ -630,11 +651,9 @@ export const attendanceService = {
     // --------------------------------------------------------
     // Daily attendance summary
     // --------------------------------------------------------
-
     summary: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.attendance.summary,
@@ -658,11 +677,9 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // GET /api/fingerprints
     // --------------------------------------------------------
-
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.fingerprints.list,
@@ -678,9 +695,9 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // GET /api/fingerprints/:id
     // --------------------------------------------------------
-
-    get: async (id) => {
-
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.fingerprints.get(id)
@@ -693,9 +710,9 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // POST /api/fingerprints
     // --------------------------------------------------------
-
-    create: async (data) => {
-
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.fingerprints.create,
@@ -707,9 +724,11 @@ export const fingerprintService = {
 
 
     // --------------------------------------------------------
-    // GET /api/fingerprints/enrollment/:id/status
+    // GET enrollment status
     // --------------------------------------------------------
-    getEnrollmentStatus: async (enrollmentId) => {
+    getEnrollmentStatus: async (
+        enrollmentId
+    ) => {
         const response =
             await apiClient.get(
                 `/api/fingerprints/enrollment/${enrollmentId}/status`
@@ -722,12 +741,10 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // PUT /api/fingerprints/:id
     // --------------------------------------------------------
-
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.fingerprints.update(id),
@@ -741,9 +758,9 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // DELETE /api/fingerprints/:id
     // --------------------------------------------------------
-
-    delete: async (id) => {
-
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.fingerprints.delete(id)
@@ -756,12 +773,10 @@ export const fingerprintService = {
     // --------------------------------------------------------
     // Employee fingerprints
     // --------------------------------------------------------
-
     employee: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.fingerprints.employee(
@@ -784,10 +799,12 @@ export const fingerprintService = {
 
 export const deviceService = {
 
+    // --------------------------------------------------------
+    // GET DEVICES
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.devices.list,
@@ -800,8 +817,12 @@ export const deviceService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET DEVICE
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.devices.get(id)
@@ -811,8 +832,12 @@ export const deviceService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE DEVICE
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.devices.create,
@@ -823,11 +848,13 @@ export const deviceService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE DEVICE
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.devices.update(id),
@@ -838,8 +865,12 @@ export const deviceService = {
     },
 
 
-    delete: async (id) => {
-
+    // --------------------------------------------------------
+    // DELETE DEVICE
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.devices.delete(id)
@@ -860,11 +891,9 @@ export const deviceEnrollmentService = {
     // --------------------------------------------------------
     // POST /api/device/fingerprint-enroll
     // --------------------------------------------------------
-
     fingerprintEnroll: async (
         data
     ) => {
-
         const response =
             await apiClient.post(
                 API.device.fingerprintEnroll,
@@ -883,10 +912,12 @@ export const deviceEnrollmentService = {
 
 export const leaveTypeService = {
 
+    // --------------------------------------------------------
+    // GET LEAVE TYPES
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.leaveTypes.list,
@@ -899,8 +930,12 @@ export const leaveTypeService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET LEAVE TYPE
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.leaveTypes.get(id)
@@ -910,8 +945,12 @@ export const leaveTypeService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE LEAVE TYPE
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.leaveTypes.create,
@@ -922,11 +961,13 @@ export const leaveTypeService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE LEAVE TYPE
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.leaveTypes.update(id),
@@ -937,8 +978,12 @@ export const leaveTypeService = {
     },
 
 
-    delete: async (id) => {
-
+    // --------------------------------------------------------
+    // DELETE LEAVE TYPE
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.leaveTypes.delete(id)
@@ -956,10 +1001,12 @@ export const leaveTypeService = {
 
 export const leaveBalanceService = {
 
+    // --------------------------------------------------------
+    // GET LEAVE BALANCES
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.leaveBalances.list,
@@ -972,8 +1019,12 @@ export const leaveBalanceService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET LEAVE BALANCE
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.leaveBalances.get(id)
@@ -983,8 +1034,12 @@ export const leaveBalanceService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE LEAVE BALANCE
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.leaveBalances.create,
@@ -995,11 +1050,13 @@ export const leaveBalanceService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE LEAVE BALANCE
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.leaveBalances.update(id),
@@ -1021,11 +1078,9 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // GET /api/leave-requests
     // --------------------------------------------------------
-
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.leaveRequests.list,
@@ -1041,9 +1096,9 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // GET /api/leave-requests/:id
     // --------------------------------------------------------
-
-    get: async (id) => {
-
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.leaveRequests.get(id)
@@ -1056,9 +1111,9 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // POST /api/leave-requests
     // --------------------------------------------------------
-
-    create: async (data) => {
-
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.leaveRequests.create,
@@ -1072,12 +1127,30 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // PUT /api/leave-requests/:id/approve
     // --------------------------------------------------------
-
-    approve: async (id) => {
-
+    //
+    // Existing usage:
+    //
+    // leaveRequestService.approve(id)
+    //
+    // This still works.
+    //
+    // New partial approval:
+    //
+    // leaveRequestService.approve(id, {
+    //     approvedStartDate: "2026-09-10",
+    //     approvedEndDate: "2026-09-11"
+    // })
+    //
+    // Backend calculates approvedDays.
+    // --------------------------------------------------------
+    approve: async (
+        id,
+        data = {}
+    ) => {
         const response =
             await apiClient.put(
-                API.leaveRequests.approve(id)
+                API.leaveRequests.approve(id),
+                data
             );
 
         return unwrap(response);
@@ -1087,12 +1160,28 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // PUT /api/leave-requests/:id/reject
     // --------------------------------------------------------
-
-    reject: async (id) => {
-
+    //
+    // Existing usage:
+    //
+    // leaveRequestService.reject(id)
+    //
+    // still works.
+    //
+    // New usage:
+    //
+    // leaveRequestService.reject(id, {
+    //     rejectionReason:
+    //         "Insufficient staffing"
+    // })
+    // --------------------------------------------------------
+    reject: async (
+        id,
+        data = {}
+    ) => {
         const response =
             await apiClient.put(
-                API.leaveRequests.reject(id)
+                API.leaveRequests.reject(id),
+                data
             );
 
         return unwrap(response);
@@ -1102,9 +1191,9 @@ export const leaveRequestService = {
     // --------------------------------------------------------
     // PUT /api/leave-requests/:id/cancel
     // --------------------------------------------------------
-
-    cancel: async (id) => {
-
+    cancel: async (
+        id
+    ) => {
         const response =
             await apiClient.put(
                 API.leaveRequests.cancel(id)
@@ -1125,11 +1214,9 @@ export const advanceService = {
     // --------------------------------------------------------
     // GET /api/advances
     // --------------------------------------------------------
-
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.advances.list,
@@ -1145,9 +1232,9 @@ export const advanceService = {
     // --------------------------------------------------------
     // GET /api/advances/:id
     // --------------------------------------------------------
-
-    get: async (id) => {
-
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.advances.get(id)
@@ -1160,9 +1247,9 @@ export const advanceService = {
     // --------------------------------------------------------
     // POST /api/advances
     // --------------------------------------------------------
-
-    create: async (data) => {
-
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.advances.create,
@@ -1176,12 +1263,10 @@ export const advanceService = {
     // --------------------------------------------------------
     // PUT /api/advances/:id
     // --------------------------------------------------------
-
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.advances.update(id),
@@ -1195,12 +1280,10 @@ export const advanceService = {
     // --------------------------------------------------------
     // PATCH /api/advances/:id/status
     // --------------------------------------------------------
-
     updateStatus: async (
         id,
         status
     ) => {
-
         const response =
             await apiClient.patch(
                 API.advances.updateStatus(id),
@@ -1216,9 +1299,9 @@ export const advanceService = {
     // --------------------------------------------------------
     // DELETE /api/advances/:id
     // --------------------------------------------------------
-
-    delete: async (id) => {
-
+    delete: async (
+        id
+    ) => {
         const response =
             await apiClient.delete(
                 API.advances.delete(id)
@@ -1231,12 +1314,10 @@ export const advanceService = {
     // --------------------------------------------------------
     // Employee advances
     // --------------------------------------------------------
-
     employee: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.advances.employee(
@@ -1259,10 +1340,12 @@ export const advanceService = {
 
 export const payrollService = {
 
+    // --------------------------------------------------------
+    // GET PAYROLL
+    // --------------------------------------------------------
     list: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.payroll.list,
@@ -1275,8 +1358,12 @@ export const payrollService = {
     },
 
 
-    get: async (id) => {
-
+    // --------------------------------------------------------
+    // GET PAYROLL RECORD
+    // --------------------------------------------------------
+    get: async (
+        id
+    ) => {
         const response =
             await apiClient.get(
                 API.payroll.get(id)
@@ -1286,8 +1373,12 @@ export const payrollService = {
     },
 
 
-    create: async (data) => {
-
+    // --------------------------------------------------------
+    // CREATE PAYROLL
+    // --------------------------------------------------------
+    create: async (
+        data
+    ) => {
         const response =
             await apiClient.post(
                 API.payroll.create,
@@ -1298,11 +1389,13 @@ export const payrollService = {
     },
 
 
+    // --------------------------------------------------------
+    // UPDATE PAYROLL
+    // --------------------------------------------------------
     update: async (
         id,
         data
     ) => {
-
         const response =
             await apiClient.put(
                 API.payroll.update(id),
@@ -1313,11 +1406,28 @@ export const payrollService = {
     },
 
 
+    // --------------------------------------------------------
+    // DELETE PAYROLL
+    // --------------------------------------------------------
+    delete: async (
+        id
+    ) => {
+        const response =
+            await apiClient.delete(
+                API.payroll.delete(id)
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // Employee payroll
+    // --------------------------------------------------------
     employee: async (
         employeeId,
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.payroll.employee(
@@ -1340,10 +1450,12 @@ export const payrollService = {
 
 export const reportService = {
 
+    // --------------------------------------------------------
+    // Dashboard report
+    // --------------------------------------------------------
     dashboard: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.dashboard,
@@ -1356,10 +1468,12 @@ export const reportService = {
     },
 
 
+    // --------------------------------------------------------
+    // Attendance report
+    // --------------------------------------------------------
     attendance: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.attendance,
@@ -1372,10 +1486,12 @@ export const reportService = {
     },
 
 
+    // --------------------------------------------------------
+    // Employees report
+    // --------------------------------------------------------
     employees: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.employees,
@@ -1388,10 +1504,12 @@ export const reportService = {
     },
 
 
+    // --------------------------------------------------------
+    // Payroll report
+    // --------------------------------------------------------
     payroll: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.payroll,
@@ -1404,10 +1522,12 @@ export const reportService = {
     },
 
 
+    // --------------------------------------------------------
+    // Advances report
+    // --------------------------------------------------------
     advances: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.advances,
@@ -1420,10 +1540,12 @@ export const reportService = {
     },
 
 
+    // --------------------------------------------------------
+    // Leaves report
+    // --------------------------------------------------------
     leaves: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.reports.leaves,
@@ -1444,8 +1566,10 @@ export const reportService = {
 
 export const selfService = {
 
+    // --------------------------------------------------------
+    // Employee profile
+    // --------------------------------------------------------
     profile: async () => {
-
         const response =
             await apiClient.get(
                 API.me.profile
@@ -1455,10 +1579,12 @@ export const selfService = {
     },
 
 
+    // --------------------------------------------------------
+    // Employee attendance
+    // --------------------------------------------------------
     attendance: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.me.attendance,
@@ -1471,10 +1597,12 @@ export const selfService = {
     },
 
 
+    // --------------------------------------------------------
+    // Employee attendance summary
+    // --------------------------------------------------------
     attendanceSummary: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.me.attendanceSummary,
@@ -1487,10 +1615,12 @@ export const selfService = {
     },
 
 
+    // --------------------------------------------------------
+    // Employee payroll
+    // --------------------------------------------------------
     payroll: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.me.payroll,
@@ -1503,10 +1633,12 @@ export const selfService = {
     },
 
 
+    // --------------------------------------------------------
+    // Employee advances
+    // --------------------------------------------------------
     advances: async (
         params = {}
     ) => {
-
         const response =
             await apiClient.get(
                 API.me.advances,
@@ -1519,10 +1651,12 @@ export const selfService = {
     },
 
 
+    // --------------------------------------------------------
+    // CREATE EMPLOYEE ADVANCE
+    // --------------------------------------------------------
     createAdvance: async (
         data
     ) => {
-
         const response =
             await apiClient.post(
                 API.me.createAdvance,
@@ -1539,12 +1673,14 @@ export const selfService = {
 // COMBINED LEAVE SERVICE
 // ============================================================
 //
-// This keeps compatibility with pages that use:
+// This wrapper keeps compatibility with pages that use:
 //
 // leaveService.types()
 // leaveService.balances()
 // leaveService.requests()
 // leaveService.approve()
+// leaveService.reject()
+// leaveService.cancel()
 //
 // ============================================================
 
@@ -1557,23 +1693,24 @@ export const leaveService = {
     types: async (
         params = {}
     ) => {
-
         return leaveTypeService.list(
             params
         );
     },
 
 
-    getType: async (id) => {
-
+    getType: async (
+        id
+    ) => {
         return leaveTypeService.get(
             id
         );
     },
 
 
-    createType: async (data) => {
-
+    createType: async (
+        data
+    ) => {
         return leaveTypeService.create(
             data
         );
@@ -1584,7 +1721,6 @@ export const leaveService = {
         id,
         data
     ) => {
-
         return leaveTypeService.update(
             id,
             data
@@ -1592,8 +1728,9 @@ export const leaveService = {
     },
 
 
-    deleteType: async (id) => {
-
+    deleteType: async (
+        id
+    ) => {
         return leaveTypeService.delete(
             id
         );
@@ -1607,15 +1744,15 @@ export const leaveService = {
     balances: async (
         params = {}
     ) => {
-
         return leaveBalanceService.list(
             params
         );
     },
 
 
-    getBalance: async (id) => {
-
+    getBalance: async (
+        id
+    ) => {
         return leaveBalanceService.get(
             id
         );
@@ -1625,7 +1762,6 @@ export const leaveService = {
     createBalance: async (
         data
     ) => {
-
         return leaveBalanceService.create(
             data
         );
@@ -1636,7 +1772,6 @@ export const leaveService = {
         id,
         data
     ) => {
-
         return leaveBalanceService.update(
             id,
             data
@@ -1651,15 +1786,15 @@ export const leaveService = {
     requests: async (
         params = {}
     ) => {
-
         return leaveRequestService.list(
             params
         );
     },
 
 
-    getRequest: async (id) => {
-
+    getRequest: async (
+        id
+    ) => {
         return leaveRequestService.get(
             id
         );
@@ -1669,31 +1804,76 @@ export const leaveService = {
     createRequest: async (
         data
     ) => {
-
         return leaveRequestService.create(
             data
         );
     },
 
 
-    approve: async (id) => {
-
+    // --------------------------------------------------------
+    // APPROVE LEAVE REQUEST
+    // --------------------------------------------------------
+    //
+    // Existing:
+    //
+    // leaveService.approve(id)
+    //
+    // Still works.
+    //
+    // Partial approval:
+    //
+    // leaveService.approve(id, {
+    //     approvedStartDate: "2026-09-10",
+    //     approvedEndDate: "2026-09-11"
+    // })
+    //
+    // --------------------------------------------------------
+    approve: async (
+        id,
+        data = {}
+    ) => {
         return leaveRequestService.approve(
-            id
+            id,
+            data
         );
     },
 
 
-    reject: async (id) => {
-
+    // --------------------------------------------------------
+    // REJECT LEAVE REQUEST
+    // --------------------------------------------------------
+    //
+    // Existing:
+    //
+    // leaveService.reject(id)
+    //
+    // Still works.
+    //
+    // With rejection reason:
+    //
+    // leaveService.reject(id, {
+    //     rejectionReason:
+    //         "Insufficient staffing"
+    // })
+    //
+    // --------------------------------------------------------
+    reject: async (
+        id,
+        data = {}
+    ) => {
         return leaveRequestService.reject(
-            id
+            id,
+            data
         );
     },
 
 
-    cancel: async (id) => {
-
+    // --------------------------------------------------------
+    // CANCEL LEAVE REQUEST
+    // --------------------------------------------------------
+    cancel: async (
+        id
+    ) => {
         return leaveRequestService.cancel(
             id
         );
@@ -1707,39 +1887,21 @@ export const leaveService = {
 // ============================================================
 
 export default {
-
     authService,
-
     companyService,
-
     employeeService,
-
     branchService,
-
     departmentService,
-
     attendanceService,
-
     fingerprintService,
-
     deviceService,
-
     deviceEnrollmentService,
-
     leaveService,
-
     leaveTypeService,
-
     leaveBalanceService,
-
     leaveRequestService,
-
     advanceService,
-
     payrollService,
-
     reportService,
-
     selfService,
-
 };
