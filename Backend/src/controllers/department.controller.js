@@ -18,6 +18,7 @@ const getDepartment = async (req, res) => {
         message: "Department fetched successfully",
         data: department
     });
+
 };
 
 
@@ -29,7 +30,8 @@ const getDepartments = async (req, res) => {
 
     const departments =
         await departmentService.getAllDepartments(
-            req.user.companyId
+            req.user.companyId,
+            req.query.branchId
         );
 
     return res.status(200).json({
@@ -37,6 +39,7 @@ const getDepartments = async (req, res) => {
         message: "Departments fetched successfully",
         data: departments
     });
+
 };
 
 
@@ -57,6 +60,7 @@ const createDepartment = async (req, res) => {
         message: "Department created successfully",
         data: department
     });
+
 };
 
 
@@ -78,6 +82,7 @@ const updateDepartment = async (req, res) => {
         message: "Department updated successfully",
         data: department
     });
+
 };
 
 
@@ -96,6 +101,7 @@ const deleteDepartment = async (req, res) => {
         success: true,
         message: "Department deleted successfully"
     });
+
 };
 
 

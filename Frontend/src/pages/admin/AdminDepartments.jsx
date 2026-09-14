@@ -30,6 +30,8 @@ export function AdminDepartments() {
 
   const [branches, setBranches] = useState([]);
 
+  const [selectedBranch, setSelectedBranch] = useState('');
+
   const [employees, setEmployees] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -47,14 +49,22 @@ export function AdminDepartments() {
   // LOAD DEPARTMENTS
   // ============================================================
 
-  const loadDepartments = async () => {
+  const loadDepartments = async (branchId = selectedBranch) => {
+
+    if (!branchId) {
+      setDepartments([]);
+      setLoading(false);
+      return;
+    }
 
     try {
 
       setLoading(true);
       setError('');
 
-      const response = await departmentService.list();
+      const response = await departmentService.list({
+        branchId: Number(branchId)
+      });
 
       console.log(
         'Departments API response:',
@@ -207,10 +217,11 @@ export function AdminDepartments() {
     const loadPage = async () => {
 
       await Promise.all([
-        loadDepartments(),
         loadBranches(),
         loadEmployees(),
       ]);
+
+      setLoading(false);
 
     };
 
@@ -220,10 +231,44 @@ export function AdminDepartments() {
 
 
   // ============================================================
+  // BRANCH SELECTION
+  // ============================================================
+
+  useEffect(() => {
+
+    if (!selectedBranch) {
+      setDepartments([]);
+      setLoading(false);
+      return;
+    }
+
+    loadDepartments(selectedBranch);
+
+  }, [selectedBranch]);
+
+
+  // ============================================================
+  // SELECTED BRANCH
+  // ============================================================
+
+  const selectedBranchData =
+    branches.find(
+      (branch) =>
+        Number(branch.branchId) ===
+        Number(selectedBranch)
+    ) || null;
+
+
+  // ============================================================
   // ADD DEPARTMENT
   // ============================================================
 
   const handleAdd = () => {
+
+    if (!selectedBranch) {
+      toast('Please select a branch first', 'error');
+      return;
+    }
 
     setEditing(null);
 
@@ -274,7 +319,7 @@ export function AdminDepartments() {
 
       // IMPORTANT:
       // Reload actual database data.
-      await loadDepartments();
+      await loadDepartments(selectedBranch);
 
     } catch (err) {
 
@@ -334,7 +379,7 @@ export function AdminDepartments() {
           formData.departmentName.trim(),
 
         branchId:
-          Number(formData.branchId),
+          Number(selectedBranch),
 
         managerId:
           formData.managerId
@@ -385,7 +430,7 @@ export function AdminDepartments() {
       // RELOAD DATABASE DATA
       // ========================================================
 
-      await loadDepartments();
+      await loadDepartments(selectedBranch);
 
       setModalOpen(false);
 
@@ -704,11 +749,13 @@ export function AdminDepartments() {
         title="Departments"
 
         subtitle={
-          `${departments.length} department${
-            departments.length !== 1
-              ? 's'
-              : ''
-          }`
+          selectedBranch
+            ? `${departments.length} department${
+                departments.length !== 1
+                  ? 's'
+                  : ''
+              }`
+            : 'Select a branch to manage departments'
         }
 
         actions={
@@ -716,6 +763,7 @@ export function AdminDepartments() {
           <button
             type="button"
             onClick={handleAdd}
+            disabled={!selectedBranch || saving}
             className="
               btn-primary
               flex
@@ -763,10 +811,74 @@ export function AdminDepartments() {
 
 
       {/* ========================================================
+          BRANCH SELECTION
+      ========================================================= */}
+
+      <div className="mb-6 rounded-xl border border-navy-200 bg-white p-5 shadow-sm">
+
+        <div className="flex flex-col gap-1.5">
+
+          <label className="text-sm font-medium text-navy-700">
+            Select Branch
+          </label>
+
+          <select
+            className="input-field max-w-xl"
+            value={selectedBranch}
+            onChange={(event) => {
+              setSelectedBranch(event.target.value);
+              setModalOpen(false);
+              setEditing(null);
+            }}
+          >
+            <option value="">
+              Select a branch to view departments
+            </option>
+
+            {branches.map((branch) => (
+              <option
+                key={branch.branchId}
+                value={branch.branchId}
+              >
+                {branch.branchName}
+                {branch.location
+                  ? ` — ${branch.location}`
+                  : ''}
+              </option>
+            ))}
+          </select>
+
+        </div>
+
+        {selectedBranchData && (
+          <div className="mt-3 text-sm text-navy-500">
+            Showing departments for
+            <span className="ml-1 font-semibold text-navy-700">
+              {selectedBranchData.branchName}
+            </span>
+          </div>
+        )}
+
+      </div>
+
+
+      {/* ========================================================
           DEPARTMENT TABLE
       ========================================================= */}
 
-      {departments.length === 0 ? (
+      {!selectedBranch ? (
+
+        <EmptyState
+
+          icon={Network}
+
+          title="Select a branch"
+
+          message="Select a branch above to view and manage its departments."
+
+        />
+
+      ) : departments.length === 0 ? (
 
         <EmptyState
 
@@ -774,7 +886,7 @@ export function AdminDepartments() {
 
           title="No departments"
 
-          message="Add departments to organize your workforce."
+          message="This branch has no departments yet. Add a department to get started."
 
         />
 
@@ -823,7 +935,7 @@ export function AdminDepartments() {
 
           editing={editing}
 
-          branches={branches}
+          selectedBranch={selectedBranchData}
 
           employees={employees}
 
@@ -860,7 +972,7 @@ export function AdminDepartments() {
 
 function DeptForm({
   editing,
-  branches,
+  selectedBranch,
   employees,
   saving,
   onCancel,
@@ -875,7 +987,9 @@ function DeptForm({
     branchId:
       editing?.branchId
         ? String(editing.branchId)
-        : '',
+        : selectedBranch?.branchId
+          ? String(selectedBranch.branchId)
+          : '',
 
     managerId:
       editing?.managerId
@@ -897,7 +1011,10 @@ function DeptForm({
 
         departmentName: '',
 
-        branchId: '',
+        branchId:
+          selectedBranch?.branchId
+            ? String(selectedBranch.branchId)
+            : '',
 
         managerId: '',
 
@@ -916,7 +1033,9 @@ function DeptForm({
       branchId:
         editing?.branchId
           ? String(editing.branchId)
-          : '',
+          : selectedBranch?.branchId
+            ? String(selectedBranch.branchId)
+            : '',
 
       managerId:
         editing?.managerId
@@ -925,7 +1044,7 @@ function DeptForm({
 
     });
 
-  }, [editing]);
+  }, [editing, selectedBranch]);
 
 
   // ============================================================
@@ -974,6 +1093,17 @@ function DeptForm({
     onSave(form);
 
   };
+
+
+  // ============================================================
+  // FILTER MANAGERS BY SELECTED BRANCH
+  // ============================================================
+
+  const branchEmployees = employees.filter(
+    (employee) =>
+      Number(employee?.branchId) ===
+      Number(form.branchId)
+  );
 
 
   // ============================================================
@@ -1050,47 +1180,19 @@ function DeptForm({
 
         </label>
 
+        <div className="input-field bg-navy-50 text-navy-700">
 
-        <select
+          {selectedBranch?.branchName || 'Selected branch'}
 
-          className="input-field"
+          {selectedBranch?.location
+            ? ` — ${selectedBranch.location}`
+            : ''}
 
-          value={form.branchId}
+        </div>
 
-          onChange={(event) =>
-            handleChange(
-              'branchId',
-              event.target.value
-            )
-          }
-
-          required
-
-          disabled={saving}
-
-        >
-
-          <option value="">
-
-            Select Branch
-
-          </option>
-
-
-          {branches.map((branch) => (
-
-            <option
-              key={branch.branchId}
-              value={branch.branchId}
-            >
-
-              {branch.branchName}
-
-            </option>
-
-          ))}
-
-        </select>
+        <p className="text-xs text-navy-400">
+          The department will be created under the selected branch.
+        </p>
 
       </div>
 
@@ -1138,7 +1240,7 @@ function DeptForm({
           </option>
 
 
-          {employees.map((employee) => {
+          {branchEmployees.map((employee) => {
 
             const fullName =
               `${employee?.firstName || ''} ${

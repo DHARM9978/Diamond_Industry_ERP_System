@@ -255,7 +255,9 @@ exports.Prisma.PayrollScalarFieldEnum = {
   basicSalary: 'basicSalary',
   advanceDeduction: 'advanceDeduction',
   netSalary: 'netSalary',
+  scheduledPaymentDate: 'scheduledPaymentDate',
   paymentDate: 'paymentDate',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -412,6 +414,10 @@ exports.Prisma.DeviceLogOrderByRelevanceFieldEnum = {
 
 exports.Prisma.AdvancePaymentOrderByRelevanceFieldEnum = {
   reason: 'reason',
+  status: 'status'
+};
+
+exports.Prisma.PayrollOrderByRelevanceFieldEnum = {
   status: 'status'
 };
 

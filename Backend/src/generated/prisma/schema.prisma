@@ -298,9 +298,6 @@ model Payroll {
 
   // ====================================================
   // HISTORICAL SALARY SNAPSHOT
-  //
-  // Nullable because old payroll records already exist.
-  // New payrolls will populate these fields.
   // ====================================================
 
   baseSalary           Decimal? @map("base_salary") @db.Decimal(12, 2)
@@ -308,23 +305,31 @@ model Payroll {
   salaryRatePerHour    Decimal? @map("salary_rate_per_hour") @db.Decimal(10, 2)
 
   // ====================================================
-  // ACTUAL PAYROLL CALCULATIONS
+  // ATTENDANCE CALCULATION
   // ====================================================
 
-  // Actual hours worked during the payroll period
   totalWorkingHours Decimal @map("total_working_hours") @db.Decimal(8, 2)
 
-  // Earned salary:
-  // totalWorkingHours × salaryRatePerHour
   basicSalary Decimal @map("basic_salary") @db.Decimal(12, 2)
 
-  // Actual advance amount deducted
+  // Total advance deduction for the finalized payroll
   advanceDeduction Decimal @default(0.00) @map("advance_deduction") @db.Decimal(12, 2)
 
-  // Final salary after deductions
+  // Final amount payable
   netSalary Decimal @map("net_salary") @db.Decimal(12, 2)
 
+  // ====================================================
+  // PAYMENT
+  // ====================================================
+
+  // Date from which admin is allowed to pay this payroll.
+  scheduledPaymentDate DateTime? @map("scheduled_payment_date") @db.Date
+
+  // Actual date on which admin completed the payment.
   paymentDate DateTime? @map("payment_date") @db.Date
+
+  // UNPAID -> PAID
+  status String @default("UNPAID") @db.VarChar(20)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -334,6 +339,8 @@ model Payroll {
 
   @@index([employeeId])
   @@index([payPeriodStart, payPeriodEnd])
+  @@index([status])
+  @@index([scheduledPaymentDate])
   @@map("payroll")
 }
 

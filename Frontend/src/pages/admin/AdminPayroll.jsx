@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import {
   Wallet,
   Download,
   RefreshCw,
-  Plus,
-  X,
+  Settings,
+  CalendarDays,
+  Save,
+  CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 
 import {
@@ -16,263 +18,152 @@ import {
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Form';
-import { Modal } from '@/components/ui/Modal';
-import { useToast } from '@/context/ToastContext';
 
 import {
   payrollService,
-  employeeService,
+  branchService,
 } from '@/services/apiServices';
 
-
-// ============================================================
-// Helpers
-// ============================================================
-
-const getErrorMessage = (error) => {
-  return (
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    error?.message ||
-    'Something went wrong.'
-  );
-};
-
-
-const formatCurrency = (value) => {
-  const amount = Number(value);
-
-  if (!Number.isFinite(amount)) {
-    return '₹0.00';
-  }
-
-  return `₹${amount.toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-};
-
-
-const formatNumber = (value) => {
-  const number = Number(value);
-
-  if (!Number.isFinite(number)) {
-    return '0.00';
-  }
-
-  return number.toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-};
-
-
-const formatDate = (date) => {
-  if (!date) {
-    return '-';
-  }
-
-  const parsedDate = new Date(date);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return '-';
-  }
-
-  return parsedDate.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-};
-
-
-const getEmployeeName = (record) => {
-  const firstName =
-    record?.employee?.firstName ||
-    record?.firstName ||
-    '';
-
-  const lastName =
-    record?.employee?.lastName ||
-    record?.lastName ||
-    '';
-
-  const fullName =
-    `${firstName} ${lastName}`.trim();
-
-  return fullName || 'Unknown Employee';
-};
-
-
-const getEmployeeDisplayName = (employee) => {
-  const firstName =
-    employee?.firstName || '';
-
-  const lastName =
-    employee?.lastName || '';
-
-  const name =
-    `${firstName} ${lastName}`.trim();
-
-  if (!name) {
-    return `Employee #${employee?.employeeId ?? ''}`;
-  }
-
-  return `${name} (#${employee.employeeId})`;
-};
-
-
-const getPayrollMonth = (record) => {
-  if (!record?.payPeriodStart) {
-    return '-';
-  }
-
-  const date =
-    new Date(record.payPeriodStart);
-
-  if (Number.isNaN(date.getTime())) {
-    return '-';
-  }
-
-  return date.toLocaleDateString('en-IN', {
-    month: 'short',
-    year: 'numeric',
-  });
-};
-
-
-const getTodayString = () => {
-  const date = new Date();
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2, '0');
-
-  const day =
-    String(
-      date.getDate()
-    ).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-};
-
-
-const getCurrentMonthStart = () => {
-  const date = new Date();
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2, '0');
-
-  return `${year}-${month}-01`;
-};
-
-
-const getCurrentMonthEnd = () => {
-  const date = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 1,
-    0
-  );
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    String(
-      date.getMonth() + 1
-    ).padStart(2, '0');
-
-  const day =
-    String(
-      date.getDate()
-    ).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-};
-
-
-const escapeCsvValue = (value) => {
-  if (
-    value === null ||
-    value === undefined
-  ) {
-    return '';
-  }
-
-  const stringValue =
-    String(value);
-
-  if (
-    stringValue.includes(',') ||
-    stringValue.includes('"') ||
-    stringValue.includes('\n')
-  ) {
-    return `"${stringValue.replace(
-      /"/g,
-      '""'
-    )}"`;
-  }
-
-  return stringValue;
-};
+import apiClient from '@/services/apiClient';
 
 
 // ============================================================
-// Main Component
+// ADMIN PAYROLL
 // ============================================================
 
 export function AdminPayroll() {
 
-  const { toast } = useToast();
+  // ==========================================================
+  // PAYROLL RECORDS
+  // ==========================================================
 
   const [records, setRecords] = useState([]);
-  const [employees, setEmployees] = useState([]);
-
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+
+  // ==========================================================
+  // PAYROLL VIEW
+  // ==========================================================
+
+  const [payrollView, setPayrollView] = useState('CURRENT');
+
+  // ==========================================================
+  // SEARCH / FILTER
+  // ==========================================================
 
   const [search, setSearch] = useState('');
 
-  const [generateModalOpen, setGenerateModalOpen] =
+  const [selectedBranch, setSelectedBranch] =
+    useState('ALL');
+
+  // ==========================================================
+  // BRANCHES
+  // ==========================================================
+
+  const [branches, setBranches] = useState([]);
+
+  const [branchesLoading, setBranchesLoading] =
+    useState(true);
+
+  // ==========================================================
+  // PAYROLL ACTION STATES
+  // ==========================================================
+
+  const [payingPayrollId, setPayingPayrollId] =
+    useState(null);
+
+  const [generatingPayroll, setGeneratingPayroll] =
     useState(false);
+
+  const [payrollMessage, setPayrollMessage] =
+    useState('');
+
+  const [payrollError, setPayrollError] =
+    useState('');
+
+  // ==========================================================
+  // PAYROLL CONFIGURATION
+  // ==========================================================
+
+  const [configuration, setConfiguration] =
+    useState({
+      startDay: 1,
+      endDay: 0,
+      paymentDay: 5,
+      enabled: true,
+    });
+
+  const [currentPeriod, setCurrentPeriod] =
+    useState(null);
+
+  const [nextPeriod, setNextPeriod] =
+    useState(null);
+
+  const [currentPeriodsByBranch, setCurrentPeriodsByBranch] = useState({});
+
+  const [configurationLoading, setConfigurationLoading] =
+    useState(false);
+
+  const [configurationSaving, setConfigurationSaving] =
+    useState(false);
+
+  const [configurationMessage, setConfigurationMessage] =
+    useState('');
+
+  const [configurationError, setConfigurationError] =
+    useState('');
 
 
   // ==========================================================
-  // Load Payroll
+  // HELPERS
+  // ==========================================================
+
+  const unwrapResponse = (response) => {
+    return (
+      response?.data?.data ??
+      response?.data ??
+      response
+    );
+  };
+
+
+  const getPayrollRecordsFromResponse = (response) => {
+
+    const data = unwrapResponse(response);
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (Array.isArray(data?.records)) {
+      return data.records;
+    }
+
+    if (Array.isArray(data?.data)) {
+      return data.data;
+    }
+
+    return [];
+  };
+
+
+  // ==========================================================
+  // LOAD PAYROLL
   // ==========================================================
 
   const loadPayroll = async () => {
+
     try {
+
       setLoading(true);
+      setPayrollError('');
 
       const response =
         await payrollService.list();
 
-      let payrollRecords = [];
+      const payrollRecords =
+        getPayrollRecordsFromResponse(response);
 
-      if (Array.isArray(response)) {
-        payrollRecords = response;
-      }
-
-      else if (
-        Array.isArray(response?.data)
-      ) {
-        payrollRecords =
-          response.data;
-      }
-
-      setRecords(
-        payrollRecords
-      );
+      setRecords(payrollRecords);
 
     } catch (error) {
 
@@ -283,262 +174,1715 @@ export function AdminPayroll() {
 
       setRecords([]);
 
-      toast(
-        getErrorMessage(error),
-        'error'
+      setPayrollError(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to load payroll records.'
       );
 
     } finally {
+
       setLoading(false);
+
     }
   };
 
 
   // ==========================================================
-  // Load Employees
+  // LOAD BRANCHES
   // ==========================================================
 
-  const loadEmployees = async () => {
+  const loadBranches = async () => {
+
     try {
 
+      setBranchesLoading(true);
+
       const response =
-        await employeeService.list();
+        await branchService.list();
 
-      let employeeRecords = [];
+      const branchRecords =
+        unwrapResponse(response);
 
-      if (Array.isArray(response)) {
-        employeeRecords = response;
-      }
+      if (Array.isArray(branchRecords)) {
 
-      else if (
-        Array.isArray(response?.data)
+        setBranches(branchRecords);
+
+      } else if (
+        Array.isArray(branchRecords?.data)
       ) {
-        employeeRecords =
-          response.data;
-      }
 
-
-      // Only active employees can have payroll generated.
-      const activeEmployees =
-        employeeRecords.filter(
-          (employee) =>
-            employee?.status === 'ACTIVE'
+        setBranches(
+          branchRecords.data
         );
 
+      } else {
 
-      setEmployees(
-        activeEmployees
-      );
+        setBranches([]);
+
+      }
 
     } catch (error) {
 
       console.error(
-        'Failed to load employees:',
+        'Failed to load branches:',
         error
       );
 
-      setEmployees([]);
+      setBranches([]);
 
-      toast(
-        getErrorMessage(error),
-        'error'
-      );
+    } finally {
+
+      setBranchesLoading(false);
+
     }
   };
 
 
   // ==========================================================
-  // Initial Load
+  // LOAD CONFIGURATION
+  // ==========================================================
+
+  const loadCurrentPeriodsForBranches = async (branchList = branches) => {
+    if (!Array.isArray(branchList) || branchList.length === 0) {
+      setCurrentPeriodsByBranch({});
+      return;
+    }
+
+    const results = await Promise.allSettled(
+      branchList.map(async (branch) => {
+        const branchId = Number(branch?.branchId);
+        if (!Number.isInteger(branchId)) return null;
+
+        const response = await apiClient.get(
+          `/api/payroll/period/${branchId}/current`
+        );
+
+        return {
+          branchId,
+          period: unwrapResponse(response) || null,
+        };
+      })
+    );
+
+    const periodMap = {};
+
+    results.forEach((result) => {
+      if (result.status === 'fulfilled' && result.value?.branchId) {
+        periodMap[result.value.branchId] = result.value.period;
+      } else if (result.status === 'rejected') {
+        console.error(
+          'Failed to load a branch current payroll period:',
+          result.reason
+        );
+      }
+    });
+
+    setCurrentPeriodsByBranch(periodMap);
+  };
+
+
+  const loadConfiguration = async (
+    branchId,
+    options = {}
+  ) => {
+
+    const {
+      clearMessages = true,
+    } = options;
+
+    if (!branchId) {
+
+      setConfiguration({
+        startDay: 1,
+        endDay: 0,
+        paymentDay: 5,
+        enabled: true,
+      });
+
+      setCurrentPeriod(null);
+      setNextPeriod(null);
+
+      return;
+    }
+
+    try {
+
+      setConfigurationLoading(true);
+
+      if (clearMessages) {
+        setConfigurationMessage('');
+        setConfigurationError('');
+      }
+
+      // --------------------------------------------------------
+      // LOAD CONFIGURATION
+      // --------------------------------------------------------
+
+      try {
+
+        const configurationResponse =
+          await apiClient.get(
+            `/api/payroll/configuration/${branchId}`
+          );
+
+        const configurationData =
+          unwrapResponse(
+            configurationResponse
+          ) || {};
+
+        setConfiguration({
+
+          startDay:
+            Number(
+              configurationData.startDay ?? 1
+            ),
+
+          endDay:
+            Number(
+              configurationData.endDay ?? 0
+            ),
+
+          paymentDay:
+            Number(
+              configurationData.paymentDay ?? 5
+            ),
+
+          enabled:
+            configurationData.enabled !== false,
+
+        });
+
+      } catch (configurationError) {
+
+        console.error(
+          'Failed to load payroll configuration:',
+          configurationError
+        );
+
+        setConfigurationError(
+          configurationError?.response?.data?.message ||
+          configurationError?.message ||
+          'Failed to load payroll configuration.'
+        );
+
+        return;
+      }
+
+      // --------------------------------------------------------
+      // LOAD CURRENT / NEXT PERIOD
+      // --------------------------------------------------------
+      // These are intentionally loaded separately. A problem with
+      // either period endpoint must not make configuration appear
+      // as if it was not saved.
+
+      const [currentResult, nextResult] =
+        await Promise.allSettled([
+
+          apiClient.get(
+            `/api/payroll/period/${branchId}/current`
+          ),
+
+          apiClient.get(
+            `/api/payroll/period/${branchId}/next`
+          ),
+
+        ]);
+
+      if (
+        currentResult.status === 'fulfilled'
+      ) {
+
+        const currentPeriodData =
+          unwrapResponse(currentResult.value) || null;
+
+        setCurrentPeriod(currentPeriodData);
+        setCurrentPeriodsByBranch((previous) => ({
+          ...previous,
+          [Number(branchId)]: currentPeriodData,
+        }));
+
+      } else {
+
+        console.error(
+          'Failed to load current payroll period:',
+          currentResult.reason
+        );
+
+        setCurrentPeriod(null);
+
+      }
+
+      if (
+        nextResult.status === 'fulfilled'
+      ) {
+
+        setNextPeriod(
+          unwrapResponse(
+            nextResult.value
+          ) || null
+        );
+
+      } else {
+
+        console.error(
+          'Failed to load next payroll period:',
+          nextResult.reason
+        );
+
+        setNextPeriod(null);
+
+      }
+
+    } finally {
+
+      setConfigurationLoading(false);
+
+    }
+  };
+
+
+  // ==========================================================
+  // INITIAL LOAD
   // ==========================================================
 
   useEffect(() => {
 
-    const loadPageData =
-      async () => {
+    const initialize = async () => {
 
-        try {
+      await Promise.all([
+        loadPayroll(),
+        loadBranches(),
+      ]);
 
-          setLoading(true);
+    };
 
-          await Promise.all([
-            loadPayroll(),
-            loadEmployees(),
-          ]);
-
-        } finally {
-
-          setLoading(false);
-
-        }
-      };
-
-
-    loadPageData();
+    initialize();
 
   }, []);
 
 
   // ==========================================================
-  // Search
+  // LOAD CURRENT PERIODS WHEN BRANCHES CHANGE
   // ==========================================================
 
-  const filtered = useMemo(() => {
-
-    const searchTerm =
-      search.trim().toLowerCase();
-
-    if (!searchTerm) {
-      return records;
+  useEffect(() => {
+    if (branches.length === 0) {
+      setCurrentPeriodsByBranch({});
+      return;
     }
 
-
-    return records.filter(
-      (record) => {
-
-        const employeeName =
-          getEmployeeName(
-            record
-          ).toLowerCase();
-
-        const employeeId =
-          String(
-            record?.employeeId ?? ''
-          ).toLowerCase();
-
-        const month =
-          getPayrollMonth(
-            record
-          ).toLowerCase();
+    loadCurrentPeriodsForBranches(branches);
+  }, [branches]);
 
 
-        return (
-          employeeName.includes(
-            searchTerm
-          ) ||
-          employeeId.includes(
-            searchTerm
-          ) ||
-          month.includes(
-            searchTerm
-          )
+  // ==========================================================
+  //   // LOAD CONFIGURATION WHEN BRANCH CHANGES
+  // ==========================================================
+
+  useEffect(() => {
+
+    if (branches.length === 0) {
+      return;
+    }
+
+    const branchId =
+      selectedBranch === 'ALL'
+        ? branches[0]?.branchId
+        : Number(selectedBranch);
+
+    if (branchId) {
+
+      loadConfiguration(
+        branchId
+      );
+
+    }
+
+  }, [
+    selectedBranch,
+    branches,
+  ]);
+
+
+  // ==========================================================
+  // REFRESH
+  // ==========================================================
+
+  const handleRefresh = async () => {
+
+    setPayrollMessage('');
+    setPayrollError('');
+
+    await Promise.all([
+      loadPayroll(),
+      loadBranches(),
+    ]);
+
+    await loadCurrentPeriodsForBranches(branches);
+
+    const branchId =
+      selectedBranch === 'ALL'
+        ? branches[0]?.branchId
+        : Number(selectedBranch);
+
+    if (branchId) {
+      await loadConfiguration(branchId);
+    }
+
+  };
+
+
+  // ==========================================================
+  // GENERATE CURRENT PAYROLL
+  // ==========================================================
+
+// ==========================================================
+// GENERATE CURRENT PAYROLL
+// ==========================================================
+
+const handleGenerateCurrentPayroll =
+  async () => {
+
+    try {
+
+      setGeneratingPayroll(true);
+
+      setPayrollMessage('');
+      setPayrollError('');
+
+
+      // ------------------------------------------------------
+      // DETERMINE BRANCHES TO GENERATE
+      // ------------------------------------------------------
+
+      const branchesToGenerate =
+        selectedBranch === 'ALL'
+          ? branches
+          : branches.filter(
+              (branch) =>
+                Number(branch.branchId) ===
+                Number(selectedBranch)
+            );
+
+
+      if (
+        branchesToGenerate.length === 0
+      ) {
+
+        setPayrollError(
+          'Please select a valid branch.'
         );
+
+        return;
+      }
+
+
+      // ------------------------------------------------------
+      // GENERATE PAYROLL FOR EACH BRANCH
+      // ------------------------------------------------------
+
+      const results = [];
+
+
+      for (
+        const branch
+        of branchesToGenerate
+      ) {
+
+        const branchId =
+          Number(
+            branch.branchId
+          );
+
+
+        const response =
+          await apiClient.post(
+            `/api/payroll/generate/branch/${branchId}`
+          );
+
+
+        const responseData =
+          unwrapResponse(response);
+
+
+        results.push({
+
+          branchId,
+
+          branchName:
+            branch.branchName,
+
+          message:
+            responseData?.message ||
+            response?.data?.message ||
+            'Branch payroll generation completed'
+
+        });
+      }
+
+
+      // ------------------------------------------------------
+      // BUILD FINAL MESSAGE
+      // ------------------------------------------------------
+
+      const messages =
+        results
+          .map(
+            (result) =>
+              result.message
+          )
+          .filter(Boolean);
+
+
+      const uniqueMessages =
+        [...new Set(messages)];
+
+
+      let finalMessage =
+        'Branch payroll generation completed.';
+
+
+      if (
+        uniqueMessages.length === 1
+      ) {
+
+        finalMessage =
+          uniqueMessages[0];
+
+      } else if (
+        uniqueMessages.length > 1
+      ) {
+
+        finalMessage =
+          uniqueMessages.join(' ');
+
+      }
+
+
+      // ------------------------------------------------------
+      // SHOW MESSAGE ON SCREEN
+      // ------------------------------------------------------
+
+      setPayrollMessage(
+        finalMessage
+      );
+
+
+      // ------------------------------------------------------
+      // RELOAD PAYROLL DATA
+      // ------------------------------------------------------
+
+      await loadPayroll();
+
+
+      // ------------------------------------------------------
+      // RELOAD CURRENT PERIODS
+      // ------------------------------------------------------
+
+      await loadCurrentPeriodsForBranches(
+        branches
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        'Payroll generation failed:',
+        error
+      );
+
+
+      setPayrollError(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to generate payroll.'
+      );
+
+
+    } finally {
+
+      setGeneratingPayroll(false);
+    }
+
+  };
+
+
+  // ==========================================================
+  // SAVE CONFIGURATION
+  // ==========================================================
+
+  const handleSaveConfiguration =
+    async () => {
+
+      if (branches.length === 0) {
+
+        setConfigurationError(
+          'No branches are available.'
+        );
+
+        return;
+      }
+
+      const startDay =
+        Number(configuration.startDay);
+
+      const endDay =
+        Number(configuration.endDay);
+
+      const paymentDay =
+        Number(configuration.paymentDay);
+
+
+      // --------------------------------------------------------
+      // VALIDATION
+      // --------------------------------------------------------
+
+      if (
+        !Number.isInteger(startDay) ||
+        startDay < 1 ||
+        startDay > 31
+      ) {
+
+        setConfigurationMessage('');
+
+        setConfigurationError(
+          'Start Day must be between 1 and 31.'
+        );
+
+        return;
+      }
+
+
+      if (
+        !Number.isInteger(endDay) ||
+        endDay < 0 ||
+        endDay > 31
+      ) {
+
+        setConfigurationMessage('');
+
+        setConfigurationError(
+          'End Day must be between 0 and 31. Use 0 for the last day of the month.'
+        );
+
+        return;
+      }
+
+
+      if (
+        !Number.isInteger(paymentDay) ||
+        paymentDay < 1 ||
+        paymentDay > 31
+      ) {
+
+        setConfigurationMessage('');
+
+        setConfigurationError(
+          'Payment Day must be between 1 and 31.'
+        );
+
+        return;
+      }
+
+
+      const payload = {
+
+        startDay,
+
+        endDay,
+
+        paymentDay,
+
+        enabled:
+          Boolean(
+            configuration.enabled
+          ),
+
+      };
+
+
+      try {
+
+        setConfigurationSaving(true);
+
+        setConfigurationMessage('');
+        setConfigurationError('');
+
+
+        // ------------------------------------------------------
+        // SAVE FOR ALL BRANCHES
+        // ------------------------------------------------------
+
+        if (
+          selectedBranch === 'ALL'
+        ) {
+
+          for (
+            const branch of branches
+          ) {
+
+            await apiClient.put(
+              `/api/payroll/configuration/${branch.branchId}`,
+              payload
+            );
+
+          }
+
+          // Keep the values visible immediately.
+          setConfiguration({
+            startDay,
+            endDay,
+            paymentDay,
+            enabled: Boolean(
+              configuration.enabled
+            ),
+          });
+
+          // Refresh configuration and period cards, but do not
+          // allow the refresh to erase the success message.
+          await loadConfiguration(
+            branches[0]?.branchId,
+            {
+              clearMessages: false,
+            }
+          );
+
+          setConfigurationMessage(
+            'Payroll period configuration saved successfully for all branches.'
+          );
+
+        }
+
+        // ------------------------------------------------------
+        // SAVE FOR SINGLE BRANCH
+        // ------------------------------------------------------
+
+        else {
+
+          const branchId =
+            Number(selectedBranch);
+
+          if (!branchId) {
+
+            throw new Error(
+              'Please select a valid branch.'
+            );
+
+          }
+
+          await apiClient.put(
+            `/api/payroll/configuration/${branchId}`,
+            payload
+          );
+
+          // Keep the values visible immediately.
+          setConfiguration({
+            startDay,
+            endDay,
+            paymentDay,
+            enabled: Boolean(
+              configuration.enabled
+            ),
+          });
+
+          // Refresh configuration and period cards, but do not
+          // allow the refresh to erase the success message.
+          await loadConfiguration(
+            branchId,
+            {
+              clearMessages: false,
+            }
+          );
+
+          setConfigurationMessage(
+            'Payroll period configuration saved successfully.'
+          );
+
+        }
+
+        await loadPayroll();
+        await loadCurrentPeriodsForBranches(branches);
+
+      } catch (error) {
+
+        console.error(
+          'Failed to save payroll configuration:',
+          error
+        );
+
+        setConfigurationMessage('');
+
+        setConfigurationError(
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to save payroll configuration.'
+        );
+
+      } finally {
+
+        setConfigurationSaving(false);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // DATE KEY
+  // ==========================================================
+
+  const getDateKey = (value) => {
+    if (!value) return null;
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+
+    return `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1
+    ).padStart(2, '0')}-${String(
+      date.getUTCDate()
+    ).padStart(2, '0')}`;
+  };
+
+
+  // ==========================================================
+  //   // PAYROLL MONTH
+  // ==========================================================
+
+  const getPayrollMonth = (
+    record
+  ) => {
+
+    if (!record?.payPeriodStart) {
+      return '-';
+    }
+
+    const date =
+      new Date(
+        record.payPeriodStart
+      );
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+
+      return '-';
+
+    }
+
+    return date.toLocaleDateString(
+      'en-IN',
+      {
+        month: 'short',
+        year: 'numeric',
       }
     );
 
-  }, [records, search]);
+  };
 
 
   // ==========================================================
-  // Export Payroll
+  // FORMAT DATE
+  // ==========================================================
+
+  const formatDate = (
+    date
+  ) => {
+
+    if (!date) {
+      return '-';
+    }
+
+    const parsedDate =
+      new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+
+      return '-';
+
+    }
+
+    return parsedDate.toLocaleDateString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }
+    );
+
+  };
+
+
+  // ==========================================================
+  // FORMAT CURRENCY
+  // ==========================================================
+
+  const formatCurrency = (
+    value
+  ) => {
+
+    const amount =
+      Number(value);
+
+    if (
+      Number.isNaN(amount)
+    ) {
+
+      return '₹0';
+
+    }
+
+    return `₹${amount.toLocaleString(
+      'en-IN',
+      {
+        maximumFractionDigits: 2,
+      }
+    )}`;
+
+  };
+
+
+  // ==========================================================
+  // EMPLOYEE NAME
+  // ==========================================================
+
+  const getEmployeeName = (
+    record
+  ) => {
+
+    const firstName =
+      record?.employee?.firstName ||
+      '';
+
+    const lastName =
+      record?.employee?.lastName ||
+      '';
+
+    const fullName =
+      `${firstName} ${lastName}`.trim();
+
+    return (
+      fullName ||
+      'Unknown Employee'
+    );
+
+  };
+
+
+  // ==========================================================
+  // EMPLOYEE BASE SALARY
+  // ==========================================================
+
+  const getBaseSalary = (
+    record
+  ) => {
+
+    const salary =
+      record?.baseSalary ??
+      record?.monthlySalary ??
+      record?.basicSalary ??
+      0;
+
+    return Number(salary) || 0;
+
+  };
+
+
+  // ==========================================================
+  // LIVE ADVANCE DEDUCTION
+  // ==========================================================
+
+  const getAdvanceDeduction = (
+    record
+  ) => {
+
+    const deduction =
+      record?.advanceDeduction ??
+      0;
+
+    return Math.max(
+      Number(deduction) || 0,
+      0
+    );
+
+  };
+
+
+  // ==========================================================
+  // LIVE PENDING AMOUNT
+  // ==========================================================
+  //
+  // Example:
+  //
+  // Salary       = ₹30,000
+  // Advance      = ₹2,000
+  // Pending      = ₹28,000
+  //
+  // Another advance:
+  //
+  // Salary       = ₹30,000
+  // Total advance = ₹7,000
+  // Pending      = ₹23,000
+  //
+  // ==========================================================
+
+  const getPendingAmount = (
+    record
+  ) => {
+
+    const salary =
+      getBaseSalary(record);
+
+    const advance =
+      getAdvanceDeduction(record);
+
+    return Math.max(
+      salary - advance,
+      0
+    );
+
+  };
+
+
+  // ==========================================================
+  // RECORD BRANCH ID
+  // ==========================================================
+
+  const getRecordBranchId = (
+    record
+  ) => {
+
+    const branchId =
+      record?.branchId ??
+      record?.employee?.branchId ??
+      record?.employee?.branch?.branchId ??
+      null;
+
+    if (
+      branchId === null ||
+      branchId === undefined
+    ) {
+
+      return null;
+
+    }
+
+    const numericBranchId =
+      Number(branchId);
+
+    return Number.isInteger(
+      numericBranchId
+    )
+      ? numericBranchId
+      : null;
+
+  };
+
+
+  // ==========================================================
+  // RECORD BRANCH NAME
+  // ==========================================================
+
+  const getRecordBranchName = (
+    record
+  ) => {
+
+    if (
+      record?.branch?.branchName
+    ) {
+
+      return (
+        record.branch.branchName
+      );
+
+    }
+
+    if (
+      record?.employee?.branch?.branchName
+    ) {
+
+      return (
+        record.employee.branch.branchName
+      );
+
+    }
+
+    const branchId =
+      getRecordBranchId(record);
+
+    if (
+      branchId === null
+    ) {
+
+      return '-';
+
+    }
+
+    const branch =
+      branches.find(
+        (item) =>
+          Number(
+            item.branchId
+          ) === branchId
+      );
+
+    return (
+      branch?.branchName ||
+      `Branch ${branchId}`
+    );
+
+  };
+
+
+  // ==========================================================
+  // STATUS
+  // ==========================================================
+
+  const isPayrollPaid = (
+    record
+  ) => {
+
+    return (
+      String(
+        record?.status || ''
+      ).toUpperCase() === 'PAID' ||
+      Boolean(record?.paymentDate)
+    );
+
+  };
+
+
+  // ==========================================================
+  // CURRENT PAYROLL RECORDS
+  // ==========================================================
+
+  const currentPayrollRecords =
+    useMemo(() => {
+      return records.filter((record) => {
+        // Paid payrolls always belong to History.
+        if (isPayrollPaid(record)) return false;
+
+        const recordBranchId = getRecordBranchId(record);
+
+        if (
+          selectedBranch !== 'ALL' &&
+          Number(recordBranchId) !== Number(selectedBranch)
+        ) {
+          return false;
+        }
+
+        if (recordBranchId === null) return false;
+
+        // Current Payroll means the exact current period for this
+        // payroll record's branch. Older and future unpaid records
+        // must not appear in Current Payroll.
+        const branchCurrentPeriod =
+          currentPeriodsByBranch[Number(recordBranchId)];
+
+        if (!branchCurrentPeriod) return false;
+
+        const currentStart = getDateKey(
+          branchCurrentPeriod.payPeriodStart ??
+          branchCurrentPeriod.periodStart
+        );
+
+        const currentEnd = getDateKey(
+          branchCurrentPeriod.payPeriodEnd ??
+          branchCurrentPeriod.periodEnd
+        );
+
+        const recordStart = getDateKey(record.payPeriodStart);
+        const recordEnd = getDateKey(record.payPeriodEnd);
+
+        return Boolean(
+          currentStart &&
+          currentEnd &&
+          recordStart &&
+          recordEnd &&
+          recordStart === currentStart &&
+          recordEnd === currentEnd
+        );
+      });
+    }, [records, selectedBranch, currentPeriodsByBranch]);
+
+
+  // HISTORY RECORDS
+  // ==========================================================
+
+  const historyPayrollRecords =
+    useMemo(() => {
+
+      return records.filter(
+        (record) =>
+          isPayrollPaid(record)
+      );
+
+    }, [records]);
+
+
+  // ==========================================================
+  // FILTER CURRENT PAYROLL
+  // ==========================================================
+
+  const filteredCurrentPayroll =
+    useMemo(() => {
+
+      const searchTerm =
+        search
+          .trim()
+          .toLowerCase();
+
+      return currentPayrollRecords.filter(
+        (record) => {
+
+          // ----------------------------------------------------
+          // BRANCH
+          // ----------------------------------------------------
+
+          if (
+            selectedBranch !== 'ALL'
+          ) {
+
+            const branchId =
+              getRecordBranchId(record);
+
+            if (
+              Number(branchId) !==
+              Number(selectedBranch)
+            ) {
+
+              return false;
+
+            }
+
+          }
+
+
+          // ----------------------------------------------------
+          // SEARCH
+          // ----------------------------------------------------
+
+          if (!searchTerm) {
+            return true;
+          }
+
+          const employeeName =
+            getEmployeeName(
+              record
+            ).toLowerCase();
+
+          const employeeId =
+            String(
+              record?.employeeId ??
+              ''
+            ).toLowerCase();
+
+          const email =
+            String(
+              record?.employee?.email ??
+              ''
+            ).toLowerCase();
+
+          const branchName =
+            getRecordBranchName(
+              record
+            ).toLowerCase();
+
+          const month =
+            getPayrollMonth(
+              record
+            ).toLowerCase();
+
+          return (
+            employeeName.includes(
+              searchTerm
+            ) ||
+            employeeId.includes(
+              searchTerm
+            ) ||
+            email.includes(
+              searchTerm
+            ) ||
+            branchName.includes(
+              searchTerm
+            ) ||
+            month.includes(
+              searchTerm
+            )
+          );
+
+        }
+      );
+
+    }, [
+      currentPayrollRecords,
+      search,
+      selectedBranch,
+      branches,
+    ]);
+
+
+  // ==========================================================
+  // FILTER HISTORY
+  // ==========================================================
+
+  const filteredHistoryPayroll =
+    useMemo(() => {
+
+      const searchTerm =
+        search
+          .trim()
+          .toLowerCase();
+
+      return historyPayrollRecords.filter(
+        (record) => {
+
+          // ----------------------------------------------------
+          // BRANCH
+          // ----------------------------------------------------
+
+          if (
+            selectedBranch !== 'ALL'
+          ) {
+
+            const branchId =
+              getRecordBranchId(record);
+
+            if (
+              Number(branchId) !==
+              Number(selectedBranch)
+            ) {
+
+              return false;
+
+            }
+
+          }
+
+
+          // ----------------------------------------------------
+          // SEARCH
+          // ----------------------------------------------------
+
+          if (!searchTerm) {
+            return true;
+          }
+
+          const employeeName =
+            getEmployeeName(
+              record
+            ).toLowerCase();
+
+          const employeeId =
+            String(
+              record?.employeeId ??
+              ''
+            ).toLowerCase();
+
+          const email =
+            String(
+              record?.employee?.email ??
+              ''
+            ).toLowerCase();
+
+          const branchName =
+            getRecordBranchName(
+              record
+            ).toLowerCase();
+
+          const month =
+            getPayrollMonth(
+              record
+            ).toLowerCase();
+
+          return (
+            employeeName.includes(
+              searchTerm
+            ) ||
+            employeeId.includes(
+              searchTerm
+            ) ||
+            email.includes(
+              searchTerm
+            ) ||
+            branchName.includes(
+              searchTerm
+            ) ||
+            month.includes(
+              searchTerm
+            )
+          );
+
+        }
+      );
+
+    }, [
+      historyPayrollRecords,
+      search,
+      selectedBranch,
+      branches,
+    ]);
+
+
+  // ==========================================================
+  // CURRENT PAYMENT DATE
+  // ==========================================================
+
+  const getScheduledPaymentDate = (
+    record
+  ) => {
+
+    if (
+      record?.scheduledPaymentDate
+    ) {
+
+      return new Date(
+        record.scheduledPaymentDate
+      );
+
+    }
+
+    if (
+      record?.paymentDate
+    ) {
+
+      return new Date(
+        record.paymentDate
+      );
+
+    }
+
+    if (
+      currentPeriod?.paymentDate
+    ) {
+
+      return new Date(
+        currentPeriod.paymentDate
+      );
+
+    }
+
+    if (
+      currentPeriod?.scheduledPaymentDate
+    ) {
+
+      return new Date(
+        currentPeriod.scheduledPaymentDate
+      );
+
+    }
+
+    return null;
+
+  };
+
+
+  // ==========================================================
+  // CAN PAY
+  // ==========================================================
+
+  const canPayPayroll = (
+    record
+  ) => {
+
+    if (
+      isPayrollPaid(record)
+    ) {
+
+      return false;
+
+    }
+
+    const paymentDate =
+      getScheduledPaymentDate(
+        record
+      );
+
+    if (!paymentDate) {
+
+      return false;
+
+    }
+
+    const today =
+      new Date();
+
+    today.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    const configuredDate =
+      new Date(
+        paymentDate
+      );
+
+    configuredDate.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+    return (
+      today >= configuredDate
+    );
+
+  };
+
+
+  // ==========================================================
+  // PAYROLL PAY ACTION
+  // ==========================================================
+
+  const handlePayPayroll =
+    async (record) => {
+
+      if (!record?.payrollId) {
+
+        setPayrollError(
+          'Payroll ID is missing.'
+        );
+
+        return;
+
+      }
+
+      if (
+        isPayrollPaid(record)
+      ) {
+
+        return;
+
+      }
+
+      if (
+        !canPayPayroll(record)
+      ) {
+
+        setPayrollError(
+          `Payroll payment is not available until ${formatDate(
+            getScheduledPaymentDate(record)
+          )}.`
+        );
+
+        return;
+
+      }
+
+      try {
+
+        setPayingPayrollId(
+          record.payrollId
+        );
+
+        setPayrollMessage('');
+        setPayrollError('');
+
+        await payrollService.pay(
+          record.payrollId
+        );
+
+        setPayrollMessage(
+          `${getEmployeeName(
+            record
+          )}'s payroll has been marked as paid successfully.`
+        );
+
+        await loadPayroll();
+
+      } catch (error) {
+
+        console.error(
+          'Failed to pay payroll:',
+          error
+        );
+
+        setPayrollError(
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to process payroll payment.'
+        );
+
+      } finally {
+
+        setPayingPayrollId(null);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // CSV ESCAPE
+  // ==========================================================
+
+  const escapeCsvValue = (
+    value
+  ) => {
+
+    if (
+      value === null ||
+      value === undefined
+    ) {
+
+      return '';
+
+    }
+
+    const stringValue =
+      String(value);
+
+    if (
+      stringValue.includes(',') ||
+      stringValue.includes('"') ||
+      stringValue.includes('\n')
+    ) {
+
+      return `"${stringValue.replace(
+        /"/g,
+        '""'
+      )}"`;
+
+    }
+
+    return stringValue;
+
+  };
+
+
+  // ==========================================================
+  // EXPORT CURRENT/HISTORY
   // ==========================================================
 
   const handleExport = () => {
 
+    const exportRecords =
+      payrollView === 'CURRENT'
+        ? filteredCurrentPayroll
+        : filteredHistoryPayroll;
+
     if (
-      filtered.length === 0
+      exportRecords.length === 0
     ) {
+
       return;
+
     }
 
-
     const headers = [
-
       'Payroll ID',
-
       'Employee ID',
-
       'Employee Name',
-
       'Email',
-
+      'Branch',
       'Pay Period Start',
-
       'Pay Period End',
-
-      'Base Salary',
-
-      'Expected Monthly Hours',
-
-      'Hourly Rate',
-
-      'Actual Working Hours',
-
-      'Earned Salary',
-
+      'Monthly Salary',
       'Advance Deduction',
-
-      'Net Salary',
-
-      'Payment Date',
-
+      'Pending / Net Salary',
+      'Scheduled Payment Date',
+      'Actual Payment Date',
+      'Status',
     ];
 
 
     const rows =
-      filtered.map(
-        (record) => [
+      exportRecords.map(
+        (record) => {
 
-          record?.payrollId,
+          const salary =
+            getBaseSalary(record);
 
-          record?.employeeId,
+          const advance =
+            getAdvanceDeduction(record);
 
-          getEmployeeName(record),
+          const pending =
+            getPendingAmount(record);
 
-          record?.employee?.email || '',
+          return [
 
-          formatDate(
-            record?.payPeriodStart
-          ),
+            record.payrollId,
 
-          formatDate(
-            record?.payPeriodEnd
-          ),
+            record.employeeId,
 
-          record?.baseSalary ?? '',
+            getEmployeeName(record),
 
-          record?.monthlyExpectedHours ?? '',
+            record.employee?.email ||
+            '',
 
-          record?.salaryRatePerHour ?? '',
+            getRecordBranchName(record),
 
-          record?.totalWorkingHours ?? 0,
+            formatDate(
+              record.payPeriodStart
+            ),
 
-          record?.basicSalary ?? 0,
+            formatDate(
+              record.payPeriodEnd
+            ),
 
-          record?.advanceDeduction ?? 0,
+            salary,
 
-          record?.netSalary ?? 0,
+            advance,
 
-          formatDate(
-            record?.paymentDate
-          ),
+            isPayrollPaid(record)
+              ? (
+                record.netSalary ??
+                pending
+              )
+              : pending,
 
-        ]
+            formatDate(
+              getScheduledPaymentDate(
+                record
+              )
+            ),
+
+            formatDate(
+              record.paymentDate
+            ),
+
+            isPayrollPaid(record)
+              ? 'PAID'
+              : 'UNPAID',
+
+          ];
+
+        }
       );
 
 
-    const csv =
-      [
-        headers,
-        ...rows,
-      ]
-        .map(
-          (row) =>
-            row
-              .map(
-                escapeCsvValue
-              )
-              .join(',')
-        )
-        .join('\n');
-
-
-    const csvWithBom =
-      '\uFEFF' + csv;
+    const csv = [
+      headers,
+      ...rows,
+    ]
+      .map(
+        (row) =>
+          row
+            .map(
+              escapeCsvValue
+            )
+            .join(',')
+      )
+      .join('\n');
 
 
     const blob =
       new Blob(
-        [csvWithBom],
+        [
+          '\uFEFF' +
+          csv,
+        ],
         {
           type:
             'text/csv;charset=utf-8;',
@@ -557,7 +1901,6 @@ export function AdminPayroll() {
         'a'
       );
 
-
     link.href = url;
 
 
@@ -568,990 +1911,530 @@ export function AdminPayroll() {
 
 
     link.download =
-      `payroll-export-${date}.csv`;
+      `payroll-${payrollView.toLowerCase()}-${date}.csv`;
 
 
     document.body.appendChild(
       link
     );
 
-
     link.click();
-
 
     document.body.removeChild(
       link
     );
 
-
     URL.revokeObjectURL(
       url
     );
+
   };
 
 
   // ==========================================================
-  // Generate Payroll
+  // TABLE COLUMNS
   // ==========================================================
 
-  const handleGeneratePayroll =
-    async (formData) => {
+  const columns = useMemo(() => {
 
-      try {
+    const baseColumns = [
 
-        setSaving(true);
+      // --------------------------------------------------------
+      // EMPLOYEE ID
+      // --------------------------------------------------------
 
+      {
+        key: 'employeeId',
+        label: 'Emp ID',
 
-        const response =
-          await payrollService.create(
-            formData
-          );
+        render: (record) => (
 
+          <span className="font-mono text-xs font-semibold text-navy-600">
 
-        console.log(
-          'Payroll created:',
-          response
-        );
+            {record.employeeId}
 
-
-        toast(
-          'Payroll generated successfully',
-          'success'
-        );
-
-
-        setGenerateModalOpen(
-          false
-        );
-
-
-        await loadPayroll();
-
-
-      } catch (error) {
-
-        console.error(
-          'Payroll generation failed:',
-          error
-        );
-
-
-        toast(
-          getErrorMessage(error),
-          'error'
-        );
-
-      } finally {
-
-        setSaving(false);
-
-      }
-    };
-
-
-  // ==========================================================
-  // Table Columns
-  // ==========================================================
-
-  const columns = [
-
-    // --------------------------------------------------------
-    // Employee ID
-    // --------------------------------------------------------
-
-    {
-      key: 'employeeId',
-
-      label: 'Emp ID',
-
-      render: (record) => (
-        <span
-          className="
-            font-mono
-            text-xs
-            font-semibold
-            text-navy-600
-          "
-        >
-          {record?.employeeId ?? '—'}
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Employee
-    // --------------------------------------------------------
-
-    {
-      key: 'employee',
-
-      label: 'Employee',
-
-      render: (record) => (
-        <div>
-
-          <div
-            className="
-              font-medium
-              text-navy-900
-            "
-          >
-            {getEmployeeName(
-              record
-            )}
-          </div>
-
-          {record?.employee?.email && (
-            <div
-              className="
-                text-xs
-                text-navy-400
-              "
-            >
-              {record.employee.email}
-            </div>
-          )}
-
-        </div>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Period
-    // --------------------------------------------------------
-
-    {
-      key: 'month',
-
-      label: 'Pay Period',
-
-      render: (record) => (
-        <div>
-
-          <span
-            className="
-              text-navy-700
-              font-medium
-            "
-          >
-            {getPayrollMonth(
-              record
-            )}
           </span>
 
-          <div
-            className="
-              text-xs
-              text-navy-400
-              mt-1
-            "
-          >
-            {formatDate(
-              record?.payPeriodStart
-            )}
+        ),
 
-            {' — '}
-
-            {formatDate(
-              record?.payPeriodEnd
-            )}
-          </div>
-
-        </div>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Base Salary
-    // --------------------------------------------------------
-
-    {
-      key: 'baseSalary',
-
-      label: 'Base Salary',
-
-      align: 'right',
-
-      render: (record) => (
-        <span
-          className="
-            text-navy-700
-            font-medium
-          "
-        >
-          {record?.baseSalary !== null &&
-           record?.baseSalary !== undefined
-            ? formatCurrency(
-                record.baseSalary
-              )
-            : '—'}
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Expected Monthly Hours
-    // --------------------------------------------------------
-
-    {
-      key: 'monthlyExpectedHours',
-
-      label: 'Expected Hrs',
-
-      align: 'right',
-
-      render: (record) => (
-        <span
-          className="
-            text-navy-600
-          "
-        >
-          {record?.monthlyExpectedHours !== null &&
-           record?.monthlyExpectedHours !== undefined
-            ? `${formatNumber(
-                record.monthlyExpectedHours
-              )} hrs`
-            : '—'}
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Hourly Rate
-    // --------------------------------------------------------
-
-    {
-      key: 'salaryRatePerHour',
-
-      label: 'Hourly Rate',
-
-      align: 'right',
-
-      render: (record) => (
-        <span
-          className="
-            text-navy-700
-            font-medium
-          "
-        >
-          {record?.salaryRatePerHour !== null &&
-           record?.salaryRatePerHour !== undefined
-            ? formatCurrency(
-                record.salaryRatePerHour
-              )
-            : '—'}
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Actual Working Hours
-    // --------------------------------------------------------
-
-    {
-      key: 'workingHours',
-
-      label: 'Actual Hours',
-
-      align: 'right',
-
-      render: (record) => (
-        <span
-          className="
-            text-navy-600
-          "
-        >
-          {formatNumber(
-            record?.totalWorkingHours
-          )}{' '}
-          hrs
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Earned Salary
-    // --------------------------------------------------------
-
-    {
-      key: 'basicSalary',
-
-      label: 'Earned Salary',
-
-      align: 'right',
-
-      render: (record) => (
-        <span
-          className="
-            text-navy-700
-            font-semibold
-          "
-        >
-          {formatCurrency(
-            record?.basicSalary
-          )}
-        </span>
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Advance Deduction
-    // --------------------------------------------------------
-
-    {
-      key: 'advanceDeduction',
-
-      label: 'Advance',
-
-      align: 'right',
-
-      render: (record) => (
-
-        <span
-          className="
-            font-medium
-            text-error-600
-          "
-        >
-
-          {Number(
-            record?.advanceDeduction
-          ) > 0
-            ? `-${formatCurrency(
-                record.advanceDeduction
-              )}`
-            : formatCurrency(0)}
-
-        </span>
-
-      ),
-    },
-
-
-    // --------------------------------------------------------
-    // Net Salary
-    // --------------------------------------------------------
-
-    {
-      key: 'netSalary',
-
-      label: 'Net Pay',
-
-      align: 'right',
-
-      render: (record) => {
-
-        const netSalary =
-          Number(
-            record?.netSalary
-          );
-
-
-        const isNegative =
-          netSalary < 0;
-
-
-        return (
-          <span
-            className={`font-bold ${
-              isNegative
-                ? 'text-error-600'
-                : 'text-navy-900'
-            }`}
-          >
-            {formatCurrency(
-              netSalary
-            )}
-          </span>
-        );
       },
-    },
 
 
-    // --------------------------------------------------------
-    // Payment Date
-    // --------------------------------------------------------
+      // --------------------------------------------------------
+      // EMPLOYEE
+      // --------------------------------------------------------
 
-    {
-      key: 'paymentDate',
+      {
+        key: 'employee',
+        label: 'Employee',
 
-      label: 'Payment Date',
+        render: (record) => (
 
-      render: (record) => (
-        <span
-          className="
-            text-navy-500
-            text-sm
-          "
-        >
-          {formatDate(
-            record?.paymentDate
-          )}
-        </span>
-      ),
-    },
+          <div>
 
-  ];
+            <div className="font-medium text-navy-900">
 
+              {getEmployeeName(record)}
 
-  // ==========================================================
-  // Loading
-  // ==========================================================
+            </div>
 
-  if (loading) {
+            {record.employee?.email && (
 
-    return (
-      <FullPageSpinner
-        message="Loading payroll..."
-      />
-    );
-  }
+              <div className="text-xs text-navy-400">
 
+                {record.employee.email}
 
-  // ==========================================================
-  // Page
-  // ==========================================================
+              </div>
 
-  return (
-    <div>
-
-      <PageHeader
-        title="Payroll"
-
-        subtitle={`
-          ${filtered.length}
-          record${filtered.length !== 1 ? 's' : ''}
-        `}
-
-        actions={
-
-          <div
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-
-            {/* Generate */}
-
-            <button
-              type="button"
-
-              onClick={() =>
-                setGenerateModalOpen(
-                  true
-                )
-              }
-
-              className="
-                btn-primary
-                flex
-                items-center
-                gap-2
-              "
-            >
-              <Plus size={18} />
-              Generate Payroll
-            </button>
-
-
-            {/* Export */}
-
-            <button
-              type="button"
-
-              onClick={handleExport}
-
-              disabled={
-                filtered.length === 0
-              }
-
-              className="
-                btn-secondary
-                flex
-                items-center
-                gap-2
-                disabled:opacity-50
-                disabled:cursor-not-allowed
-              "
-            >
-              <Download size={18} />
-              Export
-            </button>
+            )}
 
           </div>
-        }
-      />
+
+        ),
+
+      },
 
 
-      {/* ======================================================
-          Search + Refresh
-      ====================================================== */}
+      // --------------------------------------------------------
+      // BRANCH
+      // --------------------------------------------------------
 
-      <div
-        className="
-          mb-5
-          flex
-          items-center
-          gap-3
-        "
-      >
+      {
+        key: 'branch',
+        label: 'Branch',
 
-        <div className="flex-1">
+        render: (record) => (
 
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="
-              Search by employee name or ID...
-            "
-          />
+          <span className="font-medium text-navy-700">
 
-        </div>
+            {getRecordBranchName(record)}
+
+          </span>
+
+        ),
+
+      },
 
 
-        <button
-          type="button"
-          onClick={loadPayroll}
-          disabled={loading}
+      // --------------------------------------------------------
+      // MONTH
+      // --------------------------------------------------------
 
-          className="
-            flex
-            items-center
-            gap-2
-            px-4
-            py-2
-            rounded-lg
-            border
-            border-navy-200
-            text-navy-700
-            hover:bg-navy-50
-            transition-colors
-            disabled:opacity-50
-          "
-        >
+      {
+        key: 'month',
+        label: 'Month',
 
-          <RefreshCw
-            size={16}
-            className={
-              loading
-                ? 'animate-spin'
-                : ''
-            }
-          />
+        render: (record) => (
 
-          Refresh
+          <div>
 
-        </button>
+            <span className="text-navy-700 font-medium">
 
-      </div>
+              {getPayrollMonth(record)}
 
+            </span>
 
-      {/* ======================================================
-          Payroll Table
-      ====================================================== */}
+            <div className="text-xs text-navy-400 mt-1">
 
-      {filtered.length === 0 ? (
+              {formatDate(
+                record.payPeriodStart
+              )}
 
-        <EmptyState
-          icon={Wallet}
+              {' — '}
 
-          title="No payroll records"
+              {formatDate(
+                record.payPeriodEnd
+              )}
 
-          message={
-            search
-              ? 'No payroll records match your search.'
-              : 'Payroll records will appear here.'
-          }
-        />
+            </div>
 
-      ) : (
+          </div>
 
-        <DataTable
-          columns={columns}
-          data={filtered}
-        />
+        ),
 
-      )}
+      },
 
 
-      {/* ======================================================
-          Generate Payroll Modal
-      ====================================================== */}
+      // --------------------------------------------------------
+      // MONTHLY SALARY
+      // --------------------------------------------------------
 
-      <GeneratePayrollModal
-        open={
-          generateModalOpen
-        }
+      {
+        key: 'salary',
+        label: 'Salary',
+        align: 'right',
 
-        onClose={() => {
-          if (!saving) {
-            setGenerateModalOpen(
-              false
+        render: (record) => (
+
+          <span className="font-semibold text-navy-700">
+
+            {formatCurrency(
+              getBaseSalary(record)
+            )}
+
+          </span>
+
+        ),
+
+      },
+
+
+      // --------------------------------------------------------
+      // ADVANCE
+      // --------------------------------------------------------
+
+      {
+        key: 'advanceDeduction',
+        label: 'Advance',
+        align: 'right',
+
+        render: (record) => {
+
+          const advance =
+            getAdvanceDeduction(record);
+
+          return (
+
+            <span
+              className={
+                advance > 0
+                  ? 'font-semibold text-error-600'
+                  : 'text-navy-500'
+              }
+            >
+
+              {advance > 0
+                ? `-${formatCurrency(advance)}`
+                : formatCurrency(0)
+              }
+
+            </span>
+
+          );
+
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // PENDING / NET
+      // --------------------------------------------------------
+
+      {
+        key: 'pendingAmount',
+        label:
+          payrollView === 'CURRENT'
+            ? 'Pending Amount'
+            : 'Net Paid',
+        align: 'right',
+
+        render: (record) => {
+
+          const amount =
+            payrollView === 'CURRENT'
+              ? getPendingAmount(record)
+              : (
+                record.netSalary ??
+                getPendingAmount(record)
+              );
+
+          return (
+
+            <span className="font-bold text-navy-900">
+
+              {formatCurrency(amount)}
+
+            </span>
+
+          );
+
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // PAYMENT DATE
+      // --------------------------------------------------------
+
+      {
+        key: 'paymentDate',
+        label:
+          payrollView === 'CURRENT'
+            ? 'Payment Date'
+            : 'Paid On',
+
+        render: (record) => {
+
+          const date =
+            payrollView === 'CURRENT'
+              ? getScheduledPaymentDate(record)
+              : record.paymentDate;
+
+          return (
+
+            <span className="text-navy-600 text-sm">
+
+              {formatDate(date)}
+
+            </span>
+
+          );
+
+        },
+
+      },
+
+    ];
+
+
+    // ----------------------------------------------------------
+    // CURRENT PAYROLL ACTION
+    // ----------------------------------------------------------
+
+    if (
+      payrollView === 'CURRENT'
+    ) {
+
+      baseColumns.push({
+
+        key: 'action',
+        label: 'Action',
+        align: 'right',
+
+        render: (record) => {
+
+          const paid =
+            isPayrollPaid(record);
+
+          const available =
+            canPayPayroll(record);
+
+          const isPaying =
+            payingPayrollId ===
+            record.payrollId;
+
+          if (paid) {
+
+            return (
+
+              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-green-700">
+
+                <CheckCircle2
+                  size={16}
+                />
+
+                Paid
+
+              </div>
+
             );
+
           }
-        }}
-
-        employees={
-          employees
-        }
-
-        saving={
-          saving
-        }
-
-        onGenerate={
-          handleGeneratePayroll
-        }
-      />
-
-    </div>
-  );
-}
 
 
-// =================================================================
-// Generate Payroll Modal
-// =================================================================
+          return (
 
-function GeneratePayrollModal({
-  open,
-  onClose,
-  employees,
-  saving,
-  onGenerate,
-}) {
+            <div className="flex flex-col items-end gap-1">
 
-  const [form, setForm] = useState({
-    employeeId: '',
-    payPeriodStart:
-      getCurrentMonthStart(),
+              <button
+                type="button"
+                onClick={() =>
+                  handlePayPayroll(record)
+                }
+                disabled={
+                  !available ||
+                  isPaying
+                }
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-navy-800 text-white text-sm font-semibold hover:bg-navy-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title={
+                  available
+                    ? 'Pay payroll'
+                    : `Payment available from ${formatDate(
+                        getScheduledPaymentDate(record)
+                      )}`
+                }
+              >
 
-    payPeriodEnd:
-      getCurrentMonthEnd(),
+                {isPaying ? (
 
-    paymentDate:
-      getTodayString(),
-  });
+                  <>
+                    <Loader2
+                      size={15}
+                      className="animate-spin"
+                    />
 
+                    Paying...
 
-  // ==========================================================
-  // Reset Form
-  // ==========================================================
+                  </>
 
-  useEffect(() => {
+                ) : (
 
-    if (open) {
+                  <>
+                    <Wallet
+                      size={15}
+                    />
 
-      setForm({
-        employeeId: '',
-        payPeriodStart:
-          getCurrentMonthStart(),
+                    Pay
 
-        payPeriodEnd:
-          getCurrentMonthEnd(),
+                  </>
 
-        paymentDate:
-          getTodayString(),
+                )}
+
+              </button>
+
+              {!available && (
+
+                <span className="text-[11px] text-navy-400">
+
+                  Available from{' '}
+
+                  {formatDate(
+                    getScheduledPaymentDate(record)
+                  )}
+
+                </span>
+
+              )}
+
+            </div>
+
+          );
+
+        },
+
       });
 
     }
 
-  }, [open]);
 
-
-  // ==========================================================
-  // Update Field
-  // ==========================================================
-
-  const updateField = (
-    field,
-    value
-  ) => {
-
-    setForm(
-      (previous) => ({
-        ...previous,
-        [field]: value,
-      })
-    );
-
-  };
-
-
-  // ==========================================================
-  // Selected Employee
-  // ==========================================================
-
-  const selectedEmployee =
-    employees.find(
-      (employee) =>
-        String(
-          employee?.employeeId
-        ) ===
-        String(
-          form.employeeId
-        )
-    );
-
-
-  // ==========================================================
-  // Submit
-  // ==========================================================
-
-  const handleSubmit = (
-    event
-  ) => {
-
-    event.preventDefault();
-
-
-    if (!form.employeeId) {
-      return;
-    }
-
-
-    if (!form.payPeriodStart) {
-      return;
-    }
-
-
-    if (!form.payPeriodEnd) {
-      return;
-    }
-
+    // ----------------------------------------------------------
+    // HISTORY STATUS
+    // ----------------------------------------------------------
 
     if (
-      form.payPeriodStart >
-      form.payPeriodEnd
+      payrollView === 'HISTORY'
     ) {
-      return;
+
+      baseColumns.push({
+
+        key: 'status',
+        label: 'Status',
+
+        render: () => (
+
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-semibold text-green-700">
+
+            <CheckCircle2
+              size={14}
+            />
+
+            PAID
+
+          </span>
+
+        ),
+
+      });
+
     }
 
 
-    onGenerate({
-      employeeId:
-        Number(
-          form.employeeId
-        ),
+    return baseColumns;
 
-      payPeriodStart:
-        form.payPeriodStart,
-
-      payPeriodEnd:
-        form.payPeriodEnd,
-
-      paymentDate:
-        form.paymentDate || null,
-    });
-
-  };
+  }, [
+    payrollView,
+    branches,
+    payingPayrollId,
+    currentPeriod,
+    records,
+  ]);
 
 
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Generate Payroll"
-      size="lg"
-    >
+  // ==========================================================
+  // PERIOD CARD
+  // ==========================================================
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5"
-      >
+  const renderPeriodCard = (
+    title,
+    period
+  ) => {
 
-        {/* ==================================================
-            Employee
-        ================================================== */}
+    return (
 
-        <div className="flex flex-col gap-1.5">
+      <div className="rounded-xl border border-navy-100 bg-white p-5">
 
-          <label
-            className="
-              text-sm
-              font-medium
-              text-navy-700
-            "
-          >
-            Employee
+        <div className="flex items-center gap-2 mb-4">
 
-            <span className="text-error-500">
-              *
-            </span>
-          </label>
+          <CalendarDays
+            size={18}
+            className="text-navy-600"
+          />
 
+          <h3 className="font-semibold text-navy-800">
 
-          <select
-            className="input-field"
+            {title}
 
-            value={
-              form.employeeId
-            }
-
-            onChange={(event) =>
-              updateField(
-                'employeeId',
-                event.target.value
-              )
-            }
-
-            required
-          >
-
-            <option value="">
-              Select Employee
-            </option>
-
-            {employees.map(
-              (employee) => (
-                <option
-                  key={
-                    employee.employeeId
-                  }
-                  value={
-                    employee.employeeId
-                  }
-                >
-                  {getEmployeeDisplayName(
-                    employee
-                  )}
-                </option>
-              )
-            )}
-
-          </select>
-
-          {employees.length === 0 && (
-            <p
-              className="
-                text-xs
-                text-error-600
-              "
-            >
-              No active employees are available.
-            </p>
-          )}
+          </h3>
 
         </div>
 
 
-        {/* ==================================================
-            Selected Employee Salary Information
-        ================================================== */}
+        {!period ? (
 
-        {selectedEmployee && (
+          <p className="text-sm text-navy-400">
 
-          <div
-            className="
-              rounded-lg
-              border
-              border-navy-100
-              bg-navy-50
-              p-4
-            "
-          >
+            Period information unavailable.
 
-            <div
-              className="
-                text-sm
-                font-semibold
-                text-navy-800
-                mb-3
-              "
-            >
-              Current Salary Configuration
+          </p>
+
+        ) : (
+
+          <div className="space-y-3">
+
+            <div>
+
+              <div className="text-xs text-navy-400">
+
+                Payroll Period
+
+              </div>
+
+              <div className="text-base font-semibold text-navy-800">
+
+                {formatDate(
+                  period.payPeriodStart ??
+                  period.periodStart
+                )}
+
+                {' → '}
+
+                {formatDate(
+                  period.payPeriodEnd ??
+                  period.periodEnd
+                )}
+
+              </div>
+
             </div>
 
 
-            <div
-              className="
-                grid
-                grid-cols-1
-                sm:grid-cols-3
-                gap-3
-              "
-            >
+            <div>
 
-              <div>
-                <p
-                  className="
-                    text-xs
-                    text-navy-400
-                  "
-                >
-                  Base Salary
-                </p>
+              <div className="text-xs text-navy-400">
 
-                <p
-                  className="
-                    text-sm
-                    font-semibold
-                    text-navy-800
-                  "
-                >
-                  {formatCurrency(
-                    selectedEmployee.baseSalary
-                  )}
-                </p>
+                Payment Date
+
               </div>
 
+              <div className="text-sm font-semibold text-navy-700">
 
-              <div>
-                <p
-                  className="
-                    text-xs
-                    text-navy-400
-                  "
-                >
-                  Expected Hours
-                </p>
+                {formatDate(
+                  period.paymentDate ??
+                  period.scheduledPaymentDate
+                )}
 
-                <p
-                  className="
-                    text-sm
-                    font-semibold
-                    text-navy-800
-                  "
-                >
-                  {formatNumber(
-                    selectedEmployee.monthlyExpectedHours
-                  )}{' '}
-                  hrs
-                </p>
-              </div>
-
-
-              <div>
-                <p
-                  className="
-                    text-xs
-                    text-navy-400
-                  "
-                >
-                  Hourly Rate
-                </p>
-
-                <p
-                  className="
-                    text-sm
-                    font-semibold
-                    text-navy-800
-                  "
-                >
-                  {formatCurrency(
-                    selectedEmployee.salaryRatePerHour
-                  )}
-                </p>
               </div>
 
             </div>
@@ -1560,260 +2443,880 @@ function GeneratePayrollModal({
 
         )}
 
+      </div>
 
-        {/* ==================================================
-            Pay Period
-        ================================================== */}
+    );
 
-        <div
-          className="
-            grid
-            grid-cols-1
-            sm:grid-cols-2
-            gap-4
-          "
+  };
+
+
+  // ==========================================================
+  // CURRENT VIEW COUNT
+  // ==========================================================
+
+  const displayedRecords =
+    payrollView === 'CURRENT'
+      ? filteredCurrentPayroll
+      : filteredHistoryPayroll;
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
+  if (
+    loading ||
+    branchesLoading
+  ) {
+
+    return (
+
+      <FullPageSpinner
+        message="Loading payroll..."
+      />
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // PAGE
+  // ==========================================================
+
+  return (
+
+    <div>
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
+      <PageHeader
+
+        title="Payroll"
+
+        subtitle={
+          payrollView === 'CURRENT'
+            ? `${filteredCurrentPayroll.length} current payroll record${
+                filteredCurrentPayroll.length !== 1
+                  ? 's'
+                  : ''
+              }`
+            : `${filteredHistoryPayroll.length} paid payroll record${
+                filteredHistoryPayroll.length !== 1
+                  ? 's'
+                  : ''
+              }`
+        }
+
+        actions={
+
+          <div className="flex items-center gap-2">
+
+            <button
+              type="button"
+              onClick={
+                handleGenerateCurrentPayroll
+              }
+              disabled={
+                generatingPayroll ||
+                branches.length === 0
+              }
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-800 text-white hover:bg-navy-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+
+              {generatingPayroll ? (
+
+                <Loader2
+                  size={17}
+                  className="animate-spin"
+                />
+
+              ) : (
+
+                <RefreshCw
+                  size={17}
+                />
+
+              )}
+
+              {generatingPayroll
+                ? 'Generating...'
+                : 'Generate Current'
+              }
+
+            </button>
+
+
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={
+                displayedRecords.length === 0
+              }
+              className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+
+              <Download
+                size={18}
+              />
+
+              Export
+
+            </button>
+
+          </div>
+
+        }
+
+      />
+
+
+      {/* ======================================================
+          ACTION MESSAGE
+      ====================================================== */}
+
+      {payrollMessage && (
+
+        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+
+          {payrollMessage}
+
+        </div>
+
+      )}
+
+
+      {payrollError && (
+
+        <div className="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
+
+          {payrollError}
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          CURRENT / HISTORY TABS
+      ====================================================== */}
+
+      <div className="mb-5 flex items-center gap-1 rounded-xl border border-navy-100 bg-white p-1 w-fit">
+
+        <button
+          type="button"
+          onClick={() => {
+            setPayrollView('CURRENT');
+            setPayrollMessage('');
+            setPayrollError('');
+          }}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            payrollView === 'CURRENT'
+              ? 'bg-navy-800 text-white'
+              : 'text-navy-600 hover:bg-navy-50'
+          }`}
         >
 
-          {/* Start */}
+          <Wallet
+            size={16}
+          />
 
-          <div
-            className="
-              flex
-              flex-col
-              gap-1.5
-            "
+          Current Payroll
+
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs ${
+              payrollView === 'CURRENT'
+                ? 'bg-white/15 text-white'
+                : 'bg-navy-50 text-navy-600'
+            }`}
           >
 
-            <label
-              className="
-                text-sm
-                font-medium
-                text-navy-700
-              "
-            >
-              Pay Period Start
+            {currentPayrollRecords.length}
 
-              <span className="text-error-500">
-                *
-              </span>
-            </label>
+          </span>
+
+        </button>
 
 
-            <input
-              type="date"
+        <button
+          type="button"
+          onClick={() => {
+            setPayrollView('HISTORY');
+            setPayrollMessage('');
+            setPayrollError('');
+          }}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            payrollView === 'HISTORY'
+              ? 'bg-navy-800 text-white'
+              : 'text-navy-600 hover:bg-navy-50'
+          }`}
+        >
 
-              className="input-field"
+          <CheckCircle2
+            size={16}
+          />
 
-              value={
-                form.payPeriodStart
-              }
+          Payroll History
 
-              onChange={(event) =>
-                updateField(
-                  'payPeriodStart',
-                  event.target.value
-                )
-              }
-
-              required
-            />
-
-          </div>
-
-
-          {/* End */}
-
-          <div
-            className="
-              flex
-              flex-col
-              gap-1.5
-            "
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs ${
+              payrollView === 'HISTORY'
+                ? 'bg-white/15 text-white'
+                : 'bg-navy-50 text-navy-600'
+            }`}
           >
 
-            <label
-              className="
-                text-sm
-                font-medium
-                text-navy-700
-              "
-            >
-              Pay Period End
+            {historyPayrollRecords.length}
 
-              <span className="text-error-500">
-                *
-              </span>
-            </label>
+          </span>
+
+        </button>
+
+      </div>
 
 
-            <input
-              type="date"
+      {/* ======================================================
+          FILTERS
+      ====================================================== */}
 
-              className="input-field"
+      <div className="mb-5 flex flex-col lg:flex-row gap-3">
 
-              value={
-                form.payPeriodEnd
-              }
+        {/* ----------------------------------------------------
+            BRANCH
+        ----------------------------------------------------- */}
 
-              onChange={(event) =>
-                updateField(
-                  'payPeriodEnd',
-                  event.target.value
-                )
-              }
+        <div className="w-full lg:w-64">
 
-              required
-            />
+          <label
+            htmlFor="payroll-branch"
+            className="block text-xs font-medium text-navy-500 mb-1"
+          >
 
-          </div>
+            Branch
+
+          </label>
+
+
+          <select
+            id="payroll-branch"
+            value={selectedBranch}
+            onChange={(event) =>
+              setSelectedBranch(
+                event.target.value
+              )
+            }
+            className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
+          >
+
+            <option value="ALL">
+
+              All Branches
+
+            </option>
+
+
+            {branches.map(
+              (branch) => (
+
+                <option
+                  key={branch.branchId}
+                  value={branch.branchId}
+                >
+
+                  {branch.branchName}
+
+                </option>
+
+              )
+            )}
+
+          </select>
 
         </div>
 
 
-        {/* ==================================================
-            Payment Date
-        ================================================== */}
+        {/* ----------------------------------------------------
+            SEARCH
+        ----------------------------------------------------- */}
 
-        <div
-          className="
-            flex
-            flex-col
-            gap-1.5
-          "
-        >
+        <div className="flex-1">
 
-          <label
-            className="
-              text-sm
-              font-medium
-              text-navy-700
-            "
-          >
-            Payment Date
+          <label className="block text-xs font-medium text-navy-500 mb-1">
+
+            Search Employee
+
           </label>
 
 
-          <input
-            type="date"
-
-            className="input-field"
-
-            value={
-              form.paymentDate
-            }
-
-            onChange={(event) =>
-              updateField(
-                'paymentDate',
-                event.target.value
-              )
-            }
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by employee name, ID, email or branch..."
           />
 
         </div>
 
 
-        {/* ==================================================
-            Calculation Information
-        ================================================== */}
+        {/* ----------------------------------------------------
+            REFRESH
+        ----------------------------------------------------- */}
 
-        <div
-          className="
-            rounded-lg
-            bg-navy-50
-            border
-            border-navy-100
-            p-4
-            text-sm
-            text-navy-600
-          "
-        >
-
-          <p>
-            <strong>
-              Payroll is calculated automatically.
-            </strong>
-          </p>
-
-          <p className="mt-1">
-            The system reads the employee's actual
-            attendance hours for the selected period,
-            calculates earned salary using the stored
-            hourly rate, and deducts any unpaid payroll
-            eligible advance.
-          </p>
-
-          <p className="mt-1">
-            No salary amount is entered manually here.
-          </p>
-
-        </div>
-
-
-        {/* ==================================================
-            Buttons
-        ================================================== */}
-
-        <div
-          className="
-            flex
-            justify-end
-            gap-3
-            pt-4
-            border-t
-            border-navy-100
-          "
-        >
+        <div className="flex items-end">
 
           <button
             type="button"
-
-            onClick={onClose}
-
-            disabled={saving}
-
-            className="
-              px-4
-              py-2
-              rounded-lg
-              text-sm
-              font-medium
-              text-navy-600
-              hover:bg-navy-100
-              disabled:opacity-50
-            "
-          >
-            Cancel
-          </button>
-
-
-          <button
-            type="submit"
-
-            disabled={
-              saving ||
-              employees.length === 0
-            }
-
-            className="
-              btn-primary
-              px-5
-              py-2
-              disabled:opacity-50
-              disabled:cursor-not-allowed
-            "
+            onClick={handleRefresh}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors"
           >
 
-            {saving
-              ? 'Generating...'
-              : 'Generate Payroll'}
+            <RefreshCw
+              size={16}
+            />
+
+            Refresh
 
           </button>
 
         </div>
 
-      </form>
+      </div>
 
-    </Modal>
+
+      {/* ======================================================
+          PAYROLL PERIOD SETTINGS
+      ====================================================== */}
+
+      <div className="mb-6 rounded-xl border border-navy-100 bg-navy-50/40 p-5">
+
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-5">
+
+          <div>
+
+            <div className="flex items-center gap-2">
+
+              <Settings
+                size={20}
+                className="text-navy-600"
+              />
+
+              <h2 className="text-lg font-semibold text-navy-900">
+
+                Payroll Period Settings
+
+              </h2>
+
+            </div>
+
+
+            <p className="text-sm text-navy-500 mt-1">
+
+              Set the payroll cycle and payment day.
+
+            </p>
+
+          </div>
+
+
+          <div className="text-sm text-navy-500">
+
+            Applied to:{' '}
+
+            <span className="font-semibold text-navy-800">
+
+              {selectedBranch === 'ALL'
+                ? 'All Branches'
+                : (
+                    branches.find(
+                      (branch) =>
+                        Number(
+                          branch.branchId
+                        ) ===
+                        Number(
+                          selectedBranch
+                        )
+                    )?.branchName ||
+                    `Branch ${selectedBranch}`
+                  )}
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {/* ----------------------------------------------------
+            SUCCESS
+        ----------------------------------------------------- */}
+
+        {configurationMessage && (
+
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+
+            {configurationMessage}
+
+          </div>
+
+        )}
+
+
+        {/* ----------------------------------------------------
+            ERROR
+        ----------------------------------------------------- */}
+
+        {configurationError && (
+
+          <div className="mb-4 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
+
+            {configurationError}
+
+          </div>
+
+        )}
+
+
+        {/* ----------------------------------------------------
+            LOADING
+        ----------------------------------------------------- */}
+
+        {configurationLoading ? (
+
+          <div className="py-6 text-center text-sm text-navy-500">
+
+            Loading payroll period settings...
+
+          </div>
+
+        ) : (
+
+          <>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
+              {/* =================================================
+                  START DAY
+              ================================================== */}
+
+              <div>
+
+                <label
+                  htmlFor="payroll-start-day"
+                  className="block text-xs font-medium text-navy-600 mb-1"
+                >
+
+                  Start Day
+
+                </label>
+
+
+                <input
+                  id="payroll-start-day"
+                  type="number"
+                  min="1"
+                  max="31"
+                  value={
+                    configuration.startDay
+                  }
+                  onChange={(event) =>
+                    setConfiguration(
+                      (previous) => ({
+                        ...previous,
+                        startDay:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-200"
+                />
+
+
+                <p className="mt-1 text-xs text-navy-400">
+
+                  1–31
+
+                </p>
+
+              </div>
+
+
+              {/* =================================================
+                  END DAY
+              ================================================== */}
+
+              <div>
+
+                <label
+                  htmlFor="payroll-end-day"
+                  className="block text-xs font-medium text-navy-600 mb-1"
+                >
+
+                  End Day
+
+                </label>
+
+
+                <input
+                  id="payroll-end-day"
+                  type="number"
+                  min="0"
+                  max="31"
+                  value={
+                    configuration.endDay
+                  }
+                  onChange={(event) =>
+                    setConfiguration(
+                      (previous) => ({
+                        ...previous,
+                        endDay:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-200"
+                />
+
+
+                <p className="mt-1 text-xs text-navy-500">
+
+                  Enter 1–31. Use 0 for the last day of the month.
+
+                </p>
+
+              </div>
+
+
+              {/* =================================================
+                  PAYMENT DAY
+              ================================================== */}
+
+              <div>
+
+                <label
+                  htmlFor="payroll-payment-day"
+                  className="block text-xs font-medium text-navy-600 mb-1"
+                >
+
+                  Payment Day
+
+                </label>
+
+
+                <input
+                  id="payroll-payment-day"
+                  type="number"
+                  min="1"
+                  max="31"
+                  value={
+                    configuration.paymentDay
+                  }
+                  onChange={(event) =>
+                    setConfiguration(
+                      (previous) => ({
+                        ...previous,
+                        paymentDay:
+                          event.target.value,
+                      })
+                    )
+                  }
+                  className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-200"
+                />
+
+
+                <p className="mt-1 text-xs text-navy-400">
+
+                  1–31
+
+                </p>
+
+              </div>
+
+
+              {/* =================================================
+                  AUTOMATIC PAYROLL
+              ================================================== */}
+
+              <div>
+
+                <label className="block text-xs font-medium text-navy-600 mb-1">
+
+                  Automatic Payroll
+
+                </label>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setConfiguration(
+                      (previous) => ({
+                        ...previous,
+                        enabled:
+                          !previous.enabled,
+                      })
+                    )
+                  }
+                  className={`w-full px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    configuration.enabled
+                      ? 'border-green-200 bg-green-50 text-green-700'
+                      : 'border-error-200 bg-error-50 text-error-700'
+                  }`}
+                >
+
+                  {configuration.enabled
+                    ? 'Enabled'
+                    : 'Disabled'
+                  }
+
+                </button>
+
+
+                <p className="mt-1 text-xs text-navy-400">
+
+                  Controls automatic payroll generation
+
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* --------------------------------------------------
+                SAVE
+            --------------------------------------------------- */}
+
+            <div className="mt-5 flex justify-end">
+
+              <button
+                type="button"
+                onClick={
+                  handleSaveConfiguration
+                }
+                disabled={
+                  configurationSaving ||
+                  branches.length === 0
+                }
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-navy-800 text-white hover:bg-navy-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+
+                <Save
+                  size={17}
+                />
+
+                {configurationSaving
+                  ? 'Saving...'
+                  : 'Save Configuration'
+                }
+
+              </button>
+
+            </div>
+
+          </>
+
+        )}
+
+      </div>
+
+
+      {/* ======================================================
+          CURRENT / NEXT PERIOD
+      ====================================================== */}
+
+      <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        {renderPeriodCard(
+          'Current Payroll Period',
+          currentPeriod
+        )}
+
+        {renderPeriodCard(
+          'Next Payroll Period',
+          nextPeriod
+        )}
+
+      </div>
+
+
+      {/* ======================================================
+          SUMMARY
+      ====================================================== */}
+
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        {/* ----------------------------------------------------
+            CURRENT
+        ----------------------------------------------------- */}
+
+        <div className="rounded-xl border border-navy-100 bg-white p-4">
+
+          <div className="text-xs font-medium text-navy-400">
+
+            Current Payroll
+
+          </div>
+
+          <div className="mt-1 text-2xl font-bold text-navy-900">
+
+            {currentPayrollRecords.length}
+
+          </div>
+
+          <div className="mt-1 text-xs text-navy-500">
+
+            Unpaid payroll records
+
+          </div>
+
+        </div>
+
+
+        {/* ----------------------------------------------------
+            HISTORY
+        ----------------------------------------------------- */}
+
+        <div className="rounded-xl border border-navy-100 bg-white p-4">
+
+          <div className="text-xs font-medium text-navy-400">
+
+            Payroll History
+
+          </div>
+
+          <div className="mt-1 text-2xl font-bold text-navy-900">
+
+            {historyPayrollRecords.length}
+
+          </div>
+
+          <div className="mt-1 text-xs text-navy-500">
+
+            Paid payroll records
+
+          </div>
+
+        </div>
+
+
+        {/* ----------------------------------------------------
+            TOTAL PENDING
+        ----------------------------------------------------- */}
+
+        <div className="rounded-xl border border-navy-100 bg-white p-4">
+
+          <div className="text-xs font-medium text-navy-400">
+
+            Total Pending
+
+          </div>
+
+          <div className="mt-1 text-2xl font-bold text-navy-900">
+
+            {formatCurrency(
+              filteredCurrentPayroll.reduce(
+                (total, record) =>
+                  total +
+                  getPendingAmount(
+                    record
+                  ),
+                0
+              )
+            )}
+
+          </div>
+
+          <div className="mt-1 text-xs text-navy-500">
+
+            After advance deductions
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
+          SELECTED BRANCH
+      ====================================================== */}
+
+      <div className="mb-4 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-navy-50 border border-navy-100">
+
+        <span className="text-xs text-navy-500">
+
+          Showing:
+
+        </span>
+
+
+        <span className="text-sm font-semibold text-navy-800">
+
+          {selectedBranch === 'ALL'
+            ? 'All Branches'
+            : (
+                branches.find(
+                  (branch) =>
+                    Number(
+                      branch.branchId
+                    ) ===
+                    Number(
+                      selectedBranch
+                    )
+                )?.branchName ||
+                `Branch ${selectedBranch}`
+              )}
+
+        </span>
+
+      </div>
+
+
+      {/* ======================================================
+          PAYROLL TABLE
+      ====================================================== */}
+
+      {displayedRecords.length === 0 ? (
+
+        <EmptyState
+          icon={
+            payrollView === 'CURRENT'
+              ? Wallet
+              : CheckCircle2
+          }
+          title={
+            payrollView === 'CURRENT'
+              ? 'No current payroll records'
+              : 'No payroll history'
+          }
+          message={
+            search
+              ? 'No payroll records match your search.'
+              : payrollView === 'CURRENT'
+                ? 'Current payroll records will appear here.'
+                : 'Paid payroll records will appear here after payroll is processed.'
+          }
+        />
+
+      ) : (
+
+        <DataTable
+          columns={columns}
+          data={displayedRecords}
+        />
+
+      )}
+
+    </div>
+
   );
+
 }
+
+
+// ============================================================
+// DEFAULT EXPORT
+// ============================================================
+
+export default AdminPayroll;

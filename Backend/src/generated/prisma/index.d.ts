@@ -13651,7 +13651,9 @@ export namespace Prisma {
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
+    scheduledPaymentDate: Date | null
     paymentDate: Date | null
+    status: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13668,7 +13670,9 @@ export namespace Prisma {
     basicSalary: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
+    scheduledPaymentDate: Date | null
     paymentDate: Date | null
+    status: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13685,7 +13689,9 @@ export namespace Prisma {
     basicSalary: number
     advanceDeduction: number
     netSalary: number
+    scheduledPaymentDate: number
     paymentDate: number
+    status: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13728,7 +13734,9 @@ export namespace Prisma {
     basicSalary?: true
     advanceDeduction?: true
     netSalary?: true
+    scheduledPaymentDate?: true
     paymentDate?: true
+    status?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13745,7 +13753,9 @@ export namespace Prisma {
     basicSalary?: true
     advanceDeduction?: true
     netSalary?: true
+    scheduledPaymentDate?: true
     paymentDate?: true
+    status?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13762,7 +13772,9 @@ export namespace Prisma {
     basicSalary?: true
     advanceDeduction?: true
     netSalary?: true
+    scheduledPaymentDate?: true
     paymentDate?: true
+    status?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -13866,7 +13878,9 @@ export namespace Prisma {
     basicSalary: Decimal
     advanceDeduction: Decimal
     netSalary: Decimal
+    scheduledPaymentDate: Date | null
     paymentDate: Date | null
+    status: string
     createdAt: Date
     updatedAt: Date
     _count: PayrollCountAggregateOutputType | null
@@ -13902,7 +13916,9 @@ export namespace Prisma {
     basicSalary?: boolean
     advanceDeduction?: boolean
     netSalary?: boolean
+    scheduledPaymentDate?: boolean
     paymentDate?: boolean
+    status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
@@ -13923,12 +13939,14 @@ export namespace Prisma {
     basicSalary?: boolean
     advanceDeduction?: boolean
     netSalary?: boolean
+    scheduledPaymentDate?: boolean
     paymentDate?: boolean
+    status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "basicSalary" | "advanceDeduction" | "netSalary" | "paymentDate" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
+  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "basicSalary" | "advanceDeduction" | "netSalary" | "scheduledPaymentDate" | "paymentDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
   export type PayrollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
@@ -13952,7 +13970,9 @@ export namespace Prisma {
       basicSalary: Prisma.Decimal
       advanceDeduction: Prisma.Decimal
       netSalary: Prisma.Decimal
+      scheduledPaymentDate: Date | null
       paymentDate: Date | null
+      status: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["payroll"]>
@@ -14337,7 +14357,9 @@ export namespace Prisma {
     readonly basicSalary: FieldRef<"Payroll", 'Decimal'>
     readonly advanceDeduction: FieldRef<"Payroll", 'Decimal'>
     readonly netSalary: FieldRef<"Payroll", 'Decimal'>
+    readonly scheduledPaymentDate: FieldRef<"Payroll", 'DateTime'>
     readonly paymentDate: FieldRef<"Payroll", 'DateTime'>
+    readonly status: FieldRef<"Payroll", 'String'>
     readonly createdAt: FieldRef<"Payroll", 'DateTime'>
     readonly updatedAt: FieldRef<"Payroll", 'DateTime'>
   }
@@ -22372,7 +22394,9 @@ export namespace Prisma {
     basicSalary: 'basicSalary',
     advanceDeduction: 'advanceDeduction',
     netSalary: 'netSalary',
+    scheduledPaymentDate: 'scheduledPaymentDate',
     paymentDate: 'paymentDate',
+    status: 'status',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -22590,6 +22614,13 @@ export namespace Prisma {
   };
 
   export type AdvancePaymentOrderByRelevanceFieldEnum = (typeof AdvancePaymentOrderByRelevanceFieldEnum)[keyof typeof AdvancePaymentOrderByRelevanceFieldEnum]
+
+
+  export const PayrollOrderByRelevanceFieldEnum: {
+    status: 'status'
+  };
+
+  export type PayrollOrderByRelevanceFieldEnum = (typeof PayrollOrderByRelevanceFieldEnum)[keyof typeof PayrollOrderByRelevanceFieldEnum]
 
 
   export const ActivityLogOrderByRelevanceFieldEnum: {
@@ -23595,7 +23626,9 @@ export namespace Prisma {
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
     paymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
+    status?: StringFilter<"Payroll"> | string
     createdAt?: DateTimeFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
@@ -23614,11 +23647,14 @@ export namespace Prisma {
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+    scheduledPaymentDate?: SortOrderInput | SortOrder
     paymentDate?: SortOrderInput | SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     advanceDeductionRecord?: AdvancePaymentOrderByWithRelationInput
     employee?: EmployeeOrderByWithRelationInput
+    _relevance?: PayrollOrderByRelevanceInput
   }
 
   export type PayrollWhereUniqueInput = Prisma.AtLeast<{
@@ -23636,7 +23672,9 @@ export namespace Prisma {
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
     paymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
+    status?: StringFilter<"Payroll"> | string
     createdAt?: DateTimeFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
@@ -23655,7 +23693,9 @@ export namespace Prisma {
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+    scheduledPaymentDate?: SortOrderInput | SortOrder
     paymentDate?: SortOrderInput | SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: PayrollCountOrderByAggregateInput
@@ -23680,7 +23720,9 @@ export namespace Prisma {
     basicSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: DateTimeNullableWithAggregatesFilter<"Payroll"> | Date | string | null
     paymentDate?: DateTimeNullableWithAggregatesFilter<"Payroll"> | Date | string | null
+    status?: StringWithAggregatesFilter<"Payroll"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
   }
@@ -25179,7 +25221,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
@@ -25198,7 +25242,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
@@ -25214,7 +25260,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
@@ -25233,7 +25281,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
@@ -25251,7 +25301,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -25266,7 +25318,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25283,7 +25337,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26908,6 +26964,12 @@ export namespace Prisma {
     isNot?: AdvancePaymentWhereInput | null
   }
 
+  export type PayrollOrderByRelevanceInput = {
+    fields: PayrollOrderByRelevanceFieldEnum | PayrollOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type PayrollCountOrderByAggregateInput = {
     payrollId?: SortOrder
     employeeId?: SortOrder
@@ -26920,7 +26982,9 @@ export namespace Prisma {
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+    scheduledPaymentDate?: SortOrder
     paymentDate?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26949,7 +27013,9 @@ export namespace Prisma {
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+    scheduledPaymentDate?: SortOrder
     paymentDate?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -26966,7 +27032,9 @@ export namespace Prisma {
     basicSalary?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+    scheduledPaymentDate?: SortOrder
     paymentDate?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30734,7 +30802,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
@@ -30751,7 +30821,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
@@ -31242,7 +31314,9 @@ export namespace Prisma {
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
     paymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
+    status?: StringFilter<"Payroll"> | string
     createdAt?: DateTimeFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
   }
@@ -32088,7 +32162,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
@@ -32106,7 +32182,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -32237,7 +32315,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
@@ -32255,7 +32335,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34481,7 +34563,9 @@ export namespace Prisma {
     basicSalary: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
+    status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34881,7 +34965,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
@@ -34898,7 +34984,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
@@ -34915,7 +35003,9 @@ export namespace Prisma {
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

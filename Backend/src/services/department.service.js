@@ -34,26 +34,115 @@ const getDepartmentById = async (
         error.statusCode = 404;
 
         throw error;
+
     }
 
 
     return department;
+
 };
+
 
 
 // ==========================================
 // Get All Departments
+//
+// Optional branchId:
+// GET /api/departments
+// GET /api/departments?branchId=1
 // ==========================================
 
 const getAllDepartments = async (
-    companyId
+    companyId,
+    branchId
 ) => {
+
+    const company =
+        Number(companyId);
+
+
+    // ============================================================
+    // BUILD WHERE CONDITION
+    // ============================================================
+
+    const where = {
+        companyId: company
+    };
+
+
+    // ============================================================
+    // BRANCH FILTER
+    //
+    // If branchId is provided, return only departments
+    // belonging to that branch.
+    // ============================================================
+
+    if (
+        branchId !== undefined &&
+        branchId !== null &&
+        branchId !== ""
+    ) {
+
+        const branch =
+            Number(branchId);
+
+
+        if (
+            !Number.isInteger(branch) ||
+            branch < 1
+        ) {
+
+            const error =
+                new Error("Invalid Branch ID");
+
+            error.statusCode = 400;
+
+            throw error;
+
+        }
+
+
+        // --------------------------------------------------------
+        // Verify branch belongs to the company
+        // --------------------------------------------------------
+
+        const existingBranch =
+            await prisma.branch.findFirst({
+
+                where: {
+                    branchId: branch,
+                    companyId: company
+                }
+
+            });
+
+
+        if (!existingBranch) {
+
+            const error =
+                new Error(
+                    "Branch not found in your company"
+                );
+
+            error.statusCode = 404;
+
+            throw error;
+
+        }
+
+
+        where.branchId = branch;
+
+    }
+
+
+    // ============================================================
+    // FETCH DEPARTMENTS
+    // ============================================================
 
     return await prisma.department.findMany({
 
-        where: {
-            companyId: Number(companyId)
-        },
+        where,
 
         include: {
             branch: true,
@@ -67,6 +156,7 @@ const getAllDepartments = async (
     });
 
 };
+
 
 
 // ==========================================
@@ -99,6 +189,7 @@ const createDepartment = async (
         error.statusCode = 400;
 
         throw error;
+
     }
 
 
@@ -116,6 +207,31 @@ const createDepartment = async (
         error.statusCode = 400;
 
         throw error;
+
+    }
+
+
+    const branchNumber =
+        Number(branchId);
+
+    const companyNumber =
+        Number(companyId);
+
+
+    if (
+        !Number.isInteger(branchNumber) ||
+        branchNumber < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid Branch ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+
     }
 
 
@@ -127,8 +243,8 @@ const createDepartment = async (
         await prisma.branch.findFirst({
 
             where: {
-                branchId: Number(branchId),
-                companyId: Number(companyId)
+                branchId: branchNumber,
+                companyId: companyNumber
             }
 
         });
@@ -144,11 +260,16 @@ const createDepartment = async (
         error.statusCode = 404;
 
         throw error;
+
     }
 
 
     // ==========================================
     // Validate Manager
+    //
+    // Manager must belong to:
+    // 1. Same company
+    // 2. Same branch
     // ==========================================
 
     let manager = null;
@@ -160,12 +281,41 @@ const createDepartment = async (
         managerId !== ""
     ) {
 
+        const managerNumber =
+            Number(managerId);
+
+
+        if (
+            !Number.isInteger(managerNumber) ||
+            managerNumber < 1
+        ) {
+
+            const error =
+                new Error(
+                    "Invalid Manager ID"
+                );
+
+            error.statusCode = 400;
+
+            throw error;
+
+        }
+
+
         manager =
             await prisma.employee.findFirst({
 
                 where: {
-                    employeeId: Number(managerId),
-                    companyId: Number(companyId)
+
+                    employeeId:
+                        managerNumber,
+
+                    companyId:
+                        companyNumber,
+
+                    branchId:
+                        branchNumber
+
                 }
 
             });
@@ -175,12 +325,13 @@ const createDepartment = async (
 
             const error =
                 new Error(
-                    "Manager not found in your company"
+                    "Manager not found in the selected branch"
                 );
 
             error.statusCode = 404;
 
             throw error;
+
         }
 
     }
@@ -198,10 +349,10 @@ const createDepartment = async (
                 departmentName,
 
                 branchId:
-                    Number(branchId),
+                    branchNumber,
 
                 companyId:
-                    Number(companyId),
+                    companyNumber,
 
                 managerId:
                     manager
@@ -222,7 +373,9 @@ const createDepartment = async (
 
 
     return department;
+
 };
+
 
 
 // ==========================================
@@ -240,6 +393,27 @@ const updateDepartment = async (
 
     const company =
         Number(companyId);
+
+
+    // ==========================================
+    // Validate Department ID
+    // ==========================================
+
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid Department ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+
+    }
 
 
     // ==========================================
@@ -270,6 +444,7 @@ const updateDepartment = async (
         error.statusCode = 404;
 
         throw error;
+
     }
 
 
@@ -280,11 +455,49 @@ const updateDepartment = async (
     } = data;
 
 
+    // ============================================================
+    // DETERMINE EFFECTIVE BRANCH
+    //
+    // If branchId is supplied, use it.
+    // Otherwise keep the existing department branch.
+    // ============================================================
+
+    const effectiveBranchId =
+        branchId !== undefined &&
+        branchId !== null &&
+        branchId !== ""
+            ? Number(branchId)
+            : Number(existingDepartment.branchId);
+
+
+    // ==========================================
+    // Validate Effective Branch ID
+    // ==========================================
+
+    if (
+        !Number.isInteger(effectiveBranchId) ||
+        effectiveBranchId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid Branch ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+
+    }
+
+
     // ==========================================
     // Validate Branch
     // ==========================================
 
-    if (branchId !== undefined) {
+    if (
+        branchId !== undefined
+    ) {
 
         const branch =
             await prisma.branch.findFirst({
@@ -292,7 +505,7 @@ const updateDepartment = async (
                 where: {
 
                     branchId:
-                        Number(branchId),
+                        effectiveBranchId,
 
                     companyId:
                         company
@@ -312,14 +525,19 @@ const updateDepartment = async (
             error.statusCode = 404;
 
             throw error;
+
         }
 
     }
 
 
-    // ==========================================
+    // ============================================================
     // Validate Manager
-    // ==========================================
+    //
+    // Manager must belong to:
+    // 1. Same company
+    // 2. Effective department branch
+    // ============================================================
 
     if (
         managerId !== undefined &&
@@ -327,16 +545,40 @@ const updateDepartment = async (
         managerId !== ""
     ) {
 
+        const managerNumber =
+            Number(managerId);
+
+
+        if (
+            !Number.isInteger(managerNumber) ||
+            managerNumber < 1
+        ) {
+
+            const error =
+                new Error(
+                    "Invalid Manager ID"
+                );
+
+            error.statusCode = 400;
+
+            throw error;
+
+        }
+
+
         const manager =
             await prisma.employee.findFirst({
 
                 where: {
 
                     employeeId:
-                        Number(managerId),
+                        managerNumber,
 
                     companyId:
-                        company
+                        company,
+
+                    branchId:
+                        effectiveBranchId
 
                 }
 
@@ -347,12 +589,13 @@ const updateDepartment = async (
 
             const error =
                 new Error(
-                    "Manager not found in your company"
+                    "Manager not found in the selected branch"
                 );
 
             error.statusCode = 404;
 
             throw error;
+
         }
 
     }
@@ -379,12 +622,14 @@ const updateDepartment = async (
 
                 }),
 
+
                 ...(branchId !== undefined && {
 
                     branchId:
-                        Number(branchId)
+                        effectiveBranchId
 
                 }),
+
 
                 ...(managerId !== undefined && {
 
@@ -410,7 +655,9 @@ const updateDepartment = async (
 
 
     return department;
+
 };
+
 
 
 // ==========================================
@@ -427,6 +674,27 @@ const deleteDepartment = async (
 
     const company =
         Number(companyId);
+
+
+    // ==========================================
+    // Validate Department ID
+    // ==========================================
+
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid Department ID"
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+
+    }
 
 
     // ==========================================
@@ -457,6 +725,7 @@ const deleteDepartment = async (
         error.statusCode = 404;
 
         throw error;
+
     }
 
 
@@ -476,7 +745,9 @@ const deleteDepartment = async (
 
 
     return true;
+
 };
+
 
 
 // ==========================================

@@ -101,7 +101,7 @@ const char* WIFI_PASSWORD = "Bhadani@99";
 
 // Use the LAN IPv4 address of the computer running Node.js.
 // Example: http://192.168.1.10:5000
-const char* BACKEND_BASE_URL = "http://10.148.84.69:5000";
+const char* BACKEND_BASE_URL = "http://10.212.194.69:5000";
 
 // Registered device identity.
 const char* DEVICE_CODE = "ESP32-001";
@@ -128,6 +128,18 @@ const char* ENROLLMENT_LOG_ENDPOINT =
 // How often the ESP32 asks the backend whether an enrollment
 // job is waiting. Attendance scanning continues between polls.
 const unsigned long ENROLLMENT_POLL_INTERVAL = 2000;
+
+// How often the attendance scanner checks for a fingerprint.
+// This prevents the sensor from being queried continuously at high speed.
+const unsigned long ATTENDANCE_SCAN_INTERVAL = 150;
+
+// Startup diagnostics: keep each hardware/network status visible long enough
+// to read on the OLED and give the component time to initialize.
+const unsigned long STARTUP_STATUS_DISPLAY_MS = 1000;
+const unsigned long STARTUP_BACKEND_RETRY_DELAY_MS = 1000;
+const uint8_t STARTUP_BACKEND_RETRIES = 3;
+
+unsigned long lastAttendanceScan = 0;
 
 // HTTP timeouts.
 const uint16_t HTTP_CONNECT_TIMEOUT = 3000;
@@ -380,6 +392,144 @@ bool backendConfigured() {
   }
 
   return true;
+}
+
+
+// ============================================================
+// BACKEND CONNECTIVITY CHECK
+// ============================================================
+
+bool checkBackendConnectivity() {
+  Serial.println();
+  Serial.println("====================================");
+  Serial.println(" CHECKING BACKEND CONNECTION");
+  Serial.println("====================================");
+
+  if (!backendConfigured()) {
+    Serial.println("Backend configuration is invalid.");
+    return false;
+  }
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Backend check skipped: Wi-Fi is not connected.");
+    return false;
+  }
+
+  String url = makeUrl(ENROLLMENT_PENDING_ENDPOINT);
+
+  for (uint8_t attempt = 1; attempt <= STARTUP_BACKEND_RETRIES; attempt++) {
+    Serial.print("Backend check attempt ");
+    Serial.print(attempt);
+    Serial.print("/");
+    Serial.println(STARTUP_BACKEND_RETRIES);
+    Serial.print("GET: ");
+    Serial.println(url);
+
+    HTTPClient http;
+    http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
+    http.setTimeout(HTTP_TIMEOUT);
+
+    if (!http.begin(url)) {
+      Serial.println("HTTP begin failed.");
+    } else {
+      addDeviceHeaders(http);
+
+      int httpCode = http.GET();
+
+      Serial.print("Backend HTTP code: ");
+      Serial.println(httpCode);
+
+      if (httpCode > 0) {
+        String response = http.getString();
+        Serial.println("Backend response:");
+        Serial.println(response);
+
+        if (httpCode >= 200 && httpCode < 300) {
+          http.end();
+          Serial.println("Backend connection: OK");
+          return true;
+        }
+
+        // A 401/403 proves that the ESP32 reached the backend, but the
+        // device credentials were rejected. Show this as a separate state.
+        if (httpCode == 401 || httpCode == 403) {
+          Serial.println("Backend reachable, but device authentication failed.");
+          http.end();
+          return false;
+        }
+      } else {
+        Serial.print("Backend connection error: ");
+        Serial.println(http.errorToString(httpCode));
+      }
+
+      http.end();
+    }
+
+    if (attempt < STARTUP_BACKEND_RETRIES) {
+      delay(STARTUP_BACKEND_RETRY_DELAY_MS);
+    }
+  }
+
+  Serial.println("Backend connection: FAILED");
+  return false;
+}
+
+
+// ============================================================
+// STARTUP DIAGNOSTICS
+// ============================================================
+
+void showStartupStatus(
+  const String& component,
+  const String& status,
+  const String& detail = ""
+) {
+  showOLED(
+    component,
+    status,
+    detail,
+    "Please wait..."
+  );
+
+  delay(STARTUP_STATUS_DISPLAY_MS);
+}
+
+
+void testGreenLED() {
+  Serial.println("Testing GREEN LED...");
+  showStartupStatus("GREEN LED", "TESTING", "Turning ON...");
+
+  digitalWrite(GREEN_LED, HIGH);
+  delay(STARTUP_STATUS_DISPLAY_MS);
+  digitalWrite(GREEN_LED, LOW);
+
+  showStartupStatus("GREEN LED", "OK", "Test complete");
+}
+
+
+void testRedLED() {
+  Serial.println("Testing RED LED...");
+  showStartupStatus("RED LED", "TESTING", "Turning ON...");
+
+  digitalWrite(RED_LED, HIGH);
+  delay(STARTUP_STATUS_DISPLAY_MS);
+  digitalWrite(RED_LED, LOW);
+
+  showStartupStatus("RED LED", "OK", "Test complete");
+}
+
+
+void testBuzzer() {
+  Serial.println("Testing BUZZER...");
+  showStartupStatus("BUZZER", "TESTING", "Listen for beep");
+
+  tone(BUZZER, 1800, 250);
+  delay(350);
+  tone(BUZZER, 2400, 250);
+  delay(350);
+  noTone(BUZZER);
+
+  showStartupStatus("BUZZER", "OK", "Test complete");
 }
 
 
@@ -1580,6 +1730,11 @@ bool sendAttendanceToBackend(int sensorSlot) {
   Serial.print("Attendance HTTP code: ");
   Serial.println(httpCode);
 
+  if (httpCode <= 0) {
+    Serial.print("Attendance HTTP error: ");
+    Serial.println(http.errorToString(httpCode));
+  }
+
   String response = http.getString();
   Serial.println("Attendance response:");
   Serial.println(response);
@@ -1599,6 +1754,16 @@ bool sendAttendanceToBackend(int sensorSlot) {
 // ============================================================
 
 void attendanceLoop() {
+
+  unsigned long now = millis();
+
+  // Limit attendance sensor polling to a controlled interval.
+  if (now - lastAttendanceScan < ATTENDANCE_SCAN_INTERVAL) {
+    return;
+  }
+
+  lastAttendanceScan = now;
+
   int result = identifyFingerprint();
 
   if (result == -2) {
@@ -1911,15 +2076,40 @@ void setup() {
     }
   }
 
+  // ----------------------------------------------------------
+  // STARTUP INTRO
+  // ----------------------------------------------------------
   showOLED(
     "Fingerprint Machine",
     "Starting...",
-    "Please wait"
+    "Running diagnostics",
+    "Please wait..."
   );
-
   delay(1000);
 
-  // Fingerprint UART.
+  Serial.println();
+  Serial.println("========================================");
+  Serial.println(" FINGERPRINT ERP MACHINE STARTUP");
+  Serial.println(" Running full startup diagnostics");
+  Serial.println("========================================");
+
+  // ----------------------------------------------------------
+  // HARDWARE OUTPUT TESTS
+  // ----------------------------------------------------------
+  testGreenLED();
+  testRedLED();
+  testBuzzer();
+
+  // ----------------------------------------------------------
+  // FINGERPRINT UART / SENSOR TEST
+  // ----------------------------------------------------------
+  Serial.println("Initializing fingerprint sensor...");
+  showStartupStatus(
+    "Fingerprint",
+    "INITIALIZING",
+    "Sensor UART..."
+  );
+
   FingerSerial.begin(
     57600,
     SERIAL_8N1,
@@ -1932,26 +2122,122 @@ void setup() {
 
   bool fingerprintOK = checkFingerprintSensor();
 
-  if (!fingerprintOK) {
-    showOLED(
-      "Fingerprint Sensor",
-      "SENSOR ERROR",
-      "Check TX/RX"
+  if (fingerprintOK) {
+    showStartupStatus(
+      "Fingerprint",
+      "OK",
+      "Sensor Connected"
+    );
+  } else {
+    showStartupStatus(
+      "Fingerprint",
+      "FAILED",
+      "Check TX/RX/Power"
     );
 
     errorSignal();
   }
 
-  delay(1000);
+  // ----------------------------------------------------------
+  // WIFI TEST
+  // ----------------------------------------------------------
+  showOLED(
+    "WiFi",
+    "CHECKING...",
+    "Connecting",
+    "Please wait..."
+  );
+  delay(500);
 
-  // Wi-Fi.
-  connectWiFi();
+  bool wifiOK = connectWiFi();
 
+  if (wifiOK) {
+    showStartupStatus(
+      "WiFi",
+      "OK",
+      WiFi.localIP().toString()
+    );
+  } else {
+    showStartupStatus(
+      "WiFi",
+      "FAILED",
+      "Check SSID/Password"
+    );
+  }
+
+  // ----------------------------------------------------------
+  // BACKEND TEST
+  // ----------------------------------------------------------
+  bool backendOK = false;
+
+  if (wifiOK) {
+    showOLED(
+      "Backend",
+      "CHECKING...",
+      "Contacting API",
+      "Please wait..."
+    );
+    delay(500);
+
+    backendOK = checkBackendConnectivity();
+
+    if (backendOK) {
+      showStartupStatus(
+        "Backend",
+        "OK",
+        "API Connected"
+      );
+    } else {
+      showStartupStatus(
+        "Backend",
+        "FAILED",
+        "Check Server/API"
+      );
+    }
+  } else {
+    showStartupStatus(
+      "Backend",
+      "SKIPPED",
+      "WiFi not connected"
+    );
+  }
+
+  // ----------------------------------------------------------
+  // FINAL STARTUP RESULT
+  // ----------------------------------------------------------
+  if (fingerprintOK && wifiOK && backendOK) {
+    showOLED(
+      "SYSTEM READY",
+      "Fingerprint: OK",
+      "WiFi: OK",
+      "Backend: OK"
+    );
+
+    digitalWrite(GREEN_LED, HIGH);
+    delay(500);
+    digitalWrite(GREEN_LED, LOW);
+    delay(500);
+  } else {
+    showOLED(
+      "SYSTEM WARNING",
+      fingerprintOK ? "Fingerprint: OK" : "Fingerprint: FAIL",
+      wifiOK ? "WiFi: OK" : "WiFi: FAIL",
+      backendOK ? "Backend: OK" : "Backend: FAIL"
+    );
+
+    digitalWrite(RED_LED, HIGH);
+    delay(500);
+    digitalWrite(RED_LED, LOW);
+    delay(500);
+  }
+
+  // ----------------------------------------------------------
+  // NORMAL INITIAL STATE
+  // ----------------------------------------------------------
   // Force the first backend enrollment check to happen immediately on the
   // first main-loop pass rather than waiting for the full polling interval.
   lastEnrollmentPoll = millis() - ENROLLMENT_POLL_INTERVAL;
 
-  // Normal initial state.
   currentMode = ATTENDANCE_MODE;
   currentEnrollment.valid = false;
 
@@ -1982,5 +2268,5 @@ void loop() {
     }
   }
 
-  delay(20);
+  delay(10);
 }

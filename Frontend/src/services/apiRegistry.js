@@ -23,16 +23,20 @@ const API = {
     auth: {
 
         // Admin login
-        adminLogin: "/api/auth/login",
+        adminLogin:
+            "/api/auth/login",
 
         // Employee login
-        employeeLogin: "/api/auth/employee/login",
+        employeeLogin:
+            "/api/auth/employee/login",
 
         // Current authenticated user
-        me: "/api/auth/me",
+        me:
+            "/api/auth/me",
 
         // Admin authorization test
-        adminTest: "/api/auth/admin-test",
+        adminTest:
+            "/api/auth/admin-test",
 
     },
 
@@ -44,14 +48,16 @@ const API = {
     companies: {
 
         // GET /api/companies
-        list: "/api/companies",
+        list:
+            "/api/companies",
 
         // GET /api/companies/:id
         get: (id) =>
             `/api/companies/${id}`,
 
         // POST /api/companies
-        create: "/api/companies",
+        create:
+            "/api/companies",
 
         // PUT /api/companies/:id
         update: (id) =>
@@ -71,14 +77,16 @@ const API = {
     branches: {
 
         // GET /api/branches
-        list: "/api/branches",
+        list:
+            "/api/branches",
 
         // GET /api/branches/:id
         get: (id) =>
             `/api/branches/${id}`,
 
         // POST /api/branches
-        create: "/api/branches",
+        create:
+            "/api/branches",
 
         // PUT /api/branches/:id
         update: (id) =>
@@ -98,14 +106,16 @@ const API = {
     departments: {
 
         // GET /api/departments
-        list: "/api/departments",
+        list:
+            "/api/departments",
 
         // GET /api/departments/:id
         get: (id) =>
             `/api/departments/${id}`,
 
         // POST /api/departments
-        create: "/api/departments",
+        create:
+            "/api/departments",
 
         // PUT /api/departments/:id
         update: (id) =>
@@ -125,14 +135,16 @@ const API = {
     employees: {
 
         // GET /api/employees
-        list: "/api/employees",
+        list:
+            "/api/employees",
 
         // GET /api/employees/:id
         get: (id) =>
             `/api/employees/${id}`,
 
         // POST /api/employees
-        create: "/api/employees",
+        create:
+            "/api/employees",
 
         // PUT /api/employees/:id
         update: (id) =>
@@ -152,15 +164,16 @@ const API = {
     attendance: {
 
         // GET /api/attendance
-        list: "/api/attendance",
-        live: "/api/attendance/live",
+        list:
+            "/api/attendance",
 
         // GET /api/attendance/:id
         get: (id) =>
             `/api/attendance/${id}`,
 
         // GET /api/attendance/punches
-        punches: "/api/attendance/punches",
+        punches:
+            "/api/attendance/punches",
 
         // GET /api/attendance/punches/:id
         punch: (id) =>
@@ -179,7 +192,12 @@ const API = {
             `/api/attendance/employee/${employeeId}/summary`,
 
         // GET /api/attendance/summary
-        summary: "/api/attendance/summary",
+        summary:
+            "/api/attendance/summary",
+
+        // GET /api/attendance/live
+        live:
+            "/api/attendance/live",
 
     },
 
@@ -191,14 +209,16 @@ const API = {
     fingerprints: {
 
         // GET /api/fingerprints
-        list: "/api/fingerprints",
+        list:
+            "/api/fingerprints",
 
         // GET /api/fingerprints/:id
         get: (id) =>
             `/api/fingerprints/${id}`,
 
         // POST /api/fingerprints
-        create: "/api/fingerprints",
+        create:
+            "/api/fingerprints",
 
         // PUT /api/fingerprints/:id
         update: (id) =>
@@ -208,7 +228,6 @@ const API = {
         delete: (id) =>
             `/api/fingerprints/${id}`,
 
-        // Employee fingerprints
         // GET /api/fingerprints/employee/:employeeId
         employee: (employeeId) =>
             `/api/fingerprints/employee/${employeeId}`,
@@ -223,14 +242,16 @@ const API = {
     devices: {
 
         // GET /api/devices
-        list: "/api/devices",
+        list:
+            "/api/devices",
 
         // GET /api/devices/:id
         get: (id) =>
             `/api/devices/${id}`,
 
         // POST /api/devices
-        create: "/api/devices",
+        create:
+            "/api/devices",
 
         // PUT /api/devices/:id
         update: (id) =>
@@ -263,14 +284,16 @@ const API = {
     leaveTypes: {
 
         // GET /api/leave-types
-        list: "/api/leave-types",
+        list:
+            "/api/leave-types",
 
         // GET /api/leave-types/:id
         get: (id) =>
             `/api/leave-types/${id}`,
 
         // POST /api/leave-types
-        create: "/api/leave-types",
+        create:
+            "/api/leave-types",
 
         // PUT /api/leave-types/:id
         update: (id) =>
@@ -290,14 +313,16 @@ const API = {
     leaveBalances: {
 
         // GET /api/leave-balances
-        list: "/api/leave-balances",
+        list:
+            "/api/leave-balances",
 
         // GET /api/leave-balances/:id
         get: (id) =>
             `/api/leave-balances/${id}`,
 
         // POST /api/leave-balances
-        create: "/api/leave-balances",
+        create:
+            "/api/leave-balances",
 
         // PUT /api/leave-balances/:id
         update: (id) =>
@@ -313,14 +338,16 @@ const API = {
     leaveRequests: {
 
         // GET /api/leave-requests
-        list: "/api/leave-requests",
+        list:
+            "/api/leave-requests",
 
         // GET /api/leave-requests/:id
         get: (id) =>
             `/api/leave-requests/${id}`,
 
         // POST /api/leave-requests
-        create: "/api/leave-requests",
+        create:
+            "/api/leave-requests",
 
         // PUT /api/leave-requests/:id/approve
         approve: (id) =>
@@ -344,14 +371,16 @@ const API = {
     advances: {
 
         // GET /api/advances
-        list: "/api/advances",
+        list:
+            "/api/advances",
 
         // GET /api/advances/:id
         get: (id) =>
             `/api/advances/${id}`,
 
         // POST /api/advances
-        create: "/api/advances",
+        create:
+            "/api/advances",
 
         // PUT /api/advances/:id
         update: (id) =>
@@ -378,24 +407,91 @@ const API = {
 
     payroll: {
 
-        // Admin payroll list
+        // ----------------------------------------------------
+        // ADMIN PAYROLL
+        // ----------------------------------------------------
+
         // GET /api/payroll
-        list: "/api/payroll",
+        list:
+            "/api/payroll",
 
         // GET /api/payroll/:id
         get: (id) =>
             `/api/payroll/${id}`,
 
         // POST /api/payroll
-        create: "/api/payroll",
+        create:
+            "/api/payroll",
 
         // PUT /api/payroll/:id
         update: (id) =>
             `/api/payroll/${id}`,
 
+        // DELETE /api/payroll/:id
+        delete: (id) =>
+            `/api/payroll/${id}`,
+
+        // PATCH /api/payroll/:id/pay
+        pay: (id) =>
+            `/api/payroll/${id}/pay`,
+
+
+        // ----------------------------------------------------
+        // EMPLOYEE PAYROLL
+        // ----------------------------------------------------
+
         // GET /api/payroll/employee/:employeeId
         employee: (employeeId) =>
             `/api/payroll/employee/${employeeId}`,
+
+
+        // ----------------------------------------------------
+        // PAYROLL CONFIGURATION
+        // ----------------------------------------------------
+
+        // GET /api/payroll/configuration/:branchId
+        //
+        // NOTE:
+        // apiServices.js uses:
+        // API.payroll.configuration(branchId)
+        //
+        configuration: (branchId) =>
+            `/api/payroll/configuration/${branchId}`,
+
+        // PUT /api/payroll/configuration/:branchId
+        updateConfiguration: (branchId) =>
+            `/api/payroll/configuration/${branchId}`,
+
+        // Alias kept for compatibility with code that uses
+        // API.payroll.getConfiguration(branchId)
+        getConfiguration: (branchId) =>
+            `/api/payroll/configuration/${branchId}`,
+
+
+        // ----------------------------------------------------
+        // PAYROLL PERIOD
+        // ----------------------------------------------------
+
+        // GET /api/payroll/period/:branchId/current
+        currentPeriod: (branchId) =>
+            `/api/payroll/period/${branchId}/current`,
+
+        // GET /api/payroll/period/:branchId/next
+        nextPeriod: (branchId) =>
+            `/api/payroll/period/${branchId}/next`,
+
+
+        // ----------------------------------------------------
+        // PAYROLL GENERATION
+        // ----------------------------------------------------
+
+        // POST /api/payroll/generate/branch/:branchId
+        generateBranch: (branchId) =>
+            `/api/payroll/generate/branch/${branchId}`,
+
+        // POST /api/payroll/generate/branch/:branchId/current
+        generateCurrentBranch: (branchId) =>
+            `/api/payroll/generate/branch/${branchId}/current`,
 
     },
 

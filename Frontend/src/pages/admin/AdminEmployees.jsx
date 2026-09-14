@@ -978,10 +978,29 @@ function EmployeeModal({
     value
   ) => {
 
-    setForm((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
+    setForm((previous) => {
+
+      // --------------------------------------------------------
+      // Branch → Department dependency
+      // --------------------------------------------------------
+      // When the branch changes, the previously selected
+      // department may no longer belong to that branch.
+      // Clear it so an invalid branch/department combination
+      // can never be submitted from the UI.
+      if (field === 'branchId') {
+        return {
+          ...previous,
+          branchId: value,
+          departmentId: '',
+        };
+      }
+
+      return {
+        ...previous,
+        [field]: value,
+      };
+
+    });
 
   };
 
@@ -1113,8 +1132,43 @@ function EmployeeModal({
   // Department Options
   // ==========================================================
 
+  // ==========================================================
+  // Department Options
+  // ==========================================================
+  // Only departments belonging to the selected branch are shown.
+  //
+  // Example:
+  // Branch 1 → HR, Accounts
+  // Branch 2 → HR, Sales
+  //
+  // Selecting Branch 2 therefore shows only HR and Sales.
+  // The departmentId stored in the form is the actual department
+  // record belonging to that selected branch.
+  // ==========================================================
+
+  const selectedBranchId =
+    form.branchId
+      ? Number(form.branchId)
+      : null;
+
   const departmentOptions =
     departments
+
+      .filter((department) => {
+        if (!selectedBranchId) {
+          return false;
+        }
+
+        const departmentBranchId =
+          department?.branchId ??
+          department?.branch?.branchId;
+
+        return (
+          Number(departmentBranchId) ===
+          selectedBranchId
+        );
+      })
+
       .map((department) => ({
         value:
           department?.departmentId ??
@@ -1400,53 +1454,6 @@ function EmployeeModal({
 
           </div>
 
-
-          {/* Department */}
-
-          <div className="flex flex-col gap-1.5">
-
-            <label
-              className="
-                text-sm
-                font-medium
-                text-navy-700
-              "
-            >
-              Department
-            </label>
-
-            <select
-              className="input-field"
-              value={form.departmentId}
-
-              onChange={(event) =>
-                updateField(
-                  'departmentId',
-                  event.target.value
-                )
-              }
-            >
-
-              <option value="">
-                Select Department
-              </option>
-
-              {departmentOptions.map(
-                (department) => (
-                  <option
-                    key={department.value}
-                    value={department.value}
-                  >
-                    {department.label}
-                  </option>
-                )
-              )}
-
-            </select>
-
-          </div>
-
-
           {/* Branch */}
 
           <div className="flex flex-col gap-1.5">
@@ -1496,6 +1503,59 @@ function EmployeeModal({
             </select>
 
           </div>
+
+
+          {/* Department */}
+
+          <div className="flex flex-col gap-1.5">
+
+            <label
+              className="
+                text-sm
+                font-medium
+                text-navy-700
+              "
+            >
+              Department
+            </label>
+
+            <select
+              className="input-field"
+              value={form.departmentId}
+
+              onChange={(event) =>
+                updateField(
+                  'departmentId',
+                  event.target.value
+                )
+              }
+            >
+
+              <option value="">
+                {form.branchId
+                  ? departmentOptions.length > 0
+                    ? 'Select Department'
+                    : 'No departments available for this branch'
+                  : 'Select Branch first'}
+              </option>
+
+              {departmentOptions.map(
+                (department) => (
+                  <option
+                    key={department.value}
+                    value={department.value}
+                  >
+                    {department.label}
+                  </option>
+                )
+              )}
+
+            </select>
+
+          </div>
+
+
+          
 
 
           {/* ==================================================

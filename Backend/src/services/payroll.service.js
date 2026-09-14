@@ -1,10 +1,24 @@
-const prisma =
-    require("../config/database");
+const prisma = require("../config/database");
 
 
-// ==========================================
-// Helper: Validate Date
-// ==========================================
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const PAYROLL_CONFIG_KEY_PREFIX =
+    "PAYROLL_CONFIG_BRANCH_";
+
+const DEFAULT_PAYROLL_CONFIGURATION = {
+    startDay: 1,
+    endDay: 0, // 0 = last day of month
+    paymentDay: 5,
+    enabled: true
+};
+
+
+// ============================================================
+// HELPER: Parse Date
+// ============================================================
 
 const parseDate = (
     value,
@@ -19,6 +33,7 @@ const parseDate = (
             date.getTime()
         )
     ) {
+
         const error =
             new Error(
                 `${fieldName} must be a valid date`
@@ -33,9 +48,9 @@ const parseDate = (
 };
 
 
-// ==========================================
-// Helper: Round Money
-// ==========================================
+// ============================================================
+// HELPER: Round Money
+// ============================================================
 
 const roundMoney = (
     value
@@ -47,9 +62,9 @@ const roundMoney = (
 };
 
 
-// ==========================================
-// Helper: Positive Number
-// ==========================================
+// ============================================================
+// HELPER: Positive Number
+// ============================================================
 
 const validatePositiveNumber = (
     value,
@@ -63,7 +78,9 @@ const validatePositiveNumber = (
         value === undefined ||
         value === null ||
         value === "" ||
-        !Number.isFinite(numberValue) ||
+        !Number.isFinite(
+            numberValue
+        ) ||
         numberValue <= 0
     ) {
 
@@ -81,34 +98,1398 @@ const validatePositiveNumber = (
 };
 
 
-// ==========================================
-// Create Payroll Automatically
-//
-// POST /api/payroll
-//
-// Required:
-// employeeId
-// payPeriodStart
-// payPeriodEnd
-// paymentDate (optional)
-//
-// Automatically calculates:
-// totalWorkingHours
-// basicSalary
-// advanceDeduction
-// netSalary
-//
-// Salary calculation:
-//
-// baseSalary / monthlyExpectedHours
-// = salaryRatePerHour
-//
-// totalWorkingHours × salaryRatePerHour
-// = basicSalary
-//
-// basicSalary - paid advance
-// = netSalary
-// ==========================================
+// ============================================================
+// HELPER: Non-Negative Number
+// ============================================================
+
+const validateNonNegativeNumber = (
+    value,
+    fieldName
+) => {
+
+    const numberValue =
+        Number(value);
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        !Number.isFinite(
+            numberValue
+        ) ||
+        numberValue < 0
+    ) {
+
+        const error =
+            new Error(
+                `${fieldName} must be greater than or equal to 0`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    return numberValue;
+};
+
+
+// ============================================================
+// HELPER: Integer
+// ============================================================
+
+const validateInteger = (
+    value,
+    fieldName
+) => {
+
+    const numberValue =
+        Number(value);
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        !Number.isInteger(
+            numberValue
+        )
+    ) {
+
+        const error =
+            new Error(
+                `${fieldName} must be an integer`
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    return numberValue;
+};
+
+
+// ============================================================
+// HELPER: Decimal To Number
+// ============================================================
+
+const decimalToNumber = (
+    value
+) => {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return 0;
+    }
+
+    return Number(value);
+};
+
+
+// ============================================================
+// HELPER: Start Of Day
+// ============================================================
+
+const startOfDay = (
+    date
+) => {
+
+    const result =
+        new Date(date);
+
+    result.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return result;
+};
+
+
+// ============================================================
+// HELPER: End Of Day
+// ============================================================
+
+const endOfDay = (
+    date
+) => {
+
+    const result =
+        new Date(date);
+
+    result.setHours(
+        23,
+        59,
+        59,
+        999
+    );
+
+    return result;
+};
+
+
+// ============================================================
+// HELPER: Add Days
+// ============================================================
+
+const addDays = (
+    date,
+    days
+) => {
+
+    const result =
+        new Date(date);
+
+    result.setDate(
+        result.getDate() + days
+    );
+
+    return result;
+};
+
+
+// ============================================================
+// HELPER: Days In Month
+// ============================================================
+
+const getDaysInMonth = (
+    year,
+    month
+) => {
+
+    return new Date(
+        year,
+        month + 1,
+        0
+    ).getDate();
+};
+
+
+// ============================================================
+// HELPER: Normalize Payroll Configuration
+// ============================================================
+
+const normalizePayrollConfiguration = (
+    configuration
+) => {
+
+    const source =
+        configuration ||
+        DEFAULT_PAYROLL_CONFIGURATION;
+
+    const startDay =
+        Number(
+            source.startDay
+        );
+
+    const endDay =
+        Number(
+            source.endDay
+        );
+
+    const paymentDay =
+        Number(
+            source.paymentDay
+        );
+
+    return {
+
+        startDay:
+            Number.isInteger(startDay) &&
+                startDay >= 1 &&
+                startDay <= 31
+                ? startDay
+                : DEFAULT_PAYROLL_CONFIGURATION.startDay,
+
+        endDay:
+            Number.isInteger(endDay) &&
+                endDay >= 0 &&
+                endDay <= 31
+                ? endDay
+                : DEFAULT_PAYROLL_CONFIGURATION.endDay,
+
+        paymentDay:
+            Number.isInteger(paymentDay) &&
+                paymentDay >= 1 &&
+                paymentDay <= 31
+                ? paymentDay
+                : DEFAULT_PAYROLL_CONFIGURATION.paymentDay,
+
+        enabled:
+            source.enabled !== false
+    };
+};
+
+
+// ============================================================
+// HELPER: Build Config Key
+// ============================================================
+
+const buildPayrollConfigKey = (
+    branchId
+) => {
+
+    return `${PAYROLL_CONFIG_KEY_PREFIX}${branchId}`;
+};
+
+
+// ============================================================
+// HELPER: Safe Error
+// ============================================================
+
+const createServiceError = (
+    message,
+    statusCode = 400
+) => {
+
+    const error =
+        new Error(
+            message
+        );
+
+    error.statusCode =
+        statusCode;
+
+    return error;
+};
+
+
+// ============================================================
+// EMPLOYEE INCLUDE
+// ============================================================
+
+const employeeInclude = {
+
+    branch: {
+        select: {
+            branchId: true,
+            branchName: true,
+            companyId: true
+        }
+    },
+};
+
+
+// ============================================================
+// PAYROLL INCLUDE
+// ============================================================
+
+const payrollInclude = {
+
+    employee: {
+        include: employeeInclude
+    },
+
+    advanceDeductionRecord: true
+};
+
+
+// ============================================================
+// HELPER: Get Employee
+// ============================================================
+
+const getEmployeeById = async (
+    employeeId,
+    companyId
+) => {
+
+    const employee =
+        await prisma.employee.findFirst({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                companyId:
+                    Number(companyId)
+            },
+
+            include:
+                employeeInclude
+        });
+
+    if (!employee) {
+
+        throw createServiceError(
+            "Employee not found",
+            404
+        );
+    }
+
+    return employee;
+};
+
+
+// ============================================================
+// HELPER: Get Branch
+// ============================================================
+
+const getBranchById = async (
+    branchId,
+    companyId
+) => {
+
+    const branch =
+        await prisma.branch.findFirst({
+
+            where: {
+
+                branchId:
+                    Number(branchId),
+
+                companyId:
+                    Number(companyId)
+            }
+        });
+
+    if (!branch) {
+
+        throw createServiceError(
+            "Branch not found",
+            404
+        );
+    }
+
+    return branch;
+};
+
+
+// ============================================================
+// HELPER: Get Payroll Configuration
+// ============================================================
+
+const getPayrollConfiguration = async (
+    branchId,
+    companyId
+) => {
+
+    const branch =
+        await getBranchById(
+            branchId,
+            companyId
+        );
+
+    const configKey =
+        buildPayrollConfigKey(
+            branch.branchId
+        );
+
+    let configuration =
+        null;
+
+    try {
+
+        const setting =
+            await prisma.setting.findFirst({
+
+                where: {
+                    companyId:
+                        Number(companyId),
+
+                    key:
+                        configKey
+                }
+            });
+
+        if (setting) {
+
+            let parsedValue =
+                setting.value;
+
+            if (
+                typeof parsedValue ===
+                "string"
+            ) {
+
+                try {
+
+                    parsedValue =
+                        JSON.parse(
+                            parsedValue
+                        );
+
+                } catch (
+                parseError
+                ) {
+
+                    parsedValue =
+                        null;
+                }
+            }
+
+            configuration =
+                normalizePayrollConfiguration(
+                    parsedValue
+                );
+        }
+
+    } catch (
+    error
+    ) {
+
+        /*
+         * Some project versions may not have
+         * systemSetting available in the generated
+         * Prisma client. In that case, fall back
+         * to the default payroll configuration.
+         */
+    }
+
+    if (!configuration) {
+
+        configuration =
+            normalizePayrollConfiguration(
+                DEFAULT_PAYROLL_CONFIGURATION
+            );
+    }
+
+    return configuration;
+};
+
+
+// ============================================================
+// HELPER: Save Payroll Configuration
+// ============================================================
+
+const savePayrollConfiguration = async (
+    branchId,
+    companyId,
+    configuration
+) => {
+
+    const branch =
+        await getBranchById(
+            branchId,
+            companyId
+        );
+
+    const normalized =
+        normalizePayrollConfiguration(
+            configuration
+        );
+
+    const settingKey =
+        buildPayrollConfigKey(
+            branch.branchId
+        );
+
+    try {
+
+        const result =
+            await prisma.$transaction(
+                async (
+                    transaction
+                ) => {
+
+                    const settingValue =
+                        JSON.stringify(
+                            normalized
+                        );
+
+                    const existing =
+                        await transaction.setting.findFirst({
+
+                            where: {
+                                companyId:
+                                    Number(companyId),
+
+                                key:
+                                    settingKey
+                            }
+                        });
+
+                    let setting;
+
+                    if (existing) {
+
+                        setting =
+                            await transaction.setting.update({
+
+                                where: {
+                                    settingId:
+                                        existing.settingId
+                                },
+
+                                data: {
+                                    value:
+                                        settingValue
+                                }
+                            });
+
+                    } else {
+
+                        setting =
+                            await transaction.setting.create({
+
+                                data: {
+
+                                    companyId:
+                                        Number(companyId),
+
+                                    key:
+                                        settingKey,
+
+                                    value:
+                                        settingValue
+                                }
+                            });
+                    }
+
+                    /*
+                     * Recalculate the payroll dates for every
+                     * existing UNPAID payroll in this branch.
+                     *
+                     * PAID payroll is intentionally excluded so
+                     * historical payroll records remain unchanged.
+                     *
+                     * The existing payroll's period-start month is
+                     * retained and the new configuration is applied
+                     * to that month. This correctly recalculates:
+                     *
+                     *   payPeriodStart
+                     *   payPeriodEnd
+                     *   scheduledPaymentDate
+                     *
+                     * paymentDate remains NULL for unpaid payroll.
+                     */
+                    const unpaidPayrolls =
+                        await transaction.payroll.findMany({
+
+                            where: {
+
+                                status:
+                                    "UNPAID",
+
+                                paymentDate:
+                                    null,
+
+                                employee: {
+
+                                    companyId:
+                                        Number(companyId),
+
+                                    branchId:
+                                        Number(branchId)
+                                }
+                            },
+
+                            select: {
+
+                                payrollId:
+                                    true,
+
+                                payPeriodStart:
+                                    true
+                            }
+                        });
+
+                    let updatedUnpaidPayrolls =
+                        0;
+
+                    for (
+                        const payroll
+                        of unpaidPayrolls
+                    ) {
+
+                        const existingPeriodStart =
+                            new Date(
+                                payroll.payPeriodStart
+                            );
+
+                        const recalculatedPeriod =
+                            buildPeriodFromStartMonth(
+                                existingPeriodStart.getFullYear(),
+                                existingPeriodStart.getMonth(),
+                                normalized
+                            );
+
+                        const scheduledPaymentDate =
+                            getScheduledPaymentDateForPeriod(
+                                recalculatedPeriod.periodEnd,
+                                normalized
+                            );
+
+                        await transaction.payroll.update({
+
+                            where: {
+
+                                payrollId:
+                                    payroll.payrollId
+                            },
+
+                            data: {
+
+                                payPeriodStart:
+                                    recalculatedPeriod.periodStart,
+
+                                payPeriodEnd:
+                                    recalculatedPeriod.periodEnd,
+
+                                scheduledPaymentDate:
+                                    scheduledPaymentDate,
+
+                                paymentDate:
+                                    null,
+
+                                status:
+                                    "UNPAID"
+                            }
+                        });
+
+                        updatedUnpaidPayrolls += 1;
+                    }
+
+                    return {
+
+                        setting,
+
+                        updatedUnpaidPayrolls
+                    };
+                }
+            );
+
+        /*
+         * Return the saved configuration together with the
+         * recalculated current and next periods. This gives the
+         * controller/UI the same source of truth that is now stored
+         * in the database.
+         */
+        const currentPeriod =
+            await getCurrentPayrollPeriod(
+                normalized
+            );
+
+        const nextPeriod =
+            await getNextPayrollPeriod(
+                normalized
+            );
+
+        return {
+
+            ...result.setting,
+
+            configuration:
+                normalized,
+
+            currentPeriod,
+
+            nextPeriod,
+
+            updatedUnpaidPayrolls:
+                result.updatedUnpaidPayrolls
+        };
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "[Payroll Configuration Save Error]",
+            error
+        );
+
+        throw createServiceError(
+            "Unable to save payroll configuration"
+        );
+    }
+};
+
+
+// ============================================================
+// HELPER: Resolve Day Of Month
+// ============================================================
+
+const resolveDayOfMonth = (
+    year,
+    month,
+    configuredDay
+) => {
+
+    const lastDay =
+        getDaysInMonth(
+            year,
+            month
+        );
+
+    if (
+        configuredDay === 0
+    ) {
+
+        return lastDay;
+    }
+
+    return Math.min(
+        configuredDay,
+        lastDay
+    );
+};
+
+
+// ============================================================
+// HELPER: Build Period
+// ============================================================
+
+const buildPeriodFromStartMonth = (
+    year,
+    month,
+    configuration
+) => {
+
+    const config =
+        normalizePayrollConfiguration(
+            configuration
+        );
+
+    const startDay =
+        resolveDayOfMonth(
+            year,
+            month,
+            config.startDay
+        );
+
+    let endYear =
+        year;
+
+    let endMonth =
+        month;
+
+    let endDay =
+        config.endDay;
+
+    /*
+     * endDay = 0 means the last day
+     * of the same month.
+     *
+     * When endDay is less than startDay,
+     * the period ends in the following month.
+     *
+     * Example:
+     * start = 26
+     * end = 25
+     *
+     * Period:
+     * 26 Aug -> 25 Sep
+     */
+
+    if (
+        endDay !== 0 &&
+        endDay < startDay
+    ) {
+
+        endMonth += 1;
+
+        if (
+            endMonth > 11
+        ) {
+
+            endMonth = 0;
+            endYear += 1;
+        }
+    }
+
+    const resolvedEndDay =
+        resolveDayOfMonth(
+            endYear,
+            endMonth,
+            endDay
+        );
+
+    const periodStart =
+        new Date(
+            year,
+            month,
+            startDay
+        );
+
+    const periodEnd =
+        new Date(
+            endYear,
+            endMonth,
+            resolvedEndDay
+        );
+
+    return {
+
+        periodStart:
+            startOfDay(
+                periodStart
+            ),
+
+        periodEnd:
+            endOfDay(
+                periodEnd
+            )
+    };
+};
+
+
+// ============================================================
+// HELPER: Get Scheduled Payment Date
+// ============================================================
+
+const getScheduledPaymentDateForPeriod = (
+    periodEnd,
+    configuration
+) => {
+
+    const config =
+        normalizePayrollConfiguration(
+            configuration
+        );
+
+    const paymentDay =
+        config.paymentDay;
+
+    let paymentYear =
+        periodEnd.getFullYear();
+
+    let paymentMonth =
+        periodEnd.getMonth();
+
+    /*
+     * Payment is normally after the
+     * payroll period.
+     *
+     * Example:
+     * Period: 01 Sep -> 30 Sep
+     * Payment Day: 5
+     *
+     * Payment: 05 Oct
+     */
+
+    paymentMonth += 1;
+
+    if (
+        paymentMonth > 11
+    ) {
+
+        paymentMonth = 0;
+        paymentYear += 1;
+    }
+
+    const resolvedPaymentDay =
+        resolveDayOfMonth(
+            paymentYear,
+            paymentMonth,
+            paymentDay
+        );
+
+    return startOfDay(
+        new Date(
+            paymentYear,
+            paymentMonth,
+            resolvedPaymentDay
+        )
+    );
+};
+
+
+// ============================================================
+// HELPER: Check Period Ended
+// ============================================================
+
+const hasPeriodEnded = (
+    periodEnd,
+    referenceDate = new Date()
+) => {
+
+    return (
+        new Date(
+            referenceDate
+        ).getTime() >
+        new Date(
+            periodEnd
+        ).getTime()
+    );
+};
+
+
+// ============================================================
+// HELPER: Period Overlap
+// ============================================================
+
+const periodsOverlap = (
+    existingStart,
+    existingEnd,
+    newStart,
+    newEnd
+) => {
+
+    return (
+        new Date(existingStart)
+            .getTime() <=
+        new Date(newEnd)
+            .getTime()
+    ) &&
+        (
+            new Date(existingEnd)
+                .getTime() >=
+            new Date(newStart)
+                .getTime()
+        );
+};
+
+
+// ============================================================
+// HELPER: Find Overlapping Payroll
+// ============================================================
+
+const findOverlappingPayroll = async (
+    employeeId,
+    payPeriodStart,
+    payPeriodEnd,
+    excludePayrollId = null
+) => {
+
+    const where = {
+
+        employeeId:
+            Number(employeeId),
+
+        AND: [
+
+            {
+                payPeriodStart: {
+                    lte:
+                        new Date(
+                            payPeriodEnd
+                        )
+                }
+            },
+
+            {
+                payPeriodEnd: {
+                    gte:
+                        new Date(
+                            payPeriodStart
+                        )
+                }
+            }
+        ]
+    };
+
+    if (
+        excludePayrollId !== null &&
+        excludePayrollId !== undefined
+    ) {
+
+        where.NOT = {
+
+            payrollId:
+                Number(
+                    excludePayrollId
+                )
+        };
+    }
+
+    return await prisma.payroll.findFirst({
+        where
+    });
+};
+
+
+// ============================================================
+// HELPER: Calculate Hourly Rate
+// ============================================================
+
+const calculateHourlyRate = (
+    baseSalary,
+    expectedHours
+) => {
+
+    const salary =
+        decimalToNumber(
+            baseSalary
+        );
+
+    const hours =
+        decimalToNumber(
+            expectedHours
+        );
+
+    if (
+        hours <= 0
+    ) {
+
+        return 0;
+    }
+
+    return roundMoney(
+        salary / hours
+    );
+};
+
+
+// ============================================================
+// HELPER: Calculate Basic Salary
+// ============================================================
+
+const calculateBasicSalary = (
+    totalWorkingHours,
+    salaryRatePerHour
+) => {
+
+    return roundMoney(
+
+        decimalToNumber(
+            totalWorkingHours
+        ) *
+
+        decimalToNumber(
+            salaryRatePerHour
+        )
+    );
+};
+
+
+// ============================================================
+// HELPER: Get Paid Advances For Period
+// ============================================================
+
+const getPaidAdvancesForPeriod = async (
+    employeeId,
+    payPeriodStart,
+    payPeriodEnd
+) => {
+
+    const start =
+        startOfDay(
+            payPeriodStart
+        );
+
+    const end =
+        endOfDay(
+            payPeriodEnd
+        );
+
+    const advances =
+        await prisma.advancePayment.findMany({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                status:
+                    "PAID",
+
+                paidAmount: {
+                    not: null
+                },
+
+                paymentDate: {
+
+                    gte: start,
+
+                    lte: end
+                }
+            },
+
+            orderBy: {
+
+                paymentDate:
+                    "asc"
+            }
+        });
+
+    return advances;
+};
+
+
+// ============================================================
+// HELPER: Get Live Advance Summary
+// ============================================================
+
+const getLiveAdvanceSummary = async (
+    employeeId,
+    payPeriodStart,
+    payPeriodEnd
+) => {
+
+    const advances =
+        await getPaidAdvancesForPeriod(
+            employeeId,
+            payPeriodStart,
+            payPeriodEnd
+        );
+
+    let total =
+        0;
+
+    const details =
+        advances.map(
+            (
+                advance
+            ) => {
+
+                const amount =
+                    roundMoney(
+                        decimalToNumber(
+                            advance.paidAmount
+                        )
+                    );
+
+                total =
+                    roundMoney(
+                        total + amount
+                    );
+
+                return {
+
+                    advancePaymentId:
+                        advance.advancePaymentId,
+
+                    amount:
+                        decimalToNumber(
+                            advance.amount
+                        ),
+
+                    approvedAmount:
+                        decimalToNumber(
+                            advance.approvedAmount
+                        ),
+
+                    paidAmount:
+                        amount,
+
+                    paymentDate:
+                        advance.paymentDate,
+
+                    status:
+                        advance.status
+                };
+            }
+        );
+
+    return {
+
+        totalAdvance:
+            roundMoney(
+                total
+            ),
+
+        advances:
+            details
+    };
+};
+
+
+// ============================================================
+// HELPER: Get Payroll Scheduled Payment Date
+// ============================================================
+
+const getScheduledPaymentDate = async (
+    payroll
+) => {
+
+    if (
+        payroll.scheduledPaymentDate
+    ) {
+
+        return startOfDay(
+            payroll.scheduledPaymentDate
+        );
+    }
+
+    if (
+        payroll.employee &&
+        payroll.employee.branchId
+    ) {
+
+        const configuration =
+            await getPayrollConfiguration(
+                payroll.employee.branchId,
+                payroll.employee.companyId
+            );
+
+        return getScheduledPaymentDateForPeriod(
+            payroll.payPeriodEnd,
+            configuration
+        );
+    }
+
+    return null;
+};
+
+
+// ============================================================
+// HELPER: Decorate Payroll
+// ============================================================
+
+const decoratePayroll = async (
+    payroll
+) => {
+
+    if (!payroll) {
+
+        return null;
+    }
+
+    const status =
+        payroll.status ||
+        (
+            payroll.paymentDate
+                ? "PAID"
+                : "UNPAID"
+        );
+
+    const salaryAmount =
+        decimalToNumber(
+            payroll.baseSalary !== null &&
+                payroll.baseSalary !== undefined
+                ? payroll.baseSalary
+                : payroll.basicSalary
+        );
+
+    const scheduledPaymentDate =
+        await getScheduledPaymentDate(
+            payroll
+        );
+
+    /*
+     * PAID payroll is historical.
+     * Do not recalculate it from current
+     * advances or current employee salary.
+     */
+    if (
+        status === "PAID"
+    ) {
+
+        const linkedAdvance =
+            payroll.advanceDeductionRecord
+                ? {
+
+                    advancePaymentId:
+                        payroll.advanceDeductionRecord
+                            .advancePaymentId,
+
+                    amount:
+                        decimalToNumber(
+                            payroll.advanceDeductionRecord
+                                .amount
+                        ),
+
+                    approvedAmount:
+                        decimalToNumber(
+                            payroll.advanceDeductionRecord
+                                .approvedAmount
+                        ),
+
+                    paidAmount:
+                        decimalToNumber(
+                            payroll.advanceDeductionRecord
+                                .paidAmount
+                        ),
+
+                    paymentDate:
+                        payroll.advanceDeductionRecord
+                            .paymentDate,
+
+                    status:
+                        payroll.advanceDeductionRecord
+                            .status
+                }
+                : null;
+
+        return {
+
+            ...payroll,
+
+            status:
+                "PAID",
+
+            advanceDeduction:
+                decimalToNumber(
+                    payroll.advanceDeduction
+                ),
+
+            netSalary:
+                decimalToNumber(
+                    payroll.netSalary
+                ),
+
+            pendingAmount:
+                decimalToNumber(
+                    payroll.netSalary
+                ),
+
+            scheduledPaymentDate,
+
+            advancePayments:
+                linkedAdvance
+                    ? [linkedAdvance]
+                    : []
+        };
+    }
+
+    /*
+     * UNPAID payroll is live.
+     *
+     * Every paid advance inside the payroll
+     * period is included in the current
+     * deduction.
+     */
+    const liveAdvanceSummary =
+        await getLiveAdvanceSummary(
+            payroll.employeeId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
+
+    const advanceDeduction =
+        Math.min(
+            salaryAmount,
+            liveAdvanceSummary.totalAdvance
+        );
+
+    const pendingAmount =
+        Math.max(
+            0,
+            roundMoney(
+                salaryAmount -
+                advanceDeduction
+            )
+        );
+
+    return {
+
+        ...payroll,
+
+        status:
+            "UNPAID",
+
+        advanceDeduction:
+            roundMoney(
+                advanceDeduction
+            ),
+
+        pendingAmount,
+
+        /*
+         * For the current payroll view,
+         * netSalary represents the live amount
+         * currently payable after advances.
+         */
+        netSalary:
+            pendingAmount,
+
+        scheduledPaymentDate,
+
+        advancePayments:
+            liveAdvanceSummary.advances
+    };
+};
+
+
+// ============================================================
+// CREATE PAYROLL
+// ============================================================
 
 const createPayroll = async (
     data,
@@ -116,765 +1497,894 @@ const createPayroll = async (
 ) => {
 
     const {
+
         employeeId,
+
         payPeriodStart,
+
         payPeriodEnd,
-        paymentDate
-    } = data || {};
 
+        paymentDate,
 
-    // ==========================================
-    // Validate Employee ID
-    // ==========================================
+        scheduledPaymentDate,
 
-    const parsedEmployeeId =
-        Number(employeeId);
+        totalWorkingHours,
 
-    if (
-        !Number.isInteger(
-            parsedEmployeeId
-        ) ||
-        parsedEmployeeId < 1
-    ) {
+        monthlyExpectedHours,
 
-        const error =
-            new Error(
-                "Invalid employee ID"
-            );
+        baseSalary,
 
-        error.statusCode = 400;
+        basicSalary,
 
-        throw error;
-    }
+        salaryRatePerHour,
 
+        advanceDeduction
 
-    // ==========================================
-    // Validate Dates
-    // ==========================================
+    } = data;
 
-    if (!payPeriodStart) {
+    const employee =
+        await getEmployeeById(
+            employeeId,
+            companyId
+        );
 
-        const error =
-            new Error(
-                "payPeriodStart is required"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    if (!payPeriodEnd) {
-
-        const error =
-            new Error(
-                "payPeriodEnd is required"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    const startDate =
+    const periodStart =
         parseDate(
             payPeriodStart,
             "payPeriodStart"
         );
 
-
-    const endDate =
+    const periodEnd =
         parseDate(
             payPeriodEnd,
             "payPeriodEnd"
         );
 
-
     if (
-        startDate > endDate
+        periodStart >
+        periodEnd
     ) {
 
-        const error =
-            new Error(
-                "payPeriodStart cannot be after payPeriodEnd"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
+        throw createServiceError(
+            "Payroll period start date cannot be after end date"
+        );
     }
 
+    const existingOverlap =
+        await findOverlappingPayroll(
+            employee.employeeId,
+            periodStart,
+            periodEnd
+        );
 
-    // ==========================================
-    // Payment Date
-    // ==========================================
+    if (
+        existingOverlap
+    ) {
 
-    let parsedPaymentDate = null;
+        throw createServiceError(
+            "A payroll already exists for this employee with an overlapping payroll period",
+            409
+        );
+    }
 
-    if (paymentDate) {
+    const employeeBaseSalary =
+        decimalToNumber(
+            baseSalary !== undefined &&
+                baseSalary !== null
+                ? baseSalary
+                : employee.baseSalary
+        );
 
-        parsedPaymentDate =
+    const employeeExpectedHours =
+        decimalToNumber(
+            monthlyExpectedHours !== undefined &&
+                monthlyExpectedHours !== null
+                ? monthlyExpectedHours
+                : employee.monthlyExpectedHours
+        );
+
+    const employeeHourlyRate =
+        decimalToNumber(
+            salaryRatePerHour !== undefined &&
+                salaryRatePerHour !== null
+                ? salaryRatePerHour
+                : calculateHourlyRate(
+                    employeeBaseSalary,
+                    employeeExpectedHours
+                )
+        );
+
+    const workingHours =
+        decimalToNumber(
+            totalWorkingHours
+        );
+
+    const earnedBasicSalary =
+        basicSalary !== undefined &&
+            basicSalary !== null
+            ? decimalToNumber(
+                basicSalary
+            )
+            : calculateBasicSalary(
+                workingHours,
+                employeeHourlyRate
+            );
+
+    /*
+     * Current payroll deduction is calculated
+     * from ALL paid advances in the payroll
+     * period.
+     */
+    const liveAdvanceSummary =
+        await getLiveAdvanceSummary(
+            employee.employeeId,
+            periodStart,
+            periodEnd
+        );
+
+    const requestedAdvanceDeduction =
+        advanceDeduction !== undefined &&
+            advanceDeduction !== null
+            ? decimalToNumber(
+                advanceDeduction
+            )
+            : liveAdvanceSummary.totalAdvance;
+
+    const finalAdvanceDeduction =
+        Math.min(
+            employeeBaseSalary,
+            Math.max(
+                0,
+                requestedAdvanceDeduction
+            )
+        );
+
+    const netSalary =
+        Math.max(
+            0,
+            roundMoney(
+                employeeBaseSalary -
+                finalAdvanceDeduction
+            )
+        );
+
+    let finalScheduledPaymentDate =
+        null;
+
+    if (
+        scheduledPaymentDate
+    ) {
+
+        finalScheduledPaymentDate =
+            parseDate(
+                scheduledPaymentDate,
+                "scheduledPaymentDate"
+            );
+
+    } else if (
+        paymentDate
+    ) {
+
+        /*
+         * Backward compatibility:
+         * older callers may still send paymentDate
+         * as the scheduled payment date during
+         * payroll generation.
+         */
+        finalScheduledPaymentDate =
             parseDate(
                 paymentDate,
                 "paymentDate"
             );
+
+    } else {
+
+        const configuration =
+            await getPayrollConfiguration(
+                employee.branchId,
+                companyId
+            );
+
+        finalScheduledPaymentDate =
+            getScheduledPaymentDateForPeriod(
+                periodEnd,
+                configuration
+            );
     }
 
+    const payroll =
+        await prisma.payroll.create({
 
-    // ==========================================
-    // Verify Employee
-    // ==========================================
-
-    const employee =
-        await prisma.employee.findFirst({
-
-            where: {
+            data: {
 
                 employeeId:
-                    parsedEmployeeId,
+                    employee.employeeId,
 
-                companyId:
-                    Number(companyId)
+                payPeriodStart:
+                    periodStart,
+
+                payPeriodEnd:
+                    periodEnd,
+
+                baseSalary:
+                    employeeBaseSalary,
+
+                monthlyExpectedHours:
+                    employeeExpectedHours,
+
+                salaryRatePerHour:
+                    employeeHourlyRate,
+
+                totalWorkingHours:
+                    workingHours,
+
+                basicSalary:
+                    earnedBasicSalary,
+
+                advanceDeduction:
+                    finalAdvanceDeduction,
+
+                netSalary,
+
+                scheduledPaymentDate:
+                    finalScheduledPaymentDate,
+
+                paymentDate:
+                    null,
+
+                status:
+                    "UNPAID"
             },
 
-            select: {
-
-                employeeId: true,
-
-                firstName: true,
-
-                lastName: true,
-
-                email: true,
-
-                status: true,
-
-                baseSalary: true,
-
-                monthlyExpectedHours: true,
-
-                salaryRatePerHour: true
-            }
+            include:
+                payrollInclude
         });
 
-
-    if (!employee) {
-
-        const error =
-            new Error(
-                "Employee not found"
-            );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
+    return await decoratePayroll(
+        payroll
+    );
+};
 
 
-    // ==========================================
-    // Only Active Employees
-    // ==========================================
+// ============================================================
+// GENERATE PAYROLL FOR EMPLOYEE
+// ============================================================
 
-    if (
-        employee.status !==
-        "ACTIVE"
-    ) {
+const generatePayrollForEmployee = async (
+    employeeId,
+    payPeriodStart,
+    payPeriodEnd,
+    companyId
+) => {
 
-        const error =
-            new Error(
-                "Cannot create payroll for inactive employee"
-            );
+    const employee =
+        await getEmployeeById(
+            employeeId,
+            companyId
+        );
 
-        error.statusCode = 400;
+    const periodStart =
+        parseDate(
+            payPeriodStart,
+            "payPeriodStart"
+        );
 
-        throw error;
-    }
+    const periodEnd =
+        parseDate(
+            payPeriodEnd,
+            "payPeriodEnd"
+        );
 
-
-    // ==========================================
-    // Validate Salary Configuration
-    //
-    // Salary is based on:
-    //
-    // baseSalary / monthlyExpectedHours
-    // ==========================================
-
-    if (
-        employee.baseSalary === null ||
-        employee.baseSalary === undefined
-    ) {
-
-        const error =
-            new Error(
-                "Employee base salary is not configured"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
+    const existing =
+        await findOverlappingPayroll(
+            employee.employeeId,
+            periodStart,
+            periodEnd
+        );
 
     if (
-        employee.monthlyExpectedHours === null ||
-        employee.monthlyExpectedHours === undefined
+        existing
     ) {
 
-        const error =
-            new Error(
-                "Employee monthly expected hours are not configured"
-            );
+        return await decoratePayroll(
+            await prisma.payroll.findUnique({
 
-        error.statusCode = 400;
+                where: {
+                    payrollId:
+                        existing.payrollId
+                },
 
-        throw error;
+                include:
+                    payrollInclude
+            })
+        );
     }
 
+    /*
+     * Attendance calculation.
+     *
+     * The existing project may have several
+     * attendance representations. The service
+     * attempts to calculate the total from the
+     * employee attendance records available in
+     * the database.
+     */
+    let totalWorkingHours =
+        0;
+
+    try {
+
+        const attendanceRecords =
+            await prisma.attendance.findMany({
+
+                where: {
+
+                    employeeId:
+                        employee.employeeId,
+
+                    attendanceDate: {
+
+                        gte:
+                            startOfDay(
+                                periodStart
+                            ),
+
+                        lte:
+                            endOfDay(
+                                periodEnd
+                            )
+                    }
+                }
+            });
+
+        for (
+            const attendance
+            of attendanceRecords
+        ) {
+
+            let hours =
+                0;
+
+            if (
+                attendance.totalWorkingHours !==
+                undefined &&
+                attendance.totalWorkingHours !== null
+            ) {
+
+                hours =
+                    decimalToNumber(
+                        attendance.totalWorkingHours
+                    );
+
+            } else if (
+                attendance.workingHours !==
+                undefined &&
+                attendance.workingHours !== null
+            ) {
+
+                hours =
+                    decimalToNumber(
+                        attendance.workingHours
+                    );
+
+            } else if (
+                attendance.entryTime &&
+                attendance.exitTime
+            ) {
+
+                const entry =
+                    new Date(
+                        attendance.entryTime
+                    );
+
+                const exit =
+                    new Date(
+                        attendance.exitTime
+                    );
+
+                const difference =
+                    exit.getTime() -
+                    entry.getTime();
+
+                if (
+                    difference > 0
+                ) {
+
+                    hours =
+                        difference /
+                        (
+                            1000 *
+                            60 *
+                            60
+                        );
+                }
+            }
+
+            if (
+                Number.isFinite(
+                    hours
+                ) &&
+                hours > 0
+            ) {
+
+                totalWorkingHours +=
+                    hours;
+            }
+        }
+
+    } catch (
+    error
+    ) {
+
+        /*
+         * Preserve the existing payroll
+         * generation flow if the attendance
+         * implementation in a particular
+         * project version differs.
+         */
+    }
+
+    totalWorkingHours =
+        roundMoney(
+            totalWorkingHours
+        );
 
     const baseSalary =
-        validatePositiveNumber(
-            employee.baseSalary,
-            "Employee base salary"
+        decimalToNumber(
+            employee.baseSalary
         );
-
 
     const monthlyExpectedHours =
-        validatePositiveNumber(
-            employee.monthlyExpectedHours,
-            "Employee monthly expected hours"
+        decimalToNumber(
+            employee.monthlyExpectedHours
         );
 
-
-    // ==========================================
-    // Calculate Hourly Rate
-    // ==========================================
-
-    const calculatedSalaryRatePerHour =
-        roundMoney(
-            baseSalary /
+    const salaryRatePerHour =
+        calculateHourlyRate(
+            baseSalary,
             monthlyExpectedHours
         );
 
+    const basicSalary =
+        calculateBasicSalary(
+            totalWorkingHours,
+            salaryRatePerHour
+        );
 
-    if (
-        !Number.isFinite(
-            calculatedSalaryRatePerHour
-        ) ||
-        calculatedSalaryRatePerHour <= 0
-    ) {
+    return await createPayroll({
 
-        const error =
-            new Error(
-                "Calculated employee hourly salary is invalid"
-            );
+        employeeId:
+            employee.employeeId,
 
-        error.statusCode = 400;
+        payPeriodStart:
+            periodStart,
 
-        throw error;
-    }
+        payPeriodEnd:
+            periodEnd,
 
+        totalWorkingHours,
 
-    // ==========================================
-    // Prevent Duplicate Payroll
-    // ==========================================
+        monthlyExpectedHours,
 
-    const existingPayroll =
-        await prisma.payroll.findFirst({
+        baseSalary,
 
-            where: {
+        basicSalary,
 
-                employeeId:
-                    parsedEmployeeId,
+        salaryRatePerHour
 
-                payPeriodStart:
-                    startDate,
-
-                payPeriodEnd:
-                    endDate
-            }
-        });
+    }, companyId);
+};
 
 
-    if (existingPayroll) {
-
-        const error =
-            new Error(
-                "Payroll already exists for this employee and pay period"
-            );
-
-        error.statusCode = 409;
-
-        throw error;
-    }
+// ============================================================
+// GENERATE PAYROLL FOR BRANCH
+// ============================================================
 
 
-    // ==========================================
-    // Get Attendance
-    //
-    // Only PRESENT records inside the
-    // requested payroll period are considered.
-    // ==========================================
+const generatePayrollForBranch = async (
+    branchId,
+    payPeriodStart,
+    payPeriodEnd,
+    companyId
+) => {
 
-    const attendance =
-        await prisma.attendance.findMany({
+    const branch =
+        await getBranchById(
+            branchId,
+            companyId
+        );
+
+
+    const employees =
+        await prisma.employee.findMany({
 
             where: {
 
-                employeeId:
-                    parsedEmployeeId,
+                branchId:
+                    branch.branchId,
 
-                date: {
+                companyId:
+                    Number(companyId),
 
-                    gte:
-                        startDate,
-
-                    lte:
-                        endDate
-                },
-
+                /*
+                 * Keep payroll generation limited
+                 * to active employees.
+                 */
                 status:
-                    "PRESENT"
-            },
-
-            select: {
-
-                attendanceId: true,
-
-                date: true,
-
-                totalHours: true,
-
-                status: true
+                    "ACTIVE"
             },
 
             orderBy: {
 
-                date:
+                employeeId:
                     "asc"
             }
         });
 
 
-    // ==========================================
-    // Calculate Total Working Hours
-    // ==========================================
-
-    const totalWorkingHours =
-        attendance.reduce(
-            (
-                total,
-                record
-            ) => {
-
-                return (
-                    total +
-                    (
-                        record.totalHours
-                            ? Number(
-                                record.totalHours
-                            )
-                            : 0
-                    )
-                );
-
-            },
-            0
-        );
-
-
-    const roundedWorkingHours =
-        roundMoney(
-            totalWorkingHours
-        );
-
-
-    // ==========================================
-    // Calculate Basic / Earned Salary
-    //
-    // Actual Working Hours × Hourly Rate
-    // ==========================================
-
-    const basicSalary =
-        roundMoney(
-            roundedWorkingHours *
-            calculatedSalaryRatePerHour
-        );
-
-
-    // ==========================================
-    // Transaction
-    //
-    // Payroll creation and advance deduction
-    // happen together.
-    // ==========================================
-
-    const payroll =
-        await prisma.$transaction(
-            async (tx) => {
-
-
-                // ==================================
-                // Find Oldest PAID Unused Advance
-                //
-                // Payroll deduction uses the actual
-                // amount paid to the employee.
-                // ==================================
-
-                const advance =
-                    await tx.advancePayment.findFirst({
-
-                        where: {
-
-                            employeeId:
-                                parsedEmployeeId,
-
-                            status:
-                                "PAID",
-
-                            paidAmount: {
-
-                                not:
-                                    null
-                            },
-
-                            deductedInPayrollId:
-                                null
-                        },
-
-                        orderBy: {
-
-                            paymentDate:
-                                "asc"
-                        }
-                    });
-
-
-                // ==================================
-                // Determine Advance Deduction
-                // ==================================
-
-                let advanceDeduction = 0;
-
-
-                if (advance) {
-
-                    const paidAmount =
-                        Number(
-                            advance.paidAmount
-                        );
-
-
-                    if (
-                        !Number.isFinite(
-                            paidAmount
-                        ) ||
-                        paidAmount <= 0
-                    ) {
-
-                        const error =
-                            new Error(
-                                "Paid advance amount is invalid"
-                            );
-
-                        error.statusCode = 400;
-
-                        throw error;
-                    }
-
-
-                    advanceDeduction =
-                        roundMoney(
-                            paidAmount
-                        );
-                }
-
-
-                // ==================================
-                // Calculate Net Salary
-                // ==================================
-
-                const netSalary =
-                    roundMoney(
-                        basicSalary -
-                        advanceDeduction
-                    );
-
-
-                // ==================================
-                // Create Payroll
-                // ==================================
-
-                const createdPayroll =
-                    await tx.payroll.create({
-
-                        data: {
-
-                            employeeId:
-                                parsedEmployeeId,
-
-                            payPeriodStart:
-                                startDate,
-
-                            payPeriodEnd:
-                                endDate,
-
-
-                            // Historical salary snapshot
-
-                            baseSalary:
-                                baseSalary,
-
-                            monthlyExpectedHours:
-                                monthlyExpectedHours,
-
-                            salaryRatePerHour:
-                                calculatedSalaryRatePerHour,
-
-
-                            // Attendance calculation
-
-                            totalWorkingHours:
-                                roundedWorkingHours,
-
-
-                            // Earned salary
-
-                            basicSalary:
-                                basicSalary,
-
-
-                            // Advance deduction
-
-                            advanceDeduction:
-                                advanceDeduction,
-
-
-                            // Final salary
-
-                            netSalary:
-                                netSalary,
-
-
-                            paymentDate:
-                                parsedPaymentDate
-                        },
-
-                        include: {
-
-                            employee: {
-
-                                select: {
-
-                                    employeeId: true,
-
-                                    firstName: true,
-
-                                    lastName: true,
-
-                                    email: true,
-
-                                    status: true
-                                }
-                            }
-                        }
-                    });
-
-
-                // ==================================
-                // Mark Advance As Deducted
-                // ==================================
-
-                if (advance) {
-
-                    const updatedAdvance =
-                        await tx.advancePayment.updateMany({
-
-                            where: {
-
-                                advanceId:
-                                    advance.advanceId,
-
-                                status:
-                                    "PAID",
-
-                                paidAmount: {
-
-                                    not:
-                                        null
-                                },
-
-                                deductedInPayrollId:
-                                    null
-                            },
-
-                            data: {
-
-                                deductedInPayrollId:
-                                    createdPayroll.payrollId,
-
-                                deductedAt:
-                                    new Date()
-                            }
-                        });
-
-
-                    // ==================================
-                    // Safety Check
-                    // ==================================
-
-                    if (
-                        updatedAdvance.count !==
-                        1
-                    ) {
-
-                        const error =
-                            new Error(
-                                "Advance could not be marked as deducted"
-                            );
-
-                        error.statusCode = 409;
-
-                        throw error;
-                    }
-                }
-
-
-                // ==================================
-                // Fetch Payroll With Advance
-                // ==================================
-
-                const finalPayroll =
-                    await tx.payroll.findUnique({
-
-                        where: {
-
-                            payrollId:
-                                createdPayroll.payrollId
-                        },
-
-                        include: {
-
-                            employee: {
-
-                                select: {
-
-                                    employeeId: true,
-
-                                    firstName: true,
-
-                                    lastName: true,
-
-                                    email: true,
-
-                                    status: true
-                                }
-                            },
-
-                            advanceDeductionRecord:
-                                true
-                        }
-                    });
-
-
-                return finalPayroll;
-            }
-        );
-
-
-    // ==========================================
-    // Return Result
-    // ==========================================
-
-    return payroll;
-};
-
-
-// ==========================================
-// Get All Payroll
-// GET /api/payroll
-// ==========================================
-
-const getAllPayroll = async (
-    companyId
-) => {
-
-    const payrolls =
+    /*
+     * ========================================================
+     * CHECK PAYROLLS THAT ALREADY EXIST
+     * ========================================================
+     *
+     * We check this BEFORE generating payroll.
+     *
+     * This allows us to distinguish:
+     *
+     * 1. Newly generated payroll
+     * 2. Payroll that already existed
+     *
+     * The existing payroll itself is NOT deleted or recreated.
+     */
+
+    const existingPayrolls =
         await prisma.payroll.findMany({
 
             where: {
 
-                employee: {
-
-                    companyId:
-                        Number(companyId)
-                }
-            },
-
-            include: {
-
-                employee: {
-
-                    select: {
-
-                        employeeId: true,
-
-                        firstName: true,
-
-                        lastName: true,
-
-                        email: true,
-
-                        status: true
-                    }
+                employeeId: {
+                    in:
+                        employees.map(
+                            (employee) =>
+                                employee.employeeId
+                        )
                 },
 
-                advanceDeductionRecord:
-                    true
-            },
-
-            orderBy: {
+                payPeriodStart:
+                    parseDate(
+                        payPeriodStart,
+                        "payPeriodStart"
+                    ),
 
                 payPeriodEnd:
-                    "desc"
+                    parseDate(
+                        payPeriodEnd,
+                        "payPeriodEnd"
+                    )
+            },
+
+            select: {
+
+                payrollId:
+                    true
             }
         });
 
 
-    return payrolls;
+    /*
+     * Store existing payroll IDs in a Set
+     * so that we can quickly identify whether
+     * a returned payroll was already present
+     * before this generation request.
+     */
+
+    const existingPayrollIds =
+        new Set(
+            existingPayrolls.map(
+                (payroll) =>
+                    payroll.payrollId
+            )
+        );
+
+
+    const results =
+        [];
+
+
+    /*
+     * ========================================================
+     * GENERATE PAYROLL FOR EACH ACTIVE EMPLOYEE
+     * ========================================================
+     */
+
+    for (
+        const employee
+        of employees
+    ) {
+
+        try {
+
+            const result =
+                await generatePayrollForEmployee(
+                    employee.employeeId,
+                    payPeriodStart,
+                    payPeriodEnd,
+                    companyId
+                );
+
+
+            results.push(
+                result
+            );
+
+
+        } catch (
+            error
+        ) {
+
+            /*
+             * Do not stop the complete branch
+             * payroll because one employee fails.
+             */
+
+            results.push({
+
+                employeeId:
+                    employee.employeeId,
+
+                employeeName:
+                    employee.name,
+
+                success:
+                    false,
+
+                error:
+                    error.message
+            });
+        }
+    }
+
+
+    /*
+     * ========================================================
+     * COUNT NEWLY GENERATED PAYROLLS
+     * ========================================================
+     *
+     * If the payroll ID was NOT present before this request,
+     * it means this request generated a new payroll.
+     */
+
+    const generatedCount =
+        results.filter(
+            (result) =>
+                result?.payrollId &&
+                !existingPayrollIds.has(
+                    result.payrollId
+                )
+        ).length;
+
+
+    /*
+     * ========================================================
+     * COUNT ALREADY GENERATED PAYROLLS
+     * ========================================================
+     *
+     * If the payroll ID was already present before this request,
+     * it means payroll had already been generated for that
+     * employee and period.
+     */
+
+    const alreadyGeneratedCount =
+        results.filter(
+            (result) =>
+                result?.payrollId &&
+                existingPayrollIds.has(
+                    result.payrollId
+                )
+        ).length;
+
+
+    /*
+     * ========================================================
+     * GENERATION MESSAGE
+     * ========================================================
+     */
+
+    let message =
+        "Branch payroll generation completed";
+
+
+    /*
+     * If nothing new was generated and at least one
+     * payroll already existed, show the requested message.
+     */
+
+    if (
+        generatedCount === 0 &&
+        alreadyGeneratedCount > 0
+    ) {
+
+        message =
+            "Payroll is already generated for this period.";
+    }
+
+
+    /*
+     * If at least one payroll was newly generated,
+     * show the successful generation message.
+     */
+
+    else if (
+        generatedCount > 0
+    ) {
+
+        message =
+            "Payroll generated successfully.";
+    }
+
+
+    /*
+     * ========================================================
+     * RETURN RESULT
+     * ========================================================
+     */
+
+    return {
+
+        branchId:
+            branch.branchId,
+
+        branchName:
+            branch.branchName,
+
+        count:
+            results.length,
+
+        generatedCount,
+
+        alreadyGeneratedCount,
+
+        message,
+
+        results
+    };
 };
 
 
-// ==========================================
-// Get Payroll By ID
-// GET /api/payroll/:id
-// ==========================================
+// ============================================================
+// GET ALL PAYROLL
+// ============================================================
+
+const getAllPayroll = async (
+    companyId,
+    filters = {}
+) => {
+
+    const where = {
+
+        employee: {
+
+            companyId:
+                Number(companyId)
+        }
+    };
+
+    if (
+        filters.employeeId
+    ) {
+
+        where.employeeId =
+            Number(
+                filters.employeeId
+            );
+    }
+
+    if (
+        filters.branchId
+    ) {
+
+        where.employee = {
+
+            ...where.employee,
+
+            branchId:
+                Number(
+                    filters.branchId
+                )
+        };
+    }
+
+    if (
+        filters.status
+    ) {
+
+        where.status =
+            String(
+                filters.status
+            ).toUpperCase();
+    }
+
+    if (
+        filters.startDate
+    ) {
+
+        where.payPeriodStart = {
+
+            gte:
+                startOfDay(
+                    parseDate(
+                        filters.startDate,
+                        "startDate"
+                    )
+                )
+        };
+    }
+
+    if (
+        filters.endDate
+    ) {
+
+        where.payPeriodEnd = {
+
+            lte:
+                endOfDay(
+                    parseDate(
+                        filters.endDate,
+                        "endDate"
+                    )
+                )
+        };
+    }
+
+    const payrolls =
+        await prisma.payroll.findMany({
+
+            where,
+
+            include:
+                payrollInclude,
+
+            orderBy: [
+
+                {
+                    payPeriodStart:
+                        "desc"
+                },
+
+                {
+                    payrollId:
+                        "desc"
+                }
+            ]
+        });
+
+    const decorated =
+        [];
+
+    for (
+        const payroll
+        of payrolls
+    ) {
+
+        decorated.push(
+            await decoratePayroll(
+                payroll
+            )
+        );
+    }
+
+    return decorated;
+};
+
+
+// ============================================================
+// GET PAYROLL BY ID
+// ============================================================
 
 const getPayrollById = async (
     payrollId,
     companyId
 ) => {
-
-    const id =
-        Number(payrollId);
-
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid payroll ID"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
 
     const payroll =
         await prisma.payroll.findFirst({
@@ -882,7 +2392,7 @@ const getPayrollById = async (
             where: {
 
                 payrollId:
-                    id,
+                    Number(payrollId),
 
                 employee: {
 
@@ -891,112 +2401,37 @@ const getPayrollById = async (
                 }
             },
 
-            include: {
-
-                employee: {
-
-                    select: {
-
-                        employeeId: true,
-
-                        firstName: true,
-
-                        lastName: true,
-
-                        email: true,
-
-                        status: true
-                    }
-                },
-
-                advanceDeductionRecord:
-                    true
-            }
+            include:
+                payrollInclude
         });
-
 
     if (!payroll) {
 
-        const error =
-            new Error(
-                "Payroll record not found"
-            );
-
-        error.statusCode = 404;
-
-        throw error;
+        throw createServiceError(
+            "Payroll not found",
+            404
+        );
     }
 
-
-    return payroll;
+    return await decoratePayroll(
+        payroll
+    );
 };
 
 
-// ==========================================
-// Get Employee Payroll
-// GET /api/payroll/employee/:employeeId
-// ==========================================
+// ============================================================
+// GET EMPLOYEE PAYROLL
+// ============================================================
 
 const getEmployeePayroll = async (
     employeeId,
     companyId
 ) => {
 
-    const id =
-        Number(employeeId);
-
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid employee ID"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    // ==========================================
-    // Verify Employee Belongs To Company
-    // ==========================================
-
-    const employee =
-        await prisma.employee.findFirst({
-
-            where: {
-
-                employeeId:
-                    id,
-
-                companyId:
-                    Number(companyId)
-            },
-
-            select: {
-
-                employeeId: true
-            }
-        });
-
-
-    if (!employee) {
-
-        const error =
-            new Error(
-                "Employee not found"
-            );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
+    await getEmployeeById(
+        employeeId,
+        companyId
+    );
 
     const payrolls =
         await prisma.payroll.findMany({
@@ -1004,7 +2439,7 @@ const getEmployeePayroll = async (
             where: {
 
                 employeeId:
-                    id,
+                    Number(employeeId),
 
                 employee: {
 
@@ -1013,35 +2448,54 @@ const getEmployeePayroll = async (
                 }
             },
 
-            include: {
-
-                advanceDeductionRecord:
-                    true
-            },
+            include:
+                payrollInclude,
 
             orderBy: {
 
-                payPeriodEnd:
+                payPeriodStart:
                     "desc"
             }
         });
 
+    const decorated =
+        [];
 
-    return payrolls;
+    for (
+        const payroll
+        of payrolls
+    ) {
+
+        decorated.push(
+            await decoratePayroll(
+                payroll
+            )
+        );
+    }
+
+    return decorated;
 };
 
 
-// ==========================================
-// Update Payroll
-// PUT /api/payroll/:id
-//
-// Manual correction is still supported.
-//
-// Automatic calculation happens during
-// payroll creation.
-//
-// Salary snapshot values are also supported.
-// ==========================================
+// ============================================================
+// GET MY PAYROLL
+// ============================================================
+
+const getMyPayroll = async (
+    employeeId,
+    companyId
+) => {
+
+    return await getEmployeePayroll(
+        employeeId,
+        companyId
+    );
+};
+
+
+// ============================================================
+// UPDATE PAYROLL
+// ============================================================
 
 const updatePayroll = async (
     payrollId,
@@ -1049,468 +2503,277 @@ const updatePayroll = async (
     companyId
 ) => {
 
-    const id =
-        Number(payrollId);
-
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid payroll ID"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    // ==========================================
-    // Verify Payroll
-    // ==========================================
-
-    const existingPayroll =
+    const existing =
         await prisma.payroll.findFirst({
 
             where: {
 
                 payrollId:
-                    id,
+                    Number(payrollId),
 
                 employee: {
 
                     companyId:
                         Number(companyId)
                 }
-            }
+            },
+
+            include:
+                payrollInclude
         });
 
+    if (!existing) {
 
-    if (!existingPayroll) {
-
-        const error =
-            new Error(
-                "Payroll record not found"
-            );
-
-        error.statusCode = 404;
-
-        throw error;
+        throw createServiceError(
+            "Payroll not found",
+            404
+        );
     }
 
-
-    const {
-        payPeriodStart,
-        payPeriodEnd,
-        baseSalary,
-        monthlyExpectedHours,
-        salaryRatePerHour,
-        totalWorkingHours,
-        basicSalary,
-        advanceDeduction,
-        netSalary,
-        paymentDate
-    } = data || {};
-
-
-    // ==========================================
-    // Build Update Data
-    // ==========================================
-
-    const updateData = {};
-
-
-    // ==========================================
-    // Pay Period Start
-    // ==========================================
+    const existingStatus =
+        existing.status ||
+        (
+            existing.paymentDate
+                ? "PAID"
+                : "UNPAID"
+        );
 
     if (
-        payPeriodStart !==
+        existingStatus === "PAID"
+    ) {
+
+        throw createServiceError(
+            "Paid payroll cannot be modified",
+            409
+        );
+    }
+
+    const updateData =
+        {};
+
+    if (
+        data.payPeriodStart !==
         undefined
     ) {
 
         updateData.payPeriodStart =
             parseDate(
-                payPeriodStart,
+                data.payPeriodStart,
                 "payPeriodStart"
             );
     }
 
-
-    // ==========================================
-    // Pay Period End
-    // ==========================================
-
     if (
-        payPeriodEnd !==
+        data.payPeriodEnd !==
         undefined
     ) {
 
         updateData.payPeriodEnd =
             parseDate(
-                payPeriodEnd,
+                data.payPeriodEnd,
                 "payPeriodEnd"
             );
     }
 
-
-    // ==========================================
-    // Salary Snapshot: Base Salary
-    // ==========================================
-
     if (
-        baseSalary !==
-        undefined
+        updateData.payPeriodStart &&
+        updateData.payPeriodEnd &&
+        updateData.payPeriodStart >
+        updateData.payPeriodEnd
     ) {
 
-        const salary =
-            validatePositiveNumber(
-                baseSalary,
-                "baseSalary"
+        throw createServiceError(
+            "Payroll period start date cannot be after end date"
+        );
+    }
+
+    const finalStart =
+        updateData.payPeriodStart ||
+        existing.payPeriodStart;
+
+    const finalEnd =
+        updateData.payPeriodEnd ||
+        existing.payPeriodEnd;
+
+    if (
+        updateData.payPeriodStart ||
+        updateData.payPeriodEnd
+    ) {
+
+        const overlapping =
+            await findOverlappingPayroll(
+                existing.employeeId,
+                finalStart,
+                finalEnd,
+                existing.payrollId
             );
+
+        if (
+            overlapping
+        ) {
+
+            throw createServiceError(
+                "The updated payroll period overlaps another payroll for this employee",
+                409
+            );
+        }
+    }
+
+    if (
+        data.baseSalary !==
+        undefined
+    ) {
 
         updateData.baseSalary =
-            roundMoney(
-                salary
+            validateNonNegativeNumber(
+                data.baseSalary,
+                "baseSalary"
             );
     }
 
-
-    // ==========================================
-    // Salary Snapshot:
-    // Monthly Expected Hours
-    // ==========================================
-
     if (
-        monthlyExpectedHours !==
+        data.monthlyExpectedHours !==
         undefined
     ) {
-
-        const expectedHours =
-            validatePositiveNumber(
-                monthlyExpectedHours,
-                "monthlyExpectedHours"
-            );
 
         updateData.monthlyExpectedHours =
-            roundMoney(
-                expectedHours
+            validatePositiveNumber(
+                data.monthlyExpectedHours,
+                "monthlyExpectedHours"
             );
     }
 
-
-    // ==========================================
-    // Salary Snapshot:
-    // Hourly Rate
-    // ==========================================
-
     if (
-        salaryRatePerHour !==
+        data.salaryRatePerHour !==
         undefined
     ) {
-
-        const hourlyRate =
-            validatePositiveNumber(
-                salaryRatePerHour,
-                "salaryRatePerHour"
-            );
 
         updateData.salaryRatePerHour =
-            roundMoney(
-                hourlyRate
+            validateNonNegativeNumber(
+                data.salaryRatePerHour,
+                "salaryRatePerHour"
             );
     }
 
-
-    // ==========================================
-    // Total Working Hours
-    // ==========================================
-
     if (
-        totalWorkingHours !==
+        data.totalWorkingHours !==
         undefined
     ) {
-
-        const hours =
-            Number(
-                totalWorkingHours
-            );
-
-
-        if (
-            !Number.isFinite(hours) ||
-            hours < 0
-        ) {
-
-            const error =
-                new Error(
-                    "totalWorkingHours must be a valid non-negative number"
-                );
-
-            error.statusCode = 400;
-
-            throw error;
-        }
-
 
         updateData.totalWorkingHours =
-            roundMoney(
-                hours
+            validateNonNegativeNumber(
+                data.totalWorkingHours,
+                "totalWorkingHours"
             );
     }
 
-
-    // ==========================================
-    // Basic Salary
-    // ==========================================
-
     if (
-        basicSalary !==
+        data.basicSalary !==
         undefined
     ) {
-
-        const salary =
-            Number(
-                basicSalary
-            );
-
-
-        if (
-            !Number.isFinite(salary) ||
-            salary < 0
-        ) {
-
-            const error =
-                new Error(
-                    "basicSalary must be a valid non-negative number"
-                );
-
-            error.statusCode = 400;
-
-            throw error;
-        }
-
 
         updateData.basicSalary =
-            roundMoney(
-                salary
+            validateNonNegativeNumber(
+                data.basicSalary,
+                "basicSalary"
             );
     }
 
-
-    // ==========================================
-    // Advance Deduction
-    // ==========================================
-
+    /*
+     * Do not allow normal update calls to
+     * set paymentDate or PAID status.
+     *
+     * Payment must go through markPayrollPaid().
+     */
     if (
-        advanceDeduction !==
+        data.status !==
         undefined
     ) {
 
-        const deduction =
-            Number(
-                advanceDeduction
-            );
-
+        const requestedStatus =
+            String(
+                data.status
+            ).toUpperCase();
 
         if (
-            !Number.isFinite(deduction) ||
-            deduction < 0
+            requestedStatus ===
+            "PAID"
         ) {
 
-            const error =
-                new Error(
-                    "advanceDeduction must be a valid non-negative number"
-                );
-
-            error.statusCode = 400;
-
-            throw error;
+            throw createServiceError(
+                "Use the payroll payment action to mark payroll as paid",
+                400
+            );
         }
-
-
-        updateData.advanceDeduction =
-            roundMoney(
-                deduction
-            );
-    }
-
-
-    // ==========================================
-    // Net Salary
-    // ==========================================
-
-    if (
-        netSalary !==
-        undefined
-    ) {
-
-        const salary =
-            Number(
-                netSalary
-            );
-
 
         if (
-            !Number.isFinite(salary)
+            requestedStatus !==
+            "UNPAID"
         ) {
 
-            const error =
-                new Error(
-                    "netSalary must be a valid number"
-                );
-
-            error.statusCode = 400;
-
-            throw error;
+            throw createServiceError(
+                "Invalid payroll status",
+                400
+            );
         }
 
-
-        updateData.netSalary =
-            roundMoney(
-                salary
-            );
+        updateData.status =
+            "UNPAID";
     }
 
-
-    // ==========================================
-    // Payment Date
-    // ==========================================
-
     if (
-        paymentDate !==
+        data.scheduledPaymentDate !==
         undefined
     ) {
 
-        updateData.paymentDate =
-            paymentDate
-                ? parseDate(
-                    paymentDate,
-                    "paymentDate"
-                )
-                : null;
+        updateData.scheduledPaymentDate =
+            data.scheduledPaymentDate ===
+                null
+                ? null
+                : parseDate(
+                    data.scheduledPaymentDate,
+                    "scheduledPaymentDate"
+                );
     }
 
-
-    // ==========================================
-    // Validate Final Pay Period
-    // ==========================================
-
-    const finalStartDate =
-        updateData.payPeriodStart ||
-        existingPayroll.payPeriodStart;
-
-
-    const finalEndDate =
-        updateData.payPeriodEnd ||
-        existingPayroll.payPeriodEnd;
-
-
-    if (
-        finalStartDate >
-        finalEndDate
-    ) {
-
-        const error =
-            new Error(
-                "payPeriodStart cannot be after payPeriodEnd"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    // ==========================================
-    // Update Payroll
-    // ==========================================
-
-    const payroll =
+    const updated =
         await prisma.payroll.update({
 
             where: {
 
                 payrollId:
-                    id
+                    Number(payrollId)
             },
 
             data:
                 updateData,
 
-            include: {
-
-                employee: {
-
-                    select: {
-
-                        employeeId: true,
-
-                        firstName: true,
-
-                        lastName: true,
-
-                        email: true,
-
-                        status: true
-                    }
-                },
-
-                advanceDeductionRecord:
-                    true
-            }
+            include:
+                payrollInclude
         });
 
-
-    return payroll;
+    return await decoratePayroll(
+        updated
+    );
 };
 
 
-// ==========================================
-// Delete Payroll
-// DELETE /api/payroll/:id
-// ==========================================
+// ============================================================
+// DELETE PAYROLL
+// ============================================================
 
 const deletePayroll = async (
     payrollId,
     companyId
 ) => {
 
-    const id =
-        Number(payrollId);
-
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid payroll ID"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    // ==========================================
-    // Verify Payroll
-    // ==========================================
-
-    const existingPayroll =
+    const existing =
         await prisma.payroll.findFirst({
 
             where: {
 
                 payrollId:
-                    id,
+                    Number(payrollId),
 
                 employee: {
 
@@ -1520,137 +2783,673 @@ const deletePayroll = async (
             }
         });
 
+    if (!existing) {
 
-    if (!existingPayroll) {
-
-        const error =
-            new Error(
-                "Payroll record not found"
-            );
-
-        error.statusCode = 404;
-
-        throw error;
+        throw createServiceError(
+            "Payroll not found",
+            404
+        );
     }
 
+    const status =
+        existing.status ||
+        (
+            existing.paymentDate
+                ? "PAID"
+                : "UNPAID"
+        );
 
-    // ==========================================
-    // Delete Payroll + Release Advance
-    // ==========================================
+    if (
+        status === "PAID"
+    ) {
 
-    await prisma.$transaction(
-        async (tx) => {
+        throw createServiceError(
+            "Paid payroll cannot be deleted",
+            409
+        );
+    }
 
-            // ----------------------------------
-            // Release linked advance first
-            // ----------------------------------
+    return await prisma.payroll.delete({
 
-            await tx.advancePayment.updateMany({
+        where: {
 
-                where: {
-
-                    deductedInPayrollId:
-                        id
-                },
-
-                data: {
-
-                    deductedInPayrollId:
-                        null,
-
-                    deductedAt:
-                        null
-                }
-            });
-
-
-            // ----------------------------------
-            // Delete payroll
-            // ----------------------------------
-
-            await tx.payroll.delete({
-
-                where: {
-
-                    payrollId:
-                        id
-                }
-            });
+            payrollId:
+                Number(payrollId)
         }
+    });
+};
+
+
+// ============================================================
+// MARK PAYROLL PAID
+// ============================================================
+
+const markPayrollPaid = async (
+    payrollId,
+    companyId
+) => {
+
+    const payroll =
+        await prisma.payroll.findFirst({
+
+            where: {
+
+                payrollId:
+                    Number(payrollId),
+
+                employee: {
+
+                    companyId:
+                        Number(companyId)
+                }
+            },
+
+            include:
+                payrollInclude
+        });
+
+    if (!payroll) {
+
+        throw createServiceError(
+            "Payroll not found",
+            404
+        );
+    }
+
+    const currentStatus =
+        payroll.status ||
+        (
+            payroll.paymentDate
+                ? "PAID"
+                : "UNPAID"
+        );
+
+    if (
+        currentStatus ===
+        "PAID"
+    ) {
+
+        throw createServiceError(
+            "Payroll has already been paid",
+            409
+        );
+    }
+
+    const scheduledPaymentDate =
+        await getScheduledPaymentDate(
+            payroll
+        );
+
+    const today =
+        startOfDay(
+            new Date()
+        );
+
+    if (
+        scheduledPaymentDate &&
+        today <
+        scheduledPaymentDate
+    ) {
+
+        throw createServiceError(
+
+            `Payroll cannot be paid before the scheduled payment date (${scheduledPaymentDate.toISOString().slice(0, 10)})`,
+
+            400
+        );
+    }
+
+    /*
+     * Recalculate the latest advances immediately
+     * before payment. This prevents an advance paid
+     * after payroll generation from being missed.
+     */
+    const liveAdvanceSummary =
+        await getLiveAdvanceSummary(
+            payroll.employeeId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
+
+    const salaryAmount =
+        decimalToNumber(
+            payroll.baseSalary !== null &&
+                payroll.baseSalary !== undefined
+                ? payroll.baseSalary
+                : payroll.basicSalary
+        );
+
+    const totalAdvance =
+        roundMoney(
+            liveAdvanceSummary.totalAdvance
+        );
+
+    if (
+        totalAdvance >
+        salaryAmount
+    ) {
+
+        throw createServiceError(
+
+            `Advance deduction (₹${totalAdvance.toFixed(2)}) cannot exceed salary (₹${salaryAmount.toFixed(2)})`,
+
+            400
+        );
+    }
+
+    const finalAdvanceDeduction =
+        totalAdvance;
+
+    const finalNetSalary =
+        Math.max(
+            0,
+            roundMoney(
+                salaryAmount -
+                finalAdvanceDeduction
+            )
+        );
+
+    const actualPaymentDate =
+        startOfDay(
+            new Date()
+        );
+
+    const updated =
+        await prisma.$transaction(
+            async (
+                transaction
+            ) => {
+
+                /*
+                 * Re-read inside the transaction to
+                 * prevent a second payment request from
+                 * paying the same payroll.
+                 */
+                const current =
+                    await transaction.payroll.findUnique({
+
+                        where: {
+
+                            payrollId:
+                                Number(payrollId)
+                        }
+                    });
+
+                if (!current) {
+
+                    throw createServiceError(
+                        "Payroll not found",
+                        404
+                    );
+                }
+
+                const status =
+                    current.status ||
+                    (
+                        current.paymentDate
+                            ? "PAID"
+                            : "UNPAID"
+                    );
+
+                if (
+                    status ===
+                    "PAID"
+                ) {
+
+                    throw createServiceError(
+                        "Payroll has already been paid",
+                        409
+                    );
+                }
+
+                /*
+                 * Final payroll values are frozen here.
+                 */
+                return await transaction.payroll.update({
+
+                    where: {
+
+                        payrollId:
+                            Number(payrollId)
+                    },
+
+                    data: {
+
+                        status:
+                            "PAID",
+
+                        advanceDeduction:
+                            finalAdvanceDeduction,
+
+                        netSalary:
+                            finalNetSalary,
+
+                        paymentDate:
+                            actualPaymentDate,
+
+                        /*
+                         * Keep the scheduled payment date
+                         * separate from the actual payment date.
+                         */
+                        scheduledPaymentDate:
+                            scheduledPaymentDate
+                    },
+
+                    include:
+                        payrollInclude
+                });
+            }
+        );
+
+    return await decoratePayroll(
+        updated
     );
 };
 
 
-// ==========================================
-// Get My Payroll
-// GET /api/me/payroll
-// ==========================================
+// ============================================================
+// GET CURRENT PAYROLL PERIOD
+// ============================================================
 
-const getMyPayroll = async (
-    employeeId,
+const getCurrentPayrollPeriod = async (
+    configuration,
+    referenceDate = new Date()
+) => {
+
+    const config =
+        normalizePayrollConfiguration(
+            configuration
+        );
+
+    const date =
+        new Date(
+            referenceDate
+        );
+
+    const currentYear =
+        date.getFullYear();
+
+    const currentMonth =
+        date.getMonth();
+
+    /*
+     * First attempt:
+     * current month as the period start month.
+     */
+    let period =
+        buildPeriodFromStartMonth(
+            currentYear,
+            currentMonth,
+            config
+        );
+
+    /*
+     * If the current date is before the period
+     * start, the applicable period started in
+     * the previous month.
+     */
+    if (
+        date <
+        period.periodStart
+    ) {
+
+        let previousYear =
+            currentYear;
+
+        let previousMonth =
+            currentMonth - 1;
+
+        if (
+            previousMonth < 0
+        ) {
+
+            previousMonth = 11;
+            previousYear -= 1;
+        }
+
+        period =
+            buildPeriodFromStartMonth(
+                previousYear,
+                previousMonth,
+                config
+            );
+    }
+
+    return {
+
+        ...period,
+
+        scheduledPaymentDate:
+            getScheduledPaymentDateForPeriod(
+                period.periodEnd,
+                config
+            ),
+
+        configuration:
+            config
+    };
+};
+
+// ============================================================
+// GET NEXT PAYROLL PERIOD
+// ============================================================
+
+const getNextPayrollPeriod = async (
+    configuration,
+    referenceDate = new Date()
+) => {
+
+    const config =
+        normalizePayrollConfiguration(
+            configuration
+        );
+
+    const currentPeriod =
+        await getCurrentPayrollPeriod(
+            config,
+            referenceDate
+        );
+
+    if (
+        !currentPeriod
+    ) {
+        return null;
+    }
+
+    /*
+     * Determine the month in which the next
+     * payroll period starts.
+     *
+     * currentPeriod.periodStart belongs to
+     * the current payroll cycle's start month.
+     */
+    const currentStart =
+        new Date(
+            currentPeriod.periodStart
+        );
+
+    let nextYear =
+        currentStart.getFullYear();
+
+    let nextMonth =
+        currentStart.getMonth() + 1;
+
+    if (
+        nextMonth > 11
+    ) {
+
+        nextMonth = 0;
+        nextYear += 1;
+    }
+
+    const nextPeriod =
+        buildPeriodFromStartMonth(
+            nextYear,
+            nextMonth,
+            config
+        );
+
+    return {
+
+        ...nextPeriod,
+
+        scheduledPaymentDate:
+            getScheduledPaymentDateForPeriod(
+                nextPeriod.periodEnd,
+                config
+            ),
+
+        configuration:
+            config
+    };
+};
+
+
+// ============================================================
+// GET PAYROLL CONFIGURATION PUBLIC METHOD
+// ============================================================
+
+const getConfiguration = async (
+    branchId,
     companyId
 ) => {
 
-    const id =
-        Number(employeeId);
+    return await getPayrollConfiguration(
+        branchId,
+        companyId
+    );
+};
 
+
+// ============================================================
+// UPDATE PAYROLL CONFIGURATION
+// ============================================================
+
+const updateConfiguration = async (
+    branchId,
+    companyId,
+    data
+) => {
+
+    const current =
+        await getPayrollConfiguration(
+            branchId,
+            companyId
+        );
+
+    const next = {
+
+        startDay:
+            data.startDay !== undefined
+                ? validateInteger(
+                    data.startDay,
+                    "startDay"
+                )
+                : current.startDay,
+
+        endDay:
+            data.endDay !== undefined
+                ? validateInteger(
+                    data.endDay,
+                    "endDay"
+                )
+                : current.endDay,
+
+        paymentDay:
+            data.paymentDay !== undefined
+                ? validateInteger(
+                    data.paymentDay,
+                    "paymentDay"
+                )
+                : current.paymentDay,
+
+        enabled:
+            data.enabled !== undefined
+                ? Boolean(
+                    data.enabled
+                )
+                : current.enabled
+    };
 
     if (
-        !Number.isInteger(id) ||
-        id < 1
+        next.startDay < 1 ||
+        next.startDay > 31
     ) {
 
-        const error =
-            new Error(
-                "Invalid employee ID"
-            );
-
-        error.statusCode = 400;
-
-        throw error;
+        throw createServiceError(
+            "startDay must be between 1 and 31"
+        );
     }
 
+    if (
+        next.endDay < 0 ||
+        next.endDay > 31
+    ) {
+
+        throw createServiceError(
+            "endDay must be between 0 and 31"
+        );
+    }
+
+    if (
+        next.paymentDay < 1 ||
+        next.paymentDay > 31
+    ) {
+
+        throw createServiceError(
+            "paymentDay must be between 1 and 31"
+        );
+    }
+
+    return await savePayrollConfiguration(
+        branchId,
+        companyId,
+        next
+    );
+};
+
+
+// ============================================================
+// GET CURRENT BRANCH PAYROLL
+// ============================================================
+
+const getCurrentBranchPayroll = async (
+    branchId,
+    companyId,
+    referenceDate = new Date()
+) => {
+
+    const configuration =
+        await getPayrollConfiguration(
+            branchId,
+            companyId
+        );
+
+    const period =
+        await getCurrentPayrollPeriod(
+            configuration,
+            referenceDate
+        );
 
     const payrolls =
         await prisma.payroll.findMany({
 
             where: {
 
-                employeeId:
-                    id,
-
                 employee: {
 
                     companyId:
-                        Number(companyId)
-                }
+                        Number(companyId),
+
+                    branchId:
+                        Number(branchId)
+                },
+
+                payPeriodStart:
+                    period.periodStart,
+
+                payPeriodEnd:
+                    period.periodEnd
             },
 
-            include: {
-
-                advanceDeductionRecord:
-                    true
-            },
+            include:
+                payrollInclude,
 
             orderBy: {
 
-                payPeriodEnd:
-                    "desc"
+                employeeId:
+                    "asc"
             }
         });
 
+    const result =
+        [];
 
-    return payrolls;
+    for (
+        const payroll
+        of payrolls
+    ) {
+
+        result.push(
+            await decoratePayroll(
+                payroll
+            )
+        );
+    }
+
+    return {
+
+        periodStart:
+            period.periodStart,
+
+        periodEnd:
+            period.periodEnd,
+
+        scheduledPaymentDate:
+            period.scheduledPaymentDate,
+
+        configuration,
+
+        payrolls:
+            result
+    };
 };
 
 
-// ==========================================
-// EXPORT
-// ==========================================
+// ============================================================
+// GENERATE CURRENT BRANCH PAYROLL
+// ============================================================
+
+const generateCurrentBranchPayroll = async (
+    branchId,
+    companyId,
+    referenceDate = new Date()
+) => {
+
+    const configuration =
+        await getPayrollConfiguration(
+            branchId,
+            companyId
+        );
+
+    if (
+        !configuration.enabled
+    ) {
+
+        throw createServiceError(
+            "Payroll is disabled for this branch",
+            400
+        );
+    }
+
+    const period =
+        await getCurrentPayrollPeriod(
+            configuration,
+            referenceDate
+        );
+
+    return await generatePayrollForBranch(
+        branchId,
+        period.periodStart,
+        period.periodEnd,
+        companyId
+    );
+};
+
+
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
 
     createPayroll,
+
+    generatePayrollForEmployee,
+
+    generatePayrollForBranch,
+
+    generateCurrentBranchPayroll,
 
     getAllPayroll,
 
@@ -1658,9 +3457,23 @@ module.exports = {
 
     getEmployeePayroll,
 
+    getMyPayroll,
+
     updatePayroll,
 
     deletePayroll,
 
-    getMyPayroll
+    markPayrollPaid,
+
+    getCurrentPayrollPeriod,
+
+    getNextPayrollPeriod,
+
+    getCurrentBranchPayroll,
+
+    getConfiguration,
+
+    updateConfiguration,
+
+    getPayrollConfiguration
 };
