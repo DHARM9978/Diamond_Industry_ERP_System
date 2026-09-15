@@ -81,6 +81,19 @@ export function AdminPayroll() {
     useState('');
 
   // ==========================================================
+  // EXTRA WORK / INCENTIVE PAYMENT STATES
+  // ==========================================================
+
+  const [paymentRecord, setPaymentRecord] =
+    useState(null);
+
+  const [incentiveAmount, setIncentiveAmount] =
+    useState('');
+
+  const [paymentValidationError, setPaymentValidationError] =
+    useState('');
+
+  // ==========================================================
   // PAYROLL CONFIGURATION
   // ==========================================================
 
@@ -376,22 +389,25 @@ export function AdminPayroll() {
       // either period endpoint must not make configuration appear
       // as if it was not saved.
 
-      const [currentResult, nextResult] =
-        await Promise.allSettled([
+      const currentResult =
+        await Promise.resolve()
+          .then(() =>
+            apiClient.get(
+              `/api/payroll/period/${branchId}/current`
+            )
+          )
+          .then(
+            (response) => ({
+              status: 'fulfilled',
+              value: response,
+            }),
+            (reason) => ({
+              status: 'rejected',
+              reason,
+            })
+          );
 
-          apiClient.get(
-            `/api/payroll/period/${branchId}/current`
-          ),
-
-          apiClient.get(
-            `/api/payroll/period/${branchId}/next`
-          ),
-
-        ]);
-
-      if (
-        currentResult.status === 'fulfilled'
-      ) {
+      if (currentResult.status === 'fulfilled') {
 
         const currentPeriodData =
           unwrapResponse(currentResult.value) || null;
@@ -402,6 +418,164 @@ export function AdminPayroll() {
           [Number(branchId)]: currentPeriodData,
         }));
 
+        // --------------------------------------------------------
+        // CALCULATE NEXT PAYROLL PERIOD FROM THE CURRENT PERIOD
+        // --------------------------------------------------------
+        // The current-period API is the authoritative period data.
+        // Build the next cycle locally so the Next Payroll Period
+        // card does not depend on a second endpoint response shape.
+        // --------------------------------------------------------
+
+        const currentStartValue =
+          currentPeriodData?.payPeriodStart ??
+          currentPeriodData?.periodStart;
+
+        const currentEndValue =
+          currentPeriodData?.payPeriodEnd ??
+          currentPeriodData?.periodEnd;
+
+        const currentStartDate =
+          currentStartValue
+            ? new Date(currentStartValue)
+            : null;
+
+        const currentEndDate =
+          currentEndValue
+            ? new Date(currentEndValue)
+            : null;
+
+        if (
+          currentStartDate &&
+          !Number.isNaN(currentStartDate.getTime()) &&
+          currentEndDate &&
+          !Number.isNaN(currentEndDate.getTime())
+        ) {
+
+          const nextStartYear =
+            currentStartDate.getFullYear() +
+            (currentStartDate.getMonth() === 11 ? 1 : 0);
+
+          const nextStartMonth =
+            (currentStartDate.getMonth() + 1) % 12;
+
+          const startDay =
+            Math.min(
+              Math.max(Number(configuration.startDay) || 1, 1),
+              new Date(
+                nextStartYear,
+                nextStartMonth + 1,
+                0
+              ).getDate()
+            );
+
+          let nextEndYear =
+            nextStartYear;
+
+          let nextEndMonth =
+            nextStartMonth;
+
+          const configuredEndDay =
+            Number(configuration.endDay);
+
+          if (
+            configuredEndDay === 0
+          ) {
+            // End on the last day of the next start month.
+            nextEndYear =
+              nextStartYear;
+            nextEndMonth =
+              nextStartMonth;
+
+          } else if (
+            configuredEndDay < startDay
+          ) {
+            // A cycle such as 15th → 14th ends in the
+            // following calendar month.
+            nextEndMonth += 1;
+
+            if (nextEndMonth > 11) {
+              nextEndMonth = 0;
+              nextEndYear += 1;
+            }
+          }
+
+          const daysInEndMonth =
+            new Date(
+              nextEndYear,
+              nextEndMonth + 1,
+              0
+            ).getDate();
+
+          const endDay =
+            configuredEndDay === 0
+              ? daysInEndMonth
+              : Math.min(
+                  Math.max(
+                    configuredEndDay,
+                    1
+                  ),
+                  daysInEndMonth
+                );
+
+          const paymentDay =
+            Math.min(
+              Math.max(
+                Number(configuration.paymentDay) || 5,
+                1
+              ),
+              31
+            );
+
+          let paymentYear =
+            nextEndYear;
+
+          let paymentMonth =
+            nextEndMonth + 1;
+
+          if (paymentMonth > 11) {
+            paymentMonth = 0;
+            paymentYear += 1;
+          }
+
+          const daysInPaymentMonth =
+            new Date(
+              paymentYear,
+              paymentMonth + 1,
+              0
+            ).getDate();
+
+          const resolvedPaymentDay =
+            Math.min(
+              paymentDay,
+              daysInPaymentMonth
+            );
+
+          setNextPeriod({
+            payPeriodStart: new Date(
+              nextStartYear,
+              nextStartMonth,
+              startDay
+            ),
+
+            payPeriodEnd: new Date(
+              nextEndYear,
+              nextEndMonth,
+              endDay
+            ),
+
+            paymentDate: new Date(
+              paymentYear,
+              paymentMonth,
+              resolvedPaymentDay
+            ),
+          });
+
+        } else {
+
+          setNextPeriod(null);
+
+        }
+
       } else {
 
         console.error(
@@ -410,30 +584,9 @@ export function AdminPayroll() {
         );
 
         setCurrentPeriod(null);
-
-      }
-
-      if (
-        nextResult.status === 'fulfilled'
-      ) {
-
-        setNextPeriod(
-          unwrapResponse(
-            nextResult.value
-          ) || null
-        );
-
-      } else {
-
-        console.error(
-          'Failed to load next payroll period:',
-          nextResult.reason
-        );
-
         setNextPeriod(null);
 
       }
-
     } finally {
 
       setConfigurationLoading(false);
@@ -547,14 +700,15 @@ const handleGenerateCurrentPayroll =
     try {
 
       setGeneratingPayroll(true);
-
       setPayrollMessage('');
       setPayrollError('');
 
-
-      // ------------------------------------------------------
-      // DETERMINE BRANCHES TO GENERATE
-      // ------------------------------------------------------
+      if (branches.length === 0) {
+        setPayrollError(
+          'No branches are available.'
+        );
+        return;
+      }
 
       const branchesToGenerate =
         selectedBranch === 'ALL'
@@ -565,25 +719,7 @@ const handleGenerateCurrentPayroll =
                 Number(selectedBranch)
             );
 
-
-      if (
-        branchesToGenerate.length === 0
-      ) {
-
-        setPayrollError(
-          'Please select a valid branch.'
-        );
-
-        return;
-      }
-
-
-      // ------------------------------------------------------
-      // GENERATE PAYROLL FOR EACH BRANCH
-      // ------------------------------------------------------
-
-      const results = [];
-
+      const generationResults = [];
 
       for (
         const branch
@@ -595,114 +731,117 @@ const handleGenerateCurrentPayroll =
             branch.branchId
           );
 
-
         const response =
-          await apiClient.post(
-            `/api/payroll/generate/branch/${branchId}`
+          await payrollService.generateCurrentBranch(
+            branchId
           );
 
-
-        const responseData =
-          unwrapResponse(response);
-
-
-        results.push({
-
-          branchId,
-
-          branchName:
-            branch.branchName,
-
-          message:
-            responseData?.message ||
-            response?.data?.message ||
-            'Branch payroll generation completed'
-
-        });
+        generationResults.push(
+          response
+        );
       }
 
 
-      // ------------------------------------------------------
-      // BUILD FINAL MESSAGE
-      // ------------------------------------------------------
-
-      const messages =
-        results
-          .map(
-            (result) =>
-              result.message
-          )
-          .filter(Boolean);
-
-
-      const uniqueMessages =
-        [...new Set(messages)];
+      const generatedCount =
+        generationResults.reduce(
+          (
+            total,
+            result
+          ) =>
+            total +
+            Number(
+              result?.generatedCount || 0
+            ),
+          0
+        );
 
 
-      let finalMessage =
-        'Branch payroll generation completed.';
+      const alreadyGeneratedCount =
+        generationResults.reduce(
+          (
+            total,
+            result
+          ) =>
+            total +
+            Number(
+              result?.alreadyGeneratedCount || 0
+            ),
+          0
+        );
+
+
+      const employeeErrors =
+        generationResults.flatMap(
+          (result) =>
+            Array.isArray(
+              result?.results
+            )
+              ? result.results.filter(
+                  (item) =>
+                    item?.success === false
+                )
+              : []
+        );
 
 
       if (
-        uniqueMessages.length === 1
+        employeeErrors.length > 0
       ) {
 
-        finalMessage =
-          uniqueMessages[0];
+        setPayrollError(
+          employeeErrors
+            .map(
+              (item) =>
+                `Employee ${item.employeeId}: ${item.error}`
+            )
+            .join(' | ')
+        );
 
       } else if (
-        uniqueMessages.length > 1
+        generatedCount > 0
       ) {
 
-        finalMessage =
-          uniqueMessages.join(' ');
+        setPayrollMessage(
+          `${generatedCount} payroll record(s) generated successfully.`
+        );
+
+      } else if (
+        alreadyGeneratedCount > 0
+      ) {
+
+        setPayrollMessage(
+          'Payroll is already generated for the current period.'
+        );
+
+      } else {
+
+        setPayrollError(
+          'Payroll generation completed, but no employee payroll records were created.'
+        );
 
       }
 
 
-      // ------------------------------------------------------
-      // SHOW MESSAGE ON SCREEN
-      // ------------------------------------------------------
-
-      setPayrollMessage(
-        finalMessage
-      );
-
-
-      // ------------------------------------------------------
-      // RELOAD PAYROLL DATA
-      // ------------------------------------------------------
-
+      // Reload payroll after generation
       await loadPayroll();
-
-
-      // ------------------------------------------------------
-      // RELOAD CURRENT PERIODS
-      // ------------------------------------------------------
-
-      await loadCurrentPeriodsForBranches(
-        branches
-      );
-
 
     } catch (error) {
 
       console.error(
-        'Payroll generation failed:',
+        'Failed to generate current payroll:',
         error
       );
-
 
       setPayrollError(
         error?.response?.data?.message ||
         error?.message ||
-        'Failed to generate payroll.'
+        'Failed to generate current payroll.'
       );
-
 
     } finally {
 
       setGeneratingPayroll(false);
+
     }
 
   };
@@ -1149,6 +1288,62 @@ const handleGenerateCurrentPayroll =
       0
     );
 
+  };
+
+
+  // ==========================================================
+  // EXTRA WORK / SHORTAGE HELPERS
+  // ==========================================================
+
+  const getRegularWorkingHours = (record) => {
+    return Math.max(
+      Number(record?.regularWorkingHours) || 0,
+      0
+    );
+  };
+
+
+  const getExtraHours = (record) => {
+    return Math.max(
+      Number(record?.extraHours) || 0,
+      0
+    );
+  };
+
+
+  const getShortageHours = (record) => {
+    return Math.max(
+      Number(record?.shortageHours) || 0,
+      0
+    );
+  };
+
+
+  const getShortageDeduction = (record) => {
+    return Math.max(
+      Number(record?.shortageDeduction) || 0,
+      0
+    );
+  };
+
+
+  const getAccumulatedExtraHours = (record) => {
+    return Math.max(
+      Number(
+        record?.accumulatedExtraHours ??
+        record?.accumulatedExtraWorkHours ??
+        0
+      ) || 0,
+      0
+    );
+  };
+
+
+  const getIncentiveAmount = (record) => {
+    return Math.max(
+      Number(record?.incentiveAmount) || 0,
+      0
+    );
   };
 
 
@@ -1680,24 +1875,90 @@ const handleGenerateCurrentPayroll =
 
       }
 
+      setPayrollMessage('');
+      setPayrollError('');
+      setPaymentValidationError('');
+      setIncentiveAmount(
+        getIncentiveAmount(record) > 0
+          ? String(getIncentiveAmount(record))
+          : ''
+      );
+      setPaymentRecord(record);
+    };
+
+
+  // ==========================================================
+  // CONFIRM PAYROLL PAYMENT
+  // ==========================================================
+
+  const handleConfirmPayrollPayment =
+    async () => {
+
+      if (!paymentRecord?.payrollId) {
+        return;
+      }
+
+      const parsedIncentive =
+        incentiveAmount === ''
+          ? 0
+          : Number(incentiveAmount);
+
+      if (
+        !Number.isFinite(parsedIncentive) ||
+        parsedIncentive < 0
+      ) {
+
+        setPaymentValidationError(
+          'Please enter a valid incentive amount greater than or equal to ₹0.'
+        );
+
+        return;
+
+      }
+
+      const accumulatedExtraHours =
+        getAccumulatedExtraHours(paymentRecord);
+
+      if (
+        parsedIncentive > 0 &&
+        accumulatedExtraHours <= 0
+      ) {
+
+        setPaymentValidationError(
+          'An incentive can only be paid when the employee has accumulated extra work hours.'
+        );
+
+        return;
+
+      }
+
       try {
 
         setPayingPayrollId(
-          record.payrollId
+          paymentRecord.payrollId
         );
 
         setPayrollMessage('');
         setPayrollError('');
+        setPaymentValidationError('');
 
         await payrollService.pay(
-          record.payrollId
+          paymentRecord.payrollId,
+          parsedIncentive
         );
 
         setPayrollMessage(
           `${getEmployeeName(
-            record
-          )}'s payroll has been marked as paid successfully.`
+            paymentRecord
+          )}'s payroll has been marked as paid successfully${
+            parsedIncentive > 0
+              ? ` with an incentive of ${formatCurrency(parsedIncentive)}`
+              : ''
+          }.`
         );
+
+        setPaymentRecord(null);
+        setIncentiveAmount('');
 
         await loadPayroll();
 
@@ -1708,7 +1969,7 @@ const handleGenerateCurrentPayroll =
           error
         );
 
-        setPayrollError(
+        setPaymentValidationError(
           error?.response?.data?.message ||
           error?.message ||
           'Failed to process payroll payment.'
@@ -1722,6 +1983,17 @@ const handleGenerateCurrentPayroll =
 
     };
 
+
+  const handleClosePaymentDialog = () => {
+
+    if (payingPayrollId !== null) {
+      return;
+    }
+
+    setPaymentRecord(null);
+    setIncentiveAmount('');
+    setPaymentValidationError('');
+  };
 
   // ==========================================================
   // CSV ESCAPE
@@ -1789,6 +2061,12 @@ const handleGenerateCurrentPayroll =
       'Pay Period Start',
       'Pay Period End',
       'Monthly Salary',
+      'Regular Working Hours',
+      'Extra Hours',
+      'Shortage Hours',
+      'Shortage Deduction',
+      'Accumulated Extra Hours',
+      'Incentive Amount',
       'Advance Deduction',
       'Pending / Net Salary',
       'Scheduled Payment Date',
@@ -1809,6 +2087,24 @@ const handleGenerateCurrentPayroll =
 
           const pending =
             getPendingAmount(record);
+
+          const regularWorkingHours =
+            getRegularWorkingHours(record);
+
+          const extraHours =
+            getExtraHours(record);
+
+          const shortageHours =
+            getShortageHours(record);
+
+          const shortageDeduction =
+            getShortageDeduction(record);
+
+          const accumulatedExtraHours =
+            getAccumulatedExtraHours(record);
+
+          const incentive =
+            getIncentiveAmount(record);
 
           return [
 
@@ -1832,6 +2128,18 @@ const handleGenerateCurrentPayroll =
             ),
 
             salary,
+
+            regularWorkingHours,
+
+            extraHours,
+
+            shortageHours,
+
+            shortageDeduction,
+
+            accumulatedExtraHours,
+
+            incentive,
 
             advance,
 
@@ -2074,6 +2382,135 @@ const handleGenerateCurrentPayroll =
 
           </span>
 
+        ),
+
+      },
+
+
+      // --------------------------------------------------------
+      // REGULAR WORKING HOURS
+      // --------------------------------------------------------
+
+      {
+        key: 'regularWorkingHours',
+        label: 'Regular Hours',
+        align: 'right',
+
+        render: (record) => (
+          <span className="text-navy-600">
+            {getRegularWorkingHours(record).toFixed(2)} h
+          </span>
+        ),
+
+      },
+
+
+      // --------------------------------------------------------
+      // EXTRA HOURS
+      // --------------------------------------------------------
+
+      {
+        key: 'extraHours',
+        label: 'Extra Hours',
+        align: 'right',
+
+        render: (record) => {
+          const hours = getExtraHours(record);
+
+          return (
+            <span className={hours > 0 ? 'font-semibold text-green-700' : 'text-navy-500'}>
+              {hours.toFixed(2)} h
+            </span>
+          );
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // SHORTAGE HOURS
+      // --------------------------------------------------------
+
+      {
+        key: 'shortageHours',
+        label: 'Shortage Hours',
+        align: 'right',
+
+        render: (record) => {
+          const hours = getShortageHours(record);
+
+          return (
+            <span className={hours > 0 ? 'font-semibold text-error-600' : 'text-navy-500'}>
+              {hours.toFixed(2)} h
+            </span>
+          );
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // SHORTAGE DEDUCTION
+      // --------------------------------------------------------
+
+      {
+        key: 'shortageDeduction',
+        label: 'Shortage Deduction',
+        align: 'right',
+
+        render: (record) => {
+          const deduction = getShortageDeduction(record);
+
+          return (
+            <span className={deduction > 0 ? 'font-semibold text-error-600' : 'text-navy-500'}>
+              {deduction > 0
+                ? `-${formatCurrency(deduction)}`
+                : formatCurrency(0)
+              }
+            </span>
+          );
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // ACCUMULATED EXTRA HOURS
+      // --------------------------------------------------------
+
+      {
+        key: 'accumulatedExtraHours',
+        label: 'Extra Balance',
+        align: 'right',
+
+        render: (record) => {
+          const hours = getAccumulatedExtraHours(record);
+
+          return (
+            <span className={hours > 0 ? 'font-bold text-green-700' : 'text-navy-500'}>
+              {hours.toFixed(2)} h
+            </span>
+          );
+        },
+
+      },
+
+
+      // --------------------------------------------------------
+      // INCENTIVE
+      // --------------------------------------------------------
+
+      {
+        key: 'incentiveAmount',
+        label: 'Incentive',
+        align: 'right',
+
+        render: (record) => (
+          <span className="font-semibold text-navy-700">
+            {formatCurrency(
+              getIncentiveAmount(record)
+            )}
+          </span>
         ),
 
       },
@@ -3274,6 +3711,207 @@ const handleGenerateCurrentPayroll =
 
 
       {/* ======================================================
+          INCENTIVE / PAYROLL PAYMENT DIALOG
+      ====================================================== */}
+
+      {paymentRecord && (
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl border border-navy-100">
+
+            <div className="border-b border-navy-100 px-6 py-4">
+
+              <div className="flex items-center justify-between gap-4">
+
+                <div>
+                  <h2 className="text-lg font-bold text-navy-900">
+                    Process Payroll Payment
+                  </h2>
+                  <p className="mt-1 text-sm text-navy-500">
+                    {getEmployeeName(paymentRecord)}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleClosePaymentDialog}
+                  disabled={payingPayrollId !== null}
+                  className="rounded-lg px-3 py-1.5 text-sm text-navy-500 hover:bg-navy-50 disabled:opacity-50"
+                >
+                  Close
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div className="p-6 space-y-4">
+
+              <div className="grid grid-cols-2 gap-3">
+
+                <div className="rounded-lg border border-navy-100 bg-navy-50/50 p-3">
+                  <div className="text-xs text-navy-400">
+                    Payroll Salary
+                  </div>
+                  <div className="mt-1 font-bold text-navy-900">
+                    {formatCurrency(
+                      getBaseSalary(paymentRecord)
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-navy-100 bg-navy-50/50 p-3">
+                  <div className="text-xs text-navy-400">
+                    Advance Deduction
+                  </div>
+                  <div className="mt-1 font-bold text-navy-900">
+                    {formatCurrency(
+                      getAdvanceDeduction(paymentRecord)
+                    )}
+                  </div>
+                </div>
+
+              </div>
+
+
+              <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+                <div className="text-xs font-medium text-green-700">
+                  Accumulated Extra Work Hours
+                </div>
+                <div className="mt-1 text-2xl font-bold text-green-800">
+                  {getAccumulatedExtraHours(paymentRecord).toFixed(2)} hours
+                </div>
+                <p className="mt-1 text-xs text-green-700">
+                  These hours are accumulated from previous unpaid extra-work records and will be settled when this payment is processed.
+                </p>
+              </div>
+
+
+              <div>
+                <label
+                  htmlFor="payroll-incentive-amount"
+                  className="block text-sm font-semibold text-navy-700 mb-1.5"
+                >
+                  Incentive Amount
+                </label>
+
+                <input
+                  id="payroll-incentive-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={incentiveAmount}
+                  onChange={(event) => {
+                    setIncentiveAmount(
+                      event.target.value
+                    );
+                    setPaymentValidationError('');
+                  }}
+                  placeholder="Enter incentive amount"
+                  disabled={payingPayrollId !== null}
+                  className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-navy-800 focus:outline-none focus:ring-2 focus:ring-navy-200 disabled:bg-navy-50"
+                />
+
+                <p className="mt-1 text-xs text-navy-400">
+                  Enter ₹0 if no incentive is being paid.
+                </p>
+
+              </div>
+
+
+              {paymentValidationError && (
+                <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2.5 text-sm text-error-700">
+                  {paymentValidationError}
+                </div>
+              )}
+
+
+              <div className="rounded-lg border border-navy-100 bg-white p-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-navy-500">
+                    Regular payable amount
+                  </span>
+                  <span className="font-semibold text-navy-800">
+                    {formatCurrency(
+                      getPendingAmount(paymentRecord)
+                    )}
+                  </span>
+                </div>
+
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  <span className="text-navy-500">
+                    Incentive
+                  </span>
+                  <span className="font-semibold text-green-700">
+                    {formatCurrency(
+                      Number(incentiveAmount) || 0
+                    )}
+                  </span>
+                </div>
+
+                <div className="mt-3 border-t border-navy-100 pt-3 flex items-center justify-between">
+                  <span className="font-semibold text-navy-700">
+                    Total payment
+                  </span>
+                  <span className="text-xl font-bold text-navy-900">
+                    {formatCurrency(
+                      getPendingAmount(paymentRecord) +
+                      (Number(incentiveAmount) || 0)
+                    )}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+
+            <div className="flex justify-end gap-3 border-t border-navy-100 px-6 py-4">
+
+              <button
+                type="button"
+                onClick={handleClosePaymentDialog}
+                disabled={payingPayrollId !== null}
+                className="rounded-lg border border-navy-200 px-4 py-2 text-sm font-semibold text-navy-700 hover:bg-navy-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirmPayrollPayment}
+                disabled={payingPayrollId !== null}
+                className="inline-flex items-center gap-2 rounded-lg bg-navy-800 px-5 py-2 text-sm font-semibold text-white hover:bg-navy-900 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+
+                {payingPayrollId !== null ? (
+                  <>
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                    />
+                    Paying...
+                  </>
+                ) : (
+                  <>
+                    <Wallet size={16} />
+                    Confirm Payment
+                  </>
+                )}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
           PAYROLL TABLE
       ====================================================== */}
 
@@ -3318,5 +3956,4 @@ const handleGenerateCurrentPayroll =
 // ============================================================
 // DEFAULT EXPORT
 // ============================================================
-
 export default AdminPayroll;

@@ -69,6 +69,16 @@ export type AdvancePayment = $Result.DefaultSelection<Prisma.$AdvancePaymentPayl
  */
 export type Payroll = $Result.DefaultSelection<Prisma.$PayrollPayload>
 /**
+ * Model ExtraWork
+ * 
+ */
+export type ExtraWork = $Result.DefaultSelection<Prisma.$ExtraWorkPayload>
+/**
+ * Model ExtraWorkSettlement
+ * 
+ */
+export type ExtraWorkSettlement = $Result.DefaultSelection<Prisma.$ExtraWorkSettlementPayload>
+/**
  * Model ActivityLog
  * 
  */
@@ -334,6 +344,26 @@ export class PrismaClient<
     * ```
     */
   get payroll(): Prisma.PayrollDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.extraWork`: Exposes CRUD operations for the **ExtraWork** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExtraWorks
+    * const extraWorks = await prisma.extraWork.findMany()
+    * ```
+    */
+  get extraWork(): Prisma.ExtraWorkDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.extraWorkSettlement`: Exposes CRUD operations for the **ExtraWorkSettlement** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExtraWorkSettlements
+    * const extraWorkSettlements = await prisma.extraWorkSettlement.findMany()
+    * ```
+    */
+  get extraWorkSettlement(): Prisma.ExtraWorkSettlementDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.activityLog`: Exposes CRUD operations for the **ActivityLog** model.
@@ -862,6 +892,8 @@ export namespace Prisma {
     DeviceLog: 'DeviceLog',
     AdvancePayment: 'AdvancePayment',
     Payroll: 'Payroll',
+    ExtraWork: 'ExtraWork',
+    ExtraWorkSettlement: 'ExtraWorkSettlement',
     ActivityLog: 'ActivityLog',
     Setting: 'Setting',
     companies: 'companies',
@@ -884,7 +916,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment"
+      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1614,6 +1646,138 @@ export namespace Prisma {
           }
         }
       }
+      ExtraWork: {
+        payload: Prisma.$ExtraWorkPayload<ExtArgs>
+        fields: Prisma.ExtraWorkFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExtraWorkFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExtraWorkFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          findFirst: {
+            args: Prisma.ExtraWorkFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExtraWorkFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          findMany: {
+            args: Prisma.ExtraWorkFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>[]
+          }
+          create: {
+            args: Prisma.ExtraWorkCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          createMany: {
+            args: Prisma.ExtraWorkCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ExtraWorkDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          update: {
+            args: Prisma.ExtraWorkUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          deleteMany: {
+            args: Prisma.ExtraWorkDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExtraWorkUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ExtraWorkUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkPayload>
+          }
+          aggregate: {
+            args: Prisma.ExtraWorkAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExtraWork>
+          }
+          groupBy: {
+            args: Prisma.ExtraWorkGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExtraWorkGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExtraWorkCountArgs<ExtArgs>
+            result: $Utils.Optional<ExtraWorkCountAggregateOutputType> | number
+          }
+        }
+      }
+      ExtraWorkSettlement: {
+        payload: Prisma.$ExtraWorkSettlementPayload<ExtArgs>
+        fields: Prisma.ExtraWorkSettlementFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExtraWorkSettlementFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExtraWorkSettlementFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          findFirst: {
+            args: Prisma.ExtraWorkSettlementFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExtraWorkSettlementFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          findMany: {
+            args: Prisma.ExtraWorkSettlementFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>[]
+          }
+          create: {
+            args: Prisma.ExtraWorkSettlementCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          createMany: {
+            args: Prisma.ExtraWorkSettlementCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ExtraWorkSettlementDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          update: {
+            args: Prisma.ExtraWorkSettlementUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          deleteMany: {
+            args: Prisma.ExtraWorkSettlementDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExtraWorkSettlementUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ExtraWorkSettlementUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExtraWorkSettlementPayload>
+          }
+          aggregate: {
+            args: Prisma.ExtraWorkSettlementAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExtraWorkSettlement>
+          }
+          groupBy: {
+            args: Prisma.ExtraWorkSettlementGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExtraWorkSettlementGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExtraWorkSettlementCountArgs<ExtArgs>
+            result: $Utils.Optional<ExtraWorkSettlementCountAggregateOutputType> | number
+          }
+        }
+      }
       ActivityLog: {
         payload: Prisma.$ActivityLogPayload<ExtArgs>
         fields: Prisma.ActivityLogFieldRefs
@@ -2210,6 +2374,8 @@ export namespace Prisma {
     deviceLog?: DeviceLogOmit
     advancePayment?: AdvancePaymentOmit
     payroll?: PayrollOmit
+    extraWork?: ExtraWorkOmit
+    extraWorkSettlement?: ExtraWorkSettlementOmit
     activityLog?: ActivityLogOmit
     setting?: SettingOmit
     companies?: companiesOmit
@@ -2419,6 +2585,8 @@ export namespace Prisma {
     leaveBalances: number
     leaveRequests: number
     payrolls: number
+    extraWorkRecords: number
+    extraWorkSettlements: number
   }
 
   export type EmployeeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2433,6 +2601,8 @@ export namespace Prisma {
     leaveBalances?: boolean | EmployeeCountOutputTypeCountLeaveBalancesArgs
     leaveRequests?: boolean | EmployeeCountOutputTypeCountLeaveRequestsArgs
     payrolls?: boolean | EmployeeCountOutputTypeCountPayrollsArgs
+    extraWorkRecords?: boolean | EmployeeCountOutputTypeCountExtraWorkRecordsArgs
+    extraWorkSettlements?: boolean | EmployeeCountOutputTypeCountExtraWorkSettlementsArgs
   }
 
   // Custom InputTypes
@@ -2523,6 +2693,20 @@ export namespace Prisma {
     where?: PayrollWhereInput
   }
 
+  /**
+   * EmployeeCountOutputType without action
+   */
+  export type EmployeeCountOutputTypeCountExtraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkWhereInput
+  }
+
+  /**
+   * EmployeeCountOutputType without action
+   */
+  export type EmployeeCountOutputTypeCountExtraWorkSettlementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkSettlementWhereInput
+  }
+
 
   /**
    * Count Type IotDeviceCountOutputType
@@ -2561,6 +2745,37 @@ export namespace Prisma {
    */
   export type IotDeviceCountOutputTypeCountDeviceLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeviceLogWhereInput
+  }
+
+
+  /**
+   * Count Type ExtraWorkSettlementCountOutputType
+   */
+
+  export type ExtraWorkSettlementCountOutputType = {
+    extraWorkRecords: number
+  }
+
+  export type ExtraWorkSettlementCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    extraWorkRecords?: boolean | ExtraWorkSettlementCountOutputTypeCountExtraWorkRecordsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ExtraWorkSettlementCountOutputType without action
+   */
+  export type ExtraWorkSettlementCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlementCountOutputType
+     */
+    select?: ExtraWorkSettlementCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ExtraWorkSettlementCountOutputType without action
+   */
+  export type ExtraWorkSettlementCountOutputTypeCountExtraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkWhereInput
   }
 
 
@@ -6209,6 +6424,8 @@ export namespace Prisma {
     leaveBalances?: boolean | Employee$leaveBalancesArgs<ExtArgs>
     leaveRequests?: boolean | Employee$leaveRequestsArgs<ExtArgs>
     payrolls?: boolean | Employee$payrollsArgs<ExtArgs>
+    extraWorkRecords?: boolean | Employee$extraWorkRecordsArgs<ExtArgs>
+    extraWorkSettlements?: boolean | Employee$extraWorkSettlementsArgs<ExtArgs>
     _count?: boolean | EmployeeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
@@ -6253,6 +6470,8 @@ export namespace Prisma {
     leaveBalances?: boolean | Employee$leaveBalancesArgs<ExtArgs>
     leaveRequests?: boolean | Employee$leaveRequestsArgs<ExtArgs>
     payrolls?: boolean | Employee$payrollsArgs<ExtArgs>
+    extraWorkRecords?: boolean | Employee$extraWorkRecordsArgs<ExtArgs>
+    extraWorkSettlements?: boolean | Employee$extraWorkSettlementsArgs<ExtArgs>
     _count?: boolean | EmployeeCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -6274,6 +6493,8 @@ export namespace Prisma {
       leaveBalances: Prisma.$LeaveBalancePayload<ExtArgs>[]
       leaveRequests: Prisma.$LeaveRequestPayload<ExtArgs>[]
       payrolls: Prisma.$PayrollPayload<ExtArgs>[]
+      extraWorkRecords: Prisma.$ExtraWorkPayload<ExtArgs>[]
+      extraWorkSettlements: Prisma.$ExtraWorkSettlementPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       employeeId: number
@@ -6650,6 +6871,8 @@ export namespace Prisma {
     leaveBalances<T extends Employee$leaveBalancesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$leaveBalancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeaveBalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaveRequests<T extends Employee$leaveRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$leaveRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeaveRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payrolls<T extends Employee$payrollsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$payrollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    extraWorkRecords<T extends Employee$extraWorkRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$extraWorkRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    extraWorkSettlements<T extends Employee$extraWorkSettlementsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$extraWorkSettlementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7345,6 +7568,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PayrollScalarFieldEnum | PayrollScalarFieldEnum[]
+  }
+
+  /**
+   * Employee.extraWorkRecords
+   */
+  export type Employee$extraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    where?: ExtraWorkWhereInput
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    cursor?: ExtraWorkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
+  }
+
+  /**
+   * Employee.extraWorkSettlements
+   */
+  export type Employee$extraWorkSettlementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    where?: ExtraWorkSettlementWhereInput
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
   }
 
   /**
@@ -13622,7 +13893,12 @@ export namespace Prisma {
     monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
+    regularWorkingHours: Decimal | null
+    shortageHours: Decimal | null
+    shortageDeduction: Decimal | null
+    extraHours: Decimal | null
     basicSalary: Decimal | null
+    incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
   }
@@ -13634,7 +13910,12 @@ export namespace Prisma {
     monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
+    regularWorkingHours: Decimal | null
+    shortageHours: Decimal | null
+    shortageDeduction: Decimal | null
+    extraHours: Decimal | null
     basicSalary: Decimal | null
+    incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
   }
@@ -13648,7 +13929,12 @@ export namespace Prisma {
     monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
+    regularWorkingHours: Decimal | null
+    shortageHours: Decimal | null
+    shortageDeduction: Decimal | null
+    extraHours: Decimal | null
     basicSalary: Decimal | null
+    incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
     scheduledPaymentDate: Date | null
@@ -13667,7 +13953,12 @@ export namespace Prisma {
     monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal | null
+    regularWorkingHours: Decimal | null
+    shortageHours: Decimal | null
+    shortageDeduction: Decimal | null
+    extraHours: Decimal | null
     basicSalary: Decimal | null
+    incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
     netSalary: Decimal | null
     scheduledPaymentDate: Date | null
@@ -13686,7 +13977,12 @@ export namespace Prisma {
     monthlyExpectedHours: number
     salaryRatePerHour: number
     totalWorkingHours: number
+    regularWorkingHours: number
+    shortageHours: number
+    shortageDeduction: number
+    extraHours: number
     basicSalary: number
+    incentiveAmount: number
     advanceDeduction: number
     netSalary: number
     scheduledPaymentDate: number
@@ -13705,7 +14001,12 @@ export namespace Prisma {
     monthlyExpectedHours?: true
     salaryRatePerHour?: true
     totalWorkingHours?: true
+    regularWorkingHours?: true
+    shortageHours?: true
+    shortageDeduction?: true
+    extraHours?: true
     basicSalary?: true
+    incentiveAmount?: true
     advanceDeduction?: true
     netSalary?: true
   }
@@ -13717,7 +14018,12 @@ export namespace Prisma {
     monthlyExpectedHours?: true
     salaryRatePerHour?: true
     totalWorkingHours?: true
+    regularWorkingHours?: true
+    shortageHours?: true
+    shortageDeduction?: true
+    extraHours?: true
     basicSalary?: true
+    incentiveAmount?: true
     advanceDeduction?: true
     netSalary?: true
   }
@@ -13731,7 +14037,12 @@ export namespace Prisma {
     monthlyExpectedHours?: true
     salaryRatePerHour?: true
     totalWorkingHours?: true
+    regularWorkingHours?: true
+    shortageHours?: true
+    shortageDeduction?: true
+    extraHours?: true
     basicSalary?: true
+    incentiveAmount?: true
     advanceDeduction?: true
     netSalary?: true
     scheduledPaymentDate?: true
@@ -13750,7 +14061,12 @@ export namespace Prisma {
     monthlyExpectedHours?: true
     salaryRatePerHour?: true
     totalWorkingHours?: true
+    regularWorkingHours?: true
+    shortageHours?: true
+    shortageDeduction?: true
+    extraHours?: true
     basicSalary?: true
+    incentiveAmount?: true
     advanceDeduction?: true
     netSalary?: true
     scheduledPaymentDate?: true
@@ -13769,7 +14085,12 @@ export namespace Prisma {
     monthlyExpectedHours?: true
     salaryRatePerHour?: true
     totalWorkingHours?: true
+    regularWorkingHours?: true
+    shortageHours?: true
+    shortageDeduction?: true
+    extraHours?: true
     basicSalary?: true
+    incentiveAmount?: true
     advanceDeduction?: true
     netSalary?: true
     scheduledPaymentDate?: true
@@ -13875,7 +14196,12 @@ export namespace Prisma {
     monthlyExpectedHours: Decimal | null
     salaryRatePerHour: Decimal | null
     totalWorkingHours: Decimal
+    regularWorkingHours: Decimal
+    shortageHours: Decimal
+    shortageDeduction: Decimal
+    extraHours: Decimal
     basicSalary: Decimal
+    incentiveAmount: Decimal
     advanceDeduction: Decimal
     netSalary: Decimal
     scheduledPaymentDate: Date | null
@@ -13913,7 +14239,12 @@ export namespace Prisma {
     monthlyExpectedHours?: boolean
     salaryRatePerHour?: boolean
     totalWorkingHours?: boolean
+    regularWorkingHours?: boolean
+    shortageHours?: boolean
+    shortageDeduction?: boolean
+    extraHours?: boolean
     basicSalary?: boolean
+    incentiveAmount?: boolean
     advanceDeduction?: boolean
     netSalary?: boolean
     scheduledPaymentDate?: boolean
@@ -13923,6 +14254,8 @@ export namespace Prisma {
     updatedAt?: boolean
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    extraWorkRecord?: boolean | Payroll$extraWorkRecordArgs<ExtArgs>
+    extraWorkSettlement?: boolean | Payroll$extraWorkSettlementArgs<ExtArgs>
   }, ExtArgs["result"]["payroll"]>
 
 
@@ -13936,7 +14269,12 @@ export namespace Prisma {
     monthlyExpectedHours?: boolean
     salaryRatePerHour?: boolean
     totalWorkingHours?: boolean
+    regularWorkingHours?: boolean
+    shortageHours?: boolean
+    shortageDeduction?: boolean
+    extraHours?: boolean
     basicSalary?: boolean
+    incentiveAmount?: boolean
     advanceDeduction?: boolean
     netSalary?: boolean
     scheduledPaymentDate?: boolean
@@ -13946,10 +14284,12 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "basicSalary" | "advanceDeduction" | "netSalary" | "scheduledPaymentDate" | "paymentDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
+  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "regularWorkingHours" | "shortageHours" | "shortageDeduction" | "extraHours" | "basicSalary" | "incentiveAmount" | "advanceDeduction" | "netSalary" | "scheduledPaymentDate" | "paymentDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
   export type PayrollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    extraWorkRecord?: boolean | Payroll$extraWorkRecordArgs<ExtArgs>
+    extraWorkSettlement?: boolean | Payroll$extraWorkSettlementArgs<ExtArgs>
   }
 
   export type $PayrollPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -13957,6 +14297,8 @@ export namespace Prisma {
     objects: {
       advanceDeductionRecord: Prisma.$AdvancePaymentPayload<ExtArgs> | null
       employee: Prisma.$EmployeePayload<ExtArgs>
+      extraWorkRecord: Prisma.$ExtraWorkPayload<ExtArgs> | null
+      extraWorkSettlement: Prisma.$ExtraWorkSettlementPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       payrollId: number
@@ -13967,7 +14309,12 @@ export namespace Prisma {
       monthlyExpectedHours: Prisma.Decimal | null
       salaryRatePerHour: Prisma.Decimal | null
       totalWorkingHours: Prisma.Decimal
+      regularWorkingHours: Prisma.Decimal
+      shortageHours: Prisma.Decimal
+      shortageDeduction: Prisma.Decimal
+      extraHours: Prisma.Decimal
       basicSalary: Prisma.Decimal
+      incentiveAmount: Prisma.Decimal
       advanceDeduction: Prisma.Decimal
       netSalary: Prisma.Decimal
       scheduledPaymentDate: Date | null
@@ -14317,6 +14664,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     advanceDeductionRecord<T extends Payroll$advanceDeductionRecordArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$advanceDeductionRecordArgs<ExtArgs>>): Prisma__AdvancePaymentClient<$Result.GetResult<Prisma.$AdvancePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    extraWorkRecord<T extends Payroll$extraWorkRecordArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkRecordArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    extraWorkSettlement<T extends Payroll$extraWorkSettlementArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkSettlementArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14354,7 +14703,12 @@ export namespace Prisma {
     readonly monthlyExpectedHours: FieldRef<"Payroll", 'Decimal'>
     readonly salaryRatePerHour: FieldRef<"Payroll", 'Decimal'>
     readonly totalWorkingHours: FieldRef<"Payroll", 'Decimal'>
+    readonly regularWorkingHours: FieldRef<"Payroll", 'Decimal'>
+    readonly shortageHours: FieldRef<"Payroll", 'Decimal'>
+    readonly shortageDeduction: FieldRef<"Payroll", 'Decimal'>
+    readonly extraHours: FieldRef<"Payroll", 'Decimal'>
     readonly basicSalary: FieldRef<"Payroll", 'Decimal'>
+    readonly incentiveAmount: FieldRef<"Payroll", 'Decimal'>
     readonly advanceDeduction: FieldRef<"Payroll", 'Decimal'>
     readonly netSalary: FieldRef<"Payroll", 'Decimal'>
     readonly scheduledPaymentDate: FieldRef<"Payroll", 'DateTime'>
@@ -14729,6 +15083,44 @@ export namespace Prisma {
   }
 
   /**
+   * Payroll.extraWorkRecord
+   */
+  export type Payroll$extraWorkRecordArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    where?: ExtraWorkWhereInput
+  }
+
+  /**
+   * Payroll.extraWorkSettlement
+   */
+  export type Payroll$extraWorkSettlementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    where?: ExtraWorkSettlementWhereInput
+  }
+
+  /**
    * Payroll without action
    */
   export type PayrollDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14744,6 +15136,2101 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: PayrollInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ExtraWork
+   */
+
+  export type AggregateExtraWork = {
+    _count: ExtraWorkCountAggregateOutputType | null
+    _avg: ExtraWorkAvgAggregateOutputType | null
+    _sum: ExtraWorkSumAggregateOutputType | null
+    _min: ExtraWorkMinAggregateOutputType | null
+    _max: ExtraWorkMaxAggregateOutputType | null
+  }
+
+  export type ExtraWorkAvgAggregateOutputType = {
+    extraWorkId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    extraHours: Decimal | null
+    settlementId: number | null
+  }
+
+  export type ExtraWorkSumAggregateOutputType = {
+    extraWorkId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    extraHours: Decimal | null
+    settlementId: number | null
+  }
+
+  export type ExtraWorkMinAggregateOutputType = {
+    extraWorkId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    extraHours: Decimal | null
+    status: string | null
+    settlementId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExtraWorkMaxAggregateOutputType = {
+    extraWorkId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    extraHours: Decimal | null
+    status: string | null
+    settlementId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExtraWorkCountAggregateOutputType = {
+    extraWorkId: number
+    employeeId: number
+    payrollId: number
+    extraHours: number
+    status: number
+    settlementId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExtraWorkAvgAggregateInputType = {
+    extraWorkId?: true
+    employeeId?: true
+    payrollId?: true
+    extraHours?: true
+    settlementId?: true
+  }
+
+  export type ExtraWorkSumAggregateInputType = {
+    extraWorkId?: true
+    employeeId?: true
+    payrollId?: true
+    extraHours?: true
+    settlementId?: true
+  }
+
+  export type ExtraWorkMinAggregateInputType = {
+    extraWorkId?: true
+    employeeId?: true
+    payrollId?: true
+    extraHours?: true
+    status?: true
+    settlementId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExtraWorkMaxAggregateInputType = {
+    extraWorkId?: true
+    employeeId?: true
+    payrollId?: true
+    extraHours?: true
+    status?: true
+    settlementId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExtraWorkCountAggregateInputType = {
+    extraWorkId?: true
+    employeeId?: true
+    payrollId?: true
+    extraHours?: true
+    status?: true
+    settlementId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExtraWorkAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExtraWork to aggregate.
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorks to fetch.
+     */
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExtraWorkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExtraWorks
+    **/
+    _count?: true | ExtraWorkCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ExtraWorkAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ExtraWorkSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExtraWorkMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExtraWorkMaxAggregateInputType
+  }
+
+  export type GetExtraWorkAggregateType<T extends ExtraWorkAggregateArgs> = {
+        [P in keyof T & keyof AggregateExtraWork]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExtraWork[P]>
+      : GetScalarType<T[P], AggregateExtraWork[P]>
+  }
+
+
+
+
+  export type ExtraWorkGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkWhereInput
+    orderBy?: ExtraWorkOrderByWithAggregationInput | ExtraWorkOrderByWithAggregationInput[]
+    by: ExtraWorkScalarFieldEnum[] | ExtraWorkScalarFieldEnum
+    having?: ExtraWorkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExtraWorkCountAggregateInputType | true
+    _avg?: ExtraWorkAvgAggregateInputType
+    _sum?: ExtraWorkSumAggregateInputType
+    _min?: ExtraWorkMinAggregateInputType
+    _max?: ExtraWorkMaxAggregateInputType
+  }
+
+  export type ExtraWorkGroupByOutputType = {
+    extraWorkId: number
+    employeeId: number
+    payrollId: number
+    extraHours: Decimal
+    status: string
+    settlementId: number | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ExtraWorkCountAggregateOutputType | null
+    _avg: ExtraWorkAvgAggregateOutputType | null
+    _sum: ExtraWorkSumAggregateOutputType | null
+    _min: ExtraWorkMinAggregateOutputType | null
+    _max: ExtraWorkMaxAggregateOutputType | null
+  }
+
+  type GetExtraWorkGroupByPayload<T extends ExtraWorkGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExtraWorkGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExtraWorkGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExtraWorkGroupByOutputType[P]>
+            : GetScalarType<T[P], ExtraWorkGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExtraWorkSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    extraWorkId?: boolean
+    employeeId?: boolean
+    payrollId?: boolean
+    extraHours?: boolean
+    status?: boolean
+    settlementId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    settlement?: boolean | ExtraWork$settlementArgs<ExtArgs>
+  }, ExtArgs["result"]["extraWork"]>
+
+
+
+  export type ExtraWorkSelectScalar = {
+    extraWorkId?: boolean
+    employeeId?: boolean
+    payrollId?: boolean
+    extraHours?: boolean
+    status?: boolean
+    settlementId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExtraWorkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"extraWorkId" | "employeeId" | "payrollId" | "extraHours" | "status" | "settlementId" | "createdAt" | "updatedAt", ExtArgs["result"]["extraWork"]>
+  export type ExtraWorkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    settlement?: boolean | ExtraWork$settlementArgs<ExtArgs>
+  }
+
+  export type $ExtraWorkPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExtraWork"
+    objects: {
+      employee: Prisma.$EmployeePayload<ExtArgs>
+      payroll: Prisma.$PayrollPayload<ExtArgs>
+      settlement: Prisma.$ExtraWorkSettlementPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      extraWorkId: number
+      employeeId: number
+      payrollId: number
+      extraHours: Prisma.Decimal
+      status: string
+      settlementId: number | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["extraWork"]>
+    composites: {}
+  }
+
+  type ExtraWorkGetPayload<S extends boolean | null | undefined | ExtraWorkDefaultArgs> = $Result.GetResult<Prisma.$ExtraWorkPayload, S>
+
+  type ExtraWorkCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExtraWorkFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExtraWorkCountAggregateInputType | true
+    }
+
+  export interface ExtraWorkDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExtraWork'], meta: { name: 'ExtraWork' } }
+    /**
+     * Find zero or one ExtraWork that matches the filter.
+     * @param {ExtraWorkFindUniqueArgs} args - Arguments to find a ExtraWork
+     * @example
+     * // Get one ExtraWork
+     * const extraWork = await prisma.extraWork.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExtraWorkFindUniqueArgs>(args: SelectSubset<T, ExtraWorkFindUniqueArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExtraWork that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExtraWorkFindUniqueOrThrowArgs} args - Arguments to find a ExtraWork
+     * @example
+     * // Get one ExtraWork
+     * const extraWork = await prisma.extraWork.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExtraWorkFindUniqueOrThrowArgs>(args: SelectSubset<T, ExtraWorkFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExtraWork that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkFindFirstArgs} args - Arguments to find a ExtraWork
+     * @example
+     * // Get one ExtraWork
+     * const extraWork = await prisma.extraWork.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExtraWorkFindFirstArgs>(args?: SelectSubset<T, ExtraWorkFindFirstArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExtraWork that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkFindFirstOrThrowArgs} args - Arguments to find a ExtraWork
+     * @example
+     * // Get one ExtraWork
+     * const extraWork = await prisma.extraWork.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExtraWorkFindFirstOrThrowArgs>(args?: SelectSubset<T, ExtraWorkFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExtraWorks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExtraWorks
+     * const extraWorks = await prisma.extraWork.findMany()
+     * 
+     * // Get first 10 ExtraWorks
+     * const extraWorks = await prisma.extraWork.findMany({ take: 10 })
+     * 
+     * // Only select the `extraWorkId`
+     * const extraWorkWithExtraWorkIdOnly = await prisma.extraWork.findMany({ select: { extraWorkId: true } })
+     * 
+     */
+    findMany<T extends ExtraWorkFindManyArgs>(args?: SelectSubset<T, ExtraWorkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExtraWork.
+     * @param {ExtraWorkCreateArgs} args - Arguments to create a ExtraWork.
+     * @example
+     * // Create one ExtraWork
+     * const ExtraWork = await prisma.extraWork.create({
+     *   data: {
+     *     // ... data to create a ExtraWork
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExtraWorkCreateArgs>(args: SelectSubset<T, ExtraWorkCreateArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExtraWorks.
+     * @param {ExtraWorkCreateManyArgs} args - Arguments to create many ExtraWorks.
+     * @example
+     * // Create many ExtraWorks
+     * const extraWork = await prisma.extraWork.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExtraWorkCreateManyArgs>(args?: SelectSubset<T, ExtraWorkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ExtraWork.
+     * @param {ExtraWorkDeleteArgs} args - Arguments to delete one ExtraWork.
+     * @example
+     * // Delete one ExtraWork
+     * const ExtraWork = await prisma.extraWork.delete({
+     *   where: {
+     *     // ... filter to delete one ExtraWork
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExtraWorkDeleteArgs>(args: SelectSubset<T, ExtraWorkDeleteArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExtraWork.
+     * @param {ExtraWorkUpdateArgs} args - Arguments to update one ExtraWork.
+     * @example
+     * // Update one ExtraWork
+     * const extraWork = await prisma.extraWork.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExtraWorkUpdateArgs>(args: SelectSubset<T, ExtraWorkUpdateArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExtraWorks.
+     * @param {ExtraWorkDeleteManyArgs} args - Arguments to filter ExtraWorks to delete.
+     * @example
+     * // Delete a few ExtraWorks
+     * const { count } = await prisma.extraWork.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExtraWorkDeleteManyArgs>(args?: SelectSubset<T, ExtraWorkDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExtraWorks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExtraWorks
+     * const extraWork = await prisma.extraWork.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExtraWorkUpdateManyArgs>(args: SelectSubset<T, ExtraWorkUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ExtraWork.
+     * @param {ExtraWorkUpsertArgs} args - Arguments to update or create a ExtraWork.
+     * @example
+     * // Update or create a ExtraWork
+     * const extraWork = await prisma.extraWork.upsert({
+     *   create: {
+     *     // ... data to create a ExtraWork
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExtraWork we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExtraWorkUpsertArgs>(args: SelectSubset<T, ExtraWorkUpsertArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExtraWorks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkCountArgs} args - Arguments to filter ExtraWorks to count.
+     * @example
+     * // Count the number of ExtraWorks
+     * const count = await prisma.extraWork.count({
+     *   where: {
+     *     // ... the filter for the ExtraWorks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExtraWorkCountArgs>(
+      args?: Subset<T, ExtraWorkCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExtraWorkCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExtraWork.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExtraWorkAggregateArgs>(args: Subset<T, ExtraWorkAggregateArgs>): Prisma.PrismaPromise<GetExtraWorkAggregateType<T>>
+
+    /**
+     * Group by ExtraWork.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExtraWorkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExtraWorkGroupByArgs['orderBy'] }
+        : { orderBy?: ExtraWorkGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExtraWorkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExtraWorkGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExtraWork model
+   */
+  readonly fields: ExtraWorkFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExtraWork.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExtraWorkClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    payroll<T extends PayrollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PayrollDefaultArgs<ExtArgs>>): Prisma__PayrollClient<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    settlement<T extends ExtraWork$settlementArgs<ExtArgs> = {}>(args?: Subset<T, ExtraWork$settlementArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExtraWork model
+   */
+  interface ExtraWorkFieldRefs {
+    readonly extraWorkId: FieldRef<"ExtraWork", 'Int'>
+    readonly employeeId: FieldRef<"ExtraWork", 'Int'>
+    readonly payrollId: FieldRef<"ExtraWork", 'Int'>
+    readonly extraHours: FieldRef<"ExtraWork", 'Decimal'>
+    readonly status: FieldRef<"ExtraWork", 'String'>
+    readonly settlementId: FieldRef<"ExtraWork", 'Int'>
+    readonly createdAt: FieldRef<"ExtraWork", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExtraWork", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExtraWork findUnique
+   */
+  export type ExtraWorkFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWork to fetch.
+     */
+    where: ExtraWorkWhereUniqueInput
+  }
+
+  /**
+   * ExtraWork findUniqueOrThrow
+   */
+  export type ExtraWorkFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWork to fetch.
+     */
+    where: ExtraWorkWhereUniqueInput
+  }
+
+  /**
+   * ExtraWork findFirst
+   */
+  export type ExtraWorkFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWork to fetch.
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorks to fetch.
+     */
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExtraWorks.
+     */
+    cursor?: ExtraWorkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorks.
+     */
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWork findFirstOrThrow
+   */
+  export type ExtraWorkFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWork to fetch.
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorks to fetch.
+     */
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExtraWorks.
+     */
+    cursor?: ExtraWorkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorks.
+     */
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWork findMany
+   */
+  export type ExtraWorkFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorks to fetch.
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorks to fetch.
+     */
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExtraWorks.
+     */
+    cursor?: ExtraWorkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorks.
+     */
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWork create
+   */
+  export type ExtraWorkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ExtraWork.
+     */
+    data: XOR<ExtraWorkCreateInput, ExtraWorkUncheckedCreateInput>
+  }
+
+  /**
+   * ExtraWork createMany
+   */
+  export type ExtraWorkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExtraWorks.
+     */
+    data: ExtraWorkCreateManyInput | ExtraWorkCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExtraWork update
+   */
+  export type ExtraWorkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ExtraWork.
+     */
+    data: XOR<ExtraWorkUpdateInput, ExtraWorkUncheckedUpdateInput>
+    /**
+     * Choose, which ExtraWork to update.
+     */
+    where: ExtraWorkWhereUniqueInput
+  }
+
+  /**
+   * ExtraWork updateMany
+   */
+  export type ExtraWorkUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExtraWorks.
+     */
+    data: XOR<ExtraWorkUpdateManyMutationInput, ExtraWorkUncheckedUpdateManyInput>
+    /**
+     * Filter which ExtraWorks to update
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * Limit how many ExtraWorks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExtraWork upsert
+   */
+  export type ExtraWorkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ExtraWork to update in case it exists.
+     */
+    where: ExtraWorkWhereUniqueInput
+    /**
+     * In case the ExtraWork found by the `where` argument doesn't exist, create a new ExtraWork with this data.
+     */
+    create: XOR<ExtraWorkCreateInput, ExtraWorkUncheckedCreateInput>
+    /**
+     * In case the ExtraWork was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExtraWorkUpdateInput, ExtraWorkUncheckedUpdateInput>
+  }
+
+  /**
+   * ExtraWork delete
+   */
+  export type ExtraWorkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    /**
+     * Filter which ExtraWork to delete.
+     */
+    where: ExtraWorkWhereUniqueInput
+  }
+
+  /**
+   * ExtraWork deleteMany
+   */
+  export type ExtraWorkDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExtraWorks to delete
+     */
+    where?: ExtraWorkWhereInput
+    /**
+     * Limit how many ExtraWorks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExtraWork.settlement
+   */
+  export type ExtraWork$settlementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    where?: ExtraWorkSettlementWhereInput
+  }
+
+  /**
+   * ExtraWork without action
+   */
+  export type ExtraWorkDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ExtraWorkSettlement
+   */
+
+  export type AggregateExtraWorkSettlement = {
+    _count: ExtraWorkSettlementCountAggregateOutputType | null
+    _avg: ExtraWorkSettlementAvgAggregateOutputType | null
+    _sum: ExtraWorkSettlementSumAggregateOutputType | null
+    _min: ExtraWorkSettlementMinAggregateOutputType | null
+    _max: ExtraWorkSettlementMaxAggregateOutputType | null
+  }
+
+  export type ExtraWorkSettlementAvgAggregateOutputType = {
+    settlementId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    settledHours: Decimal | null
+    incentiveAmount: Decimal | null
+  }
+
+  export type ExtraWorkSettlementSumAggregateOutputType = {
+    settlementId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    settledHours: Decimal | null
+    incentiveAmount: Decimal | null
+  }
+
+  export type ExtraWorkSettlementMinAggregateOutputType = {
+    settlementId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    settledHours: Decimal | null
+    incentiveAmount: Decimal | null
+    settlementDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExtraWorkSettlementMaxAggregateOutputType = {
+    settlementId: number | null
+    employeeId: number | null
+    payrollId: number | null
+    settledHours: Decimal | null
+    incentiveAmount: Decimal | null
+    settlementDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExtraWorkSettlementCountAggregateOutputType = {
+    settlementId: number
+    employeeId: number
+    payrollId: number
+    settledHours: number
+    incentiveAmount: number
+    settlementDate: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExtraWorkSettlementAvgAggregateInputType = {
+    settlementId?: true
+    employeeId?: true
+    payrollId?: true
+    settledHours?: true
+    incentiveAmount?: true
+  }
+
+  export type ExtraWorkSettlementSumAggregateInputType = {
+    settlementId?: true
+    employeeId?: true
+    payrollId?: true
+    settledHours?: true
+    incentiveAmount?: true
+  }
+
+  export type ExtraWorkSettlementMinAggregateInputType = {
+    settlementId?: true
+    employeeId?: true
+    payrollId?: true
+    settledHours?: true
+    incentiveAmount?: true
+    settlementDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExtraWorkSettlementMaxAggregateInputType = {
+    settlementId?: true
+    employeeId?: true
+    payrollId?: true
+    settledHours?: true
+    incentiveAmount?: true
+    settlementDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExtraWorkSettlementCountAggregateInputType = {
+    settlementId?: true
+    employeeId?: true
+    payrollId?: true
+    settledHours?: true
+    incentiveAmount?: true
+    settlementDate?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExtraWorkSettlementAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExtraWorkSettlement to aggregate.
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorkSettlements to fetch.
+     */
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorkSettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorkSettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExtraWorkSettlements
+    **/
+    _count?: true | ExtraWorkSettlementCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ExtraWorkSettlementAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ExtraWorkSettlementSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExtraWorkSettlementMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExtraWorkSettlementMaxAggregateInputType
+  }
+
+  export type GetExtraWorkSettlementAggregateType<T extends ExtraWorkSettlementAggregateArgs> = {
+        [P in keyof T & keyof AggregateExtraWorkSettlement]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExtraWorkSettlement[P]>
+      : GetScalarType<T[P], AggregateExtraWorkSettlement[P]>
+  }
+
+
+
+
+  export type ExtraWorkSettlementGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkSettlementWhereInput
+    orderBy?: ExtraWorkSettlementOrderByWithAggregationInput | ExtraWorkSettlementOrderByWithAggregationInput[]
+    by: ExtraWorkSettlementScalarFieldEnum[] | ExtraWorkSettlementScalarFieldEnum
+    having?: ExtraWorkSettlementScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExtraWorkSettlementCountAggregateInputType | true
+    _avg?: ExtraWorkSettlementAvgAggregateInputType
+    _sum?: ExtraWorkSettlementSumAggregateInputType
+    _min?: ExtraWorkSettlementMinAggregateInputType
+    _max?: ExtraWorkSettlementMaxAggregateInputType
+  }
+
+  export type ExtraWorkSettlementGroupByOutputType = {
+    settlementId: number
+    employeeId: number
+    payrollId: number
+    settledHours: Decimal
+    incentiveAmount: Decimal
+    settlementDate: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: ExtraWorkSettlementCountAggregateOutputType | null
+    _avg: ExtraWorkSettlementAvgAggregateOutputType | null
+    _sum: ExtraWorkSettlementSumAggregateOutputType | null
+    _min: ExtraWorkSettlementMinAggregateOutputType | null
+    _max: ExtraWorkSettlementMaxAggregateOutputType | null
+  }
+
+  type GetExtraWorkSettlementGroupByPayload<T extends ExtraWorkSettlementGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExtraWorkSettlementGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExtraWorkSettlementGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExtraWorkSettlementGroupByOutputType[P]>
+            : GetScalarType<T[P], ExtraWorkSettlementGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExtraWorkSettlementSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    settlementId?: boolean
+    employeeId?: boolean
+    payrollId?: boolean
+    settledHours?: boolean
+    incentiveAmount?: boolean
+    settlementDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    extraWorkRecords?: boolean | ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>
+    _count?: boolean | ExtraWorkSettlementCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["extraWorkSettlement"]>
+
+
+
+  export type ExtraWorkSettlementSelectScalar = {
+    settlementId?: boolean
+    employeeId?: boolean
+    payrollId?: boolean
+    settledHours?: boolean
+    incentiveAmount?: boolean
+    settlementDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExtraWorkSettlementOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"settlementId" | "employeeId" | "payrollId" | "settledHours" | "incentiveAmount" | "settlementDate" | "createdAt" | "updatedAt", ExtArgs["result"]["extraWorkSettlement"]>
+  export type ExtraWorkSettlementInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    extraWorkRecords?: boolean | ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>
+    _count?: boolean | ExtraWorkSettlementCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ExtraWorkSettlementPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExtraWorkSettlement"
+    objects: {
+      employee: Prisma.$EmployeePayload<ExtArgs>
+      payroll: Prisma.$PayrollPayload<ExtArgs>
+      extraWorkRecords: Prisma.$ExtraWorkPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      settlementId: number
+      employeeId: number
+      payrollId: number
+      settledHours: Prisma.Decimal
+      incentiveAmount: Prisma.Decimal
+      settlementDate: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["extraWorkSettlement"]>
+    composites: {}
+  }
+
+  type ExtraWorkSettlementGetPayload<S extends boolean | null | undefined | ExtraWorkSettlementDefaultArgs> = $Result.GetResult<Prisma.$ExtraWorkSettlementPayload, S>
+
+  type ExtraWorkSettlementCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExtraWorkSettlementFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExtraWorkSettlementCountAggregateInputType | true
+    }
+
+  export interface ExtraWorkSettlementDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExtraWorkSettlement'], meta: { name: 'ExtraWorkSettlement' } }
+    /**
+     * Find zero or one ExtraWorkSettlement that matches the filter.
+     * @param {ExtraWorkSettlementFindUniqueArgs} args - Arguments to find a ExtraWorkSettlement
+     * @example
+     * // Get one ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExtraWorkSettlementFindUniqueArgs>(args: SelectSubset<T, ExtraWorkSettlementFindUniqueArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExtraWorkSettlement that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExtraWorkSettlementFindUniqueOrThrowArgs} args - Arguments to find a ExtraWorkSettlement
+     * @example
+     * // Get one ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExtraWorkSettlementFindUniqueOrThrowArgs>(args: SelectSubset<T, ExtraWorkSettlementFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExtraWorkSettlement that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementFindFirstArgs} args - Arguments to find a ExtraWorkSettlement
+     * @example
+     * // Get one ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExtraWorkSettlementFindFirstArgs>(args?: SelectSubset<T, ExtraWorkSettlementFindFirstArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExtraWorkSettlement that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementFindFirstOrThrowArgs} args - Arguments to find a ExtraWorkSettlement
+     * @example
+     * // Get one ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExtraWorkSettlementFindFirstOrThrowArgs>(args?: SelectSubset<T, ExtraWorkSettlementFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExtraWorkSettlements that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExtraWorkSettlements
+     * const extraWorkSettlements = await prisma.extraWorkSettlement.findMany()
+     * 
+     * // Get first 10 ExtraWorkSettlements
+     * const extraWorkSettlements = await prisma.extraWorkSettlement.findMany({ take: 10 })
+     * 
+     * // Only select the `settlementId`
+     * const extraWorkSettlementWithSettlementIdOnly = await prisma.extraWorkSettlement.findMany({ select: { settlementId: true } })
+     * 
+     */
+    findMany<T extends ExtraWorkSettlementFindManyArgs>(args?: SelectSubset<T, ExtraWorkSettlementFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExtraWorkSettlement.
+     * @param {ExtraWorkSettlementCreateArgs} args - Arguments to create a ExtraWorkSettlement.
+     * @example
+     * // Create one ExtraWorkSettlement
+     * const ExtraWorkSettlement = await prisma.extraWorkSettlement.create({
+     *   data: {
+     *     // ... data to create a ExtraWorkSettlement
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExtraWorkSettlementCreateArgs>(args: SelectSubset<T, ExtraWorkSettlementCreateArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExtraWorkSettlements.
+     * @param {ExtraWorkSettlementCreateManyArgs} args - Arguments to create many ExtraWorkSettlements.
+     * @example
+     * // Create many ExtraWorkSettlements
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExtraWorkSettlementCreateManyArgs>(args?: SelectSubset<T, ExtraWorkSettlementCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ExtraWorkSettlement.
+     * @param {ExtraWorkSettlementDeleteArgs} args - Arguments to delete one ExtraWorkSettlement.
+     * @example
+     * // Delete one ExtraWorkSettlement
+     * const ExtraWorkSettlement = await prisma.extraWorkSettlement.delete({
+     *   where: {
+     *     // ... filter to delete one ExtraWorkSettlement
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExtraWorkSettlementDeleteArgs>(args: SelectSubset<T, ExtraWorkSettlementDeleteArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExtraWorkSettlement.
+     * @param {ExtraWorkSettlementUpdateArgs} args - Arguments to update one ExtraWorkSettlement.
+     * @example
+     * // Update one ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExtraWorkSettlementUpdateArgs>(args: SelectSubset<T, ExtraWorkSettlementUpdateArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExtraWorkSettlements.
+     * @param {ExtraWorkSettlementDeleteManyArgs} args - Arguments to filter ExtraWorkSettlements to delete.
+     * @example
+     * // Delete a few ExtraWorkSettlements
+     * const { count } = await prisma.extraWorkSettlement.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExtraWorkSettlementDeleteManyArgs>(args?: SelectSubset<T, ExtraWorkSettlementDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExtraWorkSettlements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExtraWorkSettlements
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExtraWorkSettlementUpdateManyArgs>(args: SelectSubset<T, ExtraWorkSettlementUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ExtraWorkSettlement.
+     * @param {ExtraWorkSettlementUpsertArgs} args - Arguments to update or create a ExtraWorkSettlement.
+     * @example
+     * // Update or create a ExtraWorkSettlement
+     * const extraWorkSettlement = await prisma.extraWorkSettlement.upsert({
+     *   create: {
+     *     // ... data to create a ExtraWorkSettlement
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExtraWorkSettlement we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExtraWorkSettlementUpsertArgs>(args: SelectSubset<T, ExtraWorkSettlementUpsertArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExtraWorkSettlements.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementCountArgs} args - Arguments to filter ExtraWorkSettlements to count.
+     * @example
+     * // Count the number of ExtraWorkSettlements
+     * const count = await prisma.extraWorkSettlement.count({
+     *   where: {
+     *     // ... the filter for the ExtraWorkSettlements we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExtraWorkSettlementCountArgs>(
+      args?: Subset<T, ExtraWorkSettlementCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExtraWorkSettlementCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExtraWorkSettlement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExtraWorkSettlementAggregateArgs>(args: Subset<T, ExtraWorkSettlementAggregateArgs>): Prisma.PrismaPromise<GetExtraWorkSettlementAggregateType<T>>
+
+    /**
+     * Group by ExtraWorkSettlement.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExtraWorkSettlementGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExtraWorkSettlementGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExtraWorkSettlementGroupByArgs['orderBy'] }
+        : { orderBy?: ExtraWorkSettlementGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExtraWorkSettlementGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExtraWorkSettlementGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExtraWorkSettlement model
+   */
+  readonly fields: ExtraWorkSettlementFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExtraWorkSettlement.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExtraWorkSettlementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    payroll<T extends PayrollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PayrollDefaultArgs<ExtArgs>>): Prisma__PayrollClient<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    extraWorkRecords<T extends ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs> = {}>(args?: Subset<T, ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExtraWorkSettlement model
+   */
+  interface ExtraWorkSettlementFieldRefs {
+    readonly settlementId: FieldRef<"ExtraWorkSettlement", 'Int'>
+    readonly employeeId: FieldRef<"ExtraWorkSettlement", 'Int'>
+    readonly payrollId: FieldRef<"ExtraWorkSettlement", 'Int'>
+    readonly settledHours: FieldRef<"ExtraWorkSettlement", 'Decimal'>
+    readonly incentiveAmount: FieldRef<"ExtraWorkSettlement", 'Decimal'>
+    readonly settlementDate: FieldRef<"ExtraWorkSettlement", 'DateTime'>
+    readonly createdAt: FieldRef<"ExtraWorkSettlement", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExtraWorkSettlement", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExtraWorkSettlement findUnique
+   */
+  export type ExtraWorkSettlementFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorkSettlement to fetch.
+     */
+    where: ExtraWorkSettlementWhereUniqueInput
+  }
+
+  /**
+   * ExtraWorkSettlement findUniqueOrThrow
+   */
+  export type ExtraWorkSettlementFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorkSettlement to fetch.
+     */
+    where: ExtraWorkSettlementWhereUniqueInput
+  }
+
+  /**
+   * ExtraWorkSettlement findFirst
+   */
+  export type ExtraWorkSettlementFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorkSettlement to fetch.
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorkSettlements to fetch.
+     */
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExtraWorkSettlements.
+     */
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorkSettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorkSettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorkSettlements.
+     */
+    distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWorkSettlement findFirstOrThrow
+   */
+  export type ExtraWorkSettlementFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorkSettlement to fetch.
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorkSettlements to fetch.
+     */
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExtraWorkSettlements.
+     */
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorkSettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorkSettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorkSettlements.
+     */
+    distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWorkSettlement findMany
+   */
+  export type ExtraWorkSettlementFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter, which ExtraWorkSettlements to fetch.
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExtraWorkSettlements to fetch.
+     */
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExtraWorkSettlements.
+     */
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExtraWorkSettlements from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExtraWorkSettlements.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExtraWorkSettlements.
+     */
+    distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWorkSettlement create
+   */
+  export type ExtraWorkSettlementCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ExtraWorkSettlement.
+     */
+    data: XOR<ExtraWorkSettlementCreateInput, ExtraWorkSettlementUncheckedCreateInput>
+  }
+
+  /**
+   * ExtraWorkSettlement createMany
+   */
+  export type ExtraWorkSettlementCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExtraWorkSettlements.
+     */
+    data: ExtraWorkSettlementCreateManyInput | ExtraWorkSettlementCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExtraWorkSettlement update
+   */
+  export type ExtraWorkSettlementUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ExtraWorkSettlement.
+     */
+    data: XOR<ExtraWorkSettlementUpdateInput, ExtraWorkSettlementUncheckedUpdateInput>
+    /**
+     * Choose, which ExtraWorkSettlement to update.
+     */
+    where: ExtraWorkSettlementWhereUniqueInput
+  }
+
+  /**
+   * ExtraWorkSettlement updateMany
+   */
+  export type ExtraWorkSettlementUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExtraWorkSettlements.
+     */
+    data: XOR<ExtraWorkSettlementUpdateManyMutationInput, ExtraWorkSettlementUncheckedUpdateManyInput>
+    /**
+     * Filter which ExtraWorkSettlements to update
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * Limit how many ExtraWorkSettlements to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExtraWorkSettlement upsert
+   */
+  export type ExtraWorkSettlementUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ExtraWorkSettlement to update in case it exists.
+     */
+    where: ExtraWorkSettlementWhereUniqueInput
+    /**
+     * In case the ExtraWorkSettlement found by the `where` argument doesn't exist, create a new ExtraWorkSettlement with this data.
+     */
+    create: XOR<ExtraWorkSettlementCreateInput, ExtraWorkSettlementUncheckedCreateInput>
+    /**
+     * In case the ExtraWorkSettlement was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExtraWorkSettlementUpdateInput, ExtraWorkSettlementUncheckedUpdateInput>
+  }
+
+  /**
+   * ExtraWorkSettlement delete
+   */
+  export type ExtraWorkSettlementDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
+    /**
+     * Filter which ExtraWorkSettlement to delete.
+     */
+    where: ExtraWorkSettlementWhereUniqueInput
+  }
+
+  /**
+   * ExtraWorkSettlement deleteMany
+   */
+  export type ExtraWorkSettlementDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExtraWorkSettlements to delete
+     */
+    where?: ExtraWorkSettlementWhereInput
+    /**
+     * Limit how many ExtraWorkSettlements to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExtraWorkSettlement.extraWorkRecords
+   */
+  export type ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWork
+     */
+    select?: ExtraWorkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWork
+     */
+    omit?: ExtraWorkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkInclude<ExtArgs> | null
+    where?: ExtraWorkWhereInput
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    cursor?: ExtraWorkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
+  }
+
+  /**
+   * ExtraWorkSettlement without action
+   */
+  export type ExtraWorkSettlementDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExtraWorkSettlement
+     */
+    select?: ExtraWorkSettlementSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExtraWorkSettlement
+     */
+    omit?: ExtraWorkSettlementOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExtraWorkSettlementInclude<ExtArgs> | null
   }
 
 
@@ -22391,7 +24878,12 @@ export namespace Prisma {
     monthlyExpectedHours: 'monthlyExpectedHours',
     salaryRatePerHour: 'salaryRatePerHour',
     totalWorkingHours: 'totalWorkingHours',
+    regularWorkingHours: 'regularWorkingHours',
+    shortageHours: 'shortageHours',
+    shortageDeduction: 'shortageDeduction',
+    extraHours: 'extraHours',
     basicSalary: 'basicSalary',
+    incentiveAmount: 'incentiveAmount',
     advanceDeduction: 'advanceDeduction',
     netSalary: 'netSalary',
     scheduledPaymentDate: 'scheduledPaymentDate',
@@ -22402,6 +24894,34 @@ export namespace Prisma {
   };
 
   export type PayrollScalarFieldEnum = (typeof PayrollScalarFieldEnum)[keyof typeof PayrollScalarFieldEnum]
+
+
+  export const ExtraWorkScalarFieldEnum: {
+    extraWorkId: 'extraWorkId',
+    employeeId: 'employeeId',
+    payrollId: 'payrollId',
+    extraHours: 'extraHours',
+    status: 'status',
+    settlementId: 'settlementId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExtraWorkScalarFieldEnum = (typeof ExtraWorkScalarFieldEnum)[keyof typeof ExtraWorkScalarFieldEnum]
+
+
+  export const ExtraWorkSettlementScalarFieldEnum: {
+    settlementId: 'settlementId',
+    employeeId: 'employeeId',
+    payrollId: 'payrollId',
+    settledHours: 'settledHours',
+    incentiveAmount: 'incentiveAmount',
+    settlementDate: 'settlementDate',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExtraWorkSettlementScalarFieldEnum = (typeof ExtraWorkSettlementScalarFieldEnum)[keyof typeof ExtraWorkSettlementScalarFieldEnum]
 
 
   export const ActivityLogScalarFieldEnum: {
@@ -22621,6 +25141,13 @@ export namespace Prisma {
   };
 
   export type PayrollOrderByRelevanceFieldEnum = (typeof PayrollOrderByRelevanceFieldEnum)[keyof typeof PayrollOrderByRelevanceFieldEnum]
+
+
+  export const ExtraWorkOrderByRelevanceFieldEnum: {
+    status: 'status'
+  };
+
+  export type ExtraWorkOrderByRelevanceFieldEnum = (typeof ExtraWorkOrderByRelevanceFieldEnum)[keyof typeof ExtraWorkOrderByRelevanceFieldEnum]
 
 
   export const ActivityLogOrderByRelevanceFieldEnum: {
@@ -22997,6 +25524,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceListRelationFilter
     leaveRequests?: LeaveRequestListRelationFilter
     payrolls?: PayrollListRelationFilter
+    extraWorkRecords?: ExtraWorkListRelationFilter
+    extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
   }
 
   export type EmployeeOrderByWithRelationInput = {
@@ -23034,6 +25563,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceOrderByRelationAggregateInput
     leaveRequests?: LeaveRequestOrderByRelationAggregateInput
     payrolls?: PayrollOrderByRelationAggregateInput
+    extraWorkRecords?: ExtraWorkOrderByRelationAggregateInput
+    extraWorkSettlements?: ExtraWorkSettlementOrderByRelationAggregateInput
     _relevance?: EmployeeOrderByRelevanceInput
   }
 
@@ -23075,6 +25606,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceListRelationFilter
     leaveRequests?: LeaveRequestListRelationFilter
     payrolls?: PayrollListRelationFilter
+    extraWorkRecords?: ExtraWorkListRelationFilter
+    extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
   }, "employeeId" | "email">
 
   export type EmployeeOrderByWithAggregationInput = {
@@ -23623,7 +26156,12 @@ export namespace Prisma {
     monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
@@ -23633,6 +26171,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    extraWorkRecord?: XOR<ExtraWorkNullableScalarRelationFilter, ExtraWorkWhereInput> | null
+    extraWorkSettlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
   }
 
   export type PayrollOrderByWithRelationInput = {
@@ -23644,7 +26184,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrderInput | SortOrder
     salaryRatePerHour?: SortOrderInput | SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
     scheduledPaymentDate?: SortOrderInput | SortOrder
@@ -23654,6 +26199,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     advanceDeductionRecord?: AdvancePaymentOrderByWithRelationInput
     employee?: EmployeeOrderByWithRelationInput
+    extraWorkRecord?: ExtraWorkOrderByWithRelationInput
+    extraWorkSettlement?: ExtraWorkSettlementOrderByWithRelationInput
     _relevance?: PayrollOrderByRelevanceInput
   }
 
@@ -23669,7 +26216,12 @@ export namespace Prisma {
     monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
@@ -23679,6 +26231,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    extraWorkRecord?: XOR<ExtraWorkNullableScalarRelationFilter, ExtraWorkWhereInput> | null
+    extraWorkSettlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
   }, "payrollId">
 
   export type PayrollOrderByWithAggregationInput = {
@@ -23690,7 +26244,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrderInput | SortOrder
     salaryRatePerHour?: SortOrderInput | SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
     scheduledPaymentDate?: SortOrderInput | SortOrder
@@ -23717,7 +26276,12 @@ export namespace Prisma {
     monthlyExpectedHours?: DecimalNullableWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: DateTimeNullableWithAggregatesFilter<"Payroll"> | Date | string | null
@@ -23725,6 +26289,163 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"Payroll"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Payroll"> | Date | string
+  }
+
+  export type ExtraWorkWhereInput = {
+    AND?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
+    OR?: ExtraWorkWhereInput[]
+    NOT?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
+    extraWorkId?: IntFilter<"ExtraWork"> | number
+    employeeId?: IntFilter<"ExtraWork"> | number
+    payrollId?: IntFilter<"ExtraWork"> | number
+    extraHours?: DecimalFilter<"ExtraWork"> | Decimal | DecimalJsLike | number | string
+    status?: StringFilter<"ExtraWork"> | string
+    settlementId?: IntNullableFilter<"ExtraWork"> | number | null
+    createdAt?: DateTimeFilter<"ExtraWork"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWork"> | Date | string
+    employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    settlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
+  }
+
+  export type ExtraWorkOrderByWithRelationInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    status?: SortOrder
+    settlementId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    employee?: EmployeeOrderByWithRelationInput
+    payroll?: PayrollOrderByWithRelationInput
+    settlement?: ExtraWorkSettlementOrderByWithRelationInput
+    _relevance?: ExtraWorkOrderByRelevanceInput
+  }
+
+  export type ExtraWorkWhereUniqueInput = Prisma.AtLeast<{
+    extraWorkId?: number
+    payrollId?: number
+    AND?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
+    OR?: ExtraWorkWhereInput[]
+    NOT?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
+    employeeId?: IntFilter<"ExtraWork"> | number
+    extraHours?: DecimalFilter<"ExtraWork"> | Decimal | DecimalJsLike | number | string
+    status?: StringFilter<"ExtraWork"> | string
+    settlementId?: IntNullableFilter<"ExtraWork"> | number | null
+    createdAt?: DateTimeFilter<"ExtraWork"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWork"> | Date | string
+    employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    settlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
+  }, "extraWorkId" | "payrollId">
+
+  export type ExtraWorkOrderByWithAggregationInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    status?: SortOrder
+    settlementId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExtraWorkCountOrderByAggregateInput
+    _avg?: ExtraWorkAvgOrderByAggregateInput
+    _max?: ExtraWorkMaxOrderByAggregateInput
+    _min?: ExtraWorkMinOrderByAggregateInput
+    _sum?: ExtraWorkSumOrderByAggregateInput
+  }
+
+  export type ExtraWorkScalarWhereWithAggregatesInput = {
+    AND?: ExtraWorkScalarWhereWithAggregatesInput | ExtraWorkScalarWhereWithAggregatesInput[]
+    OR?: ExtraWorkScalarWhereWithAggregatesInput[]
+    NOT?: ExtraWorkScalarWhereWithAggregatesInput | ExtraWorkScalarWhereWithAggregatesInput[]
+    extraWorkId?: IntWithAggregatesFilter<"ExtraWork"> | number
+    employeeId?: IntWithAggregatesFilter<"ExtraWork"> | number
+    payrollId?: IntWithAggregatesFilter<"ExtraWork"> | number
+    extraHours?: DecimalWithAggregatesFilter<"ExtraWork"> | Decimal | DecimalJsLike | number | string
+    status?: StringWithAggregatesFilter<"ExtraWork"> | string
+    settlementId?: IntNullableWithAggregatesFilter<"ExtraWork"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"ExtraWork"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExtraWork"> | Date | string
+  }
+
+  export type ExtraWorkSettlementWhereInput = {
+    AND?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
+    OR?: ExtraWorkSettlementWhereInput[]
+    NOT?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
+    settlementId?: IntFilter<"ExtraWorkSettlement"> | number
+    employeeId?: IntFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntFilter<"ExtraWorkSettlement"> | number
+    settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    extraWorkRecords?: ExtraWorkListRelationFilter
+  }
+
+  export type ExtraWorkSettlementOrderByWithRelationInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+    settlementDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    employee?: EmployeeOrderByWithRelationInput
+    payroll?: PayrollOrderByWithRelationInput
+    extraWorkRecords?: ExtraWorkOrderByRelationAggregateInput
+  }
+
+  export type ExtraWorkSettlementWhereUniqueInput = Prisma.AtLeast<{
+    settlementId?: number
+    payrollId?: number
+    AND?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
+    OR?: ExtraWorkSettlementWhereInput[]
+    NOT?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
+    employeeId?: IntFilter<"ExtraWorkSettlement"> | number
+    settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    extraWorkRecords?: ExtraWorkListRelationFilter
+  }, "settlementId" | "payrollId">
+
+  export type ExtraWorkSettlementOrderByWithAggregationInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+    settlementDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExtraWorkSettlementCountOrderByAggregateInput
+    _avg?: ExtraWorkSettlementAvgOrderByAggregateInput
+    _max?: ExtraWorkSettlementMaxOrderByAggregateInput
+    _min?: ExtraWorkSettlementMinOrderByAggregateInput
+    _sum?: ExtraWorkSettlementSumOrderByAggregateInput
+  }
+
+  export type ExtraWorkSettlementScalarWhereWithAggregatesInput = {
+    AND?: ExtraWorkSettlementScalarWhereWithAggregatesInput | ExtraWorkSettlementScalarWhereWithAggregatesInput[]
+    OR?: ExtraWorkSettlementScalarWhereWithAggregatesInput[]
+    NOT?: ExtraWorkSettlementScalarWhereWithAggregatesInput | ExtraWorkSettlementScalarWhereWithAggregatesInput[]
+    settlementId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
+    employeeId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
+    settledHours?: DecimalWithAggregatesFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalWithAggregatesFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeWithAggregatesFilter<"ExtraWorkSettlement"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ExtraWorkSettlement"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExtraWorkSettlement"> | Date | string
   }
 
   export type ActivityLogWhereInput = {
@@ -24567,6 +27288,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateInput = {
@@ -24600,6 +27323,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUpdateInput = {
@@ -24632,6 +27357,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateInput = {
@@ -24665,6 +27392,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeCreateManyInput = {
@@ -25218,7 +27947,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -25228,6 +27962,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
+    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateInput = {
@@ -25239,7 +27975,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -25248,6 +27989,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
+    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollUpdateInput = {
@@ -25257,7 +28000,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25267,6 +28015,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
+    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateInput = {
@@ -25278,7 +28028,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25287,6 +28042,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
+    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
   }
 
   export type PayrollCreateManyInput = {
@@ -25298,7 +28055,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -25315,7 +28077,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25334,12 +28101,164 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkCreateInput = {
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkRecordsInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+    settlement?: ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput
+  }
+
+  export type ExtraWorkUncheckedCreateInput = {
+    extraWorkId?: number
+    employeeId: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkUpdateInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+    settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
+  }
+
+  export type ExtraWorkUncheckedUpdateInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkCreateManyInput = {
+    extraWorkId?: number
+    employeeId: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkUpdateManyMutationInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkUncheckedUpdateManyInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkSettlementCreateInput = {
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateInput = {
+    settlementId?: number
+    employeeId: number
+    payrollId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementUpdateInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementCreateManyInput = {
+    settlementId?: number
+    employeeId: number
+    payrollId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkSettlementUpdateManyMutationInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateManyInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26385,6 +29304,18 @@ export namespace Prisma {
     none?: PayrollWhereInput
   }
 
+  export type ExtraWorkListRelationFilter = {
+    every?: ExtraWorkWhereInput
+    some?: ExtraWorkWhereInput
+    none?: ExtraWorkWhereInput
+  }
+
+  export type ExtraWorkSettlementListRelationFilter = {
+    every?: ExtraWorkSettlementWhereInput
+    some?: ExtraWorkSettlementWhereInput
+    none?: ExtraWorkSettlementWhereInput
+  }
+
   export type ActivityLogOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -26414,6 +29345,14 @@ export namespace Prisma {
   }
 
   export type PayrollOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ExtraWorkOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ExtraWorkSettlementOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26964,6 +29903,16 @@ export namespace Prisma {
     isNot?: AdvancePaymentWhereInput | null
   }
 
+  export type ExtraWorkNullableScalarRelationFilter = {
+    is?: ExtraWorkWhereInput | null
+    isNot?: ExtraWorkWhereInput | null
+  }
+
+  export type ExtraWorkSettlementNullableScalarRelationFilter = {
+    is?: ExtraWorkSettlementWhereInput | null
+    isNot?: ExtraWorkSettlementWhereInput | null
+  }
+
   export type PayrollOrderByRelevanceInput = {
     fields: PayrollOrderByRelevanceFieldEnum | PayrollOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -26979,7 +29928,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
     scheduledPaymentDate?: SortOrder
@@ -26996,7 +29950,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
   }
@@ -27010,7 +29969,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
     scheduledPaymentDate?: SortOrder
@@ -27029,7 +29993,12 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
     scheduledPaymentDate?: SortOrder
@@ -27046,9 +30015,123 @@ export namespace Prisma {
     monthlyExpectedHours?: SortOrder
     salaryRatePerHour?: SortOrder
     totalWorkingHours?: SortOrder
+    regularWorkingHours?: SortOrder
+    shortageHours?: SortOrder
+    shortageDeduction?: SortOrder
+    extraHours?: SortOrder
     basicSalary?: SortOrder
+    incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
     netSalary?: SortOrder
+  }
+
+  export type PayrollScalarRelationFilter = {
+    is?: PayrollWhereInput
+    isNot?: PayrollWhereInput
+  }
+
+  export type ExtraWorkOrderByRelevanceInput = {
+    fields: ExtraWorkOrderByRelevanceFieldEnum | ExtraWorkOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ExtraWorkCountOrderByAggregateInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    status?: SortOrder
+    settlementId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkAvgOrderByAggregateInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    settlementId?: SortOrder
+  }
+
+  export type ExtraWorkMaxOrderByAggregateInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    status?: SortOrder
+    settlementId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkMinOrderByAggregateInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    status?: SortOrder
+    settlementId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkSumOrderByAggregateInput = {
+    extraWorkId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    extraHours?: SortOrder
+    settlementId?: SortOrder
+  }
+
+  export type ExtraWorkSettlementCountOrderByAggregateInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+    settlementDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkSettlementAvgOrderByAggregateInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+  }
+
+  export type ExtraWorkSettlementMaxOrderByAggregateInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+    settlementDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkSettlementMinOrderByAggregateInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
+    settlementDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExtraWorkSettlementSumOrderByAggregateInput = {
+    settlementId?: SortOrder
+    employeeId?: SortOrder
+    payrollId?: SortOrder
+    settledHours?: SortOrder
+    incentiveAmount?: SortOrder
   }
 
   export type ActivityLogOrderByRelevanceInput = {
@@ -27930,6 +31013,20 @@ export namespace Prisma {
     connect?: PayrollWhereUniqueInput | PayrollWhereUniqueInput[]
   }
 
+  export type ExtraWorkCreateNestedManyWithoutEmployeeInput = {
+    create?: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput> | ExtraWorkCreateWithoutEmployeeInput[] | ExtraWorkUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutEmployeeInput | ExtraWorkCreateOrConnectWithoutEmployeeInput[]
+    createMany?: ExtraWorkCreateManyEmployeeInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+  }
+
+  export type ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput> | ExtraWorkSettlementCreateWithoutEmployeeInput[] | ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput | ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput[]
+    createMany?: ExtraWorkSettlementCreateManyEmployeeInputEnvelope
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+  }
+
   export type ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput = {
     create?: XOR<ActivityLogCreateWithoutEmployeeInput, ActivityLogUncheckedCreateWithoutEmployeeInput> | ActivityLogCreateWithoutEmployeeInput[] | ActivityLogUncheckedCreateWithoutEmployeeInput[]
     connectOrCreate?: ActivityLogCreateOrConnectWithoutEmployeeInput | ActivityLogCreateOrConnectWithoutEmployeeInput[]
@@ -28005,6 +31102,20 @@ export namespace Prisma {
     connectOrCreate?: PayrollCreateOrConnectWithoutEmployeeInput | PayrollCreateOrConnectWithoutEmployeeInput[]
     createMany?: PayrollCreateManyEmployeeInputEnvelope
     connect?: PayrollWhereUniqueInput | PayrollWhereUniqueInput[]
+  }
+
+  export type ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput = {
+    create?: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput> | ExtraWorkCreateWithoutEmployeeInput[] | ExtraWorkUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutEmployeeInput | ExtraWorkCreateOrConnectWithoutEmployeeInput[]
+    createMany?: ExtraWorkCreateManyEmployeeInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput> | ExtraWorkSettlementCreateWithoutEmployeeInput[] | ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput | ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput[]
+    createMany?: ExtraWorkSettlementCreateManyEmployeeInputEnvelope
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -28209,6 +31320,34 @@ export namespace Prisma {
     deleteMany?: PayrollScalarWhereInput | PayrollScalarWhereInput[]
   }
 
+  export type ExtraWorkUpdateManyWithoutEmployeeNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput> | ExtraWorkCreateWithoutEmployeeInput[] | ExtraWorkUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutEmployeeInput | ExtraWorkCreateOrConnectWithoutEmployeeInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutEmployeeInput | ExtraWorkUpsertWithWhereUniqueWithoutEmployeeInput[]
+    createMany?: ExtraWorkCreateManyEmployeeInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutEmployeeInput | ExtraWorkUpdateWithWhereUniqueWithoutEmployeeInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutEmployeeInput | ExtraWorkUpdateManyWithWhereWithoutEmployeeInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
+  }
+
+  export type ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput> | ExtraWorkSettlementCreateWithoutEmployeeInput[] | ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput | ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput[]
+    upsert?: ExtraWorkSettlementUpsertWithWhereUniqueWithoutEmployeeInput | ExtraWorkSettlementUpsertWithWhereUniqueWithoutEmployeeInput[]
+    createMany?: ExtraWorkSettlementCreateManyEmployeeInputEnvelope
+    set?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    disconnect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    delete?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    update?: ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput | ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput[]
+    updateMany?: ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput | ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput[]
+    deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
+  }
+
   export type ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput = {
     create?: XOR<ActivityLogCreateWithoutEmployeeInput, ActivityLogUncheckedCreateWithoutEmployeeInput> | ActivityLogCreateWithoutEmployeeInput[] | ActivityLogUncheckedCreateWithoutEmployeeInput[]
     connectOrCreate?: ActivityLogCreateOrConnectWithoutEmployeeInput | ActivityLogCreateOrConnectWithoutEmployeeInput[]
@@ -28361,6 +31500,34 @@ export namespace Prisma {
     update?: PayrollUpdateWithWhereUniqueWithoutEmployeeInput | PayrollUpdateWithWhereUniqueWithoutEmployeeInput[]
     updateMany?: PayrollUpdateManyWithWhereWithoutEmployeeInput | PayrollUpdateManyWithWhereWithoutEmployeeInput[]
     deleteMany?: PayrollScalarWhereInput | PayrollScalarWhereInput[]
+  }
+
+  export type ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput> | ExtraWorkCreateWithoutEmployeeInput[] | ExtraWorkUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutEmployeeInput | ExtraWorkCreateOrConnectWithoutEmployeeInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutEmployeeInput | ExtraWorkUpsertWithWhereUniqueWithoutEmployeeInput[]
+    createMany?: ExtraWorkCreateManyEmployeeInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutEmployeeInput | ExtraWorkUpdateWithWhereUniqueWithoutEmployeeInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutEmployeeInput | ExtraWorkUpdateManyWithWhereWithoutEmployeeInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput> | ExtraWorkSettlementCreateWithoutEmployeeInput[] | ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput | ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput[]
+    upsert?: ExtraWorkSettlementUpsertWithWhereUniqueWithoutEmployeeInput | ExtraWorkSettlementUpsertWithWhereUniqueWithoutEmployeeInput[]
+    createMany?: ExtraWorkSettlementCreateManyEmployeeInputEnvelope
+    set?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    disconnect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    delete?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    update?: ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput | ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput[]
+    updateMany?: ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput | ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput[]
+    deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
   }
 
   export type AttendancePunchCreateNestedManyWithoutDeviceInput = {
@@ -28619,10 +31786,34 @@ export namespace Prisma {
     connect?: EmployeeWhereUniqueInput
   }
 
+  export type ExtraWorkCreateNestedOneWithoutPayrollInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
+    connect?: ExtraWorkWhereUniqueInput
+  }
+
+  export type ExtraWorkSettlementCreateNestedOneWithoutPayrollInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
+    connect?: ExtraWorkSettlementWhereUniqueInput
+  }
+
   export type AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput = {
     create?: XOR<AdvancePaymentCreateWithoutDeductedInPayrollInput, AdvancePaymentUncheckedCreateWithoutDeductedInPayrollInput>
     connectOrCreate?: AdvancePaymentCreateOrConnectWithoutDeductedInPayrollInput
     connect?: AdvancePaymentWhereUniqueInput
+  }
+
+  export type ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
+    connect?: ExtraWorkWhereUniqueInput
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
+    connect?: ExtraWorkSettlementWhereUniqueInput
   }
 
   export type AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput = {
@@ -28643,6 +31834,26 @@ export namespace Prisma {
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutPayrollsInput, EmployeeUpdateWithoutPayrollsInput>, EmployeeUncheckedUpdateWithoutPayrollsInput>
   }
 
+  export type ExtraWorkUpdateOneWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
+    upsert?: ExtraWorkUpsertWithoutPayrollInput
+    disconnect?: ExtraWorkWhereInput | boolean
+    delete?: ExtraWorkWhereInput | boolean
+    connect?: ExtraWorkWhereUniqueInput
+    update?: XOR<XOR<ExtraWorkUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkUpdateWithoutPayrollInput>, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
+    upsert?: ExtraWorkSettlementUpsertWithoutPayrollInput
+    disconnect?: ExtraWorkSettlementWhereInput | boolean
+    delete?: ExtraWorkSettlementWhereInput | boolean
+    connect?: ExtraWorkSettlementWhereUniqueInput
+    update?: XOR<XOR<ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkSettlementUpdateWithoutPayrollInput>, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+  }
+
   export type AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput = {
     create?: XOR<AdvancePaymentCreateWithoutDeductedInPayrollInput, AdvancePaymentUncheckedCreateWithoutDeductedInPayrollInput>
     connectOrCreate?: AdvancePaymentCreateOrConnectWithoutDeductedInPayrollInput
@@ -28651,6 +31862,140 @@ export namespace Prisma {
     delete?: AdvancePaymentWhereInput | boolean
     connect?: AdvancePaymentWhereUniqueInput
     update?: XOR<XOR<AdvancePaymentUpdateToOneWithWhereWithoutDeductedInPayrollInput, AdvancePaymentUpdateWithoutDeductedInPayrollInput>, AdvancePaymentUncheckedUpdateWithoutDeductedInPayrollInput>
+  }
+
+  export type ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
+    upsert?: ExtraWorkUpsertWithoutPayrollInput
+    disconnect?: ExtraWorkWhereInput | boolean
+    delete?: ExtraWorkWhereInput | boolean
+    connect?: ExtraWorkWhereUniqueInput
+    update?: XOR<XOR<ExtraWorkUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkUpdateWithoutPayrollInput>, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
+    upsert?: ExtraWorkSettlementUpsertWithoutPayrollInput
+    disconnect?: ExtraWorkSettlementWhereInput | boolean
+    delete?: ExtraWorkSettlementWhereInput | boolean
+    connect?: ExtraWorkSettlementWhereUniqueInput
+    update?: XOR<XOR<ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkSettlementUpdateWithoutPayrollInput>, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+  }
+
+  export type EmployeeCreateNestedOneWithoutExtraWorkRecordsInput = {
+    create?: XOR<EmployeeCreateWithoutExtraWorkRecordsInput, EmployeeUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutExtraWorkRecordsInput
+    connect?: EmployeeWhereUniqueInput
+  }
+
+  export type PayrollCreateNestedOneWithoutExtraWorkRecordInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordInput
+    connect?: PayrollWhereUniqueInput
+  }
+
+  export type ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutExtraWorkRecordsInput
+    connect?: ExtraWorkSettlementWhereUniqueInput
+  }
+
+  export type EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput = {
+    create?: XOR<EmployeeCreateWithoutExtraWorkRecordsInput, EmployeeUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutExtraWorkRecordsInput
+    upsert?: EmployeeUpsertWithoutExtraWorkRecordsInput
+    connect?: EmployeeWhereUniqueInput
+    update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutExtraWorkRecordsInput, EmployeeUpdateWithoutExtraWorkRecordsInput>, EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput>
+  }
+
+  export type PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordInput
+    upsert?: PayrollUpsertWithoutExtraWorkRecordInput
+    connect?: PayrollWhereUniqueInput
+    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkRecordInput, PayrollUpdateWithoutExtraWorkRecordInput>, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
+  }
+
+  export type ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutExtraWorkRecordsInput
+    upsert?: ExtraWorkSettlementUpsertWithoutExtraWorkRecordsInput
+    disconnect?: ExtraWorkSettlementWhereInput | boolean
+    delete?: ExtraWorkSettlementWhereInput | boolean
+    connect?: ExtraWorkSettlementWhereUniqueInput
+    update?: XOR<XOR<ExtraWorkSettlementUpdateToOneWithWhereWithoutExtraWorkRecordsInput, ExtraWorkSettlementUpdateWithoutExtraWorkRecordsInput>, ExtraWorkSettlementUncheckedUpdateWithoutExtraWorkRecordsInput>
+  }
+
+  export type EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput = {
+    create?: XOR<EmployeeCreateWithoutExtraWorkSettlementsInput, EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutExtraWorkSettlementsInput
+    connect?: EmployeeWhereUniqueInput
+  }
+
+  export type PayrollCreateNestedOneWithoutExtraWorkSettlementInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementInput
+    connect?: PayrollWhereUniqueInput
+  }
+
+  export type ExtraWorkCreateNestedManyWithoutSettlementInput = {
+    create?: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput> | ExtraWorkCreateWithoutSettlementInput[] | ExtraWorkUncheckedCreateWithoutSettlementInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutSettlementInput | ExtraWorkCreateOrConnectWithoutSettlementInput[]
+    createMany?: ExtraWorkCreateManySettlementInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+  }
+
+  export type ExtraWorkUncheckedCreateNestedManyWithoutSettlementInput = {
+    create?: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput> | ExtraWorkCreateWithoutSettlementInput[] | ExtraWorkUncheckedCreateWithoutSettlementInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutSettlementInput | ExtraWorkCreateOrConnectWithoutSettlementInput[]
+    createMany?: ExtraWorkCreateManySettlementInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+  }
+
+  export type EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput = {
+    create?: XOR<EmployeeCreateWithoutExtraWorkSettlementsInput, EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutExtraWorkSettlementsInput
+    upsert?: EmployeeUpsertWithoutExtraWorkSettlementsInput
+    connect?: EmployeeWhereUniqueInput
+    update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutExtraWorkSettlementsInput, EmployeeUpdateWithoutExtraWorkSettlementsInput>, EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput>
+  }
+
+  export type PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementInput
+    upsert?: PayrollUpsertWithoutExtraWorkSettlementInput
+    connect?: PayrollWhereUniqueInput
+    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementInput, PayrollUpdateWithoutExtraWorkSettlementInput>, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
+  }
+
+  export type ExtraWorkUpdateManyWithoutSettlementNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput> | ExtraWorkCreateWithoutSettlementInput[] | ExtraWorkUncheckedCreateWithoutSettlementInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutSettlementInput | ExtraWorkCreateOrConnectWithoutSettlementInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput | ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput[]
+    createMany?: ExtraWorkCreateManySettlementInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutSettlementInput | ExtraWorkUpdateWithWhereUniqueWithoutSettlementInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutSettlementInput | ExtraWorkUpdateManyWithWhereWithoutSettlementInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
+  }
+
+  export type ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput> | ExtraWorkCreateWithoutSettlementInput[] | ExtraWorkUncheckedCreateWithoutSettlementInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutSettlementInput | ExtraWorkCreateOrConnectWithoutSettlementInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput | ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput[]
+    createMany?: ExtraWorkCreateManySettlementInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutSettlementInput | ExtraWorkUpdateWithWhereUniqueWithoutSettlementInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutSettlementInput | ExtraWorkUpdateManyWithWhereWithoutSettlementInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
   }
 
   export type EmployeeCreateNestedOneWithoutActivityLogsInput = {
@@ -29681,6 +33026,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutBranchInput = {
@@ -29713,6 +33060,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutBranchInput = {
@@ -30000,6 +33349,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutManagedDepartmentsInput = {
@@ -30032,6 +33383,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutManagedDepartmentsInput = {
@@ -30068,6 +33421,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutDepartmentInput = {
@@ -30100,6 +33455,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutDepartmentInput = {
@@ -30226,6 +33583,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutManagedDepartmentsInput = {
@@ -30258,6 +33617,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUpsertWithWhereUniqueWithoutDepartmentInput = {
@@ -30542,6 +33903,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutSubordinatesInput = {
@@ -30574,6 +33937,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutSubordinatesInput = {
@@ -30610,6 +33975,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutManagerInput = {
@@ -30642,6 +34009,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutManagerInput = {
@@ -30799,7 +34168,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -30808,6 +34182,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
+    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateWithoutEmployeeInput = {
@@ -30818,7 +34194,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -30827,6 +34208,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
+    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollCreateOrConnectWithoutEmployeeInput = {
@@ -30836,6 +34219,66 @@ export namespace Prisma {
 
   export type PayrollCreateManyEmployeeInputEnvelope = {
     data: PayrollCreateManyEmployeeInput | PayrollCreateManyEmployeeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ExtraWorkCreateWithoutEmployeeInput = {
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+    settlement?: ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput
+  }
+
+  export type ExtraWorkUncheckedCreateWithoutEmployeeInput = {
+    extraWorkId?: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkCreateOrConnectWithoutEmployeeInput = {
+    where: ExtraWorkWhereUniqueInput
+    create: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkCreateManyEmployeeInputEnvelope = {
+    data: ExtraWorkCreateManyEmployeeInput | ExtraWorkCreateManyEmployeeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ExtraWorkSettlementCreateWithoutEmployeeInput = {
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput = {
+    settlementId?: number
+    payrollId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
+    create: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkSettlementCreateManyEmployeeInputEnvelope = {
+    data: ExtraWorkSettlementCreateManyEmployeeInput | ExtraWorkSettlementCreateManyEmployeeInput[]
     skipDuplicates?: boolean
   }
 
@@ -31102,6 +34545,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutSubordinatesInput = {
@@ -31134,6 +34579,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUpsertWithWhereUniqueWithoutManagerInput = {
@@ -31311,7 +34758,12 @@ export namespace Prisma {
     monthlyExpectedHours?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: DecimalNullableFilter<"Payroll"> | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: DateTimeNullableFilter<"Payroll"> | Date | string | null
@@ -31319,6 +34771,66 @@ export namespace Prisma {
     status?: StringFilter<"Payroll"> | string
     createdAt?: DateTimeFilter<"Payroll"> | Date | string
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
+  }
+
+  export type ExtraWorkUpsertWithWhereUniqueWithoutEmployeeInput = {
+    where: ExtraWorkWhereUniqueInput
+    update: XOR<ExtraWorkUpdateWithoutEmployeeInput, ExtraWorkUncheckedUpdateWithoutEmployeeInput>
+    create: XOR<ExtraWorkCreateWithoutEmployeeInput, ExtraWorkUncheckedCreateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkUpdateWithWhereUniqueWithoutEmployeeInput = {
+    where: ExtraWorkWhereUniqueInput
+    data: XOR<ExtraWorkUpdateWithoutEmployeeInput, ExtraWorkUncheckedUpdateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkUpdateManyWithWhereWithoutEmployeeInput = {
+    where: ExtraWorkScalarWhereInput
+    data: XOR<ExtraWorkUpdateManyMutationInput, ExtraWorkUncheckedUpdateManyWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkScalarWhereInput = {
+    AND?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
+    OR?: ExtraWorkScalarWhereInput[]
+    NOT?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
+    extraWorkId?: IntFilter<"ExtraWork"> | number
+    employeeId?: IntFilter<"ExtraWork"> | number
+    payrollId?: IntFilter<"ExtraWork"> | number
+    extraHours?: DecimalFilter<"ExtraWork"> | Decimal | DecimalJsLike | number | string
+    status?: StringFilter<"ExtraWork"> | string
+    settlementId?: IntNullableFilter<"ExtraWork"> | number | null
+    createdAt?: DateTimeFilter<"ExtraWork"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWork"> | Date | string
+  }
+
+  export type ExtraWorkSettlementUpsertWithWhereUniqueWithoutEmployeeInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
+    update: XOR<ExtraWorkSettlementUpdateWithoutEmployeeInput, ExtraWorkSettlementUncheckedUpdateWithoutEmployeeInput>
+    create: XOR<ExtraWorkSettlementCreateWithoutEmployeeInput, ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
+    data: XOR<ExtraWorkSettlementUpdateWithoutEmployeeInput, ExtraWorkSettlementUncheckedUpdateWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput = {
+    where: ExtraWorkSettlementScalarWhereInput
+    data: XOR<ExtraWorkSettlementUpdateManyMutationInput, ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeInput>
+  }
+
+  export type ExtraWorkSettlementScalarWhereInput = {
+    AND?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
+    OR?: ExtraWorkSettlementScalarWhereInput[]
+    NOT?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
+    settlementId?: IntFilter<"ExtraWorkSettlement"> | number
+    employeeId?: IntFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntFilter<"ExtraWorkSettlement"> | number
+    settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+    updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
   }
 
   export type AttendancePunchCreateWithoutDeviceInput = {
@@ -31581,6 +35093,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutFingerprintTemplatesInput = {
@@ -31613,6 +35127,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutFingerprintTemplatesInput = {
@@ -31660,6 +35176,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutFingerprintTemplatesInput = {
@@ -31692,6 +35210,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type IotDeviceCreateWithoutAttendancePunchesInput = {
@@ -31757,6 +35277,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutAttendancePunchesInput = {
@@ -31789,6 +35311,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutAttendancePunchesInput = {
@@ -31876,6 +35400,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAttendancePunchesInput = {
@@ -31908,6 +35434,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeCreateWithoutAttendanceInput = {
@@ -31939,6 +35467,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutAttendanceInput = {
@@ -31971,6 +35501,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutAttendanceInput = {
@@ -32018,6 +35550,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAttendanceInput = {
@@ -32050,6 +35584,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type IotDeviceCreateWithoutDeviceLogsInput = {
@@ -32159,7 +35695,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -32168,6 +35709,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
+    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateWithoutAdvanceDeductionRecordInput = {
@@ -32179,7 +35722,12 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
@@ -32187,6 +35735,8 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
   }
 
   export type PayrollCreateOrConnectWithoutAdvanceDeductionRecordInput = {
@@ -32223,6 +35773,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutAdvancePaymentsInput = {
@@ -32255,6 +35807,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutAdvancePaymentsInput = {
@@ -32312,7 +35866,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32321,6 +35880,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
+    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateWithoutAdvanceDeductionRecordInput = {
@@ -32332,7 +35893,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32340,6 +35906,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
   }
 
   export type EmployeeUpsertWithoutAdvancePaymentsInput = {
@@ -32382,6 +35950,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAdvancePaymentsInput = {
@@ -32414,6 +35984,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type AdvancePaymentCreateWithoutDeductedInPayrollInput = {
@@ -32479,6 +36051,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutPayrollsInput = {
@@ -32511,11 +36085,63 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutPayrollsInput = {
     where: EmployeeWhereUniqueInput
     create: XOR<EmployeeCreateWithoutPayrollsInput, EmployeeUncheckedCreateWithoutPayrollsInput>
+  }
+
+  export type ExtraWorkCreateWithoutPayrollInput = {
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkRecordsInput
+    settlement?: ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput
+  }
+
+  export type ExtraWorkUncheckedCreateWithoutPayrollInput = {
+    extraWorkId?: number
+    employeeId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkCreateOrConnectWithoutPayrollInput = {
+    where: ExtraWorkWhereUniqueInput
+    create: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkSettlementCreateWithoutPayrollInput = {
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateWithoutPayrollInput = {
+    settlementId?: number
+    employeeId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutSettlementInput
+  }
+
+  export type ExtraWorkSettlementCreateOrConnectWithoutPayrollInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
+    create: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
   }
 
   export type AdvancePaymentUpsertWithoutDeductedInPayrollInput = {
@@ -32598,6 +36224,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
@@ -32630,6 +36258,709 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type ExtraWorkUpsertWithoutPayrollInput = {
+    update: XOR<ExtraWorkUpdateWithoutPayrollInput, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+    create: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
+    where?: ExtraWorkWhereInput
+  }
+
+  export type ExtraWorkUpdateToOneWithWhereWithoutPayrollInput = {
+    where?: ExtraWorkWhereInput
+    data: XOR<ExtraWorkUpdateWithoutPayrollInput, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkUpdateWithoutPayrollInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
+    settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
+  }
+
+  export type ExtraWorkUncheckedUpdateWithoutPayrollInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkSettlementUpsertWithoutPayrollInput = {
+    update: XOR<ExtraWorkSettlementUpdateWithoutPayrollInput, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+    create: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+    where?: ExtraWorkSettlementWhereInput
+  }
+
+  export type ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput = {
+    where?: ExtraWorkSettlementWhereInput
+    data: XOR<ExtraWorkSettlementUpdateWithoutPayrollInput, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkSettlementUpdateWithoutPayrollInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type EmployeeCreateWithoutExtraWorkRecordsInput = {
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+  }
+
+  export type EmployeeUncheckedCreateWithoutExtraWorkRecordsInput = {
+    employeeId?: number
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    companyId: number
+    branchId: number
+    departmentId?: number | null
+    managerId?: number | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+  }
+
+  export type EmployeeCreateOrConnectWithoutExtraWorkRecordsInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutExtraWorkRecordsInput, EmployeeUncheckedCreateWithoutExtraWorkRecordsInput>
+  }
+
+  export type PayrollCreateWithoutExtraWorkRecordInput = {
+    payPeriodStart: Date | string
+    payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
+    basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
+    advanceDeduction?: Decimal | DecimalJsLike | number | string
+    netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
+    paymentDate?: Date | string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
+    employee: EmployeeCreateNestedOneWithoutPayrollsInput
+    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
+  }
+
+  export type PayrollUncheckedCreateWithoutExtraWorkRecordInput = {
+    payrollId?: number
+    employeeId: number
+    payPeriodStart: Date | string
+    payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
+    basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
+    advanceDeduction?: Decimal | DecimalJsLike | number | string
+    netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
+    paymentDate?: Date | string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
+  }
+
+  export type PayrollCreateOrConnectWithoutExtraWorkRecordInput = {
+    where: PayrollWhereUniqueInput
+    create: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+  }
+
+  export type ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput = {
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+  }
+
+  export type ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput = {
+    settlementId?: number
+    employeeId: number
+    payrollId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkSettlementCreateOrConnectWithoutExtraWorkRecordsInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
+    create: XOR<ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput>
+  }
+
+  export type EmployeeUpsertWithoutExtraWorkRecordsInput = {
+    update: XOR<EmployeeUpdateWithoutExtraWorkRecordsInput, EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput>
+    create: XOR<EmployeeCreateWithoutExtraWorkRecordsInput, EmployeeUncheckedCreateWithoutExtraWorkRecordsInput>
+    where?: EmployeeWhereInput
+  }
+
+  export type EmployeeUpdateToOneWithWhereWithoutExtraWorkRecordsInput = {
+    where?: EmployeeWhereInput
+    data: XOR<EmployeeUpdateWithoutExtraWorkRecordsInput, EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput>
+  }
+
+  export type EmployeeUpdateWithoutExtraWorkRecordsInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput = {
+    employeeId?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
+    managerId?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type PayrollUpsertWithoutExtraWorkRecordInput = {
+    update: XOR<PayrollUpdateWithoutExtraWorkRecordInput, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
+    create: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+    where?: PayrollWhereInput
+  }
+
+  export type PayrollUpdateToOneWithWhereWithoutExtraWorkRecordInput = {
+    where?: PayrollWhereInput
+    data: XOR<PayrollUpdateWithoutExtraWorkRecordInput, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
+  }
+
+  export type PayrollUpdateWithoutExtraWorkRecordInput = {
+    payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
+    employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
+  }
+
+  export type PayrollUncheckedUpdateWithoutExtraWorkRecordInput = {
+    payrollId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
+  }
+
+  export type ExtraWorkSettlementUpsertWithoutExtraWorkRecordsInput = {
+    update: XOR<ExtraWorkSettlementUpdateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedUpdateWithoutExtraWorkRecordsInput>
+    create: XOR<ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput>
+    where?: ExtraWorkSettlementWhereInput
+  }
+
+  export type ExtraWorkSettlementUpdateToOneWithWhereWithoutExtraWorkRecordsInput = {
+    where?: ExtraWorkSettlementWhereInput
+    data: XOR<ExtraWorkSettlementUpdateWithoutExtraWorkRecordsInput, ExtraWorkSettlementUncheckedUpdateWithoutExtraWorkRecordsInput>
+  }
+
+  export type ExtraWorkSettlementUpdateWithoutExtraWorkRecordsInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateWithoutExtraWorkRecordsInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmployeeCreateWithoutExtraWorkSettlementsInput = {
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+  }
+
+  export type EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput = {
+    employeeId?: number
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    companyId: number
+    branchId: number
+    departmentId?: number | null
+    managerId?: number | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+  }
+
+  export type EmployeeCreateOrConnectWithoutExtraWorkSettlementsInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutExtraWorkSettlementsInput, EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput>
+  }
+
+  export type PayrollCreateWithoutExtraWorkSettlementInput = {
+    payPeriodStart: Date | string
+    payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
+    basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
+    advanceDeduction?: Decimal | DecimalJsLike | number | string
+    netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
+    paymentDate?: Date | string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
+    employee: EmployeeCreateNestedOneWithoutPayrollsInput
+    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
+  }
+
+  export type PayrollUncheckedCreateWithoutExtraWorkSettlementInput = {
+    payrollId?: number
+    employeeId: number
+    payPeriodStart: Date | string
+    payPeriodEnd: Date | string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
+    basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
+    advanceDeduction?: Decimal | DecimalJsLike | number | string
+    netSalary: Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: Date | string | null
+    paymentDate?: Date | string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
+    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
+  }
+
+  export type PayrollCreateOrConnectWithoutExtraWorkSettlementInput = {
+    where: PayrollWhereUniqueInput
+    create: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+  }
+
+  export type ExtraWorkCreateWithoutSettlementInput = {
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutExtraWorkRecordsInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+  }
+
+  export type ExtraWorkUncheckedCreateWithoutSettlementInput = {
+    extraWorkId?: number
+    employeeId: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkCreateOrConnectWithoutSettlementInput = {
+    where: ExtraWorkWhereUniqueInput
+    create: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput>
+  }
+
+  export type ExtraWorkCreateManySettlementInputEnvelope = {
+    data: ExtraWorkCreateManySettlementInput | ExtraWorkCreateManySettlementInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EmployeeUpsertWithoutExtraWorkSettlementsInput = {
+    update: XOR<EmployeeUpdateWithoutExtraWorkSettlementsInput, EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput>
+    create: XOR<EmployeeCreateWithoutExtraWorkSettlementsInput, EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput>
+    where?: EmployeeWhereInput
+  }
+
+  export type EmployeeUpdateToOneWithWhereWithoutExtraWorkSettlementsInput = {
+    where?: EmployeeWhereInput
+    data: XOR<EmployeeUpdateWithoutExtraWorkSettlementsInput, EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput>
+  }
+
+  export type EmployeeUpdateWithoutExtraWorkSettlementsInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput = {
+    employeeId?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
+    managerId?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type PayrollUpsertWithoutExtraWorkSettlementInput = {
+    update: XOR<PayrollUpdateWithoutExtraWorkSettlementInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
+    create: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+    where?: PayrollWhereInput
+  }
+
+  export type PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementInput = {
+    where?: PayrollWhereInput
+    data: XOR<PayrollUpdateWithoutExtraWorkSettlementInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
+  }
+
+  export type PayrollUpdateWithoutExtraWorkSettlementInput = {
+    payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
+    employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
+    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
+  }
+
+  export type PayrollUncheckedUpdateWithoutExtraWorkSettlementInput = {
+    payrollId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
+    payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
+    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
+  }
+
+  export type ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput = {
+    where: ExtraWorkWhereUniqueInput
+    update: XOR<ExtraWorkUpdateWithoutSettlementInput, ExtraWorkUncheckedUpdateWithoutSettlementInput>
+    create: XOR<ExtraWorkCreateWithoutSettlementInput, ExtraWorkUncheckedCreateWithoutSettlementInput>
+  }
+
+  export type ExtraWorkUpdateWithWhereUniqueWithoutSettlementInput = {
+    where: ExtraWorkWhereUniqueInput
+    data: XOR<ExtraWorkUpdateWithoutSettlementInput, ExtraWorkUncheckedUpdateWithoutSettlementInput>
+  }
+
+  export type ExtraWorkUpdateManyWithWhereWithoutSettlementInput = {
+    where: ExtraWorkScalarWhereInput
+    data: XOR<ExtraWorkUpdateManyMutationInput, ExtraWorkUncheckedUpdateManyWithoutSettlementInput>
   }
 
   export type EmployeeCreateWithoutActivityLogsInput = {
@@ -32661,6 +36992,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutActivityLogsInput = {
@@ -32693,6 +37026,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutActivityLogsInput = {
@@ -32740,6 +37075,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutActivityLogsInput = {
@@ -32772,6 +37109,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type companiesCreateWithoutSettingsInput = {
@@ -32972,6 +37311,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutCompanyInput = {
@@ -33004,6 +37345,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutCompanyInput = {
@@ -33507,6 +37850,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutLeaveBalancesInput = {
@@ -33539,6 +37884,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutLeaveBalancesInput = {
@@ -33624,6 +37971,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutLeaveBalancesInput = {
@@ -33656,6 +38005,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type LeaveTypeUpsertWithoutBalancesInput = {
@@ -33731,6 +38082,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutLeaveRequestsInput = {
@@ -33763,6 +38116,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutLeaveRequestsInput = {
@@ -33848,6 +38203,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutLeaveRequestsInput = {
@@ -33880,6 +38237,8 @@ export namespace Prisma {
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type LeaveTypeUpsertWithoutRequestsInput = {
@@ -33955,6 +38314,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeUncheckedCreateWithoutFingerprintEnrollmentsInput = {
@@ -33987,6 +38348,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
   }
 
   export type EmployeeCreateOrConnectWithoutFingerprintEnrollmentsInput = {
@@ -34034,6 +38397,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutFingerprintEnrollmentsInput = {
@@ -34066,6 +38431,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type AdvancePaymentCreateManyApproverInput = {
@@ -34227,6 +38594,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutBranchInput = {
@@ -34259,6 +38628,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutBranchInput = {
@@ -34374,6 +38745,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
@@ -34406,6 +38779,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutDepartmentInput = {
@@ -34560,12 +38935,37 @@ export namespace Prisma {
     monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
     totalWorkingHours: Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: Decimal | DecimalJsLike | number | string
+    shortageHours?: Decimal | DecimalJsLike | number | string
+    shortageDeduction?: Decimal | DecimalJsLike | number | string
+    extraHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
+    incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
     netSalary: Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: Date | string | null
     paymentDate?: Date | string | null
     status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkCreateManyEmployeeInput = {
+    extraWorkId?: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkSettlementCreateManyEmployeeInput = {
+    settlementId?: number
+    payrollId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -34751,6 +39151,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutManagerInput = {
@@ -34783,6 +39185,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutManagerInput = {
@@ -34962,7 +39366,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34971,6 +39380,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
+    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateWithoutEmployeeInput = {
@@ -34981,7 +39392,12 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34990,6 +39406,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
+    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateManyWithoutEmployeeInput = {
@@ -35000,12 +39418,77 @@ export namespace Prisma {
     monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     totalWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    regularWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     netSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     scheduledPaymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     paymentDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkUpdateWithoutEmployeeInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+    settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
+  }
+
+  export type ExtraWorkUncheckedUpdateWithoutEmployeeInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkUncheckedUpdateManyWithoutEmployeeInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkSettlementUpdateWithoutEmployeeInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateWithoutEmployeeInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -35072,6 +39555,45 @@ export namespace Prisma {
     eventType?: StringFieldUpdateOperationsInput | string
     message?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkCreateManySettlementInput = {
+    extraWorkId?: number
+    employeeId: number
+    payrollId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkUpdateWithoutSettlementInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+  }
+
+  export type ExtraWorkUncheckedUpdateWithoutSettlementInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkUncheckedUpdateManyWithoutSettlementInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    payrollId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AdminCreateManyCompanyInput = {
@@ -35275,6 +39797,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutCompanyInput = {
@@ -35307,6 +39831,8 @@ export namespace Prisma {
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutCompanyInput = {

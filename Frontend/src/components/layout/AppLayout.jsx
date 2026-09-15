@@ -52,6 +52,7 @@ const adminNav = [
       { to: '/admin/leaves', icon: CalendarDays, label: 'Leave Requests' },
       { to: '/admin/advances', icon: Banknote, label: 'Salary Advances' },
       { to: '/admin/payroll', icon: Wallet, label: 'Payroll' },
+      { to: '/admin/overtime', icon: Clock, label: 'Extra Hours' },
     ]
   },
 

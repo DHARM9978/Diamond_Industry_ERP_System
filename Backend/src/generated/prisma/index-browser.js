@@ -252,12 +252,39 @@ exports.Prisma.PayrollScalarFieldEnum = {
   monthlyExpectedHours: 'monthlyExpectedHours',
   salaryRatePerHour: 'salaryRatePerHour',
   totalWorkingHours: 'totalWorkingHours',
+  regularWorkingHours: 'regularWorkingHours',
+  shortageHours: 'shortageHours',
+  shortageDeduction: 'shortageDeduction',
+  extraHours: 'extraHours',
   basicSalary: 'basicSalary',
+  incentiveAmount: 'incentiveAmount',
   advanceDeduction: 'advanceDeduction',
   netSalary: 'netSalary',
   scheduledPaymentDate: 'scheduledPaymentDate',
   paymentDate: 'paymentDate',
   status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ExtraWorkScalarFieldEnum = {
+  extraWorkId: 'extraWorkId',
+  employeeId: 'employeeId',
+  payrollId: 'payrollId',
+  extraHours: 'extraHours',
+  status: 'status',
+  settlementId: 'settlementId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ExtraWorkSettlementScalarFieldEnum = {
+  settlementId: 'settlementId',
+  employeeId: 'employeeId',
+  payrollId: 'payrollId',
+  settledHours: 'settledHours',
+  incentiveAmount: 'incentiveAmount',
+  settlementDate: 'settlementDate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -421,6 +448,10 @@ exports.Prisma.PayrollOrderByRelevanceFieldEnum = {
   status: 'status'
 };
 
+exports.Prisma.ExtraWorkOrderByRelevanceFieldEnum = {
+  status: 'status'
+};
+
 exports.Prisma.ActivityLogOrderByRelevanceFieldEnum = {
   actionType: 'actionType',
   description: 'description'
@@ -470,6 +501,8 @@ exports.Prisma.ModelName = {
   DeviceLog: 'DeviceLog',
   AdvancePayment: 'AdvancePayment',
   Payroll: 'Payroll',
+  ExtraWork: 'ExtraWork',
+  ExtraWorkSettlement: 'ExtraWorkSettlement',
   ActivityLog: 'ActivityLog',
   Setting: 'Setting',
   companies: 'companies',

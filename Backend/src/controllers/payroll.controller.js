@@ -298,8 +298,6 @@ const deletePayroll = async (
     });
 
 };
-
-
 // ============================================================
 // GET PAYROLL CONFIGURATION
 //
@@ -597,8 +595,6 @@ const getNextPayrollPeriod = async (
 
         throw error;
     }
-
-
     const configuration =
         await payrollService.getPayrollConfiguration(
             branchId,
@@ -607,7 +603,7 @@ const getNextPayrollPeriod = async (
 
 
     const period =
-        await payrollService.getNextPayrollPeriod(
+        payrollService.getNextPayrollPeriod(
             configuration
         );
 
@@ -648,13 +644,13 @@ const getNextPayrollPeriod = async (
             },
 
             payPeriodStart:
-                period.periodStart,
+                period.payPeriodStart,
 
             payPeriodEnd:
-                period.periodEnd,
+                period.payPeriodEnd,
 
             paymentDate:
-                period.scheduledPaymentDate
+                period.paymentDate
 
         }
 
@@ -762,7 +758,7 @@ const generatePayrollForBranch = async (
 
 
         const configuredPeriod =
-            await payrollService.getCurrentPayrollPeriod(
+            payrollService.getCurrentPayrollPeriod(
                 configuration
             );
 
@@ -776,7 +772,7 @@ const generatePayrollForBranch = async (
                 configuredPeriod.periodEnd,
 
             paymentDate:
-                configuredPeriod.scheduledPaymentDate
+                configuredPeriod.paymentDate
 
         };
 
@@ -793,14 +789,16 @@ const generatePayrollForBranch = async (
 
 
     return res.status(201).json({
-        success: true,
+
+        success:
+            true,
 
         message:
-            result.message ||
             "Branch payroll generation completed",
 
         data:
             result
+
     });
 
 };
@@ -836,7 +834,6 @@ const generateCurrentBranchPayroll = async (
             req.params.branchId
         );
 
-
     if (
         !Number.isInteger(
             branchId
@@ -856,40 +853,9 @@ const generateCurrentBranchPayroll = async (
     }
 
 
-    const configuration =
-        await payrollService.getPayrollConfiguration(
-            branchId,
-            req.user.companyId
-        );
-
-
-    if (
-        !configuration.enabled
-    ) {
-
-        const error =
-            new Error(
-                "Automatic payroll generation is disabled for this branch"
-            );
-
-        error.statusCode =
-            400;
-
-        throw error;
-    }
-
-
-    const period =
-        await payrollService.getCurrentPayrollPeriod(
-            configuration
-        );
-
-
     const result =
-        await payrollService.generatePayrollForBranch(
+        await payrollService.generateCurrentBranchPayroll(
             branchId,
-            period.periodStart,
-            period.periodEnd,
             req.user.companyId
         );
 
@@ -900,6 +866,7 @@ const generateCurrentBranchPayroll = async (
             true,
 
         message:
+            result.message ||
             "Current branch payroll generated successfully",
 
         data:
@@ -959,10 +926,15 @@ const markPayrollPaid = async (
     }
 
 
+    const incentiveAmount =
+        req.body?.incentiveAmount ??
+        0;
+
     const payroll =
         await payrollService.markPayrollPaid(
             payrollId,
-            req.user.companyId
+            req.user.companyId,
+            incentiveAmount
         );
 
 
@@ -976,6 +948,133 @@ const markPayrollPaid = async (
 
         data:
             payroll
+
+    });
+
+};
+
+
+// ============================================================
+// GET EXTRA WORK / OVERTIME RECORDS
+//
+// GET /api/payroll/extra-work
+//
+// Optional query parameters are passed directly to the service.
+// ============================================================
+
+const getExtraWorkRecords = async (
+    req,
+    res
+) => {
+
+    const records =
+        await payrollService.getExtraWorkRecords(
+            req.user.companyId,
+            req.query || {}
+        );
+
+    return res.status(200).json({
+
+        success:
+            true,
+
+        message:
+            "Extra-work records fetched successfully",
+
+        data:
+            records
+
+    });
+
+};
+// ============================================================
+// GET EXTRA WORK SETTLEMENT HISTORY
+//
+// GET /api/payroll/extra-work/history
+// ============================================================
+
+const getExtraWorkSettlementHistory = async (
+    req,
+    res
+) => {
+
+    const history =
+        await payrollService.getExtraWorkSettlementHistory(
+            req.user.companyId,
+            req.query || {}
+        );
+
+    return res.status(200).json({
+
+        success:
+            true,
+
+        message:
+            "Extra-work settlement history fetched successfully",
+
+        data:
+            history
+
+    });
+
+};
+
+
+// ============================================================
+// REJECT EXTRA WORK
+//
+// PATCH /api/payroll/extra-work/:id/reject
+//
+// Rejection does not delete the extra-work record. The service
+// changes its status so the historical overtime record remains
+// available while it is excluded from the accumulated balance.
+// ============================================================
+
+const rejectExtraWork = async (
+    req,
+    res
+) => {
+
+    const extraWorkId =
+        Number(
+            req.params.id
+        );
+
+    if (
+        !Number.isInteger(
+            extraWorkId
+        ) ||
+        extraWorkId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid extra-work ID"
+            );
+
+        error.statusCode =
+            400;
+
+        throw error;
+    }
+
+
+    const record =
+        await payrollService.rejectExtraWork(
+            extraWorkId,
+            req.user.companyId
+        );
+
+    return res.status(200).json({
+
+        success:
+            true,
+
+        message:
+            "Extra-work record rejected successfully",
+
+        data:
+            record
 
     });
 
@@ -1023,6 +1122,12 @@ module.exports = {
 
 
     // Payroll payment
-    markPayrollPaid
+    markPayrollPaid,
+
+
+    // Extra work / overtime
+    getExtraWorkRecords,
+    getExtraWorkSettlementHistory,
+    rejectExtraWork
 
 };

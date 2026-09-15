@@ -12,6 +12,7 @@ import { AdminLiveAttendance } from '@/pages/admin/AdminLiveAttendance';
 import { AdminLeaves } from '@/pages/admin/AdminLeaves';
 import { AdminAdvances } from '@/pages/admin/AdminAdvances';
 import { AdminPayroll } from '@/pages/admin/AdminPayroll';
+import { AdminOvertime } from '@/pages/admin/AdminOvertime';
 import { AdminFingerprints } from '@/pages/admin/AdminFingerprints';
 import { AdminDevices } from '@/pages/admin/AdminDevices';
 import { AdminCompany } from '@/pages/admin/AdminCompany';
@@ -164,6 +165,17 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <AdminPayroll />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/overtime"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminOvertime />
                   </AppLayout>
                 </ProtectedRoute>
               }

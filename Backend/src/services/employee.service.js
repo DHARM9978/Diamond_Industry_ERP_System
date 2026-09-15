@@ -777,6 +777,46 @@ const updateEmployee = async (
         });
 
 
+    // ============================================================
+    // Synchronize UNPAID Payroll
+    // ============================================================
+    //
+    // When an employee's salary configuration changes, any
+    // existing UNPAID payroll must use the new configuration.
+    //
+    // PAID payrolls are historical and must never be changed.
+    //
+    // We only synchronize:
+    //
+    //     baseSalary
+    //     monthlyExpectedHours
+    //     salaryRatePerHour
+    //
+    // for UNPAID payroll records.
+    // ============================================================
+
+    if (salaryUpdateRequested) {
+
+        await prisma.payroll.updateMany({
+
+            where: {
+                employeeId: id,
+                status: "UNPAID"
+            },
+
+            data: {
+                baseSalary:
+                    calculatedBaseSalary,
+
+                monthlyExpectedHours:
+                    calculatedMonthlyExpectedHours,
+
+                salaryRatePerHour:
+                    calculatedSalaryRatePerHour
+            }
+        });
+    }
+
     // ======================================
     // Remove password hash
     // ======================================

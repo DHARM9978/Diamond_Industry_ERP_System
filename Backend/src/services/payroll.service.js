@@ -385,7 +385,12 @@ const payrollInclude = {
         include: employeeInclude
     },
 
-    advanceDeductionRecord: true
+    advanceDeductionRecord: true,
+
+    // [NEW] Extra-work records and settlement history.
+    extraWorkRecord: true,
+
+    extraWorkSettlement: true
 };
 
 
@@ -1147,6 +1152,312 @@ const calculateBasicSalary = (
     );
 };
 
+// ============================================================
+// HELPER: Get Attendance Working Hours For Period
+// ============================================================
+//
+// Attendance is authoritative for payroll working hours.
+// The actual Attendance model uses:
+//   date, totalHours, checkInTime, checkOutTime
+//
+// This helper is intentionally shared by payroll generation and
+// unpaid-payroll display so an old unpaid payroll cannot continue
+// showing stale zero working hours after attendance is recorded.
+// ============================================================
+
+const getAttendanceWorkingHoursForPeriod = async (
+    employeeId,
+    payPeriodStart,
+    payPeriodEnd
+) => {
+
+    const attendanceRecords =
+        await prisma.attendance.findMany({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                date: {
+
+                    gte:
+                        startOfDay(
+                            payPeriodStart
+                        ),
+
+                    lte:
+                        endOfDay(
+                            payPeriodEnd
+                        )
+                }
+            },
+
+            orderBy: {
+
+                date:
+                    "asc"
+            }
+        });
+
+    let totalWorkingHours =
+        0;
+
+    for (
+        const attendance
+        of attendanceRecords
+    ) {
+
+        let hours =
+            0;
+
+        if (
+            attendance.totalHours !==
+                undefined &&
+            attendance.totalHours !==
+                null
+        ) {
+
+            hours =
+                decimalToNumber(
+                    attendance.totalHours
+                );
+
+        } else if (
+            attendance.checkInTime &&
+            attendance.checkOutTime
+        ) {
+
+            const attendanceDate =
+                new Date(
+                    attendance.date
+                );
+
+            const checkInParts =
+                String(
+                    attendance.checkInTime
+                )
+                    .slice(-8)
+                    .split(":")
+                    .map(Number);
+
+            const checkOutParts =
+                String(
+                    attendance.checkOutTime
+                )
+                    .slice(-8)
+                    .split(":")
+                    .map(Number);
+
+            const entry =
+                new Date(
+                    attendanceDate
+                );
+
+            entry.setHours(
+                checkInParts[0] || 0,
+                checkInParts[1] || 0,
+                checkInParts[2] || 0,
+                0
+            );
+
+            const exit =
+                new Date(
+                    attendanceDate
+                );
+
+            exit.setHours(
+                checkOutParts[0] || 0,
+                checkOutParts[1] || 0,
+                checkOutParts[2] || 0,
+                0
+            );
+
+            const difference =
+                exit.getTime() -
+                entry.getTime();
+
+            if (
+                difference > 0
+            ) {
+
+                hours =
+                    difference /
+                    (
+                        1000 *
+                        60 *
+                        60
+                    );
+            }
+        }
+
+        if (
+            Number.isFinite(
+                hours
+            ) &&
+            hours > 0
+        ) {
+
+            totalWorkingHours +=
+                hours;
+        }
+    }
+
+    return roundMoney(
+        totalWorkingHours
+    );
+};
+
+
+// ============================================================
+// [NEW] HELPER: Calculate Attendance Breakdown
+// ============================================================
+//
+// Regular salary is capped at expected monthly hours.
+// Hours above expected are stored as extra work.
+// Hours below expected become shortage hours.
+//
+const calculateAttendanceBreakdown = (
+    totalWorkingHours,
+    expectedHours,
+    salaryRatePerHour
+) => {
+
+    const actualHours =
+        Math.max(
+            0,
+            decimalToNumber(
+                totalWorkingHours
+            )
+        );
+
+    const expected =
+        Math.max(
+            0,
+            decimalToNumber(
+                expectedHours
+            )
+        );
+
+    const hourlyRate =
+        Math.max(
+            0,
+            decimalToNumber(
+                salaryRatePerHour
+            )
+        );
+
+    const regularWorkingHours =
+        Math.min(
+            actualHours,
+            expected
+        );
+
+    const extraHours =
+        Math.max(
+            actualHours - expected,
+            0
+        );
+
+    const shortageHours =
+        Math.max(
+            expected - actualHours,
+            0
+        );
+
+    const regularSalary =
+        roundMoney(
+            regularWorkingHours *
+            hourlyRate
+        );
+
+    const shortageDeduction =
+        roundMoney(
+            shortageHours *
+            hourlyRate
+        );
+
+    return {
+
+        regularWorkingHours:
+            roundMoney(
+                regularWorkingHours
+            ),
+
+        extraHours:
+            roundMoney(
+                extraHours
+            ),
+
+        shortageHours:
+            roundMoney(
+                shortageHours
+            ),
+
+        shortageDeduction,
+
+        regularSalary
+    };
+};
+
+
+// ============================================================
+// [NEW] HELPER: Get Accumulated Extra Work
+// ============================================================
+//
+// Only ACCUMULATED records with no settlement are included.
+// SETTLED records remain permanently as historical records.
+//
+const getAccumulatedExtraWork = async (
+    employeeId
+) => {
+
+    const records =
+        await prisma.extraWork.findMany({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                status:
+                    "ACCUMULATED",
+
+                settlementId:
+                    null
+            },
+
+            orderBy: {
+
+                createdAt:
+                    "asc"
+            }
+        });
+
+    const totalHours =
+        roundMoney(
+            records.reduce(
+                (
+                    total,
+                    record
+                ) =>
+                    total +
+                    decimalToNumber(
+                        record.extraHours
+                    ),
+                0
+            )
+        );
+
+    return {
+
+        records,
+
+        totalHours
+    };
+};
+
+
 
 // ============================================================
 // HELPER: Get Paid Advances For Period
@@ -1158,16 +1469,6 @@ const getPaidAdvancesForPeriod = async (
     payPeriodEnd
 ) => {
 
-    const start =
-        startOfDay(
-            payPeriodStart
-        );
-
-    const end =
-        endOfDay(
-            payPeriodEnd
-        );
-
     const advances =
         await prisma.advancePayment.findMany({
 
@@ -1176,19 +1477,32 @@ const getPaidAdvancesForPeriod = async (
                 employeeId:
                     Number(employeeId),
 
-                status:
-                    "PAID",
+                OR: [
 
-                paidAmount: {
-                    not: null
-                },
+                    {
+                        status:
+                            "APPROVED",
 
-                paymentDate: {
+                        approvedAmount: {
+                            not: null
+                        }
+                    },
 
-                    gte: start,
+                    {
+                        status:
+                            "PAID",
 
-                    lte: end
-                }
+                        paidAmount: {
+                            not: null
+                        }
+                    }
+
+                ],
+
+                // Only advances that have not already been
+                // deducted by a payroll are outstanding.
+                deductedInPayrollId:
+                    null
             },
 
             orderBy: {
@@ -1231,7 +1545,9 @@ const getLiveAdvanceSummary = async (
                 const amount =
                     roundMoney(
                         decimalToNumber(
-                            advance.paidAmount
+                            advance.status === "APPROVED"
+                                ? advance.approvedAmount
+                                : advance.paidAmount
                         )
                     );
 
@@ -1256,6 +1572,12 @@ const getLiveAdvanceSummary = async (
                         ),
 
                     paidAmount:
+                        decimalToNumber(
+                            advance.paidAmount
+                        ),
+
+                    // Actual amount being deducted from payroll.
+                    deductionAmount:
                         amount,
 
                     paymentDate:
@@ -1339,12 +1661,11 @@ const decoratePayroll = async (
                 : "UNPAID"
         );
 
+    // [CHANGED] basicSalary is the actual regular payable salary.
+    // baseSalary remains the monthly salary snapshot.
     const salaryAmount =
         decimalToNumber(
-            payroll.baseSalary !== null &&
-                payroll.baseSalary !== undefined
-                ? payroll.baseSalary
-                : payroll.basicSalary
+            payroll.basicSalary
         );
 
     const scheduledPaymentDate =
@@ -1431,10 +1752,106 @@ const decoratePayroll = async (
     /*
      * UNPAID payroll is live.
      *
-     * Every paid advance inside the payroll
-     * period is included in the current
-     * deduction.
+     * Re-read attendance for the payroll period so that
+     * payroll does not display stale totalWorkingHours,
+     * regularWorkingHours, shortageHours, extraHours, or
+     * basicSalary values from the moment the payroll row
+     * was originally created.
      */
+    let liveWorkingHours =
+        decimalToNumber(
+            payroll.totalWorkingHours
+        );
+
+    try {
+
+        liveWorkingHours =
+            await getAttendanceWorkingHoursForPeriod(
+                payroll.employeeId,
+                payroll.payPeriodStart,
+                payroll.payPeriodEnd
+            );
+
+    } catch (
+        attendanceError
+    ) {
+
+        console.error(
+            "[Payroll Attendance Refresh Error]",
+            attendanceError
+        );
+    }
+
+    // UNPAID payroll uses the employee's CURRENT salary configuration.
+    // PAID payrolls remain historical snapshots and are handled above.
+    const currentEmployee =
+        await prisma.employee.findUnique({
+
+            where: {
+
+                employeeId:
+                    Number(payroll.employeeId)
+            },
+
+            select: {
+
+                baseSalary: true,
+
+                monthlyExpectedHours: true,
+
+                salaryRatePerHour: true
+            }
+        });
+
+    const liveBaseSalary =
+        currentEmployee
+            ? decimalToNumber(
+                currentEmployee.baseSalary
+            )
+            : decimalToNumber(
+                payroll.baseSalary
+            );
+
+    const liveExpectedHours =
+        currentEmployee
+            ? decimalToNumber(
+                currentEmployee.monthlyExpectedHours
+            )
+            : decimalToNumber(
+                payroll.monthlyExpectedHours
+            );
+
+    const liveHourlyRate =
+        currentEmployee
+            ? (
+                decimalToNumber(
+                    currentEmployee.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            )
+            : (
+                decimalToNumber(
+                    payroll.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            );
+
+    const liveAttendanceBreakdown =
+        calculateAttendanceBreakdown(
+            liveWorkingHours,
+            liveExpectedHours,
+            liveHourlyRate
+        );
+
+    const liveSalaryAmount =
+        liveAttendanceBreakdown.regularSalary;
+
     const liveAdvanceSummary =
         await getLiveAdvanceSummary(
             payroll.employeeId,
@@ -1444,7 +1861,7 @@ const decoratePayroll = async (
 
     const advanceDeduction =
         Math.min(
-            salaryAmount,
+            liveSalaryAmount,
             liveAdvanceSummary.totalAdvance
         );
 
@@ -1452,9 +1869,75 @@ const decoratePayroll = async (
         Math.max(
             0,
             roundMoney(
-                salaryAmount -
+                liveSalaryAmount -
                 advanceDeduction
             )
+        );
+
+    // Current unsettled extra-work balance.
+    // Keep the current unpaid payroll's extra-work row synchronized with
+    // live attendance. This also backfills ExtraWork for older unpaid
+    // payrolls that were created before extra-work persistence was added.
+    const existingExtraWork =
+        await prisma.extraWork.findUnique({
+
+            where: {
+
+                payrollId:
+                    Number(payroll.payrollId)
+            }
+        });
+
+    if (
+        existingExtraWork &&
+        existingExtraWork.status ===
+            "ACCUMULATED" &&
+        existingExtraWork.settlementId === null
+    ) {
+
+        await prisma.extraWork.update({
+
+            where: {
+
+                extraWorkId:
+                    existingExtraWork.extraWorkId
+            },
+
+            data: {
+
+                extraHours:
+                    liveAttendanceBreakdown.extraHours
+            }
+        });
+
+    } else if (
+        !existingExtraWork &&
+        liveAttendanceBreakdown.extraHours > 0
+    ) {
+
+        await prisma.extraWork.create({
+
+            data: {
+
+                employeeId:
+                    payroll.employeeId,
+
+                payrollId:
+                    payroll.payrollId,
+
+                extraHours:
+                    liveAttendanceBreakdown.extraHours,
+
+                status:
+                    "ACCUMULATED"
+            }
+        });
+    }
+
+    // Current unsettled extra-work balance.
+    const accumulatedExtraWork =
+        await getAccumulatedExtraWork(
+            payroll.employeeId
         );
 
     return {
@@ -1463,6 +1946,26 @@ const decoratePayroll = async (
 
         status:
             "UNPAID",
+
+        // Live attendance values for the payroll UI.
+        totalWorkingHours:
+            liveWorkingHours,
+
+        regularWorkingHours:
+            liveAttendanceBreakdown.regularWorkingHours,
+
+        shortageHours:
+            liveAttendanceBreakdown.shortageHours,
+
+        shortageDeduction:
+            liveAttendanceBreakdown.shortageDeduction,
+
+        extraHours:
+            liveAttendanceBreakdown.extraHours,
+
+        // Regular salary is capped at expected hours.
+        basicSalary:
+            liveSalaryAmount,
 
         advanceDeduction:
             roundMoney(
@@ -1479,13 +1982,16 @@ const decoratePayroll = async (
         netSalary:
             pendingAmount,
 
+        // Extra hours remain separate from regular salary.
+        accumulatedExtraHours:
+            accumulatedExtraWork.totalHours,
+
         scheduledPaymentDate,
 
         advancePayments:
             liveAdvanceSummary.advances
     };
 };
-
 
 // ============================================================
 // CREATE PAYROLL
@@ -1513,8 +2019,6 @@ const createPayroll = async (
         monthlyExpectedHours,
 
         baseSalary,
-
-        basicSalary,
 
         salaryRatePerHour,
 
@@ -1599,16 +2103,16 @@ const createPayroll = async (
             totalWorkingHours
         );
 
+    // [NEW] Authoritative attendance breakdown.
+    const attendanceBreakdown =
+        calculateAttendanceBreakdown(
+            workingHours,
+            employeeExpectedHours,
+            employeeHourlyRate
+        );
+
     const earnedBasicSalary =
-        basicSalary !== undefined &&
-            basicSalary !== null
-            ? decimalToNumber(
-                basicSalary
-            )
-            : calculateBasicSalary(
-                workingHours,
-                employeeHourlyRate
-            );
+        attendanceBreakdown.regularSalary;
 
     /*
      * Current payroll deduction is calculated
@@ -1630,9 +2134,10 @@ const createPayroll = async (
             )
             : liveAdvanceSummary.totalAdvance;
 
+    // [CHANGED] Advance cannot exceed the actual regular salary.
     const finalAdvanceDeduction =
         Math.min(
-            employeeBaseSalary,
+            earnedBasicSalary,
             Math.max(
                 0,
                 requestedAdvanceDeduction
@@ -1643,7 +2148,7 @@ const createPayroll = async (
         Math.max(
             0,
             roundMoney(
-                employeeBaseSalary -
+                earnedBasicSalary -
                 finalAdvanceDeduction
             )
         );
@@ -1692,53 +2197,107 @@ const createPayroll = async (
             );
     }
 
+    // [CHANGED] Payroll and extra-work creation are atomic.
     const payroll =
-        await prisma.payroll.create({
+        await prisma.$transaction(
+            async (
+                transaction
+            ) => {
 
-            data: {
+                const createdPayroll =
+                    await transaction.payroll.create({
 
-                employeeId:
-                    employee.employeeId,
+                        data: {
 
-                payPeriodStart:
-                    periodStart,
+                            employeeId:
+                                employee.employeeId,
 
-                payPeriodEnd:
-                    periodEnd,
+                            payPeriodStart:
+                                periodStart,
 
-                baseSalary:
-                    employeeBaseSalary,
+                            payPeriodEnd:
+                                periodEnd,
 
-                monthlyExpectedHours:
-                    employeeExpectedHours,
+                            baseSalary:
+                                employeeBaseSalary,
 
-                salaryRatePerHour:
-                    employeeHourlyRate,
+                            monthlyExpectedHours:
+                                employeeExpectedHours,
 
-                totalWorkingHours:
-                    workingHours,
+                            salaryRatePerHour:
+                                employeeHourlyRate,
 
-                basicSalary:
-                    earnedBasicSalary,
+                            totalWorkingHours:
+                                workingHours,
 
-                advanceDeduction:
-                    finalAdvanceDeduction,
+                            basicSalary:
+                                earnedBasicSalary,
 
-                netSalary,
+                            // [NEW] Regular payable hours.
+                            regularWorkingHours:
+                                attendanceBreakdown.regularWorkingHours,
 
-                scheduledPaymentDate:
-                    finalScheduledPaymentDate,
+                            // [NEW] Shortage and deduction.
+                            shortageHours:
+                                attendanceBreakdown.shortageHours,
 
-                paymentDate:
-                    null,
+                            shortageDeduction:
+                                attendanceBreakdown.shortageDeduction,
 
-                status:
-                    "UNPAID"
-            },
+                            // [NEW] Extra work is tracked separately.
+                            extraHours:
+                                attendanceBreakdown.extraHours,
 
-            include:
-                payrollInclude
-        });
+                            incentiveAmount:
+                                0,
+
+                            advanceDeduction:
+                                finalAdvanceDeduction,
+
+                            netSalary,
+
+                            scheduledPaymentDate:
+                                finalScheduledPaymentDate,
+
+                            paymentDate:
+                                null,
+
+                            status:
+                                "UNPAID"
+                        },
+
+                        include:
+                            payrollInclude
+                    });
+
+                // [NEW] Never add extra hours to basicSalary.
+                // Store every generated extra-work period separately.
+                if (
+                    attendanceBreakdown.extraHours > 0
+                ) {
+
+                    await transaction.extraWork.create({
+
+                        data: {
+
+                            employeeId:
+                                employee.employeeId,
+
+                            payrollId:
+                                createdPayroll.payrollId,
+
+                            extraHours:
+                                attendanceBreakdown.extraHours,
+
+                            status:
+                                "ACCUMULATED"
+                        }
+                    });
+                }
+
+                return createdPayroll;
+            }
+        );
 
     return await decoratePayroll(
         payroll
@@ -1803,130 +2362,15 @@ const generatePayrollForEmployee = async (
     /*
      * Attendance calculation.
      *
-     * The existing project may have several
-     * attendance representations. The service
-     * attempts to calculate the total from the
-     * employee attendance records available in
-     * the database.
+     * Use the actual Attendance model:
+     * date + totalHours, with check-in/check-out
+     * as a fallback.
      */
-    let totalWorkingHours =
-        0;
-
-    try {
-
-        const attendanceRecords =
-            await prisma.attendance.findMany({
-
-                where: {
-
-                    employeeId:
-                        employee.employeeId,
-
-                    attendanceDate: {
-
-                        gte:
-                            startOfDay(
-                                periodStart
-                            ),
-
-                        lte:
-                            endOfDay(
-                                periodEnd
-                            )
-                    }
-                }
-            });
-
-        for (
-            const attendance
-            of attendanceRecords
-        ) {
-
-            let hours =
-                0;
-
-            if (
-                attendance.totalWorkingHours !==
-                undefined &&
-                attendance.totalWorkingHours !== null
-            ) {
-
-                hours =
-                    decimalToNumber(
-                        attendance.totalWorkingHours
-                    );
-
-            } else if (
-                attendance.workingHours !==
-                undefined &&
-                attendance.workingHours !== null
-            ) {
-
-                hours =
-                    decimalToNumber(
-                        attendance.workingHours
-                    );
-
-            } else if (
-                attendance.entryTime &&
-                attendance.exitTime
-            ) {
-
-                const entry =
-                    new Date(
-                        attendance.entryTime
-                    );
-
-                const exit =
-                    new Date(
-                        attendance.exitTime
-                    );
-
-                const difference =
-                    exit.getTime() -
-                    entry.getTime();
-
-                if (
-                    difference > 0
-                ) {
-
-                    hours =
-                        difference /
-                        (
-                            1000 *
-                            60 *
-                            60
-                        );
-                }
-            }
-
-            if (
-                Number.isFinite(
-                    hours
-                ) &&
-                hours > 0
-            ) {
-
-                totalWorkingHours +=
-                    hours;
-            }
-        }
-
-    } catch (
-    error
-    ) {
-
-        /*
-         * Preserve the existing payroll
-         * generation flow if the attendance
-         * implementation in a particular
-         * project version differs.
-         */
-    }
-
-    totalWorkingHours =
-        roundMoney(
-            totalWorkingHours
+    const totalWorkingHours =
+        await getAttendanceWorkingHoursForPeriod(
+            employee.employeeId,
+            periodStart,
+            periodEnd
         );
 
     const baseSalary =
@@ -1945,12 +2389,7 @@ const generatePayrollForEmployee = async (
             monthlyExpectedHours
         );
 
-    const basicSalary =
-        calculateBasicSalary(
-            totalWorkingHours,
-            salaryRatePerHour
-        );
-
+    // [CHANGED] createPayroll performs the authoritative breakdown.
     return await createPayroll({
 
         employeeId:
@@ -1968,9 +2407,7 @@ const generatePayrollForEmployee = async (
 
         baseSalary,
 
-        basicSalary,
-
-        salaryRatePerHour
+                salaryRatePerHour
 
     }, companyId);
 };
@@ -2736,6 +3173,81 @@ const updatePayroll = async (
                 );
     }
 
+    // [NEW] Recalculate all attendance-derived fields when an unpaid
+    // payroll's working hours/salary configuration is manually changed.
+    if (
+        data.totalWorkingHours !== undefined ||
+        data.monthlyExpectedHours !== undefined ||
+        data.salaryRatePerHour !== undefined ||
+        data.baseSalary !== undefined
+    ) {
+
+        const finalWorkingHours =
+            data.totalWorkingHours !== undefined
+                ? validateNonNegativeNumber(
+                    data.totalWorkingHours,
+                    "totalWorkingHours"
+                )
+                : decimalToNumber(
+                    existing.totalWorkingHours
+                );
+
+        const finalExpectedHours =
+            data.monthlyExpectedHours !== undefined
+                ? validatePositiveNumber(
+                    data.monthlyExpectedHours,
+                    "monthlyExpectedHours"
+                )
+                : decimalToNumber(
+                    existing.monthlyExpectedHours
+                );
+
+        const finalBaseSalary =
+            data.baseSalary !== undefined
+                ? validateNonNegativeNumber(
+                    data.baseSalary,
+                    "baseSalary"
+                )
+                : decimalToNumber(
+                    existing.baseSalary
+                );
+
+        const finalHourlyRate =
+            data.salaryRatePerHour !== undefined
+                ? validateNonNegativeNumber(
+                    data.salaryRatePerHour,
+                    "salaryRatePerHour"
+                )
+                : decimalToNumber(
+                    existing.salaryRatePerHour
+                ) || calculateHourlyRate(
+                    finalBaseSalary,
+                    finalExpectedHours
+                );
+
+        const breakdown =
+            calculateAttendanceBreakdown(
+                finalWorkingHours,
+                finalExpectedHours,
+                finalHourlyRate
+            );
+
+        updateData.basicSalary =
+            breakdown.regularSalary;
+
+        updateData.regularWorkingHours =
+            breakdown.regularWorkingHours;
+
+        updateData.shortageHours =
+            breakdown.shortageHours;
+
+        updateData.shortageDeduction =
+            breakdown.shortageDeduction;
+
+        updateData.extraHours =
+            breakdown.extraHours;
+    }
+
     const updated =
         await prisma.payroll.update({
 
@@ -2809,6 +3321,26 @@ const deletePayroll = async (
         );
     }
 
+    // [NEW] Preserve extra-work history. A payroll linked to an
+    // extra-work record cannot be deleted.
+    const linkedExtraWork =
+        await prisma.extraWork.findFirst({
+
+            where: {
+
+                payrollId:
+                    Number(payrollId)
+            }
+        });
+
+    if (linkedExtraWork) {
+
+        throw createServiceError(
+            "Payroll with extra-work records cannot be deleted because extra-work history must be preserved",
+            409
+        );
+    }
+
     return await prisma.payroll.delete({
 
         where: {
@@ -2821,13 +3353,404 @@ const deletePayroll = async (
 
 
 // ============================================================
+// EXTRA WORK / OVERTIME LIST
+// ============================================================
+
+const getExtraWorkRecords = async (
+    companyId,
+    options = {}
+) => {
+
+    const status =
+        options.status
+            ? String(options.status).toUpperCase()
+            : "ACCUMULATED";
+
+    const records =
+        await prisma.extraWork.findMany({
+
+            where: {
+
+                status,
+
+                employee: {
+
+                    companyId:
+                        Number(companyId)
+                },
+
+                ...(options.employeeId
+                    ? {
+                        employeeId:
+                            Number(options.employeeId)
+                    }
+                    : {}),
+
+                ...(options.fromDate || options.toDate
+                    ? {
+                        createdAt: {
+                            ...(options.fromDate
+                                ? {
+                                    gte: parseDate(
+                                        options.fromDate,
+                                        "fromDate"
+                                    )
+                                }
+                                : {}),
+                            ...(options.toDate
+                                ? {
+                                    lte: parseDate(
+                                        options.toDate,
+                                        "toDate"
+                                    )
+                                }
+                                : {})
+                        }
+                    }
+                    : {})
+            },
+
+            include: {
+
+                employee: {
+                    include: employeeInclude
+                },
+
+                payroll: true,
+
+                settlement: true
+            },
+
+            orderBy: [
+                {
+                    createdAt:
+                        "desc"
+                },
+                {
+                    extraWorkId:
+                        "desc"
+                }
+            ]
+        });
+
+    return records.map(
+        (record) => ({
+
+            extraWorkId:
+                record.extraWorkId,
+
+            employeeId:
+                record.employeeId,
+
+            employee: record.employee,
+
+            payrollId:
+                record.payrollId,
+
+            payPeriodStart:
+                record.payroll
+                    ? record.payroll.payPeriodStart
+                    : null,
+
+            payPeriodEnd:
+                record.payroll
+                    ? record.payroll.payPeriodEnd
+                    : null,
+
+            expectedHours:
+                record.payroll
+                    ? decimalToNumber(
+                        record.payroll.monthlyExpectedHours
+                    )
+                    : 0,
+
+            regularWorkingHours:
+                record.payroll
+                    ? decimalToNumber(
+                        record.payroll.regularWorkingHours
+                    )
+                    : 0,
+
+            extraHours:
+                decimalToNumber(
+                    record.extraHours
+                ),
+
+            status:
+                record.status,
+
+            settlementId:
+                record.settlementId,
+
+            createdAt:
+                record.createdAt,
+
+            updatedAt:
+                record.updatedAt
+        })
+    );
+};
+
+
+// ============================================================
+// EXTRA WORK SETTLEMENT HISTORY
+// ============================================================
+
+const getExtraWorkSettlementHistory = async (
+    companyId,
+    options = {}
+) => {
+
+    const settlements =
+        await prisma.extraWorkSettlement.findMany({
+
+            where: {
+
+                employee: {
+
+                    companyId:
+                        Number(companyId)
+                },
+
+                ...(options.employeeId
+                    ? {
+                        employeeId:
+                            Number(options.employeeId)
+                    }
+                    : {})
+            },
+
+            include: {
+
+                employee: {
+                    include: employeeInclude
+                },
+
+                payroll: true,
+
+                extraWorkRecords: true
+            },
+
+            orderBy: [
+                {
+                    settlementDate:
+                        "desc"
+                },
+                {
+                    settlementId:
+                        "desc"
+                }
+            ]
+        });
+
+    return settlements.map(
+        (settlement) => ({
+
+            settlementId:
+                settlement.settlementId,
+
+            employeeId:
+                settlement.employeeId,
+
+            employee:
+                settlement.employee,
+
+            payrollId:
+                settlement.payrollId,
+
+            payPeriodStart:
+                settlement.payroll
+                    ? settlement.payroll.payPeriodStart
+                    : null,
+
+            payPeriodEnd:
+                settlement.payroll
+                    ? settlement.payroll.payPeriodEnd
+                    : null,
+
+            settledHours:
+                decimalToNumber(
+                    settlement.settledHours
+                ),
+
+            incentiveAmount:
+                decimalToNumber(
+                    settlement.incentiveAmount
+                ),
+
+            settlementDate:
+                settlement.settlementDate,
+
+            extraWorkRecords:
+                settlement.extraWorkRecords,
+
+            createdAt:
+                settlement.createdAt
+        })
+    );
+};
+
+
+// ============================================================
+// REJECT EXTRA WORK
+// ============================================================
+
+const rejectExtraWork = async (
+    extraWorkId,
+    companyId
+) => {
+
+    const id =
+        Number(extraWorkId);
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
+
+        throw createServiceError(
+            "Invalid extraWorkId",
+            400
+        );
+    }
+
+    const record =
+        await prisma.extraWork.findFirst({
+
+            where: {
+
+                extraWorkId: id,
+
+                employee: {
+
+                    companyId:
+                        Number(companyId)
+                }
+            },
+
+            include: {
+
+                employee: {
+                    include: employeeInclude
+                },
+
+                payroll: true
+            }
+        });
+
+    if (!record) {
+
+        throw createServiceError(
+            "Extra-work record not found",
+            404
+        );
+    }
+
+    if (
+        record.status ===
+            "SETTLED"
+    ) {
+
+        throw createServiceError(
+            "Settled extra-work records cannot be rejected",
+            409
+        );
+    }
+
+    if (
+        record.status ===
+            "REJECTED"
+    ) {
+
+        throw createServiceError(
+            "Extra-work record has already been rejected",
+            409
+        );
+    }
+
+    const rejected =
+        await prisma.extraWork.update({
+
+            where: {
+
+                extraWorkId: id
+            },
+
+            data: {
+
+                status:
+                    "REJECTED",
+
+                settlementId:
+                    null
+            },
+
+            include: {
+
+                employee: {
+                    include: employeeInclude
+                },
+
+                payroll: true
+            }
+        });
+
+    return {
+
+        extraWorkId:
+            rejected.extraWorkId,
+
+        employeeId:
+            rejected.employeeId,
+
+        employee:
+            rejected.employee,
+
+        payrollId:
+            rejected.payrollId,
+
+        payPeriodStart:
+            rejected.payroll
+                ? rejected.payroll.payPeriodStart
+                : null,
+
+        payPeriodEnd:
+            rejected.payroll
+                ? rejected.payroll.payPeriodEnd
+                : null,
+
+        extraHours:
+            decimalToNumber(
+                rejected.extraHours
+            ),
+
+        status:
+            rejected.status,
+
+        createdAt:
+            rejected.createdAt,
+
+        updatedAt:
+            rejected.updatedAt
+    };
+};
+
+
+// ============================================================
 // MARK PAYROLL PAID
 // ============================================================
 
 const markPayrollPaid = async (
     payrollId,
-    companyId
+    companyId,
+    incentiveAmount = 0
 ) => {
+
+    const requestedIncentiveAmount =
+        validateNonNegativeNumber(
+            incentiveAmount,
+            "incentiveAmount"
+        );
 
     const payroll =
         await prisma.payroll.findFirst({
@@ -2899,56 +3822,6 @@ const markPayrollPaid = async (
         );
     }
 
-    /*
-     * Recalculate the latest advances immediately
-     * before payment. This prevents an advance paid
-     * after payroll generation from being missed.
-     */
-    const liveAdvanceSummary =
-        await getLiveAdvanceSummary(
-            payroll.employeeId,
-            payroll.payPeriodStart,
-            payroll.payPeriodEnd
-        );
-
-    const salaryAmount =
-        decimalToNumber(
-            payroll.baseSalary !== null &&
-                payroll.baseSalary !== undefined
-                ? payroll.baseSalary
-                : payroll.basicSalary
-        );
-
-    const totalAdvance =
-        roundMoney(
-            liveAdvanceSummary.totalAdvance
-        );
-
-    if (
-        totalAdvance >
-        salaryAmount
-    ) {
-
-        throw createServiceError(
-
-            `Advance deduction (₹${totalAdvance.toFixed(2)}) cannot exceed salary (₹${salaryAmount.toFixed(2)})`,
-
-            400
-        );
-    }
-
-    const finalAdvanceDeduction =
-        totalAdvance;
-
-    const finalNetSalary =
-        Math.max(
-            0,
-            roundMoney(
-                salaryAmount -
-                finalAdvanceDeduction
-            )
-        );
-
     const actualPaymentDate =
         startOfDay(
             new Date()
@@ -2960,11 +3833,7 @@ const markPayrollPaid = async (
                 transaction
             ) => {
 
-                /*
-                 * Re-read inside the transaction to
-                 * prevent a second payment request from
-                 * paying the same payroll.
-                 */
+                // [NEW] Re-read inside the transaction.
                 const current =
                     await transaction.payroll.findUnique({
 
@@ -3002,42 +3871,195 @@ const markPayrollPaid = async (
                     );
                 }
 
-                /*
-                 * Final payroll values are frozen here.
-                 */
-                return await transaction.payroll.update({
+                // [NEW] Current unsettled extra-work balance.
+                // Historical SETTLED records are never deleted.
+                const accumulatedExtraWork =
+                    await transaction.extraWork.findMany({
 
-                    where: {
+                        where: {
 
-                        payrollId:
-                            Number(payrollId)
-                    },
+                            employeeId:
+                                current.employeeId,
 
-                    data: {
+                            status:
+                                "ACCUMULATED",
 
-                        status:
-                            "PAID",
+                            settlementId:
+                                null
+                        },
 
-                        advanceDeduction:
-                            finalAdvanceDeduction,
+                        orderBy: {
 
-                        netSalary:
-                            finalNetSalary,
+                            createdAt:
+                                "asc"
+                        }
+                    });
 
-                        paymentDate:
-                            actualPaymentDate,
+                const settledHours =
+                    roundMoney(
+                        accumulatedExtraWork.reduce(
+                            (
+                                total,
+                                record
+                            ) =>
+                                total +
+                                decimalToNumber(
+                                    record.extraHours
+                                ),
+                            0
+                        )
+                    );
 
-                        /*
-                         * Keep the scheduled payment date
-                         * separate from the actual payment date.
-                         */
-                        scheduledPaymentDate:
-                            scheduledPaymentDate
-                    },
+                if (
+                    requestedIncentiveAmount > 0 &&
+                    settledHours <= 0
+                ) {
 
-                    include:
-                        payrollInclude
-                });
+                    throw createServiceError(
+                        "Incentive cannot be paid because there are no accumulated extra hours",
+                        400
+                    );
+                }
+
+                // [CHANGED] Regular salary comes from basicSalary,
+                // not the monthly baseSalary snapshot.
+                const salaryAmount =
+                    decimalToNumber(
+                        current.basicSalary
+                    );
+
+                // [NEW] Latest advances are recalculated immediately
+                // before payment.
+                const liveAdvanceSummary =
+                    await getLiveAdvanceSummary(
+                        current.employeeId,
+                        current.payPeriodStart,
+                        current.payPeriodEnd
+                    );
+
+                const totalAdvance =
+                    roundMoney(
+                        liveAdvanceSummary.totalAdvance
+                    );
+
+                if (
+                    totalAdvance >
+                    salaryAmount
+                ) {
+
+                    throw createServiceError(
+
+                        `Advance deduction (₹${totalAdvance.toFixed(2)}) cannot exceed salary (₹${salaryAmount.toFixed(2)})`,
+
+                        400
+                    );
+                }
+
+                const finalAdvanceDeduction =
+                    totalAdvance;
+
+                // [NEW] Incentive is paid on top of regular salary.
+                const finalNetSalary =
+                    Math.max(
+                        0,
+                        roundMoney(
+                            salaryAmount +
+                            requestedIncentiveAmount -
+                            finalAdvanceDeduction
+                        )
+                    );
+
+                const paidPayroll =
+                    await transaction.payroll.update({
+
+                        where: {
+
+                            payrollId:
+                                Number(payrollId)
+                        },
+
+                        data: {
+
+                            status:
+                                "PAID",
+
+                            advanceDeduction:
+                                finalAdvanceDeduction,
+
+                            // [NEW] Persist incentive in payroll.
+                            incentiveAmount:
+                                requestedIncentiveAmount,
+
+                            netSalary:
+                                finalNetSalary,
+
+                            paymentDate:
+                                actualPaymentDate,
+
+                            scheduledPaymentDate:
+                                scheduledPaymentDate
+                        },
+
+                        include:
+                            payrollInclude
+                    });
+
+                // [NEW] Preserve a settlement-history record.
+                if (
+                    settledHours > 0
+                ) {
+
+                    const settlement =
+                        await transaction.extraWorkSettlement.create({
+
+                            data: {
+
+                                employeeId:
+                                    current.employeeId,
+
+                                payrollId:
+                                    current.payrollId,
+
+                                settledHours,
+
+                                incentiveAmount:
+                                    requestedIncentiveAmount,
+
+                                settlementDate:
+                                    actualPaymentDate
+                            }
+                        });
+
+                    // [NEW] Reset current extra-hour balance by marking
+                    // records SETTLED. The records remain in the database.
+                    await transaction.extraWork.updateMany({
+
+                        where: {
+
+                            extraWorkId: {
+
+                                in:
+                                    accumulatedExtraWork.map(
+                                        (
+                                            record
+                                        ) =>
+                                            record.extraWorkId
+                                    )
+                            }
+                        },
+
+                        data: {
+
+                            status:
+                                "SETTLED",
+
+                            settlementId:
+                                settlement.settlementId
+                        }
+                    });
+                }
+
+                return paidPayroll;
             }
         );
 
@@ -3047,7 +4069,6 @@ const markPayrollPaid = async (
 };
 
 
-// ============================================================
 // GET CURRENT PAYROLL PERIOD
 // ============================================================
 
@@ -3462,6 +4483,12 @@ module.exports = {
     updatePayroll,
 
     deletePayroll,
+
+    getExtraWorkRecords,
+
+    getExtraWorkSettlementHistory,
+
+    rejectExtraWork,
 
     markPayrollPaid,
 

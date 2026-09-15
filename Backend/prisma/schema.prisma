@@ -7,7 +7,6 @@ datasource db {
   provider = "mysql"
 }
 
-
 // ======================================================
 // ADMIN
 // ======================================================
@@ -29,7 +28,6 @@ model Admin {
   @@map("admin")
 }
 
-
 // ======================================================
 // BRANCH
 // ======================================================
@@ -50,7 +48,6 @@ model Branch {
   @@index([companyId])
   @@map("branches")
 }
-
 
 // ======================================================
 // DEPARTMENT
@@ -76,45 +73,44 @@ model Department {
   @@map("departments")
 }
 
-
 // ======================================================
 // EMPLOYEE
 // ======================================================
 
 model Employee {
-  employeeId        Int       @id @default(autoincrement()) @map("employee_id")
-  firstName         String    @map("first_name") @db.VarChar(100)
-  lastName          String    @map("last_name") @db.VarChar(100)
-  gender            String?   @db.VarChar(20)
-  email             String    @unique @db.VarChar(150)
-  phone             String?   @db.VarChar(20)
-  hireDate          DateTime? @map("hire_date") @db.Date
-  role              String    @db.VarChar(30)
+  employeeId Int       @id @default(autoincrement()) @map("employee_id")
+  firstName  String    @map("first_name") @db.VarChar(100)
+  lastName   String    @map("last_name") @db.VarChar(100)
+  gender     String?   @db.VarChar(20)
+  email      String    @unique @db.VarChar(150)
+  phone      String?   @db.VarChar(20)
+  hireDate   DateTime? @map("hire_date") @db.Date
+  role       String    @db.VarChar(30)
 
   // Monthly/base salary
-  baseSalary        Decimal?  @map("base_salary") @db.Decimal(12, 2)
+  baseSalary Decimal? @map("base_salary") @db.Decimal(12, 2)
 
   // Expected working hours per month
   monthlyExpectedHours Decimal? @map("monthly_expected_hours") @db.Decimal(8, 2)
 
   // Calculated hourly rate
   // baseSalary / monthlyExpectedHours
-  salaryRatePerHour Decimal?  @map("salary_rate_per_hour") @db.Decimal(10, 2)
+  salaryRatePerHour Decimal? @map("salary_rate_per_hour") @db.Decimal(10, 2)
 
-  companyId         Int
-  branchId          Int
-  departmentId      Int?
-  managerId         Int?
-  status            String    @db.VarChar(20)
-  passwordHash      String    @map("password_hash") @db.Text
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  companyId    Int
+  branchId     Int
+  departmentId Int?
+  managerId    Int?
+  status       String   @db.VarChar(20)
+  passwordHash String   @map("password_hash") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   activityLogs       ActivityLog[]
-  advancePayments    AdvancePayment[] @relation("EmployeeAdvances")
+  advancePayments    AdvancePayment[]  @relation("EmployeeAdvances")
   attendance         Attendance[]
   attendancePunches  AttendancePunch[]
-  managedDepartments Department[]     @relation("DepartmentManager")
+  managedDepartments Department[]      @relation("DepartmentManager")
 
   branch       Branch      @relation(fields: [branchId], references: [branchId])
   company      companies   @relation(fields: [companyId], references: [company_id])
@@ -130,13 +126,16 @@ model Employee {
 
   payrolls Payroll[]
 
+  // Extra-work accumulation and settlement history
+  extraWorkRecords     ExtraWork[]
+  extraWorkSettlements ExtraWorkSettlement[]
+
   @@index([companyId])
   @@index([branchId])
   @@index([departmentId])
   @@index([managerId])
   @@map("employees")
 }
-
 
 // ======================================================
 // IOT DEVICE
@@ -166,7 +165,6 @@ model IotDevice {
   @@map("iot_devices")
 }
 
-
 // ======================================================
 // FINGERPRINT TEMPLATE
 // ======================================================
@@ -186,7 +184,6 @@ model FingerprintTemplate {
   @@index([employeeId])
   @@map("fingerprint_templates")
 }
-
 
 // ======================================================
 // ATTENDANCE PUNCH
@@ -211,7 +208,6 @@ model AttendancePunch {
   @@map("attendance_punches")
 }
 
-
 // ======================================================
 // ATTENDANCE
 // ======================================================
@@ -235,7 +231,6 @@ model Attendance {
   @@map("attendance")
 }
 
-
 // ======================================================
 // DEVICE LOG
 // ======================================================
@@ -255,36 +250,35 @@ model DeviceLog {
   @@map("device_logs")
 }
 
-
 // ======================================================
 // ADVANCE PAYMENT
 // ======================================================
 
 model AdvancePayment {
-  advanceId           Int       @id @default(autoincrement()) @map("advance_id")
-  employeeId          Int
+  advanceId  Int @id @default(autoincrement()) @map("advance_id")
+  employeeId Int
 
   // Original amount requested by employee
-  amount              Decimal   @db.Decimal(10, 2)
+  amount Decimal @db.Decimal(10, 2)
 
   // Amount approved by admin
-  approvedAmount      Decimal?  @map("approved_amount") @db.Decimal(10, 2)
+  approvedAmount Decimal? @map("approved_amount") @db.Decimal(10, 2)
 
   // Actual amount paid by admin
-  paidAmount          Decimal?  @map("paid_amount") @db.Decimal(10, 2)
+  paidAmount Decimal? @map("paid_amount") @db.Decimal(10, 2)
 
-  reason              String?   @db.Text
-  paymentDate         DateTime  @map("payment_date") @db.Date
+  reason      String?  @db.Text
+  paymentDate DateTime @map("payment_date") @db.Date
 
-  approvedBy          Int?
-  status              String    @db.VarChar(20)
+  approvedBy Int?
+  status     String @db.VarChar(20)
 
-  createdAt           DateTime  @default(now()) @map("created_at")
-  updatedAt           DateTime  @updatedAt @map("updated_at")
-  deductedAt          DateTime? @map("deducted_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deductedAt DateTime? @map("deducted_at")
 
   // Payroll that deducted this advance
-  deductedInPayrollId Int?      @unique @map("deducted_in_payroll_id")
+  deductedInPayrollId Int? @unique @map("deducted_in_payroll_id")
 
   approver          Admin?   @relation("ApprovedAdvances", fields: [approvedBy], references: [adminId])
   deductedInPayroll Payroll? @relation("AdvancePayroll", fields: [deductedInPayrollId], references: [payrollId])
@@ -295,33 +289,55 @@ model AdvancePayment {
   @@map("advance_payments")
 }
 
-
 // ======================================================
 // PAYROLL
 // ======================================================
 
 model Payroll {
-  payrollId         Int       @id @default(autoincrement()) @map("payroll_id")
-  employeeId        Int
+  payrollId  Int @id @default(autoincrement()) @map("payroll_id")
+  employeeId Int
 
-  payPeriodStart    DateTime  @map("pay_period_start") @db.Date
-  payPeriodEnd      DateTime  @map("pay_period_end") @db.Date
+  payPeriodStart DateTime @map("pay_period_start") @db.Date
+  payPeriodEnd   DateTime @map("pay_period_end") @db.Date
 
   // ====================================================
   // HISTORICAL SALARY SNAPSHOT
   // ====================================================
 
-  baseSalary          Decimal? @map("base_salary") @db.Decimal(12, 2)
+  baseSalary           Decimal? @map("base_salary") @db.Decimal(12, 2)
   monthlyExpectedHours Decimal? @map("monthly_expected_hours") @db.Decimal(8, 2)
-  salaryRatePerHour   Decimal? @map("salary_rate_per_hour") @db.Decimal(10, 2)
+  salaryRatePerHour    Decimal? @map("salary_rate_per_hour") @db.Decimal(10, 2)
 
   // ====================================================
   // ATTENDANCE CALCULATION
   // ====================================================
 
+  // Total actual attendance hours in this payroll period
   totalWorkingHours Decimal @map("total_working_hours") @db.Decimal(8, 2)
 
+  // Hours that are payable at the normal salary rate.
+  // Cannot exceed monthlyExpectedHours.
+  regularWorkingHours Decimal @default(0.00) @map("regular_working_hours") @db.Decimal(8, 2)
+
+  // Hours below the expected monthly hours.
+  shortageHours Decimal @default(0.00) @map("shortage_hours") @db.Decimal(8, 2)
+
+  // Monetary deduction caused by shortage hours.
+  shortageDeduction Decimal @default(0.00) @map("shortage_deduction") @db.Decimal(12, 2)
+
+  // Hours above the expected monthly hours.
+  // These are stored separately and accumulated across payroll periods.
+  extraHours Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
+
+  // ====================================================
+  // SALARY
+  // ====================================================
+
+  // Regular salary after applying shortage calculation.
   basicSalary Decimal @map("basic_salary") @db.Decimal(12, 2)
+
+  // Incentive paid when accumulated extra work is settled.
+  incentiveAmount Decimal @default(0.00) @map("incentive_amount") @db.Decimal(12, 2)
 
   // Total advance deduction for the finalized payroll
   advanceDeduction Decimal @default(0.00) @map("advance_deduction") @db.Decimal(12, 2)
@@ -345,8 +361,21 @@ model Payroll {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  // ====================================================
+  // RELATIONS
+  // ====================================================
+
   advanceDeductionRecord AdvancePayment? @relation("AdvancePayroll")
-  employee               Employee        @relation(fields: [employeeId], references: [employeeId])
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  // One ExtraWork record represents this payroll period's
+  // extra-hour contribution.
+  extraWorkRecord ExtraWork?
+
+  // A settlement may be associated with the payroll
+  // in which the incentive was paid.
+  extraWorkSettlement ExtraWorkSettlement?
 
   @@index([employeeId])
   @@index([payPeriodStart, payPeriodEnd])
@@ -355,6 +384,110 @@ model Payroll {
   @@map("payroll")
 }
 
+// ======================================================
+// EXTRA WORK
+// ======================================================
+//
+// Stores extra hours generated by each payroll period.
+//
+// Example:
+//
+// September -> 25 hours
+// October   -> 15 hours
+//
+// Current accumulated balance = 40 hours.
+//
+// These records are NOT deleted when an incentive is paid.
+// They are linked to a settlement for historical tracking.
+// ======================================================
+
+model ExtraWork {
+  extraWorkId Int @id @default(autoincrement()) @map("extra_work_id")
+
+  employeeId Int
+
+  // The payroll period that generated these extra hours.
+  payrollId Int @unique @map("payroll_id")
+
+  // Number of extra hours generated during this payroll period.
+  extraHours Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
+
+  // ACCUMULATED -> SETTLED
+  status String @default("ACCUMULATED") @db.VarChar(20)
+
+  // NULL while these hours are still accumulated.
+  // Set when the hours are included in an incentive settlement.
+  settlementId Int? @map("settlement_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  payroll Payroll @relation(fields: [payrollId], references: [payrollId])
+
+  settlement ExtraWorkSettlement? @relation(fields: [settlementId], references: [settlementId])
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([settlementId])
+  @@index([createdAt])
+  @@map("extra_work")
+}
+
+// ======================================================
+// EXTRA WORK SETTLEMENT
+// ======================================================
+//
+// Historical record of an incentive settlement.
+//
+// Example:
+//
+// September extra = 25
+// October extra   = 15
+// -----------------
+// Settled hours   = 40
+// Incentive       = ₹2,000
+//
+// The settlement record remains permanently.
+// The ExtraWork records are marked SETTLED.
+// A new accumulation cycle can then begin.
+// ======================================================
+
+model ExtraWorkSettlement {
+  settlementId Int @id @default(autoincrement()) @map("settlement_id")
+
+  employeeId Int
+
+  // Payroll in which the incentive was actually paid.
+  payrollId Int @unique @map("payroll_id")
+
+  // Total accumulated extra hours settled.
+  settledHours Decimal @map("settled_hours") @db.Decimal(8, 2)
+
+  // Incentive amount decided by admin.
+  incentiveAmount Decimal @map("incentive_amount") @db.Decimal(12, 2)
+
+  // Explicitly supplied by the application when settlement occurs.
+  //
+  // No database CURRENT_TIMESTAMP default is used here because
+  // MySQL can reject CURRENT_TIMESTAMP as a DATE default.
+  settlementDate DateTime @map("settlement_date") @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  payroll Payroll @relation(fields: [payrollId], references: [payrollId])
+
+  // All ExtraWork records included in this settlement.
+  extraWorkRecords ExtraWork[]
+
+  @@index([employeeId])
+  @@index([settlementDate])
+  @@map("extra_work_settlements")
+}
 
 // ======================================================
 // ACTIVITY LOG
@@ -375,7 +508,6 @@ model ActivityLog {
   @@map("activity_logs")
 }
 
-
 // ======================================================
 // SETTINGS
 // ======================================================
@@ -394,7 +526,6 @@ model Setting {
   @@index([companyId])
   @@map("settings")
 }
-
 
 // ======================================================
 // COMPANY
@@ -417,7 +548,6 @@ model companies {
   leaveTypes  LeaveType[]
   settings    Setting[]
 }
-
 
 // ======================================================
 // LEAVE TYPE
@@ -449,7 +579,6 @@ model LeaveType {
   @@map("leave_types")
 }
 
-
 // ======================================================
 // LEAVE BALANCE
 // ======================================================
@@ -474,7 +603,6 @@ model LeaveBalance {
   @@index([year])
   @@map("leave_balances")
 }
-
 
 // ======================================================
 // LEAVE REQUEST
@@ -521,7 +649,6 @@ model LeaveRequest {
   @@index([approvedStartDate, approvedEndDate])
   @@map("leave_requests")
 }
-
 
 // ======================================================
 // FINGERPRINT ENROLLMENT

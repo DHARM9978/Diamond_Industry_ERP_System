@@ -437,6 +437,24 @@ const API = {
 
 
         // ----------------------------------------------------
+        // EXTRA WORK / OVERTIME
+        // ----------------------------------------------------
+
+        // GET /api/payroll/extra-work
+        extraWork: {
+            list: "/api/payroll/extra-work",
+
+            // GET /api/payroll/extra-work/history
+            history:
+                "/api/payroll/extra-work/history",
+
+            // PATCH /api/payroll/extra-work/:id/reject
+            reject: (id) =>
+                `/api/payroll/extra-work/${id}/reject`,
+        },
+
+
+        // ----------------------------------------------------
         // EMPLOYEE PAYROLL
         // ----------------------------------------------------
 

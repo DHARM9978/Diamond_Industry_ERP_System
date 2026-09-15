@@ -1278,15 +1278,91 @@ export const payrollService = {
     // --------------------------------------------------------
 
     pay: async (
-        id
+        id,
+        incentiveAmount = 0
     ) => {
 
         const response =
             await apiClient.patch(
-                API.payroll.pay(id)
+                API.payroll.pay(id),
+                {
+                    incentiveAmount:
+                        incentiveAmount
+                }
             );
 
         return unwrap(response);
+    },
+
+
+    // ========================================================
+    // EXTRA WORK / OVERTIME
+    // ========================================================
+
+    // --------------------------------------------------------
+    // GET PENDING EXTRA WORK / OVERTIME
+    //
+    // GET /api/payroll/extra-work
+    // --------------------------------------------------------
+
+    extraWork: {
+        list: async (
+            params = {}
+        ) => {
+
+            const response =
+                await apiClient.get(
+                    API.payroll.extraWork.list,
+                    {
+                        params,
+                    }
+                );
+
+            return unwrap(response);
+        },
+
+
+        // ----------------------------------------------------
+        // GET EXTRA WORK SETTLEMENT HISTORY
+        //
+        // GET /api/payroll/extra-work/history
+        // ----------------------------------------------------
+
+        history: async (
+            params = {}
+        ) => {
+
+            const response =
+                await apiClient.get(
+                    API.payroll.extraWork.history,
+                    {
+                        params,
+                    }
+                );
+
+            return unwrap(response);
+        },
+
+
+        // ----------------------------------------------------
+        // REJECT EXTRA WORK / OVERTIME
+        //
+        // PATCH /api/payroll/extra-work/:id/reject
+        // ----------------------------------------------------
+
+        reject: async (
+            id,
+            data = {}
+        ) => {
+
+            const response =
+                await apiClient.patch(
+                    API.payroll.extraWork.reject(id),
+                    data
+                );
+
+            return unwrap(response);
+        },
     },
 
 
