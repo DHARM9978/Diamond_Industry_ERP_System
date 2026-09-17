@@ -1459,6 +1459,78 @@ const getAccumulatedExtraWork = async (
 
 
 
+
+// ============================================================
+// HELPER: Get Closed Extra Work For Payroll
+// ============================================================
+//
+// SETTLED records have already been paid and must not contribute
+// to the current overtime balance.
+//
+// REJECTED records have been closed as well and must not return
+// to the current overtime balance.
+//
+// This helper is intentionally scoped to one payroll so that
+// settlements covering multiple payroll periods do not cause
+// hours from one payroll to be subtracted from another.
+// ============================================================
+
+const getClosedExtraWorkForPayroll = async (
+    employeeId,
+    payrollId
+) => {
+
+    const records =
+        await prisma.extraWork.findMany({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                payrollId:
+                    Number(payrollId),
+
+                status: {
+                    in: [
+                        "SETTLED",
+                        "REJECTED"
+                    ]
+                }
+            },
+
+            orderBy: {
+
+                createdAt:
+                    "asc"
+            }
+        });
+
+    const closedHours =
+        roundMoney(
+            records.reduce(
+                (
+                    total,
+                    record
+                ) =>
+                    total +
+                    decimalToNumber(
+                        record.extraHours
+                    ),
+                0
+            )
+        );
+
+    return {
+
+        records,
+
+        closedHours
+    };
+};
+
+
+
 // ============================================================
 // HELPER: Get Paid Advances For Period
 // ============================================================
@@ -1874,17 +1946,55 @@ const decoratePayroll = async (
             )
         );
 
-    // Current unsettled extra-work balance.
-    // Keep the current unpaid payroll's extra-work row synchronized with
-    // live attendance. This also backfills ExtraWork for older unpaid
-    // payrolls that were created before extra-work persistence was added.
-    const existingExtraWork =
+    /*
+     * Extra-work accumulation is cycle based.
+     *
+     * liveAttendanceBreakdown.extraHours is the total overtime
+     * generated inside the payroll period. It is NOT the current
+     * unpaid overtime balance after previous settlements.
+     *
+     * Subtract only overtime records for this payroll that have
+     * already been closed as SETTLED or REJECTED. The remaining
+     * value is the employee's current accumulation cycle.
+     */
+    const closedExtraWork =
+        await getClosedExtraWorkForPayroll(
+            payroll.employeeId,
+            payroll.payrollId
+        );
+
+    const currentExtraHours =
+        Math.max(
+            0,
+            roundMoney(
+                liveAttendanceBreakdown.extraHours -
+                closedExtraWork.closedHours
+            )
+        );
+
+    /*
+     * Find only the currently active accumulation record.
+     *
+     * A SETTLED/REJECTED record is historical and is never reused.
+     * When the current balance becomes positive after a settlement,
+     * a new ACCUMULATED record is created for the new cycle.
+     */
+    const currentAccumulatedExtraWork =
         await prisma.extraWork.findFirst({
 
             where: {
 
+                employeeId:
+                    Number(payroll.employeeId),
+
                 payrollId:
-                    Number(payroll.payrollId)
+                    Number(payroll.payrollId),
+
+                status:
+                    "ACCUMULATED",
+
+                settlementId:
+                    null
             },
 
             orderBy: {
@@ -1895,52 +2005,89 @@ const decoratePayroll = async (
         });
 
     if (
-        existingExtraWork &&
-        existingExtraWork.status ===
-            "ACCUMULATED" &&
-        existingExtraWork.settlementId === null
+        currentExtraHours > 0
     ) {
 
+        if (
+            currentAccumulatedExtraWork
+        ) {
+
+            /*
+             * Update only the active cycle.
+             * Historical SETTLED/REJECTED rows remain unchanged.
+             */
+            await prisma.extraWork.update({
+
+                where: {
+
+                    extraWorkId:
+                        currentAccumulatedExtraWork.extraWorkId
+                },
+
+                data: {
+
+                    extraHours:
+                        currentExtraHours
+                }
+            });
+
+        } else {
+
+            /*
+             * A previous cycle has already been settled/rejected,
+             * so this is a new accumulation cycle.
+             */
+            await prisma.extraWork.create({
+
+                data: {
+
+                    employeeId:
+                        payroll.employeeId,
+
+                    payrollId:
+                        payroll.payrollId,
+
+                    extraHours:
+                        currentExtraHours,
+
+                    status:
+                        "ACCUMULATED"
+                }
+            });
+        }
+
+    } else if (
+        currentAccumulatedExtraWork &&
+        decimalToNumber(
+            currentAccumulatedExtraWork.extraHours
+        ) !== 0
+    ) {
+
+        /*
+         * No current overtime remains after closed historical
+         * overtime is deducted. Keep the active record at zero
+         * rather than carrying an old balance forward.
+         */
         await prisma.extraWork.update({
 
             where: {
 
                 extraWorkId:
-                    existingExtraWork.extraWorkId
+                    currentAccumulatedExtraWork.extraWorkId
             },
 
             data: {
 
                 extraHours:
-                    liveAttendanceBreakdown.extraHours
-            }
-        });
-
-    } else if (
-        !existingExtraWork &&
-        liveAttendanceBreakdown.extraHours > 0
-    ) {
-
-        await prisma.extraWork.create({
-
-            data: {
-
-                employeeId:
-                    payroll.employeeId,
-
-                payrollId:
-                    payroll.payrollId,
-
-                extraHours:
-                    liveAttendanceBreakdown.extraHours,
-
-                status:
-                    "ACCUMULATED"
+                    0
             }
         });
     }
 
-    // Current unsettled extra-work balance.
+    /*
+     * Current unsettled extra-work balance across the employee.
+     * Only ACCUMULATED records with no settlement are included.
+     */
     const accumulatedExtraWork =
         await getAccumulatedExtraWork(
             payroll.employeeId
@@ -1966,8 +2113,13 @@ const decoratePayroll = async (
         shortageDeduction:
             liveAttendanceBreakdown.shortageDeduction,
 
+        /*
+         * Show only the current unpaid overtime cycle.
+         * Previously this returned the full live payroll-period
+         * overtime, which caused already-settled hours to appear again.
+         */
         extraHours:
-            liveAttendanceBreakdown.extraHours,
+            currentExtraHours,
 
         // Regular salary is capped at expected hours.
         basicSalary:
