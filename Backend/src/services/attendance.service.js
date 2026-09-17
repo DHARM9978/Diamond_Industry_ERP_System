@@ -67,6 +67,54 @@ const getISTDateString = (date) => {
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 };
 
+// ======================================================
+// MYSQL DATE HELPERS
+// ======================================================
+//
+// Attendance.date is a MySQL DATE field, not a timestamp.
+// It must represent the IST calendar date itself.
+//
+// Do NOT use getStartOfDay()/getEndOfDay() for Attendance.date
+// queries or writes. Those helpers return UTC instants that
+// represent an IST day boundary and are intended for real
+// DateTime values such as AttendancePunch.punchedAt.
+//
+// For the DATE column, use a UTC-midnight Date whose calendar
+// components are the desired IST year/month/day. This prevents
+// MySQL from storing the previous calendar day (for example,
+// 17-Sep IST becoming 16-Sep in the database).
+// ======================================================
+
+const getISTCalendarDate = (date) => {
+    const {
+        year,
+        month,
+        day
+    } = getISTDateParts(date);
+
+    return new Date(
+        Date.UTC(
+            year,
+            month,
+            day,
+            0,
+            0,
+            0,
+            0
+        )
+    );
+};
+
+const getNextISTCalendarDate = (date) => {
+    const calendarDate =
+        getISTCalendarDate(date);
+
+    return new Date(
+        calendarDate.getTime() +
+        (24 * 60 * 60 * 1000)
+    );
+};
+
 
 // ======================================================
 // MYSQL TIME HELPERS
@@ -980,6 +1028,9 @@ const processDevicePunch = async (data) => {
                 // FIND ATTENDANCE
                 // ======================================
 
+                // Attendance.date is a MySQL DATE field.
+                // Use the pure IST calendar date here so the lookup
+                // matches the same value used when creating the row.
                 let attendance =
                     await tx.attendance.findUnique({
                         where: {
@@ -988,7 +1039,9 @@ const processDevicePunch = async (data) => {
                                     employee.employeeId,
 
                                 date:
-                                    startOfToday
+                                    getISTCalendarDate(
+                                        punchedAt
+                                    )
                             }
                         }
                     });
@@ -1007,7 +1060,7 @@ const processDevicePunch = async (data) => {
                                     employee.employeeId,
 
                                 date:
-                                    startOfToday,
+                                    getISTCalendarDate(punchedAt),
 
                                 checkInTime:
                                     punchType === "IN"
@@ -1156,12 +1209,12 @@ const getAllAttendance = async (
 
         where.date = {
             gte:
-                getStartOfDay(
+                getISTCalendarDate(
                     selectedDate
                 ),
 
             lt:
-                getEndOfDay(
+                getNextISTCalendarDate(
                     selectedDate
                 )
         };
@@ -1196,7 +1249,7 @@ const getAllAttendance = async (
             }
 
             where.date.gte =
-                getStartOfDay(
+                getISTCalendarDate(
                     fromDate
                 );
         }
@@ -1224,7 +1277,7 @@ const getAllAttendance = async (
             }
 
             where.date.lt =
-                getEndOfDay(
+                getNextISTCalendarDate(
                     toDate
                 );
         }
@@ -1394,7 +1447,7 @@ const getEmployeeAttendance = async (
             }
 
             where.date.gte =
-                getStartOfDay(
+                getISTCalendarDate(
                     fromDate
                 );
         }
@@ -1422,7 +1475,7 @@ const getEmployeeAttendance = async (
             }
 
             where.date.lt =
-                getEndOfDay(
+                getNextISTCalendarDate(
                     toDate
                 );
         }
@@ -1488,13 +1541,13 @@ const getAttendanceSummary = async (
     }
 
 
-    const startOfDay =
-        getStartOfDay(
+    const calendarDateStart =
+        getISTCalendarDate(
             targetDate
         );
 
-    const endOfDay =
-        getEndOfDay(
+    const calendarDateEnd =
+        getNextISTCalendarDate(
             targetDate
         );
 
@@ -1511,8 +1564,8 @@ const getAttendanceSummary = async (
         await prisma.attendance.findMany({
             where: {
                 date: {
-                    gte: startOfDay,
-                    lt: endOfDay
+                    gte: calendarDateStart,
+                    lt: calendarDateEnd
                 },
 
                 employee: {
@@ -1692,7 +1745,7 @@ const getEmployeeAttendanceSummary = async (
             }
 
             where.date.gte =
-                getStartOfDay(
+                getISTCalendarDate(
                     fromDate
                 );
         }
@@ -1720,7 +1773,7 @@ const getEmployeeAttendanceSummary = async (
             }
 
             where.date.lt =
-                getEndOfDay(
+                getNextISTCalendarDate(
                     toDate
                 );
         }
@@ -1941,9 +1994,9 @@ const getAttendancePaginated = async (
 
         where.date = {
             gte:
-                getStartOfDay(selectedDate),
+                getISTCalendarDate(selectedDate),
             lt:
-                getEndOfDay(selectedDate)
+                getNextISTCalendarDate(selectedDate)
         };
     }
     else if (from || to) {
@@ -1967,7 +2020,7 @@ const getAttendancePaginated = async (
             }
 
             where.date.gte =
-                getStartOfDay(fromDate);
+                getISTCalendarDate(fromDate);
         }
 
         if (to) {
@@ -1988,7 +2041,7 @@ const getAttendancePaginated = async (
             }
 
             where.date.lt =
-                getEndOfDay(toDate);
+                getNextISTCalendarDate(toDate);
         }
     }
 
