@@ -397,14 +397,23 @@ const getAttendance = async (req, res) => {
     console.log("URL:", req.originalUrl);
     console.log("METHOD:", req.method);
     console.log("======================================");
+
     const {
         date,
         from,
         to,
         employeeId,
+        status,
         page,
         limit
     } = req.query;
+
+
+    const companyId =
+        Number(
+            req.user?.companyId
+        );
+
 
     const result =
         await attendanceService.getAttendancePaginated({
@@ -412,9 +421,12 @@ const getAttendance = async (req, res) => {
             from,
             to,
             employeeId,
+            status,
+            companyId,
             page,
             limit
         });
+
 
     return res.status(200).json({
         success: true,
@@ -435,7 +447,10 @@ const getAttendance = async (req, res) => {
             employeeId:
                 employeeId
                     ? Number(employeeId)
-                    : null
+                    : null,
+
+            status:
+                status || null
         },
 
         data:
@@ -445,6 +460,7 @@ const getAttendance = async (req, res) => {
             result.pagination
     });
 };
+
 
 // Get raw punch history for one employee.
 const getEmployeePunchHistory =

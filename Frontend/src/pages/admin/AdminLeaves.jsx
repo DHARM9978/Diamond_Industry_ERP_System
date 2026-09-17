@@ -4,6 +4,9 @@ import {
   Check,
   X,
   RefreshCw,
+  Filter,
+  Search,
+  RotateCcw,
 } from 'lucide-react';
 
 import {
@@ -16,82 +19,283 @@ import { FullPageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Form';
 import { useToast } from '@/context/ToastContext';
+
 import { leaveService } from '@/services/apiServices';
 
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const STATUS_OPTIONS = [
+  {
+    value: '',
+    label: 'All Statuses',
+  },
+  {
+    value: 'PENDING',
+    label: 'Pending',
+  },
+  {
+    value: 'APPROVED',
+    label: 'Approved',
+  },
+  {
+    value: 'REJECTED',
+    label: 'Rejected',
+  },
+  {
+    value: 'CANCELLED',
+    label: 'Cancelled',
+  },
+];
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+const getErrorMessage = (error, fallback) => {
+  return (
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.message ||
+    fallback
+  );
+};
+
+
+const getEmployeeName = (leave) => {
+  const firstName =
+    leave?.employee?.firstName || '';
+
+  const lastName =
+    leave?.employee?.lastName || '';
+
+  const fullName =
+    `${firstName} ${lastName}`.trim();
+
+  return (
+    fullName ||
+    leave?.employee?.email ||
+    'Unknown Employee'
+  );
+};
+
+
+const formatDate = (date) => {
+  if (!date) {
+    return '-';
+  }
+
+  const parsedDate =
+    new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+    return '-';
+  }
+
+  return parsedDate.toLocaleDateString(
+    'en-IN',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }
+  );
+};
+
+
+const formatDateTime = (date) => {
+  if (!date) {
+    return '-';
+  }
+
+  const parsedDate =
+    new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+    return '-';
+  }
+
+  return parsedDate.toLocaleString(
+    'en-IN',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }
+  );
+};
+
+
+const getRequestTime = (leave) => {
+  const createdAt =
+    leave?.createdAt;
+
+  if (createdAt) {
+    const timestamp =
+      new Date(createdAt).getTime();
+
+    if (
+      Number.isFinite(timestamp)
+    ) {
+      return timestamp;
+    }
+  }
+
+  /*
+   * Fallback for older records where
+   * createdAt may not be available.
+   *
+   * leaveRequestId is monotonically
+   * increasing in the current schema,
+   * so it still gives a deterministic
+   * latest-first ordering.
+   */
+  const requestId =
+    Number(
+      leave?.leaveRequestId
+    );
+
+  return Number.isFinite(requestId)
+    ? requestId
+    : 0;
+};
+
+
+const sortNewestFirst = (records) => {
+  return [...records].sort(
+    (a, b) => {
+      const timeDifference =
+        getRequestTime(b) -
+        getRequestTime(a);
+
+      if (
+        timeDifference !== 0
+      ) {
+        return timeDifference;
+      }
+
+      /*
+       * Stable secondary ordering.
+       */
+      return (
+        Number(
+          b?.leaveRequestId || 0
+        ) -
+        Number(
+          a?.leaveRequestId || 0
+        )
+      );
+    }
+  );
+};
+
+
+// ============================================================
+// ADMIN LEAVE REQUESTS
+// ============================================================
 
 export function AdminLeaves() {
   const { toast } = useToast();
 
-  const [leaves, setLeaves] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(null);
-  const [search, setSearch] = useState('');
+  // ==========================================================
+  // DATA
+  // ==========================================================
 
-  /**
-   * --------------------------------------------------
-   * Approval modal state
-   * --------------------------------------------------
-   */
-  const [approveModalOpen, setApproveModalOpen] =
+  const [leaves, setLeaves] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [refreshing, setRefreshing] =
     useState(false);
 
-  const [selectedLeave, setSelectedLeave] =
+  const [actionLoading, setActionLoading] =
     useState(null);
 
-  const [approvedStartDate, setApprovedStartDate] =
+  // ==========================================================
+  // FILTERS
+  // ==========================================================
+
+  const [search, setSearch] =
     useState('');
 
-  const [approvedEndDate, setApprovedEndDate] =
+  const [statusFilter, setStatusFilter] =
     useState('');
 
-  /**
-   * --------------------------------------------------
-   * Reject modal state
-   * --------------------------------------------------
-   */
-  const [rejectModalOpen, setRejectModalOpen] =
-    useState(false);
-
-  const [rejectionReason, setRejectionReason] =
+  const [leaveTypeFilter, setLeaveTypeFilter] =
     useState('');
 
+  // ==========================================================
+  // LOAD LEAVE REQUESTS
+  // ==========================================================
 
-  // --------------------------------------------------
-  // Load leave requests
-  // --------------------------------------------------
-  const loadLeaves = async () => {
+  const loadLeaves = async (
+    showRefresh = false
+  ) => {
     try {
-      setLoading(true);
-
-      const response =
-        await leaveService.requests();
+      if (showRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
 
       /*
-       * Backend response may be:
+       * The backend already supports:
        *
-       * [
-       *   ...
-       * ]
+       * GET /api/leave-requests?status=PENDING
        *
-       * OR:
+       * The current leave request service also
+       * orders requests by createdAt DESC.
        *
-       * {
-       *   success: true,
-       *   data: [...]
-       * }
+       * We still sort the returned data on the
+       * frontend as a defensive guarantee so the
+       * newest request remains first after local
+       * approve/reject updates.
        */
+      const params = {};
+
+      if (statusFilter) {
+        params.status =
+          statusFilter;
+      }
+
+      const response =
+        await leaveService.requests(
+          params
+        );
 
       let records = [];
 
-      if (Array.isArray(response)) {
+      if (
+        Array.isArray(response)
+      ) {
         records = response;
       } else if (
-        Array.isArray(response?.data)
+        Array.isArray(
+          response?.data
+        )
       ) {
-        records = response.data;
+        records =
+          response.data;
       }
 
-      setLeaves(records);
+      setLeaves(
+        sortNewestFirst(records)
+      );
     } catch (error) {
       console.error(
         'Failed to load leave requests:',
@@ -101,506 +305,410 @@ export function AdminLeaves() {
       setLeaves([]);
 
       toast(
-        error?.response?.data?.message ||
-          error?.message ||
-          'Failed to load leave requests',
+        getErrorMessage(
+          error,
+          'Failed to load leave requests'
+        ),
         'error'
       );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
+
+  // ==========================================================
+  // INITIAL LOAD + STATUS REFRESH
+  // ==========================================================
 
   useEffect(() => {
     loadLeaves();
-  }, []);
+  }, [statusFilter]);
 
 
-  // --------------------------------------------------
-  // Format date
-  // --------------------------------------------------
-  const formatDate = (date) => {
-    if (!date) return '-';
+  // ==========================================================
+  // DERIVED LEAVE TYPES
+  // ==========================================================
 
-    const parsedDate = new Date(date);
+  const leaveTypeOptions =
+    useMemo(() => {
+      const map =
+        new Map();
 
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-      return '-';
-    }
+      leaves.forEach(
+        (leave) => {
+          const id =
+            leave?.leaveType
+              ?.leaveTypeId ??
+            leave?.leaveTypeId;
 
-    return parsedDate.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
-  };
+          const name =
+            leave?.leaveType?.name ||
+            leave?.leaveType?.leaveTypeName ||
+            (id
+              ? `Leave Type ${id}`
+              : '');
 
-
-  // --------------------------------------------------
-  // Convert date to YYYY-MM-DD for input
-  // --------------------------------------------------
-  const formatInputDate = (date) => {
-    if (!date) return '';
-
-    const parsedDate = new Date(date);
-
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-      return '';
-    }
-
-    const year =
-      parsedDate.getFullYear();
-
-    const month =
-      String(
-        parsedDate.getMonth() + 1
-      ).padStart(2, '0');
-
-    const day =
-      String(
-        parsedDate.getDate()
-      ).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  };
-
-
-  // --------------------------------------------------
-  // Employee name
-  // --------------------------------------------------
-  const getEmployeeName = (leave) => {
-    const firstName =
-      leave?.employee?.firstName || '';
-
-    const lastName =
-      leave?.employee?.lastName || '';
-
-    const fullName =
-      `${firstName} ${lastName}`.trim();
-
-    return (
-      fullName ||
-      'Unknown Employee'
-    );
-  };
-
-
-  // --------------------------------------------------
-  // Open approve modal
-  // --------------------------------------------------
-  const openApproveModal = (leave) => {
-    if (!leave?.leaveRequestId) {
-      return;
-    }
-
-    setSelectedLeave(leave);
-
-    /**
-     * By default, approve the complete
-     * originally requested range.
-     */
-    setApprovedStartDate(
-      formatInputDate(
-        leave.startDate
-      )
-    );
-
-    setApprovedEndDate(
-      formatInputDate(
-        leave.endDate
-      )
-    );
-
-    setApproveModalOpen(true);
-  };
-
-
-  // --------------------------------------------------
-  // Close approve modal
-  // --------------------------------------------------
-  const closeApproveModal = () => {
-    if (
-      actionLoading !== null
-    ) {
-      return;
-    }
-
-    setApproveModalOpen(false);
-
-    setSelectedLeave(null);
-
-    setApprovedStartDate('');
-
-    setApprovedEndDate('');
-  };
-
-
-  // --------------------------------------------------
-  // Approve leave
-  // --------------------------------------------------
-  const handleApprove = async () => {
-    const id =
-      selectedLeave?.leaveRequestId;
-
-    if (!id) {
-      return;
-    }
-
-
-    /**
-     * Approval dates are required.
-     */
-    if (
-      !approvedStartDate ||
-      !approvedEndDate
-    ) {
-      toast(
-        'Approved start date and end date are required',
-        'error'
-      );
-
-      return;
-    }
-
-
-    /**
-     * Convert strings to Date objects.
-     *
-     * Using T00:00:00 avoids browser inconsistencies.
-     */
-    const requestedStart =
-      new Date(
-        `${formatInputDate(
-          selectedLeave.startDate
-        )}T00:00:00`
-      );
-
-    const requestedEnd =
-      new Date(
-        `${formatInputDate(
-          selectedLeave.endDate
-        )}T00:00:00`
-      );
-
-    const approvedStart =
-      new Date(
-        `${approvedStartDate}T00:00:00`
-      );
-
-    const approvedEnd =
-      new Date(
-        `${approvedEndDate}T00:00:00`
-      );
-
-
-    /**
-     * Validate dates.
-     */
-    if (
-      Number.isNaN(
-        approvedStart.getTime()
-      ) ||
-      Number.isNaN(
-        approvedEnd.getTime()
-      )
-    ) {
-      toast(
-        'Please select valid approval dates',
-        'error'
-      );
-
-      return;
-    }
-
-
-    /**
-     * Start cannot be after end.
-     */
-    if (
-      approvedStart >
-      approvedEnd
-    ) {
-      toast(
-        'Approved end date cannot be before approved start date',
-        'error'
-      );
-
-      return;
-    }
-
-
-    /**
-     * Approved range must remain
-     * inside requested range.
-     */
-    if (
-      approvedStart <
-        requestedStart ||
-      approvedEnd >
-        requestedEnd
-    ) {
-      toast(
-        'Approved dates must be within the requested date range',
-        'error'
-      );
-
-      return;
-    }
-
-
-    try {
-      setActionLoading(
-        `approve-${id}`
-      );
-
-
-      /**
-       * Send approved date range
-       * to backend.
-       */
-      await leaveService.approve(
-        id,
-        {
-          approvedStartDate,
-          approvedEndDate,
+          if (
+            id !== undefined &&
+            id !== null &&
+            name
+          ) {
+            map.set(
+              String(id),
+              name
+            );
+          }
         }
       );
 
-
-      toast(
-        'Leave request approved successfully',
-        'success'
-      );
-
-
-      /**
-       * Close modal.
-       */
-      setApproveModalOpen(false);
-
-      setSelectedLeave(null);
-
-      setApprovedStartDate('');
-
-      setApprovedEndDate('');
-
-
-      /**
-       * Reload records so the UI receives
-       * approvedStartDate, approvedEndDate
-       * and approvedDays from backend.
-       */
-      await loadLeaves();
-    } catch (error) {
-      console.error(
-        'Approve leave error:',
-        error
-      );
-
-      toast(
-        error?.response?.data?.message ||
-          error?.message ||
-          'Failed to approve leave request',
-        'error'
-      );
-    } finally {
-      setActionLoading(null);
-    }
-  };
+      return Array.from(
+        map.entries()
+      )
+        .map(
+          ([value, label]) => ({
+            value,
+            label,
+          })
+        )
+        .sort(
+          (a, b) =>
+            a.label.localeCompare(
+              b.label
+            )
+        );
+    }, [leaves]);
 
 
-  // --------------------------------------------------
-  // Open reject modal
-  // --------------------------------------------------
-  const openRejectModal = (leave) => {
-    if (!leave?.leaveRequestId) {
-      return;
-    }
+  // ==========================================================
+  // SEARCH + LEAVE TYPE FILTER
+  // ==========================================================
 
-    setSelectedLeave(leave);
-
-    setRejectionReason('');
-
-    setRejectModalOpen(true);
-  };
-
-
-  // --------------------------------------------------
-  // Close reject modal
-  // --------------------------------------------------
-  const closeRejectModal = () => {
-    if (
-      actionLoading !== null
-    ) {
-      return;
-    }
-
-    setRejectModalOpen(false);
-
-    setSelectedLeave(null);
-
-    setRejectionReason('');
-  };
-
-
-  // --------------------------------------------------
-  // Reject leave
-  // --------------------------------------------------
-  const handleReject = async () => {
-    const id =
-      selectedLeave?.leaveRequestId;
-
-    if (!id) {
-      return;
-    }
-
-
-    try {
-      setActionLoading(
-        `reject-${id}`
-      );
-
-
-      /**
-       * Send rejection reason to backend.
-       *
-       * Empty reason is allowed by the backend,
-       * but a reason is recommended.
-       */
-      await leaveService.reject(
-        id,
-        {
-          rejectionReason:
-            rejectionReason.trim(),
-        }
-      );
-
-
-      toast(
-        'Leave request rejected successfully',
-        'warning'
-      );
-
-
-      setRejectModalOpen(false);
-
-      setSelectedLeave(null);
-
-      setRejectionReason('');
-
-
-      /**
-       * Reload so the table receives
-       * the latest status/rejection data.
-       */
-      await loadLeaves();
-    } catch (error) {
-      console.error(
-        'Reject leave error:',
-        error
-      );
-
-      toast(
-        error?.response?.data?.message ||
-          error?.message ||
-          'Failed to reject leave request',
-        'error'
-      );
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-
-  // --------------------------------------------------
-  // Search
-  // --------------------------------------------------
   const filtered = useMemo(() => {
     const searchTerm =
-      search.trim().toLowerCase();
+      search
+        .trim()
+        .toLowerCase();
 
-    if (!searchTerm) {
-      return leaves;
-    }
+    const result =
+      leaves.filter(
+        (leave) => {
+          // ---------------------------------------------------
+          // Status
+          // ---------------------------------------------------
 
-    return leaves.filter(
-      (leave) => {
-        const employeeName =
-          getEmployeeName(
-            leave
-          ).toLowerCase();
+          if (
+            statusFilter &&
+            String(
+              leave?.status ?? ''
+            ).toUpperCase() !==
+              statusFilter
+          ) {
+            return false;
+          }
 
-        const employeeId =
-          String(
-            leave?.employeeId ?? ''
-          ).toLowerCase();
+          // ---------------------------------------------------
+          // Leave type
+          // ---------------------------------------------------
 
-        const leaveType =
-          String(
-            leave?.leaveType?.name ?? ''
-          ).toLowerCase();
+          if (
+            leaveTypeFilter
+          ) {
+            const rowLeaveTypeId =
+              leave?.leaveType
+                ?.leaveTypeId ??
+              leave?.leaveTypeId;
 
-        const leaveCode =
-          String(
-            leave?.leaveType?.code ?? ''
-          ).toLowerCase();
+            if (
+              String(
+                rowLeaveTypeId ?? ''
+              ) !==
+              String(
+                leaveTypeFilter
+              )
+            ) {
+              return false;
+            }
+          }
 
-        const reason =
-          String(
-            leave?.reason ?? ''
-          ).toLowerCase();
+          // ---------------------------------------------------
+          // Search
+          // ---------------------------------------------------
 
-        const status =
-          String(
-            leave?.status ?? ''
-          ).toLowerCase();
+          if (!searchTerm) {
+            return true;
+          }
 
-        return (
-          employeeName.includes(
-            searchTerm
-          ) ||
-          employeeId.includes(
-            searchTerm
-          ) ||
-          leaveType.includes(
-            searchTerm
-          ) ||
-          leaveCode.includes(
-            searchTerm
-          ) ||
-          reason.includes(
-            searchTerm
-          ) ||
-          status.includes(
-            searchTerm
-          )
+          const employeeName =
+            getEmployeeName(
+              leave
+            ).toLowerCase();
+
+          const employeeId =
+            String(
+              leave?.employeeId ??
+              ''
+            ).toLowerCase();
+
+          const employeeEmail =
+            String(
+              leave?.employee?.email ??
+              ''
+            ).toLowerCase();
+
+          const leaveTypeName =
+            String(
+              leave?.leaveType?.name ??
+              leave?.leaveType?.leaveTypeName ??
+              ''
+            ).toLowerCase();
+
+          const leaveCode =
+            String(
+              leave?.leaveType?.code ??
+              ''
+            ).toLowerCase();
+
+          const reason =
+            String(
+              leave?.reason ??
+              ''
+            ).toLowerCase();
+
+          const status =
+            String(
+              leave?.status ??
+              ''
+            ).toLowerCase();
+
+          const requestId =
+            String(
+              leave?.leaveRequestId ??
+              ''
+            ).toLowerCase();
+
+          return (
+            employeeName.includes(
+              searchTerm
+            ) ||
+            employeeId.includes(
+              searchTerm
+            ) ||
+            employeeEmail.includes(
+              searchTerm
+            ) ||
+            leaveTypeName.includes(
+              searchTerm
+            ) ||
+            leaveCode.includes(
+              searchTerm
+            ) ||
+            reason.includes(
+              searchTerm
+            ) ||
+            status.includes(
+              searchTerm
+            ) ||
+            requestId.includes(
+              searchTerm
+            )
+          );
+        }
+      );
+
+    return sortNewestFirst(
+      result
+    );
+  }, [
+    leaves,
+    search,
+    statusFilter,
+    leaveTypeFilter,
+  ]);
+
+
+  // ==========================================================
+  // CLEAR FILTERS
+  // ==========================================================
+
+  const clearFilters = () => {
+    setSearch('');
+    setStatusFilter('');
+    setLeaveTypeFilter('');
+  };
+
+
+  const hasActiveFilters =
+    Boolean(
+      search.trim()
+    ) ||
+    Boolean(
+      statusFilter
+    ) ||
+    Boolean(
+      leaveTypeFilter
+    );
+
+
+  // ==========================================================
+  // APPROVE
+  // ==========================================================
+
+  const handleApprove =
+    async (id) => {
+      if (!id) {
+        return;
+      }
+
+      try {
+        setActionLoading(
+          `approve-${id}`
+        );
+
+        const response =
+          await leaveService.approve(
+            id
+          );
+
+        /*
+         * Update the UI only after the
+         * API successfully approves the
+         * request.
+         */
+        setLeaves(
+          (previous) =>
+            sortNewestFirst(
+              previous.map(
+                (leave) =>
+                  leave.leaveRequestId === id
+                    ? {
+                        ...leave,
+                        status:
+                          'APPROVED',
+                        approvedAt:
+                          response?.approvedAt ??
+                          leave.approvedAt ??
+                          new Date().toISOString(),
+                      }
+                    : leave
+              )
+            )
+        );
+
+        toast(
+          'Leave request approved successfully',
+          'success'
+        );
+      } catch (error) {
+        console.error(
+          'Approve leave error:',
+          error
+        );
+
+        toast(
+          getErrorMessage(
+            error,
+            'Failed to approve leave request'
+          ),
+          'error'
+        );
+      } finally {
+        setActionLoading(
+          null
         );
       }
-    );
-  }, [leaves, search]);
+    };
 
 
-  // --------------------------------------------------
-  // Table columns
-  // --------------------------------------------------
+  // ==========================================================
+  // REJECT
+  // ==========================================================
+
+  const handleReject =
+    async (id) => {
+      if (!id) {
+        return;
+      }
+
+      try {
+        setActionLoading(
+          `reject-${id}`
+        );
+
+        const response =
+          await leaveService.reject(
+            id
+          );
+
+        /*
+         * Update the UI only after the
+         * API successfully rejects the
+         * request.
+         */
+        setLeaves(
+          (previous) =>
+            sortNewestFirst(
+              previous.map(
+                (leave) =>
+                  leave.leaveRequestId === id
+                    ? {
+                        ...leave,
+                        status:
+                          'REJECTED',
+                        rejectedAt:
+                          response?.rejectedAt ??
+                          leave.rejectedAt ??
+                          new Date().toISOString(),
+                      }
+                    : leave
+              )
+            )
+        );
+
+        toast(
+          'Leave request rejected successfully',
+          'warning'
+        );
+      } catch (error) {
+        console.error(
+          'Reject leave error:',
+          error
+        );
+
+        toast(
+          getErrorMessage(
+            error,
+            'Failed to reject leave request'
+          ),
+          'error'
+        );
+      } finally {
+        setActionLoading(
+          null
+        );
+      }
+    };
+
+
+  // ==========================================================
+  // TABLE COLUMNS
+  // ==========================================================
+
   const columns = [
     {
+      key: 'leaveRequestId',
+      label: 'Request ID',
+      render: (row) => (
+        <span className="font-mono text-xs font-semibold text-navy-600">
+          #{row.leaveRequestId}
+        </span>
+      ),
+    },
+
+    {
       key: 'employeeId',
-
       label: 'Emp ID',
-
       render: (row) => (
         <span className="font-mono text-xs font-semibold text-navy-600">
           {row.employeeId}
@@ -608,12 +716,9 @@ export function AdminLeaves() {
       ),
     },
 
-
     {
       key: 'employee',
-
       label: 'Employee',
-
       render: (row) => (
         <div>
           <div className="font-medium text-navy-900">
@@ -629,169 +734,114 @@ export function AdminLeaves() {
       ),
     },
 
-
     {
       key: 'leaveType',
-
       label: 'Type',
-
       render: (row) => (
         <div>
           <span className="text-navy-700">
-            {row.leaveType?.name ||
-              '-'}
+            {
+              row.leaveType?.name ||
+              row.leaveType?.leaveTypeName ||
+              '-'
+            }
           </span>
 
           {row.leaveType?.code && (
             <span className="ml-2 text-xs text-navy-400">
-              (
-              {row.leaveType.code}
-              )
+              ({row.leaveType.code})
             </span>
           )}
         </div>
       ),
     },
 
-
-    /**
-     * Requested dates
-     */
     {
-      key: 'requestedDates',
-
-      label: 'Requested',
-
+      key: 'startDate',
+      label: 'Start',
       render: (row) => (
-        <div className="text-sm">
-          <div className="text-navy-600">
-            {formatDate(
-              row.startDate
-            )}
-          </div>
-
-          <div className="text-xs text-navy-400">
-            to{' '}
-            {formatDate(
-              row.endDate
-            )}
-          </div>
-
-          <div className="mt-1 font-semibold text-navy-700">
-            {row.totalDays ?? '-'} day
-            {Number(
-              row.totalDays
-            ) === 1
-              ? ''
-              : 's'}
-          </div>
-        </div>
+        <span className="text-navy-600">
+          {formatDate(
+            row.startDate
+          )}
+        </span>
       ),
     },
 
-
-    /**
-     * Approved dates
-     */
     {
-      key: 'approvedDates',
-
-      label: 'Approved',
-
-      render: (row) => {
-        if (
-          row.status !==
-          'APPROVED'
-        ) {
-          return (
-            <span className="text-xs text-navy-300">
-              —
-            </span>
-          );
-        }
-
-        return (
-          <div className="text-sm">
-            <div className="font-medium text-success-700">
-              {formatDate(
-                row.approvedStartDate
-              )}
-            </div>
-
-            <div className="text-xs text-navy-400">
-              to{' '}
-              {formatDate(
-                row.approvedEndDate
-              )}
-            </div>
-
-            <div className="mt-1 font-semibold text-success-700">
-              {row.approvedDays ?? '-'} day
-              {Number(
-                row.approvedDays
-              ) === 1
-                ? ''
-                : 's'}
-            </div>
-          </div>
-        );
-      },
+      key: 'endDate',
+      label: 'End',
+      render: (row) => (
+        <span className="text-navy-600">
+          {formatDate(
+            row.endDate
+          )}
+        </span>
+      ),
     },
 
+    {
+      key: 'totalDays',
+      label: 'Days',
+      align: 'center',
+      render: (row) => (
+        <span className="font-semibold text-navy-700">
+          {row.totalDays}
+        </span>
+      ),
+    },
 
     {
       key: 'reason',
-
       label: 'Reason',
-
       render: (row) => (
         <span
-          className="text-sm text-navy-500"
-          title={row.reason || ''}
+          className="block max-w-xs truncate text-sm text-navy-500"
+          title={
+            row.reason || ''
+          }
         >
           {row.reason || '-'}
         </span>
       ),
     },
 
-
     {
-      key: 'status',
-
-      label: 'Status',
-
-      align: 'center',
-
+      key: 'createdAt',
+      label: 'Requested On',
       render: (row) => (
-        <div className="flex flex-col items-center gap-1">
-          <StatusBadge
-            status={row.status}
-          />
-
-          {row.status ===
-            'REJECTED' &&
-            row.rejectionReason && (
-              <span
-                className="max-w-[180px] truncate text-xs text-error-600"
-                title={
-                  row.rejectionReason
-                }
-              >
-                {row.rejectionReason}
-              </span>
-            )}
-        </div>
+        <span
+          className="whitespace-nowrap text-sm text-navy-600"
+          title={
+            row.createdAt
+              ? formatDateTime(
+                  row.createdAt
+                )
+              : ''
+          }
+        >
+          {formatDate(
+            row.createdAt
+          )}
+        </span>
       ),
     },
 
+    {
+      key: 'status',
+      label: 'Status',
+      align: 'center',
+      render: (row) => (
+        <StatusBadge
+          status={row.status}
+        />
+      ),
+    },
 
     {
       key: 'actions',
-
       label: 'Actions',
-
       align: 'right',
-
       render: (row) => {
         const isPending =
           row.status ===
@@ -805,70 +855,102 @@ export function AdminLeaves() {
           actionLoading ===
           `reject-${row.leaveRequestId}`;
 
-
         if (!isPending) {
           return (
-            <span className="text-navy-300 text-xs">
+            <span className="text-xs text-navy-300">
               —
             </span>
           );
         }
 
-
         return (
           <div className="flex items-center justify-end gap-2">
-
-            {/* Approve */}
             <button
               type="button"
               onClick={() =>
-                openApproveModal(
-                  row
+                handleApprove(
+                  row.leaveRequestId
                 )
               }
               disabled={
-                approving ||
-                rejecting
+                Boolean(
+                  actionLoading
+                )
               }
-              className="p-2 rounded-lg bg-success-100 text-success-700 hover:bg-success-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="
+                inline-flex
+                items-center
+                gap-1.5
+                rounded-lg
+                bg-success-100
+                px-3
+                py-2
+                text-xs
+                font-semibold
+                text-success-700
+                transition-colors
+                hover:bg-success-200
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
               title="Approve"
             >
               {approving ? (
                 <RefreshCw
-                  size={16}
+                  size={14}
                   className="animate-spin"
                 />
               ) : (
                 <Check
-                  size={16}
+                  size={14}
                 />
               )}
+
+              Approve
             </button>
 
-
-            {/* Reject */}
             <button
               type="button"
               onClick={() =>
-                openRejectModal(
-                  row
+                handleReject(
+                  row.leaveRequestId
                 )
               }
               disabled={
-                approving ||
-                rejecting
+                Boolean(
+                  actionLoading
+                )
               }
-              className="p-2 rounded-lg bg-error-100 text-error-700 hover:bg-error-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="
+                inline-flex
+                items-center
+                gap-1.5
+                rounded-lg
+                bg-error-100
+                px-3
+                py-2
+                text-xs
+                font-semibold
+                text-error-700
+                transition-colors
+                hover:bg-error-200
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
               title="Reject"
             >
               {rejecting ? (
                 <RefreshCw
-                  size={16}
+                  size={14}
                   className="animate-spin"
                 />
               ) : (
-                <X size={16} />
+                <X
+                  size={14}
+                />
               )}
+
+              Reject
             </button>
           </div>
         );
@@ -877,9 +959,10 @@ export function AdminLeaves() {
   ];
 
 
-  // --------------------------------------------------
-  // Loading
-  // --------------------------------------------------
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
   if (loading) {
     return (
       <FullPageSpinner
@@ -889,400 +972,345 @@ export function AdminLeaves() {
   }
 
 
-  // --------------------------------------------------
+  // ==========================================================
   // UI
-  // --------------------------------------------------
+  // ==========================================================
+
   return (
-    <div>
+    <div className="space-y-5">
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
       <PageHeader
         title="Leave Requests"
-        subtitle={`${filtered.length} request${
-          filtered.length !== 1
-            ? 's'
-            : ''
+        subtitle={`${filtered.length} ${
+          filtered.length === 1
+            ? 'request'
+            : 'requests'
         }`}
       />
 
 
-      <div className="mb-5 flex items-center gap-3">
-        <div className="flex-1">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by employee, leave type, ID..."
-          />
+      {/* ======================================================
+          FILTER BAR
+      ====================================================== */}
+
+      <div className="card p-4 sm:p-5">
+        <div className="flex flex-col">
+
+          {/* Filter header */}
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-navy-100 pb-4">
+
+            <div className="flex items-center gap-2">
+              <Filter
+                size={18}
+                className="text-navy-500"
+              />
+
+              <h2 className="text-sm font-semibold text-navy-800">
+                Filters
+              </h2>
+
+              {hasActiveFilters && (
+                <span className="rounded-full bg-accent-100 px-2 py-0.5 text-xs font-semibold text-accent-700">
+                  Active
+                </span>
+              )}
+            </div>
+
+            <div className="text-xs text-navy-400">
+              Click a status to filter instantly
+            </div>
+          </div>
+
+
+          {/* Main filter controls */}
+
+          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-end">
+
+            {/* Search */}
+
+            <div className="lg:col-span-6">
+              <label
+                htmlFor="leave-search"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Search
+              </label>
+
+              <SearchInput
+                id="leave-search"
+                value={search}
+                onChange={setSearch}
+                placeholder="Search employee, ID, type, reason..."
+              />
+            </div>
+
+
+            {/* Leave Type */}
+
+            <div className="lg:col-span-3">
+              <label
+                htmlFor="leave-type-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Leave Type
+              </label>
+
+              <select
+                id="leave-type-filter"
+                value={leaveTypeFilter}
+                onChange={(event) =>
+                  setLeaveTypeFilter(
+                    event.target.value
+                  )
+                }
+                className="
+                  h-10
+                  w-full
+                  rounded-lg
+                  border
+                  border-navy-200
+                  bg-white
+                  px-3
+                  py-2.5
+                  text-sm
+                  text-navy-800
+                  outline-none
+                  transition
+                  focus:border-accent-400
+                  focus:ring-2
+                  focus:ring-accent-100
+                "
+              >
+                <option value="">
+                  All Leave Types
+                </option>
+
+                {leaveTypeOptions.map(
+                  (option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                    >
+                      {option.label}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+
+            {/* Actions */}
+
+            <div className="flex gap-2 lg:col-span-3">
+              <button
+                type="button"
+                onClick={clearFilters}
+                disabled={!hasActiveFilters}
+                className="
+                  inline-flex
+                  h-10
+                  flex-1
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  border
+                  border-navy-200
+                  bg-white
+                  px-3
+                  text-sm
+                  font-medium
+                  text-navy-700
+                  transition-colors
+                  hover:bg-navy-50
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                "
+              >
+                <RotateCcw size={15} />
+                Clear
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  loadLeaves(true)
+                }
+                disabled={refreshing}
+                className="
+                  inline-flex
+                  h-10
+                  flex-1
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-lg
+                  border
+                  border-navy-200
+                  bg-white
+                  px-3
+                  text-sm
+                  font-medium
+                  text-navy-700
+                  transition-colors
+                  hover:bg-navy-50
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
+                title="Refresh leave requests"
+              >
+                <RefreshCw
+                  size={15}
+                  className={
+                    refreshing
+                      ? 'animate-spin'
+                      : ''
+                  }
+                />
+                Refresh
+              </button>
+            </div>
+
+          </div>
+
+
+          {/* Quick status filters */}
+
+          <div className="mt-4 border-t border-navy-100 pt-4">
+
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="text-xs font-medium text-navy-500">
+                Status
+              </label>
+
+              <span className="text-xs text-navy-400">
+                {statusFilter
+                  ? `${statusFilter.charAt(0)}${statusFilter.slice(1).toLowerCase()} requests`
+                  : 'All requests'}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {STATUS_OPTIONS.map(
+                (option) => {
+                  const isSelected =
+                    statusFilter ===
+                    option.value;
+
+                  const label =
+                    option.value === ''
+                      ? 'All'
+                      : option.label;
+
+                  return (
+                    <button
+                      key={
+                        option.value ||
+                        'ALL'
+                      }
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter(
+                          option.value
+                        );
+                        setLeaveTypeFilter(
+                          ''
+                        );
+                      }}
+                      className={`
+                        inline-flex
+                        h-9
+                        min-w-[92px]
+                        items-center
+                        justify-center
+                        rounded-lg
+                        border
+                        px-4
+                        text-sm
+                        font-semibold
+                        transition-all
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-accent-200
+                        ${
+                          isSelected
+                            ? 'border-accent-600 bg-accent-600 text-white shadow-sm'
+                            : 'border-navy-200 bg-white text-navy-700 hover:border-navy-300 hover:bg-navy-50'
+                        }
+                      `}
+                    >
+                      {label}
+                    </button>
+                  );
+                }
+              )}
+            </div>
+          </div>
+
+
+          {/* Result summary */}
+
+          <div className="mt-4 flex flex-col gap-2 border-t border-navy-100 pt-4 text-xs text-navy-500 sm:flex-row sm:items-center sm:justify-between">
+
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <Search size={14} />
+
+              <span>
+                Showing{' '}
+                <strong className="text-navy-700">
+                  {filtered.length}
+                </strong>{' '}
+                of{' '}
+                <strong className="text-navy-700">
+                  {leaves.length}
+                </strong>{' '}
+                loaded requests
+              </span>
+            </div>
+
+            <span className="text-navy-400">
+              Newest requests appear first
+            </span>
+          </div>
+
         </div>
-
-
-        <button
-          type="button"
-          onClick={loadLeaves}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
-          title="Refresh"
-        >
-          <RefreshCw size={16} />
-
-          Refresh
-        </button>
       </div>
 
 
+      {/* ======================================================
+          TABLE / EMPTY STATE
+      ====================================================== */}
+
       {filtered.length === 0 ? (
-        <EmptyState
-          icon={CalendarDays}
-          title="No leave requests"
-          message={
-            search
-              ? 'No leave requests match your search.'
-              : 'There are no leave requests to review.'
-          }
-        />
+        <div className="card">
+          <EmptyState
+            icon={
+              CalendarDays
+            }
+            title="No leave requests"
+            message={
+              hasActiveFilters
+                ? 'No leave requests match the selected filters.'
+                : 'There are no leave requests to review.'
+            }
+          />
+        </div>
       ) : (
         <DataTable
-          columns={columns}
-          data={filtered}
+          columns={
+            columns
+          }
+          data={
+            filtered
+          }
         />
       )}
 
-
-      {/* ==================================================
-          APPROVE MODAL
-          ================================================== */}
-      {approveModalOpen &&
-        selectedLeave && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-navy-100 px-6 py-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-navy-900">
-                    Approve Leave
-                  </h2>
-
-                  <p className="mt-1 text-sm text-navy-500">
-                    {getEmployeeName(
-                      selectedLeave
-                    )}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={
-                    closeApproveModal
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="rounded-lg p-2 text-navy-400 hover:bg-navy-50 hover:text-navy-700 disabled:opacity-50"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-
-              {/* Body */}
-              <div className="space-y-5 px-6 py-5">
-
-                {/* Requested range */}
-                <div className="rounded-lg bg-navy-50 p-4">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-navy-400">
-                    Employee Requested
-                  </div>
-
-                  <div className="mt-2 text-sm font-medium text-navy-800">
-                    {formatDate(
-                      selectedLeave.startDate
-                    )}
-                    {' → '}
-                    {formatDate(
-                      selectedLeave.endDate
-                    )}
-                  </div>
-
-                  <div className="mt-1 text-sm text-navy-500">
-                    Requested days:{' '}
-                    <span className="font-semibold text-navy-700">
-                      {selectedLeave.totalDays}
-                    </span>
-                  </div>
-                </div>
-
-
-                {/* Approved start */}
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-navy-700">
-                    Approved Start Date
-                  </label>
-
-                  <input
-                    type="date"
-                    value={
-                      approvedStartDate
-                    }
-                    min={formatInputDate(
-                      selectedLeave.startDate
-                    )}
-                    max={formatInputDate(
-                      selectedLeave.endDate
-                    )}
-                    onChange={(event) =>
-                      setApprovedStartDate(
-                        event.target.value
-                      )
-                    }
-                    disabled={
-                      actionLoading !== null
-                    }
-                    className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-navy-400 focus:ring-2 focus:ring-navy-100 disabled:bg-navy-50"
-                  />
-                </div>
-
-
-                {/* Approved end */}
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-navy-700">
-                    Approved End Date
-                  </label>
-
-                  <input
-                    type="date"
-                    value={
-                      approvedEndDate
-                    }
-                    min={formatInputDate(
-                      selectedLeave.startDate
-                    )}
-                    max={formatInputDate(
-                      selectedLeave.endDate
-                    )}
-                    onChange={(event) =>
-                      setApprovedEndDate(
-                        event.target.value
-                      )
-                    }
-                    disabled={
-                      actionLoading !== null
-                    }
-                    className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-navy-400 focus:ring-2 focus:ring-navy-100 disabled:bg-navy-50"
-                  />
-                </div>
-
-
-                {/* Preview */}
-                {approvedStartDate &&
-                  approvedEndDate && (
-                    <div className="rounded-lg border border-success-200 bg-success-50 p-4">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-success-600">
-                        Approval Preview
-                      </div>
-
-                      <div className="mt-2 text-sm font-medium text-success-800">
-                        {formatDate(
-                          approvedStartDate
-                        )}
-                        {' → '}
-                        {formatDate(
-                          approvedEndDate
-                        )}
-                      </div>
-
-                      <div className="mt-1 text-sm text-success-700">
-                        Only this approved range
-                        will be deducted from
-                        the employee's leave
-                        balance.
-                      </div>
-                    </div>
-                  )}
-              </div>
-
-
-              {/* Footer */}
-              <div className="flex items-center justify-end gap-3 border-t border-navy-100 px-6 py-4">
-
-                <button
-                  type="button"
-                  onClick={
-                    closeApproveModal
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="rounded-lg border border-navy-200 px-4 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-
-
-                <button
-                  type="button"
-                  onClick={
-                    handleApprove
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="flex items-center gap-2 rounded-lg bg-success-600 px-4 py-2 text-sm font-medium text-white hover:bg-success-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {actionLoading ===
-                  `approve-${selectedLeave.leaveRequestId}` ? (
-                    <RefreshCw
-                      size={16}
-                      className="animate-spin"
-                    />
-                  ) : (
-                    <Check size={16} />
-                  )}
-
-                  Approve Leave
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-
-      {/* ==================================================
-          REJECT MODAL
-          ================================================== */}
-      {rejectModalOpen &&
-        selectedLeave && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
-
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-navy-100 px-6 py-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-navy-900">
-                    Reject Leave
-                  </h2>
-
-                  <p className="mt-1 text-sm text-navy-500">
-                    {getEmployeeName(
-                      selectedLeave
-                    )}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={
-                    closeRejectModal
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="rounded-lg p-2 text-navy-400 hover:bg-navy-50 hover:text-navy-700 disabled:opacity-50"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-
-              {/* Body */}
-              <div className="space-y-5 px-6 py-5">
-
-                <div className="rounded-lg bg-error-50 p-4">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-error-500">
-                    Leave Request
-                  </div>
-
-                  <div className="mt-2 text-sm font-medium text-navy-800">
-                    {formatDate(
-                      selectedLeave.startDate
-                    )}
-                    {' → '}
-                    {formatDate(
-                      selectedLeave.endDate
-                    )}
-                  </div>
-
-                  <div className="mt-1 text-sm text-navy-500">
-                    {selectedLeave.totalDays}{' '}
-                    day
-                    {Number(
-                      selectedLeave.totalDays
-                    ) === 1
-                      ? ''
-                      : 's'}
-                  </div>
-                </div>
-
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-navy-700">
-                    Rejection Reason
-                    <span className="ml-1 text-navy-400 font-normal">
-                      (optional)
-                    </span>
-                  </label>
-
-                  <textarea
-                    value={
-                      rejectionReason
-                    }
-                    onChange={(event) =>
-                      setRejectionReason(
-                        event.target.value
-                      )
-                    }
-                    rows={4}
-                    disabled={
-                      actionLoading !== null
-                    }
-                    placeholder="Enter the reason for rejecting this leave request..."
-                    className="w-full resize-none rounded-lg border border-navy-200 px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-navy-400 focus:ring-2 focus:ring-navy-100 disabled:bg-navy-50"
-                  />
-                </div>
-              </div>
-
-
-              {/* Footer */}
-              <div className="flex items-center justify-end gap-3 border-t border-navy-100 px-6 py-4">
-
-                <button
-                  type="button"
-                  onClick={
-                    closeRejectModal
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="rounded-lg border border-navy-200 px-4 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-
-
-                <button
-                  type="button"
-                  onClick={
-                    handleReject
-                  }
-                  disabled={
-                    actionLoading !== null
-                  }
-                  className="flex items-center gap-2 rounded-lg bg-error-600 px-4 py-2 text-sm font-medium text-white hover:bg-error-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {actionLoading ===
-                  `reject-${selectedLeave.leaveRequestId}` ? (
-                    <RefreshCw
-                      size={16}
-                      className="animate-spin"
-                    />
-                  ) : (
-                    <X size={16} />
-                  )}
-
-                  Reject Leave
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
     </div>
   );
 }

@@ -32,6 +32,20 @@ import {
 
 
 // ============================================================
+// GET TODAY'S DATE IN IST
+// ============================================================
+
+const getISTTodayString = () => {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+};
+
+
+// ============================================================
 // ADMIN ATTENDANCE
 // ============================================================
 
@@ -195,12 +209,46 @@ export function AdminAttendance() {
         setLoading(true);
       }
 
-      const response = await attendanceService.list();
+      // ========================================================
+      // SEND CURRENT FILTERS TO BACKEND
+      // ========================================================
+      //
+      // Daily status filters are calculated by the backend so
+      // Absent and On Leave can also be returned when no
+      // Attendance row exists yet.
+      // ========================================================
+
+      const params = {
+        page: 1,
+        limit: 100,
+
+        ...(dateFilter
+          ? {
+              date: dateFilter,
+            }
+          : {}),
+
+        ...(statusFilter
+          ? {
+              status: statusFilter,
+            }
+          : {}),
+      };
+
+
+      const response =
+        await attendanceService.list(params);
+
 
       console.log(
         'Attendance API response:',
         response
       );
+
+
+      // ========================================================
+      // EXTRACT DATA
+      // ========================================================
 
       const apiData =
         Array.isArray(response)
@@ -209,70 +257,110 @@ export function AdminAttendance() {
             ? response.data
             : [];
 
-      const normalizedRecords = apiData.map((record) => {
-        const firstName =
-          record.employee?.firstName || '';
 
-        const lastName =
-          record.employee?.lastName || '';
+      // ========================================================
+      // NORMALIZE
+      // ========================================================
 
-        const employeeName =
-          `${firstName} ${lastName}`.trim();
+      const normalizedRecords =
+        apiData.map((record) => {
 
-        return {
-          attendanceId:
-            record.attendanceId,
+          const firstName =
+            record.employee?.firstName ||
+            '';
 
-          employeeId:
-            record.employeeId,
+          const lastName =
+            record.employee?.lastName ||
+            '';
 
-          employeeName:
-            employeeName ||
-            `Employee ${record.employeeId}`,
+          const employeeName =
+            `${firstName} ${lastName}`.trim();
 
-          employeeEmail:
-            record.employee?.email || '',
 
-          employeeStatus:
-            record.employee?.status || '',
+          return {
+            attendanceId:
+              record.attendanceId,
 
-          date:
-            record.date,
+            employeeId:
+              record.employeeId,
 
-          checkInTime:
-            record.checkInTime || null,
+            employeeName:
+              employeeName ||
+              `Employee ${record.employeeId}`,
 
-          checkOutTime:
-            record.checkOutTime || null,
+            employeeEmail:
+              record.employee?.email ||
+              '',
 
-          totalHours:
-            record.totalHours !== null &&
-            record.totalHours !== undefined
-              ? Number(record.totalHours)
-              : null,
+            employeeStatus:
+              record.employee?.status ||
+              '',
 
-          status:
-            record.status,
+            date:
+              record.date,
 
-          createdAt:
-            record.createdAt,
+            checkInTime:
+              record.checkInTime ||
+              null,
 
-          updatedAt:
-            record.updatedAt,
-        };
-      });
+            checkOutTime:
+              record.checkOutTime ||
+              null,
 
-      setRecords(normalizedRecords);
+            totalHours:
+              record.totalHours !== null &&
+              record.totalHours !== undefined
+                ? Number(
+                    record.totalHours
+                  )
+                : null,
+
+            status:
+              record.status,
+
+            attendanceStatus:
+              record.attendanceStatus ||
+              null,
+
+            onLeave:
+              record.onLeave === true,
+
+            late:
+              record.late === true,
+
+            createdAt:
+              record.createdAt,
+
+            updatedAt:
+              record.updatedAt,
+          };
+        });
+
+
+      console.log(
+        'Normalized attendance records:',
+        normalizedRecords
+      );
+
+
+      setRecords(
+        normalizedRecords
+      );
+
     } catch (error) {
+
       console.error(
         'Failed to fetch attendance:',
         error
       );
 
+
       if (showPageLoading) {
         setRecords([]);
       }
+
     } finally {
+
       if (showPageLoading) {
         setLoading(false);
       }
@@ -288,34 +376,78 @@ export function AdminAttendance() {
   // INITIAL LOAD + LIVE ATTENDANCE REFRESH
   // ============================================================
   //
-  // Five seconds is enough to make a new IN/OUT punch appear
-  // promptly while keeping the request rate reasonable.
+  // Reload when the date/status filter changes and continue to
+  // refresh every five seconds so a new fingerprint punch appears
+  // automatically.
   // ============================================================
 
   useEffect(() => {
     let mounted = true;
+
 
     const initialLoad = async () => {
       if (!mounted) {
         return;
       }
 
-      await loadAttendance(false, true);
+      await loadAttendance(
+        false,
+        true
+      );
     };
+
 
     initialLoad();
 
-    const intervalId = setInterval(() => {
-      if (mounted) {
-        loadAttendance(false, false);
-      }
-    }, 5000);
+
+    const intervalId =
+      setInterval(() => {
+
+        if (mounted) {
+          loadAttendance(
+            false,
+            false
+          );
+        }
+
+      }, 5000);
+
 
     return () => {
       mounted = false;
       clearInterval(intervalId);
     };
-  }, []);
+
+  }, [
+    statusFilter,
+    dateFilter,
+  ]);
+
+
+  // ============================================================
+  // STATUS FILTER CHANGE
+  // ============================================================
+  //
+  // Status is a daily concept. When the user selects a status
+  // without a date, automatically use today's IST date so:
+  // PRESENT / ABSENT / LATE / ON_LEAVE all refer to the
+  // same working day.
+  // ============================================================
+
+  const handleStatusFilterChange = (
+    value
+  ) => {
+    setStatusFilter(value);
+
+    if (
+      value &&
+      !dateFilter
+    ) {
+      setDateFilter(
+        getISTTodayString()
+      );
+    }
+  };
 
 
   // ============================================================
@@ -538,7 +670,7 @@ export function AdminAttendance() {
 
         <Select
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={handleStatusFilterChange}
           placeholder="All Statuses"
           options={[
             {
@@ -584,7 +716,7 @@ export function AdminAttendance() {
           message={
             records.length === 0
               ? 'No attendance records are available.'
-              : 'No records match your filters.'
+              : 'No records match your filters. Try another status or date.'
           }
         />
       ) : (

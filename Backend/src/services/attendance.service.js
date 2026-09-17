@@ -1886,6 +1886,79 @@ const getEmployeeAttendanceSummary = async (
 // GET ATTENDANCE WITH FILTERS + PAGINATION
 // ======================================================
 
+// ======================================================
+// ATTENDANCE STATUS RULES FOR ADMIN DAILY VIEW
+// ======================================================
+//
+// The Attendance table currently stores PRESENT / ABSENT.
+// LATE and ON_LEAVE are derived for the admin daily view so
+// historical attendance rows do not need a schema migration.
+//
+// Late cutoff is intentionally kept configurable here.
+// Change this value when the ERP's official shift start changes.
+// ======================================================
+
+const LATE_AFTER_MINUTES = 9 * 60;
+
+
+// ======================================================
+// BUILD EFFECTIVE STATUS
+// ======================================================
+
+const getEffectiveAttendanceStatus = (
+    attendanceRecord,
+    leaveMap,
+    employeeId,
+    isDailyView = false
+) => {
+    const checkInTime =
+        attendanceRecord?.checkInTime || null;
+
+    // Real attendance always takes precedence over leave.
+    if (checkInTime) {
+        const checkInMinutes =
+            timeValueToMinutes(checkInTime);
+
+        if (
+            checkInMinutes !== null &&
+            checkInMinutes > LATE_AFTER_MINUTES
+        ) {
+            return "LATE";
+        }
+
+        return "PRESENT";
+    }
+
+    // Preserve an explicitly corrected stored status when it exists.
+    if (
+        attendanceRecord?.status === "ABSENT"
+    ) {
+        return "ABSENT";
+    }
+
+    // Approved leave applies only when there is no attendance.
+    if (
+        leaveMap?.has(
+            Number(employeeId)
+        )
+    ) {
+        return "ON_LEAVE";
+    }
+
+    // Daily roster view needs a concrete state even when no
+    // Attendance row exists yet.
+    if (isDailyView) {
+        return "ABSENT";
+    }
+
+    return attendanceRecord?.status || "ABSENT";
+};
+
+
+// ======================================================
+// GET ATTENDANCE WITH FILTERS + PAGINATION
+// ======================================================
+
 const getAttendancePaginated = async (
     filters = {}
 ) => {
@@ -1895,6 +1968,8 @@ const getAttendancePaginated = async (
         from,
         to,
         employeeId,
+        companyId,
+        status,
         page = 1,
         limit = 20
     } = filters;
@@ -1943,21 +2018,73 @@ const getAttendancePaginated = async (
 
 
     // ==============================================
-    // WHERE
+    // VALIDATE STATUS
     // ==============================================
 
-    const where = {};
+    const allowedStatusFilters = [
+        "PRESENT",
+        "ABSENT",
+        "LATE",
+        "ON_LEAVE"
+    ];
 
+    if (
+        status !== undefined &&
+        status !== "" &&
+        !allowedStatusFilters.includes(status)
+    ) {
+        const error = new Error(
+            "Invalid attendance status filter"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    // ==============================================
+    // OPTIONAL COMPANY SCOPE
+    // ==============================================
+
+    const parsedCompanyId =
+        companyId !== undefined &&
+        companyId !== null &&
+        companyId !== ""
+            ? Number(companyId)
+            : null;
+
+    if (
+        parsedCompanyId !== null &&
+        (
+            !Number.isInteger(parsedCompanyId) ||
+            parsedCompanyId < 1
+        )
+    ) {
+        const error = new Error(
+            "Invalid company ID"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    // ==============================================
+    // OPTIONAL EMPLOYEE FILTER
+    // ==============================================
+
+    let parsedEmployeeId = null;
 
     if (
         employeeId !== undefined &&
         employeeId !== ""
     ) {
-        const id = Number(employeeId);
+        parsedEmployeeId =
+            Number(employeeId);
 
         if (
-            !Number.isInteger(id) ||
-            id < 1
+            !Number.isInteger(parsedEmployeeId) ||
+            parsedEmployeeId < 1
         ) {
             const error = new Error(
                 "Invalid employee ID"
@@ -1966,8 +2093,545 @@ const getAttendancePaginated = async (
             error.statusCode = 400;
             throw error;
         }
+    }
 
-        where.employeeId = id;
+
+    // ==============================================
+    // DAILY STATUS VIEW
+    // ==============================================
+    //
+    // This mode is used whenever a specific date is selected,
+    // or whenever a status filter is selected without a date.
+    //
+    // It creates one row per active employee for that day, so:
+    //
+    // - PRESENT -> has attendance
+    // - LATE -> check-in is after the configured cutoff
+    // - ON_LEAVE -> approved leave and no attendance
+    // - ABSENT -> no attendance and no approved leave
+    //
+    // This is the part that makes every status filter actually
+    // usable instead of depending on an Attendance row already
+    // existing in the database.
+    // ==============================================
+
+    const dailyViewRequested =
+        Boolean(date) ||
+        Boolean(status);
+
+    let dailyDate = null;
+
+    if (dailyViewRequested) {
+        dailyDate = date
+            ? new Date(
+                `${date}T00:00:00`
+            )
+            : new Date();
+
+        if (
+            Number.isNaN(
+                dailyDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const dailyDateStart =
+            getISTCalendarDate(
+                dailyDate
+            );
+
+        const dailyDateEnd =
+            getNextISTCalendarDate(
+                dailyDate
+            );
+
+
+        // ----------------------------------------------
+        // Active employees for the selected company
+        // ----------------------------------------------
+
+        const employeeWhere = {
+            status: "ACTIVE"
+        };
+
+        if (
+            parsedCompanyId !== null
+        ) {
+            employeeWhere.companyId =
+                parsedCompanyId;
+        }
+
+        if (
+            parsedEmployeeId !== null
+        ) {
+            employeeWhere.employeeId =
+                parsedEmployeeId;
+        }
+
+
+        const employees =
+            await prisma.employee.findMany({
+                where: employeeWhere,
+
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                },
+
+                orderBy: {
+                    employeeId: "asc"
+                }
+            });
+
+
+        const employeeIds =
+            employees.map(
+                employee =>
+                    employee.employeeId
+            );
+
+
+        if (
+            employeeIds.length === 0
+        ) {
+            return {
+                data: [],
+                pagination: {
+                    page: 1,
+                    limit: parsedLimit,
+                    total: 0,
+                    totalPages: 0,
+                    hasNextPage: false,
+                    hasPreviousPage: false
+                }
+            };
+        }
+
+
+        // ----------------------------------------------
+        // Stored attendance for selected day
+        // ----------------------------------------------
+
+        const storedAttendance =
+            await prisma.attendance.findMany({
+                where: {
+                    employeeId: {
+                        in: employeeIds
+                    },
+
+                    date: {
+                        gte:
+                            dailyDateStart,
+
+                        lt:
+                            dailyDateEnd
+                    }
+                },
+
+                include: {
+                    employee: {
+                        select: {
+                            employeeId: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            status: true
+                        }
+                    }
+                }
+            });
+
+
+        const attendanceMap =
+            new Map();
+
+        for (
+            const record
+            of storedAttendance
+        ) {
+            attendanceMap.set(
+                Number(record.employeeId),
+                record
+            );
+        }
+
+
+        // ----------------------------------------------
+        // Today's raw punches
+        // ----------------------------------------------
+        //
+        // Raw punches are needed only when the selected day
+        // is the current IST day. They keep the admin page
+        // live while the Attendance summary row is being built.
+        // ----------------------------------------------
+
+        const now =
+            new Date();
+
+        const isToday =
+            getISTDateString(
+                dailyDate
+            ) ===
+            getISTDateString(
+                now
+            );
+
+        let todayViews = [];
+
+        if (isToday) {
+            const todayStart =
+                getStartOfDay(now);
+
+            const todayEnd =
+                getEndOfDay(now);
+
+
+            const todayPunches =
+                await prisma.attendancePunch.findMany({
+                    where: {
+                        punchedAt: {
+                            gte:
+                                todayStart,
+
+                            lte:
+                                todayEnd
+                        },
+
+                        employeeId: {
+                            in: employeeIds
+                        }
+                    },
+
+                    include: {
+                        employee: {
+                            select: {
+                                employeeId: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                                status: true
+                            }
+                        }
+                    },
+
+                    orderBy: {
+                        punchedAt: "asc"
+                    }
+                });
+
+
+            todayViews =
+                buildTodayAttendanceFromPunches(
+                    todayPunches,
+                    now
+                );
+        }
+
+
+        const todayViewMap =
+            new Map();
+
+        for (
+            const todayView
+            of todayViews
+        ) {
+            todayViewMap.set(
+                Number(todayView.employeeId),
+                todayView
+            );
+        }
+
+
+        // ----------------------------------------------
+        // Approved leaves overlapping selected date
+        // ----------------------------------------------
+
+        const approvedLeaves =
+            await prisma.leaveRequest.findMany({
+                where: {
+                    employeeId: {
+                        in: employeeIds
+                    },
+
+                    status: "APPROVED"
+                },
+
+                select: {
+                    employeeId: true,
+                    startDate: true,
+                    endDate: true,
+                    approvedStartDate: true,
+                    approvedEndDate: true
+                }
+            });
+
+
+        const selectedDateKey =
+            getISTDateString(
+                dailyDate
+            );
+
+
+        const leaveMap =
+            new Map();
+
+
+        for (
+            const leave
+            of approvedLeaves
+        ) {
+            const effectiveStart =
+                leave.approvedStartDate ||
+                leave.startDate;
+
+            const effectiveEnd =
+                leave.approvedEndDate ||
+                leave.endDate;
+
+            if (
+                !effectiveStart ||
+                !effectiveEnd
+            ) {
+                continue;
+            }
+
+
+            const startKey =
+                getISTDateString(
+                    effectiveStart
+                );
+
+            const endKey =
+                getISTDateString(
+                    effectiveEnd
+                );
+
+
+            if (
+                selectedDateKey >= startKey &&
+                selectedDateKey <= endKey
+            ) {
+                leaveMap.set(
+                    Number(leave.employeeId),
+                    true
+                );
+            }
+        }
+
+
+        // ----------------------------------------------
+        // Build one daily row per employee
+        // ----------------------------------------------
+
+        const dailyRows = [];
+
+
+        for (
+            const employee
+            of employees
+        ) {
+            const id =
+                Number(
+                    employee.employeeId
+                );
+
+
+            const storedRecord =
+                attendanceMap.get(id) ||
+                null;
+
+
+            const liveRecord =
+                todayViewMap.get(id) ||
+                null;
+
+
+            const baseRecord =
+                liveRecord
+                    ? {
+                        ...(storedRecord || {}),
+                        ...liveRecord,
+                        employee:
+                            storedRecord?.employee ||
+                            liveRecord?.employee ||
+                            employee
+                    }
+                    : (
+                        storedRecord
+                            ? storedRecord
+                            : {
+                                attendanceId:
+                                    null,
+
+                                employeeId:
+                                    employee.employeeId,
+
+                                date:
+                                    dailyDate,
+
+                                checkInTime:
+                                    null,
+
+                                checkOutTime:
+                                    null,
+
+                                totalHours:
+                                    null,
+
+                                status:
+                                    null,
+
+                                createdAt:
+                                    null,
+
+                                updatedAt:
+                                    null,
+
+                                employee:
+                                    employee
+                            }
+                    );
+
+
+            const effectiveStatus =
+                getEffectiveAttendanceStatus(
+                    baseRecord,
+                    leaveMap,
+                    id,
+                    true
+                );
+
+
+            // ------------------------------------------
+            // Status filter
+            // ------------------------------------------
+
+            if (
+                status &&
+                effectiveStatus !== status
+            ) {
+                continue;
+            }
+
+
+            dailyRows.push({
+                ...baseRecord,
+
+                employee:
+                    baseRecord.employee ||
+                    employee,
+
+                employeeId:
+                    employee.employeeId,
+
+                date:
+                    baseRecord.date ||
+                    dailyDate,
+
+                status:
+                    effectiveStatus,
+
+                attendanceStatus:
+                    baseRecord.status ||
+                    null,
+
+                onLeave:
+                    effectiveStatus ===
+                    "ON_LEAVE",
+
+                late:
+                    effectiveStatus ===
+                    "LATE"
+            });
+        }
+
+
+        // ----------------------------------------------
+        // Search/order/pagination
+        // ----------------------------------------------
+
+        dailyRows.sort(
+            (a, b) =>
+                Number(a.employeeId) -
+                Number(b.employeeId)
+        );
+
+
+        const total =
+            dailyRows.length;
+
+
+        // Daily roster intentionally returns the complete
+        // employee set because AdminAttendance has no
+        // pagination controls of its own.
+        const pagedDailyRows =
+            dailyRows;
+
+
+        const serializedDailyRows =
+            pagedDailyRows.map(
+                serializeAttendance
+            );
+
+
+        return {
+            data:
+                serializedDailyRows,
+
+            pagination: {
+                page: 1,
+                limit:
+                    Math.max(
+                        total,
+                        parsedLimit
+                    ),
+                total,
+                totalPages:
+                    total > 0
+                        ? 1
+                        : 0,
+                hasNextPage: false,
+                hasPreviousPage: false
+            }
+        };
+    }
+
+
+    // ==============================================
+    // ORIGINAL HISTORY / DATE-RANGE VIEW
+    // ==============================================
+    //
+    // Preserve the existing historical behavior when no
+    // daily status view is requested.
+    // ==============================================
+
+    const where = {};
+
+
+    if (
+        parsedCompanyId !== null
+    ) {
+        where.employee = {
+            companyId:
+                parsedCompanyId
+        };
+    }
+
+
+    if (
+        parsedEmployeeId !== null
+    ) {
+        where.employeeId =
+            parsedEmployeeId;
     }
 
 
@@ -1977,7 +2641,9 @@ const getAttendancePaginated = async (
 
     if (date) {
         const selectedDate =
-            new Date(`${date}T00:00:00`);
+            new Date(
+                `${date}T00:00:00`
+            );
 
         if (
             Number.isNaN(
@@ -1994,9 +2660,13 @@ const getAttendancePaginated = async (
 
         where.date = {
             gte:
-                getISTCalendarDate(selectedDate),
+                getISTCalendarDate(
+                    selectedDate
+                ),
             lt:
-                getNextISTCalendarDate(selectedDate)
+                getNextISTCalendarDate(
+                    selectedDate
+                )
         };
     }
     else if (from || to) {
@@ -2004,7 +2674,9 @@ const getAttendancePaginated = async (
 
         if (from) {
             const fromDate =
-                new Date(`${from}T00:00:00`);
+                new Date(
+                    `${from}T00:00:00`
+                );
 
             if (
                 Number.isNaN(
@@ -2020,12 +2692,17 @@ const getAttendancePaginated = async (
             }
 
             where.date.gte =
-                getISTCalendarDate(fromDate);
+                getISTCalendarDate(
+                    fromDate
+                );
         }
+
 
         if (to) {
             const toDate =
-                new Date(`${to}T00:00:00`);
+                new Date(
+                    `${to}T00:00:00`
+                );
 
             if (
                 Number.isNaN(
@@ -2041,13 +2718,16 @@ const getAttendancePaginated = async (
             }
 
             where.date.lt =
-                getNextISTCalendarDate(toDate);
+                getNextISTCalendarDate(
+                    toDate
+                );
         }
     }
 
 
     const skip =
-        (parsedPage - 1) * parsedLimit;
+        (parsedPage - 1) *
+        parsedLimit;
 
 
     // ==============================================
@@ -2076,32 +2756,51 @@ const getAttendancePaginated = async (
     // LOAD TODAY'S RAW PUNCHES
     // ==============================================
     //
-    // When no historical date filter is selected, include today's
-    // punches so the Attendance page behaves like a current-day view.
+    // Preserve the existing behavior: when no historical
+    // date filter is selected, today's raw punches are merged
+    // into the historical attendance list.
     // ==============================================
 
-    const now = new Date();
-    const todayStart = getStartOfDay(now);
-    const todayEnd = getEndOfDay(now);
+    const now =
+        new Date();
+
+    const todayStart =
+        getStartOfDay(now);
+
+    const todayEnd =
+        getEndOfDay(now);
 
     const includeToday =
         !date &&
         !from &&
         !to;
 
+
     const todayPunches =
         includeToday
             ? await prisma.attendancePunch.findMany({
                 where: {
                     punchedAt: {
-                        gte: todayStart,
-                        lte: todayEnd
+                        gte:
+                            todayStart,
+
+                        lte:
+                            todayEnd
                     },
 
-                    ...(employeeId !== undefined &&
-                    employeeId !== ""
+                    ...(parsedEmployeeId !== null
                         ? {
-                            employeeId: Number(employeeId)
+                            employeeId:
+                                parsedEmployeeId
+                        }
+                        : {}),
+
+                    ...(parsedCompanyId !== null
+                        ? {
+                            employee: {
+                                companyId:
+                                    parsedCompanyId
+                            }
                         }
                         : {})
                 },
@@ -2136,97 +2835,177 @@ const getAttendancePaginated = async (
     // MERGE TODAY'S RAW DATA INTO ATTENDANCE DATA
     // ==============================================
 
-    const merged = new Map();
+    const merged =
+        new Map();
 
 
-    for (const record of attendance) {
+    for (
+        const record
+        of attendance
+    ) {
         const key =
             `${record.employeeId}|${getISTDateString(
                 record.date
             )}`;
 
-        merged.set(key, record);
+        merged.set(
+            key,
+            record
+        );
     }
 
 
-    for (const todayView of todayViews) {
+    for (
+        const todayView
+        of todayViews
+    ) {
         const key =
             `${todayView.employeeId}|${getISTDateString(
                 todayView.date
             )}`;
 
-        const existing = merged.get(key);
+        const existing =
+            merged.get(key);
+
 
         if (existing) {
-            merged.set(key, {
-                ...existing,
-                checkInTime:
-                    todayView.checkInTime,
-                checkOutTime:
-                    todayView.checkOutTime,
-                totalHours:
-                    todayView.totalHours,
-                status: "PRESENT",
-                employee:
-                    existing.employee ||
-                    todayView.employee
-            });
+            merged.set(
+                key,
+                {
+                    ...existing,
+
+                    checkInTime:
+                        todayView.checkInTime,
+
+                    checkOutTime:
+                        todayView.checkOutTime,
+
+                    totalHours:
+                        todayView.totalHours,
+
+                    status:
+                        "PRESENT",
+
+                    employee:
+                        existing.employee ||
+                        todayView.employee
+                }
+            );
         }
         else {
-            // Defensive fallback: a raw IN punch must be visible even
-            // when its summary Attendance row has not been created.
-            merged.set(key, {
-                attendanceId: null,
-                employeeId:
-                    todayView.employeeId,
-                date:
-                    todayView.date,
-                checkInTime:
-                    todayView.checkInTime,
-                checkOutTime:
-                    todayView.checkOutTime,
-                totalHours:
-                    todayView.totalHours,
-                status:
-                    "PRESENT",
-                createdAt:
-                    now,
-                updatedAt:
-                    now,
-                employee:
-                    todayView.employee
-            });
+            // Defensive fallback: a raw IN punch must be visible
+            // even when its summary Attendance row has not been created.
+            merged.set(
+                key,
+                {
+                    attendanceId:
+                        null,
+
+                    employeeId:
+                        todayView.employeeId,
+
+                    date:
+                        todayView.date,
+
+                    checkInTime:
+                        todayView.checkInTime,
+
+                    checkOutTime:
+                        todayView.checkOutTime,
+
+                    totalHours:
+                        todayView.totalHours,
+
+                    status:
+                        "PRESENT",
+
+                    createdAt:
+                        now,
+
+                    updatedAt:
+                        now,
+
+                    employee:
+                        todayView.employee
+                }
+            );
         }
     }
+
+
+    // ==============================================
+    // CALCULATE LATE STATUS FOR EXISTING RECORDS
+    // ==============================================
+    //
+    // Historical rows do not get synthesized absent/leave
+    // rows here. They retain their existing list behavior.
+    // LATE is still derived from check-in time.
+    // ==============================================
+
+    const historicalAttendance =
+        Array.from(
+            merged.values()
+        ).map(
+            (record) => ({
+                ...record,
+
+                status:
+                    record.checkInTime &&
+                    timeValueToMinutes(
+                        record.checkInTime
+                    ) >
+                    LATE_AFTER_MINUTES
+                        ? "LATE"
+                        : (
+                            record.status ||
+                            "ABSENT"
+                        )
+            })
+        );
 
 
     // ==============================================
     // SORT ALL RECORDS
     // ==============================================
 
-    const mergedAttendance =
-        Array.from(merged.values()).sort(
-            (a, b) => {
-                const aTime =
-                    new Date(a.date).getTime();
+    historicalAttendance.sort(
+        (a, b) => {
 
-                const bTime =
-                    new Date(b.date).getTime();
+            const aTime =
+                new Date(
+                    a.date
+                ).getTime();
 
-                if (aTime !== bTime) {
-                    return bTime - aTime;
-                }
+            const bTime =
+                new Date(
+                    b.date
+                ).getTime();
 
+
+            if (
+                aTime !== bTime
+            ) {
                 return (
-                    Number(a.employeeId) -
-                    Number(b.employeeId)
+                    bTime -
+                    aTime
                 );
             }
-        );
+
+
+            return (
+                Number(
+                    a.employeeId
+                ) -
+                Number(
+                    b.employeeId
+                )
+            );
+        }
+    );
 
 
     const total =
-        mergedAttendance.length;
+        historicalAttendance.length;
 
 
     // ==============================================
@@ -2234,7 +3013,7 @@ const getAttendancePaginated = async (
     // ==============================================
 
     const pagedAttendance =
-        mergedAttendance.slice(
+        historicalAttendance.slice(
             skip,
             skip + parsedLimit
         );
@@ -2273,10 +3052,12 @@ const getAttendancePaginated = async (
             totalPages,
 
             hasNextPage:
-                parsedPage < totalPages,
+                parsedPage <
+                totalPages,
 
             hasPreviousPage:
-                parsedPage > 1
+                parsedPage >
+                1
         }
     };
 };

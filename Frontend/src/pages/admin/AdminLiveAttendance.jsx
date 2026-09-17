@@ -79,6 +79,15 @@ const getEmployeeName = (employee) => {
 };
 
 
+const toCount = (value) => {
+  const numberValue = Number(value);
+
+  return Number.isFinite(numberValue)
+    ? numberValue
+    : 0;
+};
+
+
 /* ============================================================
    LIVE ATTENDANCE PAGE
    ============================================================ */
@@ -141,6 +150,7 @@ export function AdminLiveAttendance() {
 
 
       const data =
+        response?.data?.data ??
         response?.data ??
         response;
 
@@ -157,7 +167,43 @@ export function AdminLiveAttendance() {
       }
 
 
-      setLiveData(data);
+      const rawStatistics =
+        data?.statistics || {};
+
+      const normalizedData = {
+        ...data,
+        statistics: {
+          ...rawStatistics,
+          totalPunches: toCount(
+            rawStatistics.totalPunches
+          ),
+          totalIn: toCount(
+            rawStatistics.totalIn
+          ),
+          totalOut: toCount(
+            rawStatistics.totalOut
+          ),
+          employeesToday: toCount(
+            rawStatistics.employeesToday
+          ),
+          currentlyWorking: toCount(
+            rawStatistics.currentlyWorking
+          ),
+        },
+        currentlyWorking:
+          Array.isArray(
+            data?.currentlyWorking
+          )
+            ? data.currentlyWorking
+            : [],
+        punches:
+          Array.isArray(data?.punches)
+            ? data.punches
+            : [],
+      };
+
+
+      setLiveData(normalizedData);
 
       setLastUpdated(
         new Date()
@@ -510,38 +556,42 @@ export function AdminLiveAttendance() {
       >
 
         <StatCard
-          title="Currently Working"
+          label="Currently Working"
           value={
-            statistics.currentlyWorking ?? 0
+            statistics.currentlyWorking
           }
           icon={Activity}
+          color="success"
         />
 
 
         <StatCard
-          title="Employees Today"
+          label="Employees Today"
           value={
-            statistics.employeesToday ?? 0
+            statistics.employeesToday
           }
           icon={Users}
+          color="navy"
         />
 
 
         <StatCard
-          title="IN Punches"
+          label="IN Punches"
           value={
-            statistics.totalIn ?? 0
+            statistics.totalIn
           }
           icon={LogIn}
+          color="accent"
         />
 
 
         <StatCard
-          title="OUT Punches"
+          label="OUT Punches"
           value={
-            statistics.totalOut ?? 0
+            statistics.totalOut
           }
           icon={LogOut}
+          color="warning"
         />
 
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import {
   Plus,
@@ -127,6 +127,9 @@ export function AdminEmployees() {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [branchFilter, setBranchFilter] = useState('');
+  const [designationFilter, setDesignationFilter] = useState('');
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -210,10 +213,176 @@ export function AdminEmployees() {
 
 
   // ==========================================================
+  // Department Filter Options
+  // ==========================================================
+
+  const getEmployeeDepartmentId = (employee) => {
+    return (
+      employee?.departmentId ??
+      employee?.department?.departmentId ??
+      null
+    );
+  };
+
+  const departmentFilterOptions = (() => {
+    const uniqueDepartments = new Map();
+
+    departments.forEach((department) => {
+      const departmentId =
+        department?.departmentId ??
+        department?.id ??
+        '';
+
+      const departmentLabel =
+        department?.departmentName ??
+        department?.name ??
+        'Unknown Department';
+
+      if (departmentId === '') {
+        return;
+      }
+
+      // Keep only one visible option for the same department name.
+      // When duplicate records use different IDs, keep all IDs so the
+      // filter still matches every employee in that department.
+      const normalizedLabel = String(departmentLabel)
+        .trim()
+        .toLowerCase();
+
+      if (!uniqueDepartments.has(normalizedLabel)) {
+        uniqueDepartments.set(normalizedLabel, {
+          label: String(departmentLabel).trim(),
+          ids: [],
+        });
+      }
+
+      const entry = uniqueDepartments.get(normalizedLabel);
+      const stringDepartmentId = String(departmentId);
+
+      if (!entry.ids.includes(stringDepartmentId)) {
+        entry.ids.push(stringDepartmentId);
+      }
+    });
+
+    return Array.from(uniqueDepartments.values())
+      .map((department) => ({
+        value: JSON.stringify(department.ids),
+        label: department.label,
+      }))
+      .sort((a, b) =>
+        String(a.label).localeCompare(
+          String(b.label),
+          'en',
+          { sensitivity: 'base' }
+        )
+      );
+  })();
+
+  const selectedDepartmentIds = useMemo(() => {
+    if (!departmentFilter) {
+      return [];
+    }
+
+    try {
+      const parsedIds = JSON.parse(departmentFilter);
+
+      if (Array.isArray(parsedIds)) {
+        return parsedIds.map((id) => String(id));
+      }
+
+      return [String(parsedIds)];
+    } catch {
+      // Fallback keeps the filter compatible with a plain ID value.
+      return [String(departmentFilter)];
+    }
+  }, [departmentFilter]);
+
+  // ==========================================================
+  // Branch Filter Options
+  // ==========================================================
+
+  const getEmployeeBranchId = (employee) => {
+    return (
+      employee?.branchId ??
+      employee?.branch?.branchId ??
+      employee?.branch?.id ??
+      null
+    );
+  };
+
+  const branchFilterOptions = branches
+    .map((branch) => ({
+      value:
+        branch?.branchId ??
+        branch?.id ??
+        '',
+      label:
+        branch?.branchName ??
+        branch?.name ??
+        'Unknown Branch',
+    }))
+    .filter(
+      (branch) =>
+        branch.value !== ''
+    )
+    .sort((a, b) =>
+      String(a.label).localeCompare(
+        String(b.label),
+        'en',
+        { sensitivity: 'base' }
+      )
+    );
+
+
+  // ==========================================================
+  // Designation Filter Options
+  // ==========================================================
+  // The current employee data stores designation as the
+  // employee role (for example EMPLOYEE / MANAGER).
+
+  const designationFilterOptions = useMemo(() => {
+    const values = new Map();
+
+    employees.forEach((employee) => {
+      const role = String(
+        employee?.role ??
+        ''
+      ).trim();
+
+      if (!role) {
+        return;
+      }
+
+      const value = role.toUpperCase();
+
+      if (!values.has(value)) {
+        values.set(value, {
+          value,
+          label: role
+            .toLowerCase()
+            .replace(/\b\w/g, (character) =>
+              character.toUpperCase()
+            ),
+        });
+      }
+    });
+
+    return Array.from(values.values()).sort((a, b) =>
+      String(a.label).localeCompare(
+        String(b.label),
+        'en',
+        { sensitivity: 'base' }
+      )
+    );
+  }, [employees]);
+
+
+  // ==========================================================
   // Filter Employees
   // ==========================================================
 
   const filtered = employees.filter(
+
     (employee) => {
       const employeeName =
         getEmployeeName(employee);
@@ -223,6 +392,21 @@ export function AdminEmployees() {
 
       const employeeId =
         employee?.employeeId || '';
+
+      const employeeDepartment =
+        getDepartmentName(employee);
+
+      const employeeDepartmentId =
+        getEmployeeDepartmentId(employee);
+
+      const employeeBranchId =
+        getEmployeeBranchId(employee);
+
+      const employeeDesignation =
+        String(
+          employee?.role ??
+          ''
+        ).trim().toUpperCase();
 
       const searchText =
         search.toLowerCase().trim();
@@ -237,15 +421,43 @@ export function AdminEmployees() {
           .includes(searchText) ||
         String(employeeId)
           .toLowerCase()
+          .includes(searchText) ||
+        employeeDepartment
+          .toLowerCase()
+          .includes(searchText) ||
+        getBranchName(employee)
+          .toLowerCase()
+          .includes(searchText) ||
+        employeeDesignation
+          .toLowerCase()
           .includes(searchText);
 
       const matchStatus =
         !statusFilter ||
         employee?.status === statusFilter;
 
+      const matchDepartment =
+        !departmentFilter ||
+        selectedDepartmentIds.includes(
+          String(employeeDepartmentId)
+        );
+
+      const matchBranch =
+        !branchFilter ||
+        String(employeeBranchId) ===
+          String(branchFilter);
+
+      const matchDesignation =
+        !designationFilter ||
+        employeeDesignation ===
+          String(designationFilter).toUpperCase();
+
       return (
         matchSearch &&
-        matchStatus
+        matchStatus &&
+        matchDepartment &&
+        matchBranch &&
+        matchDesignation
       );
     }
   );
@@ -706,53 +918,152 @@ export function AdminEmployees() {
 
       <div
         className="
-          flex
-          flex-col
-          sm:flex-row
-          gap-3
           mb-5
+          rounded-xl
+          border
+          border-navy-100
+          bg-white
+          p-4
+          shadow-sm
         "
       >
 
-        <div className="flex-1">
+        {/* Search + Dropdown Filters: Status, Branch, Department, Designation */}
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-3
+            md:grid-cols-2
+            xl:grid-cols-5
+          "
+        >
 
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by name, email, or ID..."
-          />
+          {/* Search */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Search
+            </label>
+
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search by name, email, ID, department, branch, designation..."
+            />
+          </div>
+
+
+          {/* Status */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Status
+            </label>
+
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              placeholder="All Statuses"
+              options={[
+                { value: 'ACTIVE', label: 'Active' },
+                { value: 'INACTIVE', label: 'Inactive' },
+                { value: 'SUSPENDED', label: 'Suspended' },
+                { value: 'TERMINATED', label: 'Terminated' },
+              ]}
+            />
+          </div>
+
+
+          {/* Branch */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Branch
+            </label>
+
+            <Select
+              value={branchFilter}
+              onChange={setBranchFilter}
+              placeholder="All Branches"
+              options={branchFilterOptions}
+            />
+          </div>
+
+
+          {/* Department */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Department
+            </label>
+
+            <Select
+              value={departmentFilter}
+              onChange={setDepartmentFilter}
+              placeholder="All Departments"
+              options={departmentFilterOptions}
+            />
+          </div>
+
+
+          {/* Designation */}
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Designation
+            </label>
+
+            <Select
+              value={designationFilter}
+              onChange={setDesignationFilter}
+              placeholder="All Designations"
+              options={designationFilterOptions}
+            />
+          </div>
 
         </div>
 
 
-        <div className="sm:w-48">
+        {/* Filter summary + clear */}
+        <div
+          className="
+            mt-4
+            flex
+            flex-wrap
+            items-center
+            justify-between
+            gap-2
+            border-t
+            border-navy-100
+            pt-3
+          "
+        >
 
-          <Select
-            value={statusFilter}
-            onChange={setStatusFilter}
-            placeholder="All Statuses"
+          <p className="text-sm text-navy-500">
+            Showing <span className="font-semibold text-navy-800">{filtered.length}</span> of{' '}
+            <span className="font-semibold text-navy-800">{employees.length}</span> employees
+          </p>
 
-            options={[
-              {
-                value: 'ACTIVE',
-                label: 'Active',
-              },
-              {
-                value: 'INACTIVE',
-                label: 'Inactive',
-              },
-              {
-                value: 'SUSPENDED',
-                label: 'Suspended',
-              },
-              {
-                value: 'TERMINATED',
-                label: 'Terminated',
-              },
-            ]}
-          />
+          {(search || statusFilter || departmentFilter || branchFilter || designationFilter) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setStatusFilter('');
+                setDepartmentFilter('');
+                setBranchFilter('');
+                setDesignationFilter('');
+              }}
+              className="
+                text-sm
+                font-medium
+                text-navy-500
+                hover:text-navy-800
+                transition-colors
+              "
+            >
+              Clear Filters
+            </button>
+          )}
 
         </div>
+
 
       </div>
 
@@ -766,10 +1077,15 @@ export function AdminEmployees() {
         <EmptyState
           icon={Users}
           title="No employees found"
-          message="
-            Try adjusting your search or filters,
-            or add a new employee.
-          "
+          message={
+            search ||
+            statusFilter ||
+            departmentFilter ||
+            branchFilter ||
+            designationFilter
+              ? 'No employees match the selected search or filters.'
+              : 'Add a new employee to get started.'
+          }
         />
 
       ) : (

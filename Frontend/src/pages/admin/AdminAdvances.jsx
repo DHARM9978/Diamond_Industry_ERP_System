@@ -40,6 +40,14 @@ export function AdminAdvances() {
   const [search, setSearch] = useState('');
 
   // ----------------------------------------------------------
+  // Status filter
+  // ----------------------------------------------------------
+  // Empty string = all statuses
+  // Supported advance statuses:
+  // PENDING / APPROVED / REJECTED / PAID
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // ----------------------------------------------------------
   // Modal state
   // ----------------------------------------------------------
 
@@ -602,7 +610,97 @@ export function AdminAdvances() {
 
 
   // ==========================================================
-  // Search
+  // Status options
+  // ==========================================================
+
+  const statusOptions = [
+    {
+      value: '',
+      label: 'All',
+    },
+    {
+      value: 'PENDING',
+      label: 'Pending',
+    },
+    {
+      value: 'APPROVED',
+      label: 'Approved',
+    },
+    {
+      value: 'REJECTED',
+      label: 'Rejected',
+    },
+    {
+      value: 'PAID',
+      label: 'Paid',
+    },
+  ];
+
+
+  // ==========================================================
+  // Status counts
+  // ==========================================================
+
+  const statusCounts =
+    useMemo(() => {
+      const counts = {
+        '': advances.length,
+        PENDING: 0,
+        APPROVED: 0,
+        REJECTED: 0,
+        PAID: 0,
+      };
+
+      advances.forEach(
+        (advance) => {
+          const status =
+            getStatus(advance);
+
+          if (
+            Object.prototype.hasOwnProperty.call(
+              counts,
+              status
+            )
+          ) {
+            counts[status] += 1;
+          }
+        }
+      );
+
+      return counts;
+    }, [advances]);
+
+
+  // ==========================================================
+  // Get request timestamp
+  // ==========================================================
+  //
+  // Newest salary advance requests must appear first.
+  // createdAt is the authoritative request timestamp.
+  // paymentDate is used only as a backwards-compatible
+  // fallback when createdAt is unavailable.
+  // ==========================================================
+
+  const getRequestTimestamp = (
+    advance
+  ) => {
+    const value =
+      advance?.createdAt ??
+      advance?.paymentDate;
+
+    const timestamp =
+      value
+        ? new Date(value).getTime()
+        : 0;
+
+    return Number.isFinite(timestamp)
+      ? timestamp
+      : 0;
+  };
+
+
+  // ==========================================================
+  // Search + Status Filter
   // ==========================================================
 
   const filtered =
@@ -613,80 +711,144 @@ export function AdminAdvances() {
           .trim()
           .toLowerCase();
 
-      if (!searchTerm) {
-        return advances;
-      }
+      const selectedStatus =
+        String(
+          statusFilter || ''
+        )
+          .trim()
+          .toUpperCase();
 
-      return advances.filter(
-        (advance) => {
+      const result =
+        advances.filter(
+          (advance) => {
 
-          const employeeName =
-            getEmployeeName(
-              advance
-            ).toLowerCase();
+            const advanceStatus =
+              getStatus(advance);
 
-          const employeeId =
-            String(
-              advance?.employeeId ??
-                ''
-            ).toLowerCase();
+            const matchesStatus =
+              !selectedStatus ||
+              advanceStatus ===
+                selectedStatus;
 
-          const amount =
-            String(
-              advance?.amount ??
-                ''
-            ).toLowerCase();
+            if (
+              !matchesStatus
+            ) {
+              return false;
+            }
 
-          const approvedAmount =
-            String(
-              advance?.approvedAmount ??
-                ''
-            ).toLowerCase();
+            if (!searchTerm) {
+              return true;
+            }
 
-          const paidAmount =
-            String(
-              advance?.paidAmount ??
-                ''
-            ).toLowerCase();
+            const employeeName =
+              getEmployeeName(
+                advance
+              ).toLowerCase();
 
-          const reason =
-            String(
-              advance?.reason ??
-                ''
-            ).toLowerCase();
+            const employeeId =
+              String(
+                advance?.employeeId ??
+                  ''
+              ).toLowerCase();
 
-          const status =
-            String(
-              advance?.status ??
-                ''
-            ).toLowerCase();
+            const amount =
+              String(
+                advance?.amount ??
+                  ''
+              ).toLowerCase();
+
+            const approvedAmount =
+              String(
+                advance?.approvedAmount ??
+                  ''
+              ).toLowerCase();
+
+            const paidAmount =
+              String(
+                advance?.paidAmount ??
+                  ''
+              ).toLowerCase();
+
+            const reason =
+              String(
+                advance?.reason ??
+                  ''
+              ).toLowerCase();
+
+            const status =
+              String(
+                advance?.status ??
+                  ''
+              ).toLowerCase();
+
+            return (
+              employeeName.includes(
+                searchTerm
+              ) ||
+              employeeId.includes(
+                searchTerm
+              ) ||
+              amount.includes(
+                searchTerm
+              ) ||
+              approvedAmount.includes(
+                searchTerm
+              ) ||
+              paidAmount.includes(
+                searchTerm
+              ) ||
+              reason.includes(
+                searchTerm
+              ) ||
+              status.includes(
+                searchTerm
+              )
+            );
+          }
+        );
+
+      return [...result].sort(
+        (first, second) => {
+          const timeDifference =
+            getRequestTimestamp(
+              second
+            ) -
+            getRequestTimestamp(
+              first
+            );
+
+          if (
+            timeDifference !== 0
+          ) {
+            return timeDifference;
+          }
 
           return (
-            employeeName.includes(
-              searchTerm
-            ) ||
-            employeeId.includes(
-              searchTerm
-            ) ||
-            amount.includes(
-              searchTerm
-            ) ||
-            approvedAmount.includes(
-              searchTerm
-            ) ||
-            paidAmount.includes(
-              searchTerm
-            ) ||
-            reason.includes(
-              searchTerm
-            ) ||
-            status.includes(
-              searchTerm
+            Number(
+              second?.advanceId || 0
+            ) -
+            Number(
+              first?.advanceId || 0
             )
           );
         }
       );
-    }, [advances, search]);
+    }, [
+      advances,
+      search,
+      statusFilter,
+    ]);
+
+
+  // ==========================================================
+  // Clear filters
+  // ==========================================================
+
+  const handleClearFilters =
+    () => {
+      setSearch('');
+      setStatusFilter('');
+    };
 
 
   // ==========================================================
@@ -1072,33 +1234,211 @@ export function AdminAdvances() {
 
 
       {/* ======================================================
-          Search + Refresh
+          FILTERS
           ====================================================== */}
 
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-5 rounded-2xl border border-navy-100 bg-white p-5 shadow-sm">
 
-        <div className="flex-1">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by employee name, ID, amount or status..."
-          />
+        {/* ------------------------------------------------------
+            Filter heading
+            ------------------------------------------------------ */}
+
+        <div className="mb-4 flex items-center justify-between gap-3">
+
+          <div>
+            <h2 className="text-sm font-semibold text-navy-900">
+              Filters
+            </h2>
+
+            <p className="mt-1 text-xs text-navy-400">
+              Filter salary advance requests by status or search.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+
+            <button
+              type="button"
+              onClick={
+                handleClearFilters
+              }
+              disabled={
+                !search &&
+                !statusFilter
+              }
+              className="rounded-lg border border-navy-200 px-3 py-2 text-sm font-medium text-navy-600 transition-colors hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Clear
+            </button>
+
+            <button
+              type="button"
+              onClick={
+                loadAdvances
+              }
+              disabled={loading}
+              className="flex items-center gap-2 rounded-lg border border-navy-200 px-3 py-2 text-sm font-medium text-navy-700 transition-colors hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-50"
+              title="Refresh salary advances"
+            >
+              <RefreshCw
+                size={16}
+              />
+
+              Refresh
+            </button>
+
+          </div>
+
         </div>
 
 
-        <button
-          type="button"
-          onClick={loadAdvances}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
-          title="Refresh salary advances"
-        >
-          <RefreshCw
-            size={16}
+        {/* ------------------------------------------------------
+            Search
+            ------------------------------------------------------ */}
+
+        <div className="mb-5">
+
+          <label
+            htmlFor="salaryAdvanceSearch"
+            className="mb-2 block text-xs font-semibold uppercase tracking-wide text-navy-500"
+          >
+            Search
+          </label>
+
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search employee, ID, amount, reason or status..."
           />
 
-          Refresh
-        </button>
+        </div>
+
+
+        {/* ------------------------------------------------------
+            Quick status filters
+            ------------------------------------------------------ */}
+
+        <div>
+
+          <div className="mb-2 flex items-center justify-between gap-3">
+
+            <label className="block text-xs font-semibold uppercase tracking-wide text-navy-500">
+              Status
+            </label>
+
+            <span className="text-xs text-navy-400">
+              {filtered.length} matching request{
+                filtered.length !== 1
+                  ? 's'
+                  : ''
+              }
+            </span>
+
+          </div>
+
+
+          <div className="flex flex-wrap gap-2">
+
+            {statusOptions.map(
+              (option) => {
+                const isSelected =
+                  statusFilter ===
+                  option.value;
+
+                const count =
+                  statusCounts[
+                    option.value
+                  ] ?? 0;
+
+                return (
+                  <button
+                    key={
+                      option.value ||
+                      'ALL'
+                    }
+                    type="button"
+                    onClick={() =>
+                      setStatusFilter(
+                        option.value
+                      )
+                    }
+                    className={`
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-full
+                      border
+                      px-4
+                      py-2
+                      text-sm
+                      font-medium
+                      transition-colors
+                      ${
+                        isSelected
+                          ? 'border-navy-700 bg-navy-700 text-white shadow-sm'
+                          : 'border-navy-200 bg-white text-navy-600 hover:bg-navy-50'
+                      }
+                    `}
+                  >
+                    <span>
+                      {
+                        option.label
+                      }
+                    </span>
+
+                    <span
+                      className={`
+                        inline-flex
+                        min-w-6
+                        items-center
+                        justify-center
+                        rounded-full
+                        px-1.5
+                        py-0.5
+                        text-xs
+                        font-semibold
+                        ${
+                          isSelected
+                            ? 'bg-white/15 text-white'
+                            : 'bg-navy-50 text-navy-500'
+                        }
+                      `}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              }
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* ------------------------------------------------------
+            Filter summary
+            ------------------------------------------------------ */}
+
+        <div className="mt-5 flex flex-col gap-2 border-t border-navy-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+
+          <p className="text-sm text-navy-500">
+            Showing{' '}
+            <span className="font-semibold text-navy-800">
+              {filtered.length}
+            </span>{' '}
+            of{' '}
+            <span className="font-semibold text-navy-800">
+              {advances.length}
+            </span>{' '}
+            loaded requests
+          </p>
+
+          <p className="text-xs text-navy-400">
+            Newest requests appear first
+          </p>
+
+        </div>
 
       </div>
 
@@ -1113,8 +1453,9 @@ export function AdminAdvances() {
           icon={Banknote}
           title="No salary advances"
           message={
-            search
-              ? 'No salary advances match your search.'
+            search ||
+            statusFilter
+              ? 'No salary advances match the current filters.'
               : 'There are no salary advance requests to review.'
           }
         />
