@@ -324,8 +324,15 @@ export function AdminOvertime() {
         status: 'ACCUMULATED',
       });
 
+    // Keep the database record even when overtime is zero,
+    // but do not display zero-hour records in the pending UI.
+    const pendingRecords =
+      getArray(response).filter(
+        (record) => getExtraHours(record) > 0
+      );
+
     setRecords(
-      getArray(response)
+      pendingRecords
     );
 
   };
@@ -656,10 +663,14 @@ export function AdminOvertime() {
       // PAYROLL PAYMENT
       // ------------------------------------------------------
 
-      await payrollService.pay(
-        selectedRecord.payrollId,
-        amount
-      );
+      await payrollService.extraWork.settle({
+        employeeId:
+          selectedRecord.employeeId,
+        payrollId:
+          selectedRecord.payrollId,
+        incentiveAmount:
+          amount
+      });
 
 
       setSelectedRecord(null);
@@ -669,7 +680,7 @@ export function AdminOvertime() {
       setMessage(
         `${getEmployeeName(
           selectedRecord
-        )}'s payroll was paid and the accumulated overtime was settled successfully.`
+        )}'s accumulated overtime was settled successfully. Regular payroll remains unchanged.`
       );
 
 

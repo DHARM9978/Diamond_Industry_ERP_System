@@ -233,6 +233,17 @@ const getMyAttendanceSummary = async (
 // Get My Payroll
 // GET /api/me/payroll
 // ==========================================
+//
+// The payroll service is responsible for
+// returning the employee's own payroll data,
+// including overtime / extra-work information
+// when supported by the service layer.
+//
+// This controller does not calculate or settle
+// overtime. It only returns the employee's
+// authenticated payroll information.
+//
+// ==========================================
 
 const getMyPayroll = async (
     req,

@@ -2579,7 +2579,6 @@ export namespace Prisma {
     attendance: number
     attendancePunches: number
     managedDepartments: number
-    subordinates: number
     fingerprintEnrollments: number
     fingerprintTemplates: number
     leaveBalances: number
@@ -2587,6 +2586,7 @@ export namespace Prisma {
     payrolls: number
     extraWorkRecords: number
     extraWorkSettlements: number
+    subordinates: number
   }
 
   export type EmployeeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2595,7 +2595,6 @@ export namespace Prisma {
     attendance?: boolean | EmployeeCountOutputTypeCountAttendanceArgs
     attendancePunches?: boolean | EmployeeCountOutputTypeCountAttendancePunchesArgs
     managedDepartments?: boolean | EmployeeCountOutputTypeCountManagedDepartmentsArgs
-    subordinates?: boolean | EmployeeCountOutputTypeCountSubordinatesArgs
     fingerprintEnrollments?: boolean | EmployeeCountOutputTypeCountFingerprintEnrollmentsArgs
     fingerprintTemplates?: boolean | EmployeeCountOutputTypeCountFingerprintTemplatesArgs
     leaveBalances?: boolean | EmployeeCountOutputTypeCountLeaveBalancesArgs
@@ -2603,6 +2602,7 @@ export namespace Prisma {
     payrolls?: boolean | EmployeeCountOutputTypeCountPayrollsArgs
     extraWorkRecords?: boolean | EmployeeCountOutputTypeCountExtraWorkRecordsArgs
     extraWorkSettlements?: boolean | EmployeeCountOutputTypeCountExtraWorkSettlementsArgs
+    subordinates?: boolean | EmployeeCountOutputTypeCountSubordinatesArgs
   }
 
   // Custom InputTypes
@@ -2654,13 +2654,6 @@ export namespace Prisma {
   /**
    * EmployeeCountOutputType without action
    */
-  export type EmployeeCountOutputTypeCountSubordinatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: EmployeeWhereInput
-  }
-
-  /**
-   * EmployeeCountOutputType without action
-   */
   export type EmployeeCountOutputTypeCountFingerprintEnrollmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FingerprintEnrollmentWhereInput
   }
@@ -2707,6 +2700,13 @@ export namespace Prisma {
     where?: ExtraWorkSettlementWhereInput
   }
 
+  /**
+   * EmployeeCountOutputType without action
+   */
+  export type EmployeeCountOutputTypeCountSubordinatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmployeeWhereInput
+  }
+
 
   /**
    * Count Type IotDeviceCountOutputType
@@ -2745,6 +2745,46 @@ export namespace Prisma {
    */
   export type IotDeviceCountOutputTypeCountDeviceLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeviceLogWhereInput
+  }
+
+
+  /**
+   * Count Type PayrollCountOutputType
+   */
+
+  export type PayrollCountOutputType = {
+    extraWorkRecords: number
+    extraWorkSettlements: number
+  }
+
+  export type PayrollCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    extraWorkRecords?: boolean | PayrollCountOutputTypeCountExtraWorkRecordsArgs
+    extraWorkSettlements?: boolean | PayrollCountOutputTypeCountExtraWorkSettlementsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PayrollCountOutputType without action
+   */
+  export type PayrollCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PayrollCountOutputType
+     */
+    select?: PayrollCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PayrollCountOutputType without action
+   */
+  export type PayrollCountOutputTypeCountExtraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkWhereInput
+  }
+
+  /**
+   * PayrollCountOutputType without action
+   */
+  export type PayrollCountOutputTypeCountExtraWorkSettlementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExtraWorkSettlementWhereInput
   }
 
 
@@ -6414,11 +6454,6 @@ export namespace Prisma {
     attendance?: boolean | Employee$attendanceArgs<ExtArgs>
     attendancePunches?: boolean | Employee$attendancePunchesArgs<ExtArgs>
     managedDepartments?: boolean | Employee$managedDepartmentsArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-    company?: boolean | companiesDefaultArgs<ExtArgs>
-    department?: boolean | Employee$departmentArgs<ExtArgs>
-    manager?: boolean | Employee$managerArgs<ExtArgs>
-    subordinates?: boolean | Employee$subordinatesArgs<ExtArgs>
     fingerprintEnrollments?: boolean | Employee$fingerprintEnrollmentsArgs<ExtArgs>
     fingerprintTemplates?: boolean | Employee$fingerprintTemplatesArgs<ExtArgs>
     leaveBalances?: boolean | Employee$leaveBalancesArgs<ExtArgs>
@@ -6426,6 +6461,11 @@ export namespace Prisma {
     payrolls?: boolean | Employee$payrollsArgs<ExtArgs>
     extraWorkRecords?: boolean | Employee$extraWorkRecordsArgs<ExtArgs>
     extraWorkSettlements?: boolean | Employee$extraWorkSettlementsArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    department?: boolean | Employee$departmentArgs<ExtArgs>
+    manager?: boolean | Employee$managerArgs<ExtArgs>
+    subordinates?: boolean | Employee$subordinatesArgs<ExtArgs>
     _count?: boolean | EmployeeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
@@ -6460,11 +6500,6 @@ export namespace Prisma {
     attendance?: boolean | Employee$attendanceArgs<ExtArgs>
     attendancePunches?: boolean | Employee$attendancePunchesArgs<ExtArgs>
     managedDepartments?: boolean | Employee$managedDepartmentsArgs<ExtArgs>
-    branch?: boolean | BranchDefaultArgs<ExtArgs>
-    company?: boolean | companiesDefaultArgs<ExtArgs>
-    department?: boolean | Employee$departmentArgs<ExtArgs>
-    manager?: boolean | Employee$managerArgs<ExtArgs>
-    subordinates?: boolean | Employee$subordinatesArgs<ExtArgs>
     fingerprintEnrollments?: boolean | Employee$fingerprintEnrollmentsArgs<ExtArgs>
     fingerprintTemplates?: boolean | Employee$fingerprintTemplatesArgs<ExtArgs>
     leaveBalances?: boolean | Employee$leaveBalancesArgs<ExtArgs>
@@ -6472,6 +6507,11 @@ export namespace Prisma {
     payrolls?: boolean | Employee$payrollsArgs<ExtArgs>
     extraWorkRecords?: boolean | Employee$extraWorkRecordsArgs<ExtArgs>
     extraWorkSettlements?: boolean | Employee$extraWorkSettlementsArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    department?: boolean | Employee$departmentArgs<ExtArgs>
+    manager?: boolean | Employee$managerArgs<ExtArgs>
+    subordinates?: boolean | Employee$subordinatesArgs<ExtArgs>
     _count?: boolean | EmployeeCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -6483,11 +6523,6 @@ export namespace Prisma {
       attendance: Prisma.$AttendancePayload<ExtArgs>[]
       attendancePunches: Prisma.$AttendancePunchPayload<ExtArgs>[]
       managedDepartments: Prisma.$DepartmentPayload<ExtArgs>[]
-      branch: Prisma.$BranchPayload<ExtArgs>
-      company: Prisma.$companiesPayload<ExtArgs>
-      department: Prisma.$DepartmentPayload<ExtArgs> | null
-      manager: Prisma.$EmployeePayload<ExtArgs> | null
-      subordinates: Prisma.$EmployeePayload<ExtArgs>[]
       fingerprintEnrollments: Prisma.$FingerprintEnrollmentPayload<ExtArgs>[]
       fingerprintTemplates: Prisma.$FingerprintTemplatePayload<ExtArgs>[]
       leaveBalances: Prisma.$LeaveBalancePayload<ExtArgs>[]
@@ -6495,6 +6530,11 @@ export namespace Prisma {
       payrolls: Prisma.$PayrollPayload<ExtArgs>[]
       extraWorkRecords: Prisma.$ExtraWorkPayload<ExtArgs>[]
       extraWorkSettlements: Prisma.$ExtraWorkSettlementPayload<ExtArgs>[]
+      branch: Prisma.$BranchPayload<ExtArgs>
+      company: Prisma.$companiesPayload<ExtArgs>
+      department: Prisma.$DepartmentPayload<ExtArgs> | null
+      manager: Prisma.$EmployeePayload<ExtArgs> | null
+      subordinates: Prisma.$EmployeePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       employeeId: number
@@ -6861,11 +6901,6 @@ export namespace Prisma {
     attendance<T extends Employee$attendanceArgs<ExtArgs> = {}>(args?: Subset<T, Employee$attendanceArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendancePunches<T extends Employee$attendancePunchesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$attendancePunchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePunchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     managedDepartments<T extends Employee$managedDepartmentsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$managedDepartmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    department<T extends Employee$departmentArgs<ExtArgs> = {}>(args?: Subset<T, Employee$departmentArgs<ExtArgs>>): Prisma__DepartmentClient<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    manager<T extends Employee$managerArgs<ExtArgs> = {}>(args?: Subset<T, Employee$managerArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    subordinates<T extends Employee$subordinatesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$subordinatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fingerprintEnrollments<T extends Employee$fingerprintEnrollmentsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$fingerprintEnrollmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FingerprintEnrollmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fingerprintTemplates<T extends Employee$fingerprintTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$fingerprintTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FingerprintTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaveBalances<T extends Employee$leaveBalancesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$leaveBalancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeaveBalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6873,6 +6908,11 @@ export namespace Prisma {
     payrolls<T extends Employee$payrollsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$payrollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     extraWorkRecords<T extends Employee$extraWorkRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$extraWorkRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     extraWorkSettlements<T extends Employee$extraWorkSettlementsArgs<ExtArgs> = {}>(args?: Subset<T, Employee$extraWorkSettlementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    department<T extends Employee$departmentArgs<ExtArgs> = {}>(args?: Subset<T, Employee$departmentArgs<ExtArgs>>): Prisma__DepartmentClient<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    manager<T extends Employee$managerArgs<ExtArgs> = {}>(args?: Subset<T, Employee$managerArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    subordinates<T extends Employee$subordinatesArgs<ExtArgs> = {}>(args?: Subset<T, Employee$subordinatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7389,68 +7429,6 @@ export namespace Prisma {
   }
 
   /**
-   * Employee.department
-   */
-  export type Employee$departmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Department
-     */
-    select?: DepartmentSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Department
-     */
-    omit?: DepartmentOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: DepartmentInclude<ExtArgs> | null
-    where?: DepartmentWhereInput
-  }
-
-  /**
-   * Employee.manager
-   */
-  export type Employee$managerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Employee
-     */
-    select?: EmployeeSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Employee
-     */
-    omit?: EmployeeOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EmployeeInclude<ExtArgs> | null
-    where?: EmployeeWhereInput
-  }
-
-  /**
-   * Employee.subordinates
-   */
-  export type Employee$subordinatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Employee
-     */
-    select?: EmployeeSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Employee
-     */
-    omit?: EmployeeOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EmployeeInclude<ExtArgs> | null
-    where?: EmployeeWhereInput
-    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
-    cursor?: EmployeeWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
-  }
-
-  /**
    * Employee.fingerprintEnrollments
    */
   export type Employee$fingerprintEnrollmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7616,6 +7594,68 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
+  }
+
+  /**
+   * Employee.department
+   */
+  export type Employee$departmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Department
+     */
+    select?: DepartmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Department
+     */
+    omit?: DepartmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentInclude<ExtArgs> | null
+    where?: DepartmentWhereInput
+  }
+
+  /**
+   * Employee.manager
+   */
+  export type Employee$managerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    where?: EmployeeWhereInput
+  }
+
+  /**
+   * Employee.subordinates
+   */
+  export type Employee$subordinatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    where?: EmployeeWhereInput
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    cursor?: EmployeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
   }
 
   /**
@@ -14254,8 +14294,9 @@ export namespace Prisma {
     updatedAt?: boolean
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
-    extraWorkRecord?: boolean | Payroll$extraWorkRecordArgs<ExtArgs>
-    extraWorkSettlement?: boolean | Payroll$extraWorkSettlementArgs<ExtArgs>
+    extraWorkRecords?: boolean | Payroll$extraWorkRecordsArgs<ExtArgs>
+    extraWorkSettlements?: boolean | Payroll$extraWorkSettlementsArgs<ExtArgs>
+    _count?: boolean | PayrollCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["payroll"]>
 
 
@@ -14288,8 +14329,9 @@ export namespace Prisma {
   export type PayrollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
-    extraWorkRecord?: boolean | Payroll$extraWorkRecordArgs<ExtArgs>
-    extraWorkSettlement?: boolean | Payroll$extraWorkSettlementArgs<ExtArgs>
+    extraWorkRecords?: boolean | Payroll$extraWorkRecordsArgs<ExtArgs>
+    extraWorkSettlements?: boolean | Payroll$extraWorkSettlementsArgs<ExtArgs>
+    _count?: boolean | PayrollCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $PayrollPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14297,8 +14339,8 @@ export namespace Prisma {
     objects: {
       advanceDeductionRecord: Prisma.$AdvancePaymentPayload<ExtArgs> | null
       employee: Prisma.$EmployeePayload<ExtArgs>
-      extraWorkRecord: Prisma.$ExtraWorkPayload<ExtArgs> | null
-      extraWorkSettlement: Prisma.$ExtraWorkSettlementPayload<ExtArgs> | null
+      extraWorkRecords: Prisma.$ExtraWorkPayload<ExtArgs>[]
+      extraWorkSettlements: Prisma.$ExtraWorkSettlementPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       payrollId: number
@@ -14664,8 +14706,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     advanceDeductionRecord<T extends Payroll$advanceDeductionRecordArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$advanceDeductionRecordArgs<ExtArgs>>): Prisma__AdvancePaymentClient<$Result.GetResult<Prisma.$AdvancePaymentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    extraWorkRecord<T extends Payroll$extraWorkRecordArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkRecordArgs<ExtArgs>>): Prisma__ExtraWorkClient<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    extraWorkSettlement<T extends Payroll$extraWorkSettlementArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkSettlementArgs<ExtArgs>>): Prisma__ExtraWorkSettlementClient<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    extraWorkRecords<T extends Payroll$extraWorkRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    extraWorkSettlements<T extends Payroll$extraWorkSettlementsArgs<ExtArgs> = {}>(args?: Subset<T, Payroll$extraWorkSettlementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkSettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15083,9 +15125,9 @@ export namespace Prisma {
   }
 
   /**
-   * Payroll.extraWorkRecord
+   * Payroll.extraWorkRecords
    */
-  export type Payroll$extraWorkRecordArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Payroll$extraWorkRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the ExtraWork
      */
@@ -15099,12 +15141,17 @@ export namespace Prisma {
      */
     include?: ExtraWorkInclude<ExtArgs> | null
     where?: ExtraWorkWhereInput
+    orderBy?: ExtraWorkOrderByWithRelationInput | ExtraWorkOrderByWithRelationInput[]
+    cursor?: ExtraWorkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExtraWorkScalarFieldEnum | ExtraWorkScalarFieldEnum[]
   }
 
   /**
-   * Payroll.extraWorkSettlement
+   * Payroll.extraWorkSettlements
    */
-  export type Payroll$extraWorkSettlementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Payroll$extraWorkSettlementsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the ExtraWorkSettlement
      */
@@ -15118,6 +15165,11 @@ export namespace Prisma {
      */
     include?: ExtraWorkSettlementInclude<ExtArgs> | null
     where?: ExtraWorkSettlementWhereInput
+    orderBy?: ExtraWorkSettlementOrderByWithRelationInput | ExtraWorkSettlementOrderByWithRelationInput[]
+    cursor?: ExtraWorkSettlementWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExtraWorkSettlementScalarFieldEnum | ExtraWorkSettlementScalarFieldEnum[]
   }
 
   /**
@@ -16385,7 +16437,7 @@ export namespace Prisma {
   export type ExtraWorkSettlementGroupByOutputType = {
     settlementId: number
     employeeId: number
-    payrollId: number
+    payrollId: number | null
     settledHours: Decimal
     incentiveAmount: Decimal
     settlementDate: Date
@@ -16422,7 +16474,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
-    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    payroll?: boolean | ExtraWorkSettlement$payrollArgs<ExtArgs>
     extraWorkRecords?: boolean | ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>
     _count?: boolean | ExtraWorkSettlementCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["extraWorkSettlement"]>
@@ -16443,7 +16495,7 @@ export namespace Prisma {
   export type ExtraWorkSettlementOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"settlementId" | "employeeId" | "payrollId" | "settledHours" | "incentiveAmount" | "settlementDate" | "createdAt" | "updatedAt", ExtArgs["result"]["extraWorkSettlement"]>
   export type ExtraWorkSettlementInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
-    payroll?: boolean | PayrollDefaultArgs<ExtArgs>
+    payroll?: boolean | ExtraWorkSettlement$payrollArgs<ExtArgs>
     extraWorkRecords?: boolean | ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>
     _count?: boolean | ExtraWorkSettlementCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -16452,13 +16504,13 @@ export namespace Prisma {
     name: "ExtraWorkSettlement"
     objects: {
       employee: Prisma.$EmployeePayload<ExtArgs>
-      payroll: Prisma.$PayrollPayload<ExtArgs>
+      payroll: Prisma.$PayrollPayload<ExtArgs> | null
       extraWorkRecords: Prisma.$ExtraWorkPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       settlementId: number
       employeeId: number
-      payrollId: number
+      payrollId: number | null
       settledHours: Prisma.Decimal
       incentiveAmount: Prisma.Decimal
       settlementDate: Date
@@ -16805,7 +16857,7 @@ export namespace Prisma {
   export interface Prisma__ExtraWorkSettlementClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    payroll<T extends PayrollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PayrollDefaultArgs<ExtArgs>>): Prisma__PayrollClient<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    payroll<T extends ExtraWorkSettlement$payrollArgs<ExtArgs> = {}>(args?: Subset<T, ExtraWorkSettlement$payrollArgs<ExtArgs>>): Prisma__PayrollClient<$Result.GetResult<Prisma.$PayrollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     extraWorkRecords<T extends ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs> = {}>(args?: Subset<T, ExtraWorkSettlement$extraWorkRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExtraWorkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -17189,6 +17241,25 @@ export namespace Prisma {
      * Limit how many ExtraWorkSettlements to delete.
      */
     limit?: number
+  }
+
+  /**
+   * ExtraWorkSettlement.payroll
+   */
+  export type ExtraWorkSettlement$payrollArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payroll
+     */
+    select?: PayrollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Payroll
+     */
+    omit?: PayrollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PayrollInclude<ExtArgs> | null
+    where?: PayrollWhereInput
   }
 
   /**
@@ -25514,11 +25585,6 @@ export namespace Prisma {
     attendance?: AttendanceListRelationFilter
     attendancePunches?: AttendancePunchListRelationFilter
     managedDepartments?: DepartmentListRelationFilter
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
-    department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
-    manager?: XOR<EmployeeNullableScalarRelationFilter, EmployeeWhereInput> | null
-    subordinates?: EmployeeListRelationFilter
     fingerprintEnrollments?: FingerprintEnrollmentListRelationFilter
     fingerprintTemplates?: FingerprintTemplateListRelationFilter
     leaveBalances?: LeaveBalanceListRelationFilter
@@ -25526,6 +25592,11 @@ export namespace Prisma {
     payrolls?: PayrollListRelationFilter
     extraWorkRecords?: ExtraWorkListRelationFilter
     extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
+    manager?: XOR<EmployeeNullableScalarRelationFilter, EmployeeWhereInput> | null
+    subordinates?: EmployeeListRelationFilter
   }
 
   export type EmployeeOrderByWithRelationInput = {
@@ -25553,11 +25624,6 @@ export namespace Prisma {
     attendance?: AttendanceOrderByRelationAggregateInput
     attendancePunches?: AttendancePunchOrderByRelationAggregateInput
     managedDepartments?: DepartmentOrderByRelationAggregateInput
-    branch?: BranchOrderByWithRelationInput
-    company?: companiesOrderByWithRelationInput
-    department?: DepartmentOrderByWithRelationInput
-    manager?: EmployeeOrderByWithRelationInput
-    subordinates?: EmployeeOrderByRelationAggregateInput
     fingerprintEnrollments?: FingerprintEnrollmentOrderByRelationAggregateInput
     fingerprintTemplates?: FingerprintTemplateOrderByRelationAggregateInput
     leaveBalances?: LeaveBalanceOrderByRelationAggregateInput
@@ -25565,6 +25631,11 @@ export namespace Prisma {
     payrolls?: PayrollOrderByRelationAggregateInput
     extraWorkRecords?: ExtraWorkOrderByRelationAggregateInput
     extraWorkSettlements?: ExtraWorkSettlementOrderByRelationAggregateInput
+    branch?: BranchOrderByWithRelationInput
+    company?: companiesOrderByWithRelationInput
+    department?: DepartmentOrderByWithRelationInput
+    manager?: EmployeeOrderByWithRelationInput
+    subordinates?: EmployeeOrderByRelationAggregateInput
     _relevance?: EmployeeOrderByRelevanceInput
   }
 
@@ -25596,11 +25667,6 @@ export namespace Prisma {
     attendance?: AttendanceListRelationFilter
     attendancePunches?: AttendancePunchListRelationFilter
     managedDepartments?: DepartmentListRelationFilter
-    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
-    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
-    department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
-    manager?: XOR<EmployeeNullableScalarRelationFilter, EmployeeWhereInput> | null
-    subordinates?: EmployeeListRelationFilter
     fingerprintEnrollments?: FingerprintEnrollmentListRelationFilter
     fingerprintTemplates?: FingerprintTemplateListRelationFilter
     leaveBalances?: LeaveBalanceListRelationFilter
@@ -25608,6 +25674,11 @@ export namespace Prisma {
     payrolls?: PayrollListRelationFilter
     extraWorkRecords?: ExtraWorkListRelationFilter
     extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    department?: XOR<DepartmentNullableScalarRelationFilter, DepartmentWhereInput> | null
+    manager?: XOR<EmployeeNullableScalarRelationFilter, EmployeeWhereInput> | null
+    subordinates?: EmployeeListRelationFilter
   }, "employeeId" | "email">
 
   export type EmployeeOrderByWithAggregationInput = {
@@ -26171,8 +26242,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
-    extraWorkRecord?: XOR<ExtraWorkNullableScalarRelationFilter, ExtraWorkWhereInput> | null
-    extraWorkSettlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
+    extraWorkRecords?: ExtraWorkListRelationFilter
+    extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
   }
 
   export type PayrollOrderByWithRelationInput = {
@@ -26199,8 +26270,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     advanceDeductionRecord?: AdvancePaymentOrderByWithRelationInput
     employee?: EmployeeOrderByWithRelationInput
-    extraWorkRecord?: ExtraWorkOrderByWithRelationInput
-    extraWorkSettlement?: ExtraWorkSettlementOrderByWithRelationInput
+    extraWorkRecords?: ExtraWorkOrderByRelationAggregateInput
+    extraWorkSettlements?: ExtraWorkSettlementOrderByRelationAggregateInput
     _relevance?: PayrollOrderByRelevanceInput
   }
 
@@ -26231,8 +26302,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Payroll"> | Date | string
     advanceDeductionRecord?: XOR<AdvancePaymentNullableScalarRelationFilter, AdvancePaymentWhereInput> | null
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
-    extraWorkRecord?: XOR<ExtraWorkNullableScalarRelationFilter, ExtraWorkWhereInput> | null
-    extraWorkSettlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
+    extraWorkRecords?: ExtraWorkListRelationFilter
+    extraWorkSettlements?: ExtraWorkSettlementListRelationFilter
   }, "payrollId">
 
   export type PayrollOrderByWithAggregationInput = {
@@ -26325,11 +26396,11 @@ export namespace Prisma {
 
   export type ExtraWorkWhereUniqueInput = Prisma.AtLeast<{
     extraWorkId?: number
-    payrollId?: number
     AND?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
     OR?: ExtraWorkWhereInput[]
     NOT?: ExtraWorkWhereInput | ExtraWorkWhereInput[]
     employeeId?: IntFilter<"ExtraWork"> | number
+    payrollId?: IntFilter<"ExtraWork"> | number
     extraHours?: DecimalFilter<"ExtraWork"> | Decimal | DecimalJsLike | number | string
     status?: StringFilter<"ExtraWork"> | string
     settlementId?: IntNullableFilter<"ExtraWork"> | number | null
@@ -26338,7 +26409,7 @@ export namespace Prisma {
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
     payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
     settlement?: XOR<ExtraWorkSettlementNullableScalarRelationFilter, ExtraWorkSettlementWhereInput> | null
-  }, "extraWorkId" | "payrollId">
+  }, "extraWorkId">
 
   export type ExtraWorkOrderByWithAggregationInput = {
     extraWorkId?: SortOrder
@@ -26376,21 +26447,21 @@ export namespace Prisma {
     NOT?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
     settlementId?: IntFilter<"ExtraWorkSettlement"> | number
     employeeId?: IntFilter<"ExtraWorkSettlement"> | number
-    payrollId?: IntFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntNullableFilter<"ExtraWorkSettlement"> | number | null
     settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
-    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    payroll?: XOR<PayrollNullableScalarRelationFilter, PayrollWhereInput> | null
     extraWorkRecords?: ExtraWorkListRelationFilter
   }
 
   export type ExtraWorkSettlementOrderByWithRelationInput = {
     settlementId?: SortOrder
     employeeId?: SortOrder
-    payrollId?: SortOrder
+    payrollId?: SortOrderInput | SortOrder
     settledHours?: SortOrder
     incentiveAmount?: SortOrder
     settlementDate?: SortOrder
@@ -26403,25 +26474,25 @@ export namespace Prisma {
 
   export type ExtraWorkSettlementWhereUniqueInput = Prisma.AtLeast<{
     settlementId?: number
-    payrollId?: number
     AND?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
     OR?: ExtraWorkSettlementWhereInput[]
     NOT?: ExtraWorkSettlementWhereInput | ExtraWorkSettlementWhereInput[]
     employeeId?: IntFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntNullableFilter<"ExtraWorkSettlement"> | number | null
     settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
-    payroll?: XOR<PayrollScalarRelationFilter, PayrollWhereInput>
+    payroll?: XOR<PayrollNullableScalarRelationFilter, PayrollWhereInput> | null
     extraWorkRecords?: ExtraWorkListRelationFilter
-  }, "settlementId" | "payrollId">
+  }, "settlementId">
 
   export type ExtraWorkSettlementOrderByWithAggregationInput = {
     settlementId?: SortOrder
     employeeId?: SortOrder
-    payrollId?: SortOrder
+    payrollId?: SortOrderInput | SortOrder
     settledHours?: SortOrder
     incentiveAmount?: SortOrder
     settlementDate?: SortOrder
@@ -26440,7 +26511,7 @@ export namespace Prisma {
     NOT?: ExtraWorkSettlementScalarWhereWithAggregatesInput | ExtraWorkSettlementScalarWhereWithAggregatesInput[]
     settlementId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
     employeeId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
-    payrollId?: IntWithAggregatesFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntNullableWithAggregatesFilter<"ExtraWorkSettlement"> | number | null
     settledHours?: DecimalWithAggregatesFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalWithAggregatesFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeWithAggregatesFilter<"ExtraWorkSettlement"> | Date | string
@@ -27278,11 +27349,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -27290,6 +27356,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateInput = {
@@ -27317,7 +27388,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -27325,6 +27395,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUpdateInput = {
@@ -27347,11 +27418,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -27359,6 +27425,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateInput = {
@@ -27386,7 +27457,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -27394,6 +27464,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeCreateManyInput = {
@@ -27962,8 +28033,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
-    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateInput = {
@@ -27989,8 +28060,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
-    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollUpdateInput = {
@@ -28015,8 +28086,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
-    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateInput = {
@@ -28042,8 +28113,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
-    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollNestedInput
   }
 
   export type PayrollCreateManyInput = {
@@ -28122,7 +28193,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutExtraWorkRecordsInput
-    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordsInput
     settlement?: ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput
   }
 
@@ -28143,7 +28214,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
     settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
   }
 
@@ -28194,14 +28265,14 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput
-    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+    payroll?: PayrollCreateNestedOneWithoutExtraWorkSettlementsInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutSettlementInput
   }
 
   export type ExtraWorkSettlementUncheckedCreateInput = {
     settlementId?: number
     employeeId: number
-    payrollId: number
+    payrollId?: number | null
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
     settlementDate: Date | string
@@ -28217,14 +28288,14 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+    payroll?: PayrollUpdateOneWithoutExtraWorkSettlementsNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
   }
 
   export type ExtraWorkSettlementUncheckedUpdateInput = {
     settlementId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
-    payrollId?: IntFieldUpdateOperationsInput | number
+    payrollId?: NullableIntFieldUpdateOperationsInput | number | null
     settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28236,7 +28307,7 @@ export namespace Prisma {
   export type ExtraWorkSettlementCreateManyInput = {
     settlementId?: number
     employeeId: number
-    payrollId: number
+    payrollId?: number | null
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
     settlementDate: Date | string
@@ -28255,7 +28326,7 @@ export namespace Prisma {
   export type ExtraWorkSettlementUncheckedUpdateManyInput = {
     settlementId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
-    payrollId?: IntFieldUpdateOperationsInput | number
+    payrollId?: NullableIntFieldUpdateOperationsInput | number | null
     settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29269,11 +29340,6 @@ export namespace Prisma {
     none?: AttendancePunchWhereInput
   }
 
-  export type DepartmentNullableScalarRelationFilter = {
-    is?: DepartmentWhereInput | null
-    isNot?: DepartmentWhereInput | null
-  }
-
   export type FingerprintEnrollmentListRelationFilter = {
     every?: FingerprintEnrollmentWhereInput
     some?: FingerprintEnrollmentWhereInput
@@ -29314,6 +29380,11 @@ export namespace Prisma {
     every?: ExtraWorkSettlementWhereInput
     some?: ExtraWorkSettlementWhereInput
     none?: ExtraWorkSettlementWhereInput
+  }
+
+  export type DepartmentNullableScalarRelationFilter = {
+    is?: DepartmentWhereInput | null
+    isNot?: DepartmentWhereInput | null
   }
 
   export type ActivityLogOrderByRelationAggregateInput = {
@@ -29903,16 +29974,6 @@ export namespace Prisma {
     isNot?: AdvancePaymentWhereInput | null
   }
 
-  export type ExtraWorkNullableScalarRelationFilter = {
-    is?: ExtraWorkWhereInput | null
-    isNot?: ExtraWorkWhereInput | null
-  }
-
-  export type ExtraWorkSettlementNullableScalarRelationFilter = {
-    is?: ExtraWorkSettlementWhereInput | null
-    isNot?: ExtraWorkSettlementWhereInput | null
-  }
-
   export type PayrollOrderByRelevanceInput = {
     fields: PayrollOrderByRelevanceFieldEnum | PayrollOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -30028,6 +30089,11 @@ export namespace Prisma {
   export type PayrollScalarRelationFilter = {
     is?: PayrollWhereInput
     isNot?: PayrollWhereInput
+  }
+
+  export type ExtraWorkSettlementNullableScalarRelationFilter = {
+    is?: ExtraWorkSettlementWhereInput | null
+    isNot?: ExtraWorkSettlementWhereInput | null
   }
 
   export type ExtraWorkOrderByRelevanceInput = {
@@ -30947,37 +31013,6 @@ export namespace Prisma {
     connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
   }
 
-  export type BranchCreateNestedOneWithoutEmployeesInput = {
-    create?: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: BranchCreateOrConnectWithoutEmployeesInput
-    connect?: BranchWhereUniqueInput
-  }
-
-  export type companiesCreateNestedOneWithoutEmployeesInput = {
-    create?: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: companiesCreateOrConnectWithoutEmployeesInput
-    connect?: companiesWhereUniqueInput
-  }
-
-  export type DepartmentCreateNestedOneWithoutEmployeesInput = {
-    create?: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: DepartmentCreateOrConnectWithoutEmployeesInput
-    connect?: DepartmentWhereUniqueInput
-  }
-
-  export type EmployeeCreateNestedOneWithoutSubordinatesInput = {
-    create?: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
-    connectOrCreate?: EmployeeCreateOrConnectWithoutSubordinatesInput
-    connect?: EmployeeWhereUniqueInput
-  }
-
-  export type EmployeeCreateNestedManyWithoutManagerInput = {
-    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
-    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
-    createMany?: EmployeeCreateManyManagerInputEnvelope
-    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-  }
-
   export type FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput = {
     create?: XOR<FingerprintEnrollmentCreateWithoutEmployeeInput, FingerprintEnrollmentUncheckedCreateWithoutEmployeeInput> | FingerprintEnrollmentCreateWithoutEmployeeInput[] | FingerprintEnrollmentUncheckedCreateWithoutEmployeeInput[]
     connectOrCreate?: FingerprintEnrollmentCreateOrConnectWithoutEmployeeInput | FingerprintEnrollmentCreateOrConnectWithoutEmployeeInput[]
@@ -31027,6 +31062,37 @@ export namespace Prisma {
     connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
   }
 
+  export type BranchCreateNestedOneWithoutEmployeesInput = {
+    create?: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutEmployeesInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type companiesCreateNestedOneWithoutEmployeesInput = {
+    create?: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutEmployeesInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type DepartmentCreateNestedOneWithoutEmployeesInput = {
+    create?: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: DepartmentCreateOrConnectWithoutEmployeesInput
+    connect?: DepartmentWhereUniqueInput
+  }
+
+  export type EmployeeCreateNestedOneWithoutSubordinatesInput = {
+    create?: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSubordinatesInput
+    connect?: EmployeeWhereUniqueInput
+  }
+
+  export type EmployeeCreateNestedManyWithoutManagerInput = {
+    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
+    createMany?: EmployeeCreateManyManagerInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+  }
+
   export type ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput = {
     create?: XOR<ActivityLogCreateWithoutEmployeeInput, ActivityLogUncheckedCreateWithoutEmployeeInput> | ActivityLogCreateWithoutEmployeeInput[] | ActivityLogUncheckedCreateWithoutEmployeeInput[]
     connectOrCreate?: ActivityLogCreateOrConnectWithoutEmployeeInput | ActivityLogCreateOrConnectWithoutEmployeeInput[]
@@ -31060,13 +31126,6 @@ export namespace Prisma {
     connectOrCreate?: DepartmentCreateOrConnectWithoutManagerInput | DepartmentCreateOrConnectWithoutManagerInput[]
     createMany?: DepartmentCreateManyManagerInputEnvelope
     connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
-  }
-
-  export type EmployeeUncheckedCreateNestedManyWithoutManagerInput = {
-    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
-    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
-    createMany?: EmployeeCreateManyManagerInputEnvelope
-    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
   }
 
   export type FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput = {
@@ -31116,6 +31175,13 @@ export namespace Prisma {
     connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput | ExtraWorkSettlementCreateOrConnectWithoutEmployeeInput[]
     createMany?: ExtraWorkSettlementCreateManyEmployeeInputEnvelope
     connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+  }
+
+  export type EmployeeUncheckedCreateNestedManyWithoutManagerInput = {
+    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
+    createMany?: EmployeeCreateManyManagerInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -31198,56 +31264,6 @@ export namespace Prisma {
     update?: DepartmentUpdateWithWhereUniqueWithoutManagerInput | DepartmentUpdateWithWhereUniqueWithoutManagerInput[]
     updateMany?: DepartmentUpdateManyWithWhereWithoutManagerInput | DepartmentUpdateManyWithWhereWithoutManagerInput[]
     deleteMany?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
-  }
-
-  export type BranchUpdateOneRequiredWithoutEmployeesNestedInput = {
-    create?: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: BranchCreateOrConnectWithoutEmployeesInput
-    upsert?: BranchUpsertWithoutEmployeesInput
-    connect?: BranchWhereUniqueInput
-    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutEmployeesInput, BranchUpdateWithoutEmployeesInput>, BranchUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type companiesUpdateOneRequiredWithoutEmployeesNestedInput = {
-    create?: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: companiesCreateOrConnectWithoutEmployeesInput
-    upsert?: companiesUpsertWithoutEmployeesInput
-    connect?: companiesWhereUniqueInput
-    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutEmployeesInput, companiesUpdateWithoutEmployeesInput>, companiesUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type DepartmentUpdateOneWithoutEmployeesNestedInput = {
-    create?: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
-    connectOrCreate?: DepartmentCreateOrConnectWithoutEmployeesInput
-    upsert?: DepartmentUpsertWithoutEmployeesInput
-    disconnect?: DepartmentWhereInput | boolean
-    delete?: DepartmentWhereInput | boolean
-    connect?: DepartmentWhereUniqueInput
-    update?: XOR<XOR<DepartmentUpdateToOneWithWhereWithoutEmployeesInput, DepartmentUpdateWithoutEmployeesInput>, DepartmentUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type EmployeeUpdateOneWithoutSubordinatesNestedInput = {
-    create?: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
-    connectOrCreate?: EmployeeCreateOrConnectWithoutSubordinatesInput
-    upsert?: EmployeeUpsertWithoutSubordinatesInput
-    disconnect?: EmployeeWhereInput | boolean
-    delete?: EmployeeWhereInput | boolean
-    connect?: EmployeeWhereUniqueInput
-    update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutSubordinatesInput, EmployeeUpdateWithoutSubordinatesInput>, EmployeeUncheckedUpdateWithoutSubordinatesInput>
-  }
-
-  export type EmployeeUpdateManyWithoutManagerNestedInput = {
-    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
-    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
-    upsert?: EmployeeUpsertWithWhereUniqueWithoutManagerInput | EmployeeUpsertWithWhereUniqueWithoutManagerInput[]
-    createMany?: EmployeeCreateManyManagerInputEnvelope
-    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    update?: EmployeeUpdateWithWhereUniqueWithoutManagerInput | EmployeeUpdateWithWhereUniqueWithoutManagerInput[]
-    updateMany?: EmployeeUpdateManyWithWhereWithoutManagerInput | EmployeeUpdateManyWithWhereWithoutManagerInput[]
-    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
   }
 
   export type FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput = {
@@ -31348,6 +31364,56 @@ export namespace Prisma {
     deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
   }
 
+  export type BranchUpdateOneRequiredWithoutEmployeesNestedInput = {
+    create?: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutEmployeesInput
+    upsert?: BranchUpsertWithoutEmployeesInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutEmployeesInput, BranchUpdateWithoutEmployeesInput>, BranchUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type companiesUpdateOneRequiredWithoutEmployeesNestedInput = {
+    create?: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutEmployeesInput
+    upsert?: companiesUpsertWithoutEmployeesInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutEmployeesInput, companiesUpdateWithoutEmployeesInput>, companiesUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type DepartmentUpdateOneWithoutEmployeesNestedInput = {
+    create?: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: DepartmentCreateOrConnectWithoutEmployeesInput
+    upsert?: DepartmentUpsertWithoutEmployeesInput
+    disconnect?: DepartmentWhereInput | boolean
+    delete?: DepartmentWhereInput | boolean
+    connect?: DepartmentWhereUniqueInput
+    update?: XOR<XOR<DepartmentUpdateToOneWithWhereWithoutEmployeesInput, DepartmentUpdateWithoutEmployeesInput>, DepartmentUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type EmployeeUpdateOneWithoutSubordinatesNestedInput = {
+    create?: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSubordinatesInput
+    upsert?: EmployeeUpsertWithoutSubordinatesInput
+    disconnect?: EmployeeWhereInput | boolean
+    delete?: EmployeeWhereInput | boolean
+    connect?: EmployeeWhereUniqueInput
+    update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutSubordinatesInput, EmployeeUpdateWithoutSubordinatesInput>, EmployeeUncheckedUpdateWithoutSubordinatesInput>
+  }
+
+  export type EmployeeUpdateManyWithoutManagerNestedInput = {
+    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutManagerInput | EmployeeUpsertWithWhereUniqueWithoutManagerInput[]
+    createMany?: EmployeeCreateManyManagerInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutManagerInput | EmployeeUpdateWithWhereUniqueWithoutManagerInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutManagerInput | EmployeeUpdateManyWithWhereWithoutManagerInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+  }
+
   export type ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput = {
     create?: XOR<ActivityLogCreateWithoutEmployeeInput, ActivityLogUncheckedCreateWithoutEmployeeInput> | ActivityLogCreateWithoutEmployeeInput[] | ActivityLogUncheckedCreateWithoutEmployeeInput[]
     connectOrCreate?: ActivityLogCreateOrConnectWithoutEmployeeInput | ActivityLogCreateOrConnectWithoutEmployeeInput[]
@@ -31416,20 +31482,6 @@ export namespace Prisma {
     update?: DepartmentUpdateWithWhereUniqueWithoutManagerInput | DepartmentUpdateWithWhereUniqueWithoutManagerInput[]
     updateMany?: DepartmentUpdateManyWithWhereWithoutManagerInput | DepartmentUpdateManyWithWhereWithoutManagerInput[]
     deleteMany?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
-  }
-
-  export type EmployeeUncheckedUpdateManyWithoutManagerNestedInput = {
-    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
-    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
-    upsert?: EmployeeUpsertWithWhereUniqueWithoutManagerInput | EmployeeUpsertWithWhereUniqueWithoutManagerInput[]
-    createMany?: EmployeeCreateManyManagerInputEnvelope
-    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
-    update?: EmployeeUpdateWithWhereUniqueWithoutManagerInput | EmployeeUpdateWithWhereUniqueWithoutManagerInput[]
-    updateMany?: EmployeeUpdateManyWithWhereWithoutManagerInput | EmployeeUpdateManyWithWhereWithoutManagerInput[]
-    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
   }
 
   export type FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput = {
@@ -31528,6 +31580,20 @@ export namespace Prisma {
     update?: ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput | ExtraWorkSettlementUpdateWithWhereUniqueWithoutEmployeeInput[]
     updateMany?: ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput | ExtraWorkSettlementUpdateManyWithWhereWithoutEmployeeInput[]
     deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutManagerNestedInput = {
+    create?: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput> | EmployeeCreateWithoutManagerInput[] | EmployeeUncheckedCreateWithoutManagerInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutManagerInput | EmployeeCreateOrConnectWithoutManagerInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutManagerInput | EmployeeUpsertWithWhereUniqueWithoutManagerInput[]
+    createMany?: EmployeeCreateManyManagerInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutManagerInput | EmployeeUpdateWithWhereUniqueWithoutManagerInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutManagerInput | EmployeeUpdateManyWithWhereWithoutManagerInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
   }
 
   export type AttendancePunchCreateNestedManyWithoutDeviceInput = {
@@ -31786,16 +31852,18 @@ export namespace Prisma {
     connect?: EmployeeWhereUniqueInput
   }
 
-  export type ExtraWorkCreateNestedOneWithoutPayrollInput = {
-    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
-    connect?: ExtraWorkWhereUniqueInput
+  export type ExtraWorkCreateNestedManyWithoutPayrollInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput> | ExtraWorkCreateWithoutPayrollInput[] | ExtraWorkUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput | ExtraWorkCreateOrConnectWithoutPayrollInput[]
+    createMany?: ExtraWorkCreateManyPayrollInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
   }
 
-  export type ExtraWorkSettlementCreateNestedOneWithoutPayrollInput = {
-    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
-    connect?: ExtraWorkSettlementWhereUniqueInput
+  export type ExtraWorkSettlementCreateNestedManyWithoutPayrollInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput> | ExtraWorkSettlementCreateWithoutPayrollInput[] | ExtraWorkSettlementUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput | ExtraWorkSettlementCreateOrConnectWithoutPayrollInput[]
+    createMany?: ExtraWorkSettlementCreateManyPayrollInputEnvelope
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
   }
 
   export type AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput = {
@@ -31804,16 +31872,18 @@ export namespace Prisma {
     connect?: AdvancePaymentWhereUniqueInput
   }
 
-  export type ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput = {
-    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
-    connect?: ExtraWorkWhereUniqueInput
+  export type ExtraWorkUncheckedCreateNestedManyWithoutPayrollInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput> | ExtraWorkCreateWithoutPayrollInput[] | ExtraWorkUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput | ExtraWorkCreateOrConnectWithoutPayrollInput[]
+    createMany?: ExtraWorkCreateManyPayrollInputEnvelope
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
   }
 
-  export type ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput = {
-    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
-    connect?: ExtraWorkSettlementWhereUniqueInput
+  export type ExtraWorkSettlementUncheckedCreateNestedManyWithoutPayrollInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput> | ExtraWorkSettlementCreateWithoutPayrollInput[] | ExtraWorkSettlementUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput | ExtraWorkSettlementCreateOrConnectWithoutPayrollInput[]
+    createMany?: ExtraWorkSettlementCreateManyPayrollInputEnvelope
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
   }
 
   export type AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput = {
@@ -31834,24 +31904,32 @@ export namespace Prisma {
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutPayrollsInput, EmployeeUpdateWithoutPayrollsInput>, EmployeeUncheckedUpdateWithoutPayrollsInput>
   }
 
-  export type ExtraWorkUpdateOneWithoutPayrollNestedInput = {
-    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
-    upsert?: ExtraWorkUpsertWithoutPayrollInput
-    disconnect?: ExtraWorkWhereInput | boolean
-    delete?: ExtraWorkWhereInput | boolean
-    connect?: ExtraWorkWhereUniqueInput
-    update?: XOR<XOR<ExtraWorkUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkUpdateWithoutPayrollInput>, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+  export type ExtraWorkUpdateManyWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput> | ExtraWorkCreateWithoutPayrollInput[] | ExtraWorkUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput | ExtraWorkCreateOrConnectWithoutPayrollInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutPayrollInput | ExtraWorkUpsertWithWhereUniqueWithoutPayrollInput[]
+    createMany?: ExtraWorkCreateManyPayrollInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutPayrollInput | ExtraWorkUpdateWithWhereUniqueWithoutPayrollInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutPayrollInput | ExtraWorkUpdateManyWithWhereWithoutPayrollInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
   }
 
-  export type ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput = {
-    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
-    upsert?: ExtraWorkSettlementUpsertWithoutPayrollInput
-    disconnect?: ExtraWorkSettlementWhereInput | boolean
-    delete?: ExtraWorkSettlementWhereInput | boolean
-    connect?: ExtraWorkSettlementWhereUniqueInput
-    update?: XOR<XOR<ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkSettlementUpdateWithoutPayrollInput>, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+  export type ExtraWorkSettlementUpdateManyWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput> | ExtraWorkSettlementCreateWithoutPayrollInput[] | ExtraWorkSettlementUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput | ExtraWorkSettlementCreateOrConnectWithoutPayrollInput[]
+    upsert?: ExtraWorkSettlementUpsertWithWhereUniqueWithoutPayrollInput | ExtraWorkSettlementUpsertWithWhereUniqueWithoutPayrollInput[]
+    createMany?: ExtraWorkSettlementCreateManyPayrollInputEnvelope
+    set?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    disconnect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    delete?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    update?: ExtraWorkSettlementUpdateWithWhereUniqueWithoutPayrollInput | ExtraWorkSettlementUpdateWithWhereUniqueWithoutPayrollInput[]
+    updateMany?: ExtraWorkSettlementUpdateManyWithWhereWithoutPayrollInput | ExtraWorkSettlementUpdateManyWithWhereWithoutPayrollInput[]
+    deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
   }
 
   export type AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput = {
@@ -31864,24 +31942,32 @@ export namespace Prisma {
     update?: XOR<XOR<AdvancePaymentUpdateToOneWithWhereWithoutDeductedInPayrollInput, AdvancePaymentUpdateWithoutDeductedInPayrollInput>, AdvancePaymentUncheckedUpdateWithoutDeductedInPayrollInput>
   }
 
-  export type ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput = {
-    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput
-    upsert?: ExtraWorkUpsertWithoutPayrollInput
-    disconnect?: ExtraWorkWhereInput | boolean
-    delete?: ExtraWorkWhereInput | boolean
-    connect?: ExtraWorkWhereUniqueInput
-    update?: XOR<XOR<ExtraWorkUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkUpdateWithoutPayrollInput>, ExtraWorkUncheckedUpdateWithoutPayrollInput>
+  export type ExtraWorkUncheckedUpdateManyWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput> | ExtraWorkCreateWithoutPayrollInput[] | ExtraWorkUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkCreateOrConnectWithoutPayrollInput | ExtraWorkCreateOrConnectWithoutPayrollInput[]
+    upsert?: ExtraWorkUpsertWithWhereUniqueWithoutPayrollInput | ExtraWorkUpsertWithWhereUniqueWithoutPayrollInput[]
+    createMany?: ExtraWorkCreateManyPayrollInputEnvelope
+    set?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    disconnect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    delete?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    connect?: ExtraWorkWhereUniqueInput | ExtraWorkWhereUniqueInput[]
+    update?: ExtraWorkUpdateWithWhereUniqueWithoutPayrollInput | ExtraWorkUpdateWithWhereUniqueWithoutPayrollInput[]
+    updateMany?: ExtraWorkUpdateManyWithWhereWithoutPayrollInput | ExtraWorkUpdateManyWithWhereWithoutPayrollInput[]
+    deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
   }
 
-  export type ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput = {
-    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
-    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput
-    upsert?: ExtraWorkSettlementUpsertWithoutPayrollInput
-    disconnect?: ExtraWorkSettlementWhereInput | boolean
-    delete?: ExtraWorkSettlementWhereInput | boolean
-    connect?: ExtraWorkSettlementWhereUniqueInput
-    update?: XOR<XOR<ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput, ExtraWorkSettlementUpdateWithoutPayrollInput>, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
+  export type ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollNestedInput = {
+    create?: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput> | ExtraWorkSettlementCreateWithoutPayrollInput[] | ExtraWorkSettlementUncheckedCreateWithoutPayrollInput[]
+    connectOrCreate?: ExtraWorkSettlementCreateOrConnectWithoutPayrollInput | ExtraWorkSettlementCreateOrConnectWithoutPayrollInput[]
+    upsert?: ExtraWorkSettlementUpsertWithWhereUniqueWithoutPayrollInput | ExtraWorkSettlementUpsertWithWhereUniqueWithoutPayrollInput[]
+    createMany?: ExtraWorkSettlementCreateManyPayrollInputEnvelope
+    set?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    disconnect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    delete?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    connect?: ExtraWorkSettlementWhereUniqueInput | ExtraWorkSettlementWhereUniqueInput[]
+    update?: ExtraWorkSettlementUpdateWithWhereUniqueWithoutPayrollInput | ExtraWorkSettlementUpdateWithWhereUniqueWithoutPayrollInput[]
+    updateMany?: ExtraWorkSettlementUpdateManyWithWhereWithoutPayrollInput | ExtraWorkSettlementUpdateManyWithWhereWithoutPayrollInput[]
+    deleteMany?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
   }
 
   export type EmployeeCreateNestedOneWithoutExtraWorkRecordsInput = {
@@ -31890,9 +31976,9 @@ export namespace Prisma {
     connect?: EmployeeWhereUniqueInput
   }
 
-  export type PayrollCreateNestedOneWithoutExtraWorkRecordInput = {
-    create?: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
-    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordInput
+  export type PayrollCreateNestedOneWithoutExtraWorkRecordsInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkRecordsInput, PayrollUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordsInput
     connect?: PayrollWhereUniqueInput
   }
 
@@ -31910,12 +31996,12 @@ export namespace Prisma {
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutExtraWorkRecordsInput, EmployeeUpdateWithoutExtraWorkRecordsInput>, EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput>
   }
 
-  export type PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput = {
-    create?: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
-    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordInput
-    upsert?: PayrollUpsertWithoutExtraWorkRecordInput
+  export type PayrollUpdateOneRequiredWithoutExtraWorkRecordsNestedInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkRecordsInput, PayrollUncheckedCreateWithoutExtraWorkRecordsInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkRecordsInput
+    upsert?: PayrollUpsertWithoutExtraWorkRecordsInput
     connect?: PayrollWhereUniqueInput
-    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkRecordInput, PayrollUpdateWithoutExtraWorkRecordInput>, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
+    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkRecordsInput, PayrollUpdateWithoutExtraWorkRecordsInput>, PayrollUncheckedUpdateWithoutExtraWorkRecordsInput>
   }
 
   export type ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput = {
@@ -31934,9 +32020,9 @@ export namespace Prisma {
     connect?: EmployeeWhereUniqueInput
   }
 
-  export type PayrollCreateNestedOneWithoutExtraWorkSettlementInput = {
-    create?: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
-    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementInput
+  export type PayrollCreateNestedOneWithoutExtraWorkSettlementsInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkSettlementsInput, PayrollUncheckedCreateWithoutExtraWorkSettlementsInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementsInput
     connect?: PayrollWhereUniqueInput
   }
 
@@ -31962,12 +32048,14 @@ export namespace Prisma {
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutExtraWorkSettlementsInput, EmployeeUpdateWithoutExtraWorkSettlementsInput>, EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput>
   }
 
-  export type PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput = {
-    create?: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
-    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementInput
-    upsert?: PayrollUpsertWithoutExtraWorkSettlementInput
+  export type PayrollUpdateOneWithoutExtraWorkSettlementsNestedInput = {
+    create?: XOR<PayrollCreateWithoutExtraWorkSettlementsInput, PayrollUncheckedCreateWithoutExtraWorkSettlementsInput>
+    connectOrCreate?: PayrollCreateOrConnectWithoutExtraWorkSettlementsInput
+    upsert?: PayrollUpsertWithoutExtraWorkSettlementsInput
+    disconnect?: PayrollWhereInput | boolean
+    delete?: PayrollWhereInput | boolean
     connect?: PayrollWhereUniqueInput
-    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementInput, PayrollUpdateWithoutExtraWorkSettlementInput>, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
+    update?: XOR<XOR<PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementsInput, PayrollUpdateWithoutExtraWorkSettlementsInput>, PayrollUncheckedUpdateWithoutExtraWorkSettlementsInput>
   }
 
   export type ExtraWorkUpdateManyWithoutSettlementNestedInput = {
@@ -33017,10 +33105,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -33028,6 +33112,10 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutBranchInput = {
@@ -33054,7 +33142,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -33062,6 +33149,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutBranchInput = {
@@ -33339,11 +33427,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -33351,6 +33434,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutManagedDepartmentsInput = {
@@ -33377,7 +33465,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -33385,6 +33472,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutManagedDepartmentsInput = {
@@ -33412,10 +33500,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -33423,6 +33507,10 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutDepartmentInput = {
@@ -33449,7 +33537,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -33457,6 +33544,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutDepartmentInput = {
@@ -33573,11 +33661,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -33585,6 +33668,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutManagedDepartmentsInput = {
@@ -33611,7 +33699,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -33619,6 +33706,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUpsertWithWhereUniqueWithoutDepartmentInput = {
@@ -33788,241 +33876,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type BranchCreateWithoutEmployeesInput = {
-    branchName: string
-    location: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    company: companiesCreateNestedOneWithoutBranchesInput
-    departments?: DepartmentCreateNestedManyWithoutBranchInput
-    devices?: IotDeviceCreateNestedManyWithoutBranchInput
-  }
-
-  export type BranchUncheckedCreateWithoutEmployeesInput = {
-    branchId?: number
-    branchName: string
-    location: string
-    companyId: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
-    devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
-  }
-
-  export type BranchCreateOrConnectWithoutEmployeesInput = {
-    where: BranchWhereUniqueInput
-    create: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
-  }
-
-  export type companiesCreateWithoutEmployeesInput = {
-    company_name: string
-    address?: string | null
-    contact_email?: string | null
-    contact_phone?: string | null
-    created_at?: Date | string
-    updated_at: Date | string
-    admins?: AdminCreateNestedManyWithoutCompanyInput
-    branches?: BranchCreateNestedManyWithoutCompanyInput
-    departments?: DepartmentCreateNestedManyWithoutCompanyInput
-    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
-    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
-    settings?: SettingCreateNestedManyWithoutCompanyInput
-  }
-
-  export type companiesUncheckedCreateWithoutEmployeesInput = {
-    company_id?: number
-    company_name: string
-    address?: string | null
-    contact_email?: string | null
-    contact_phone?: string | null
-    created_at?: Date | string
-    updated_at: Date | string
-    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
-    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
-    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
-    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
-    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
-    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
-  }
-
-  export type companiesCreateOrConnectWithoutEmployeesInput = {
-    where: companiesWhereUniqueInput
-    create: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
-  }
-
-  export type DepartmentCreateWithoutEmployeesInput = {
-    departmentName: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    branch: BranchCreateNestedOneWithoutDepartmentsInput
-    company: companiesCreateNestedOneWithoutDepartmentsInput
-    manager?: EmployeeCreateNestedOneWithoutManagedDepartmentsInput
-  }
-
-  export type DepartmentUncheckedCreateWithoutEmployeesInput = {
-    departmentId?: number
-    departmentName: string
-    branchId: number
-    companyId: number
-    managerId?: number | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type DepartmentCreateOrConnectWithoutEmployeesInput = {
-    where: DepartmentWhereUniqueInput
-    create: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
-  }
-
-  export type EmployeeCreateWithoutSubordinatesInput = {
-    firstName: string
-    lastName: string
-    gender?: string | null
-    email: string
-    phone?: string | null
-    hireDate?: Date | string | null
-    role: string
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
-    status: string
-    passwordHash: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
-    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
-    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
-    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
-    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
-    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
-    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
-    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
-    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
-    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
-    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
-  }
-
-  export type EmployeeUncheckedCreateWithoutSubordinatesInput = {
-    employeeId?: number
-    firstName: string
-    lastName: string
-    gender?: string | null
-    email: string
-    phone?: string | null
-    hireDate?: Date | string | null
-    role: string
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
-    companyId: number
-    branchId: number
-    departmentId?: number | null
-    managerId?: number | null
-    status: string
-    passwordHash: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
-    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
-    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
-    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
-    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
-    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
-    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
-    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
-    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
-    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
-  }
-
-  export type EmployeeCreateOrConnectWithoutSubordinatesInput = {
-    where: EmployeeWhereUniqueInput
-    create: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
-  }
-
-  export type EmployeeCreateWithoutManagerInput = {
-    firstName: string
-    lastName: string
-    gender?: string | null
-    email: string
-    phone?: string | null
-    hireDate?: Date | string | null
-    role: string
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
-    status: string
-    passwordHash: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
-    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
-    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
-    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
-    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
-    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
-    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
-    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
-    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
-    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
-    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
-    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
-  }
-
-  export type EmployeeUncheckedCreateWithoutManagerInput = {
-    employeeId?: number
-    firstName: string
-    lastName: string
-    gender?: string | null
-    email: string
-    phone?: string | null
-    hireDate?: Date | string | null
-    role: string
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
-    companyId: number
-    branchId: number
-    departmentId?: number | null
-    status: string
-    passwordHash: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
-    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
-    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
-    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
-    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
-    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
-    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
-    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
-    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
-    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
-    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
-  }
-
-  export type EmployeeCreateOrConnectWithoutManagerInput = {
-    where: EmployeeWhereUniqueInput
-    create: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput>
-  }
-
-  export type EmployeeCreateManyManagerInputEnvelope = {
-    data: EmployeeCreateManyManagerInput | EmployeeCreateManyManagerInput[]
-    skipDuplicates?: boolean
-  }
-
   export type FingerprintEnrollmentCreateWithoutEmployeeInput = {
     sensorSlot: number
     fingerName?: string | null
@@ -34182,8 +34035,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
-    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateWithoutEmployeeInput = {
@@ -34208,8 +34061,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
-    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollCreateOrConnectWithoutEmployeeInput = {
@@ -34227,7 +34080,7 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordsInput
     settlement?: ExtraWorkSettlementCreateNestedOneWithoutExtraWorkRecordsInput
   }
 
@@ -34257,13 +34110,13 @@ export namespace Prisma {
     settlementDate: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
-    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+    payroll?: PayrollCreateNestedOneWithoutExtraWorkSettlementsInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutSettlementInput
   }
 
   export type ExtraWorkSettlementUncheckedCreateWithoutEmployeeInput = {
     settlementId?: number
-    payrollId: number
+    payrollId?: number | null
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
     settlementDate: Date | string
@@ -34279,6 +34132,241 @@ export namespace Prisma {
 
   export type ExtraWorkSettlementCreateManyEmployeeInputEnvelope = {
     data: ExtraWorkSettlementCreateManyEmployeeInput | ExtraWorkSettlementCreateManyEmployeeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BranchCreateWithoutEmployeesInput = {
+    branchName: string
+    location: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutBranchesInput
+    departments?: DepartmentCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutEmployeesInput = {
+    branchId?: number
+    branchName: string
+    location: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutEmployeesInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
+  }
+
+  export type companiesCreateWithoutEmployeesInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutEmployeesInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutEmployeesInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
+  }
+
+  export type DepartmentCreateWithoutEmployeesInput = {
+    departmentName: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutDepartmentsInput
+    company: companiesCreateNestedOneWithoutDepartmentsInput
+    manager?: EmployeeCreateNestedOneWithoutManagedDepartmentsInput
+  }
+
+  export type DepartmentUncheckedCreateWithoutEmployeesInput = {
+    departmentId?: number
+    departmentName: string
+    branchId: number
+    companyId: number
+    managerId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DepartmentCreateOrConnectWithoutEmployeesInput = {
+    where: DepartmentWhereUniqueInput
+    create: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
+  }
+
+  export type EmployeeCreateWithoutSubordinatesInput = {
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+  }
+
+  export type EmployeeUncheckedCreateWithoutSubordinatesInput = {
+    employeeId?: number
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    companyId: number
+    branchId: number
+    departmentId?: number | null
+    managerId?: number | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+  }
+
+  export type EmployeeCreateOrConnectWithoutSubordinatesInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
+  }
+
+  export type EmployeeCreateWithoutManagerInput = {
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
+  }
+
+  export type EmployeeUncheckedCreateWithoutManagerInput = {
+    employeeId?: number
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    companyId: number
+    branchId: number
+    departmentId?: number | null
+    status: string
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activityLogs?: ActivityLogUncheckedCreateNestedManyWithoutEmployeeInput
+    advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
+    attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
+    attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
+    managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
+    leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
+    payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
+  }
+
+  export type EmployeeCreateOrConnectWithoutManagerInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput>
+  }
+
+  export type EmployeeCreateManyManagerInputEnvelope = {
+    data: EmployeeCreateManyManagerInput | EmployeeCreateManyManagerInput[]
     skipDuplicates?: boolean
   }
 
@@ -34399,204 +34487,6 @@ export namespace Prisma {
   export type DepartmentUpdateManyWithWhereWithoutManagerInput = {
     where: DepartmentScalarWhereInput
     data: XOR<DepartmentUpdateManyMutationInput, DepartmentUncheckedUpdateManyWithoutManagerInput>
-  }
-
-  export type BranchUpsertWithoutEmployeesInput = {
-    update: XOR<BranchUpdateWithoutEmployeesInput, BranchUncheckedUpdateWithoutEmployeesInput>
-    create: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
-    where?: BranchWhereInput
-  }
-
-  export type BranchUpdateToOneWithWhereWithoutEmployeesInput = {
-    where?: BranchWhereInput
-    data: XOR<BranchUpdateWithoutEmployeesInput, BranchUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type BranchUpdateWithoutEmployeesInput = {
-    branchName?: StringFieldUpdateOperationsInput | string
-    location?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
-    departments?: DepartmentUpdateManyWithoutBranchNestedInput
-    devices?: IotDeviceUpdateManyWithoutBranchNestedInput
-  }
-
-  export type BranchUncheckedUpdateWithoutEmployeesInput = {
-    branchId?: IntFieldUpdateOperationsInput | number
-    branchName?: StringFieldUpdateOperationsInput | string
-    location?: StringFieldUpdateOperationsInput | string
-    companyId?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
-    devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
-  }
-
-  export type companiesUpsertWithoutEmployeesInput = {
-    update: XOR<companiesUpdateWithoutEmployeesInput, companiesUncheckedUpdateWithoutEmployeesInput>
-    create: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
-    where?: companiesWhereInput
-  }
-
-  export type companiesUpdateToOneWithWhereWithoutEmployeesInput = {
-    where?: companiesWhereInput
-    data: XOR<companiesUpdateWithoutEmployeesInput, companiesUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type companiesUpdateWithoutEmployeesInput = {
-    company_name?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
-    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    admins?: AdminUpdateManyWithoutCompanyNestedInput
-    branches?: BranchUpdateManyWithoutCompanyNestedInput
-    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
-    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
-    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
-    settings?: SettingUpdateManyWithoutCompanyNestedInput
-  }
-
-  export type companiesUncheckedUpdateWithoutEmployeesInput = {
-    company_id?: IntFieldUpdateOperationsInput | number
-    company_name?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
-    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
-    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
-    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
-    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
-    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
-    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
-  }
-
-  export type DepartmentUpsertWithoutEmployeesInput = {
-    update: XOR<DepartmentUpdateWithoutEmployeesInput, DepartmentUncheckedUpdateWithoutEmployeesInput>
-    create: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
-    where?: DepartmentWhereInput
-  }
-
-  export type DepartmentUpdateToOneWithWhereWithoutEmployeesInput = {
-    where?: DepartmentWhereInput
-    data: XOR<DepartmentUpdateWithoutEmployeesInput, DepartmentUncheckedUpdateWithoutEmployeesInput>
-  }
-
-  export type DepartmentUpdateWithoutEmployeesInput = {
-    departmentName?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    branch?: BranchUpdateOneRequiredWithoutDepartmentsNestedInput
-    company?: companiesUpdateOneRequiredWithoutDepartmentsNestedInput
-    manager?: EmployeeUpdateOneWithoutManagedDepartmentsNestedInput
-  }
-
-  export type DepartmentUncheckedUpdateWithoutEmployeesInput = {
-    departmentId?: IntFieldUpdateOperationsInput | number
-    departmentName?: StringFieldUpdateOperationsInput | string
-    branchId?: IntFieldUpdateOperationsInput | number
-    companyId?: IntFieldUpdateOperationsInput | number
-    managerId?: NullableIntFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EmployeeUpsertWithoutSubordinatesInput = {
-    update: XOR<EmployeeUpdateWithoutSubordinatesInput, EmployeeUncheckedUpdateWithoutSubordinatesInput>
-    create: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
-    where?: EmployeeWhereInput
-  }
-
-  export type EmployeeUpdateToOneWithWhereWithoutSubordinatesInput = {
-    where?: EmployeeWhereInput
-    data: XOR<EmployeeUpdateWithoutSubordinatesInput, EmployeeUncheckedUpdateWithoutSubordinatesInput>
-  }
-
-  export type EmployeeUpdateWithoutSubordinatesInput = {
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: StringFieldUpdateOperationsInput | string
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
-    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
-    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
-    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
-    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
-    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
-    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
-    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
-    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
-    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
-    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
-  }
-
-  export type EmployeeUncheckedUpdateWithoutSubordinatesInput = {
-    employeeId?: IntFieldUpdateOperationsInput | number
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: StringFieldUpdateOperationsInput | string
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    companyId?: IntFieldUpdateOperationsInput | number
-    branchId?: IntFieldUpdateOperationsInput | number
-    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
-    managerId?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
-    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
-    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
-    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
-    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
-    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
-    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
-    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
-    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
-    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
-  }
-
-  export type EmployeeUpsertWithWhereUniqueWithoutManagerInput = {
-    where: EmployeeWhereUniqueInput
-    update: XOR<EmployeeUpdateWithoutManagerInput, EmployeeUncheckedUpdateWithoutManagerInput>
-    create: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput>
-  }
-
-  export type EmployeeUpdateWithWhereUniqueWithoutManagerInput = {
-    where: EmployeeWhereUniqueInput
-    data: XOR<EmployeeUpdateWithoutManagerInput, EmployeeUncheckedUpdateWithoutManagerInput>
-  }
-
-  export type EmployeeUpdateManyWithWhereWithoutManagerInput = {
-    where: EmployeeScalarWhereInput
-    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyWithoutManagerInput>
   }
 
   export type FingerprintEnrollmentUpsertWithWhereUniqueWithoutEmployeeInput = {
@@ -34825,12 +34715,210 @@ export namespace Prisma {
     NOT?: ExtraWorkSettlementScalarWhereInput | ExtraWorkSettlementScalarWhereInput[]
     settlementId?: IntFilter<"ExtraWorkSettlement"> | number
     employeeId?: IntFilter<"ExtraWorkSettlement"> | number
-    payrollId?: IntFilter<"ExtraWorkSettlement"> | number
+    payrollId?: IntNullableFilter<"ExtraWorkSettlement"> | number | null
     settledHours?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"ExtraWorkSettlement"> | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     createdAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
     updatedAt?: DateTimeFilter<"ExtraWorkSettlement"> | Date | string
+  }
+
+  export type BranchUpsertWithoutEmployeesInput = {
+    update: XOR<BranchUpdateWithoutEmployeesInput, BranchUncheckedUpdateWithoutEmployeesInput>
+    create: XOR<BranchCreateWithoutEmployeesInput, BranchUncheckedCreateWithoutEmployeesInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutEmployeesInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutEmployeesInput, BranchUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type BranchUpdateWithoutEmployeesInput = {
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
+    departments?: DepartmentUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutEmployeesInput = {
+    branchId?: IntFieldUpdateOperationsInput | number
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type companiesUpsertWithoutEmployeesInput = {
+    update: XOR<companiesUpdateWithoutEmployeesInput, companiesUncheckedUpdateWithoutEmployeesInput>
+    create: XOR<companiesCreateWithoutEmployeesInput, companiesUncheckedCreateWithoutEmployeesInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutEmployeesInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutEmployeesInput, companiesUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type companiesUpdateWithoutEmployeesInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutEmployeesInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type DepartmentUpsertWithoutEmployeesInput = {
+    update: XOR<DepartmentUpdateWithoutEmployeesInput, DepartmentUncheckedUpdateWithoutEmployeesInput>
+    create: XOR<DepartmentCreateWithoutEmployeesInput, DepartmentUncheckedCreateWithoutEmployeesInput>
+    where?: DepartmentWhereInput
+  }
+
+  export type DepartmentUpdateToOneWithWhereWithoutEmployeesInput = {
+    where?: DepartmentWhereInput
+    data: XOR<DepartmentUpdateWithoutEmployeesInput, DepartmentUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type DepartmentUpdateWithoutEmployeesInput = {
+    departmentName?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutDepartmentsNestedInput
+    company?: companiesUpdateOneRequiredWithoutDepartmentsNestedInput
+    manager?: EmployeeUpdateOneWithoutManagedDepartmentsNestedInput
+  }
+
+  export type DepartmentUncheckedUpdateWithoutEmployeesInput = {
+    departmentId?: IntFieldUpdateOperationsInput | number
+    departmentName?: StringFieldUpdateOperationsInput | string
+    branchId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    managerId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmployeeUpsertWithoutSubordinatesInput = {
+    update: XOR<EmployeeUpdateWithoutSubordinatesInput, EmployeeUncheckedUpdateWithoutSubordinatesInput>
+    create: XOR<EmployeeCreateWithoutSubordinatesInput, EmployeeUncheckedCreateWithoutSubordinatesInput>
+    where?: EmployeeWhereInput
+  }
+
+  export type EmployeeUpdateToOneWithWhereWithoutSubordinatesInput = {
+    where?: EmployeeWhereInput
+    data: XOR<EmployeeUpdateWithoutSubordinatesInput, EmployeeUncheckedUpdateWithoutSubordinatesInput>
+  }
+
+  export type EmployeeUpdateWithoutSubordinatesInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateWithoutSubordinatesInput = {
+    employeeId?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
+    managerId?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+  }
+
+  export type EmployeeUpsertWithWhereUniqueWithoutManagerInput = {
+    where: EmployeeWhereUniqueInput
+    update: XOR<EmployeeUpdateWithoutManagerInput, EmployeeUncheckedUpdateWithoutManagerInput>
+    create: XOR<EmployeeCreateWithoutManagerInput, EmployeeUncheckedCreateWithoutManagerInput>
+  }
+
+  export type EmployeeUpdateWithWhereUniqueWithoutManagerInput = {
+    where: EmployeeWhereUniqueInput
+    data: XOR<EmployeeUpdateWithoutManagerInput, EmployeeUncheckedUpdateWithoutManagerInput>
+  }
+
+  export type EmployeeUpdateManyWithWhereWithoutManagerInput = {
+    where: EmployeeScalarWhereInput
+    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyWithoutManagerInput>
   }
 
   export type AttendancePunchCreateWithoutDeviceInput = {
@@ -35084,17 +35172,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutFingerprintTemplatesInput = {
@@ -35122,13 +35210,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutFingerprintTemplatesInput = {
@@ -35167,17 +35255,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutFingerprintTemplatesInput = {
@@ -35205,13 +35293,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type IotDeviceCreateWithoutAttendancePunchesInput = {
@@ -35267,11 +35355,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -35279,6 +35362,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutAttendancePunchesInput = {
@@ -35305,7 +35393,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -35313,6 +35400,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutAttendancePunchesInput = {
@@ -35390,11 +35478,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -35402,6 +35485,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAttendancePunchesInput = {
@@ -35428,7 +35516,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -35436,6 +35523,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeCreateWithoutAttendanceInput = {
@@ -35457,11 +35545,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -35469,6 +35552,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutAttendanceInput = {
@@ -35495,7 +35583,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -35503,6 +35590,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutAttendanceInput = {
@@ -35540,11 +35628,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -35552,6 +35635,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAttendanceInput = {
@@ -35578,7 +35666,6 @@ export namespace Prisma {
     advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -35586,6 +35673,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type IotDeviceCreateWithoutDeviceLogsInput = {
@@ -35709,8 +35797,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
-    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollUncheckedCreateWithoutAdvanceDeductionRecordInput = {
@@ -35735,8 +35823,8 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutPayrollInput
   }
 
   export type PayrollCreateOrConnectWithoutAdvanceDeductionRecordInput = {
@@ -35763,11 +35851,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -35775,6 +35858,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutAdvancePaymentsInput = {
@@ -35801,7 +35889,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -35809,6 +35896,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutAdvancePaymentsInput = {
@@ -35880,8 +35968,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
-    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateWithoutAdvanceDeductionRecordInput = {
@@ -35906,8 +35994,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollNestedInput
   }
 
   export type EmployeeUpsertWithoutAdvancePaymentsInput = {
@@ -35940,11 +36028,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -35952,6 +36035,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutAdvancePaymentsInput = {
@@ -35978,7 +36066,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -35986,6 +36073,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type AdvancePaymentCreateWithoutDeductedInPayrollInput = {
@@ -36042,17 +36130,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutPayrollsInput = {
@@ -36080,13 +36168,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutPayrollsInput = {
@@ -36118,6 +36206,11 @@ export namespace Prisma {
     create: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
   }
 
+  export type ExtraWorkCreateManyPayrollInputEnvelope = {
+    data: ExtraWorkCreateManyPayrollInput | ExtraWorkCreateManyPayrollInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ExtraWorkSettlementCreateWithoutPayrollInput = {
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
@@ -36142,6 +36235,11 @@ export namespace Prisma {
   export type ExtraWorkSettlementCreateOrConnectWithoutPayrollInput = {
     where: ExtraWorkSettlementWhereUniqueInput
     create: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
+  }
+
+  export type ExtraWorkSettlementCreateManyPayrollInputEnvelope = {
+    data: ExtraWorkSettlementCreateManyPayrollInput | ExtraWorkSettlementCreateManyPayrollInput[]
+    skipDuplicates?: boolean
   }
 
   export type AdvancePaymentUpsertWithoutDeductedInPayrollInput = {
@@ -36215,17 +36313,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutPayrollsInput = {
@@ -36253,75 +36351,45 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
-  export type ExtraWorkUpsertWithoutPayrollInput = {
+  export type ExtraWorkUpsertWithWhereUniqueWithoutPayrollInput = {
+    where: ExtraWorkWhereUniqueInput
     update: XOR<ExtraWorkUpdateWithoutPayrollInput, ExtraWorkUncheckedUpdateWithoutPayrollInput>
     create: XOR<ExtraWorkCreateWithoutPayrollInput, ExtraWorkUncheckedCreateWithoutPayrollInput>
-    where?: ExtraWorkWhereInput
   }
 
-  export type ExtraWorkUpdateToOneWithWhereWithoutPayrollInput = {
-    where?: ExtraWorkWhereInput
+  export type ExtraWorkUpdateWithWhereUniqueWithoutPayrollInput = {
+    where: ExtraWorkWhereUniqueInput
     data: XOR<ExtraWorkUpdateWithoutPayrollInput, ExtraWorkUncheckedUpdateWithoutPayrollInput>
   }
 
-  export type ExtraWorkUpdateWithoutPayrollInput = {
-    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    status?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
-    settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
+  export type ExtraWorkUpdateManyWithWhereWithoutPayrollInput = {
+    where: ExtraWorkScalarWhereInput
+    data: XOR<ExtraWorkUpdateManyMutationInput, ExtraWorkUncheckedUpdateManyWithoutPayrollInput>
   }
 
-  export type ExtraWorkUncheckedUpdateWithoutPayrollInput = {
-    extraWorkId?: IntFieldUpdateOperationsInput | number
-    employeeId?: IntFieldUpdateOperationsInput | number
-    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    status?: StringFieldUpdateOperationsInput | string
-    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ExtraWorkSettlementUpsertWithoutPayrollInput = {
+  export type ExtraWorkSettlementUpsertWithWhereUniqueWithoutPayrollInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
     update: XOR<ExtraWorkSettlementUpdateWithoutPayrollInput, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
     create: XOR<ExtraWorkSettlementCreateWithoutPayrollInput, ExtraWorkSettlementUncheckedCreateWithoutPayrollInput>
-    where?: ExtraWorkSettlementWhereInput
   }
 
-  export type ExtraWorkSettlementUpdateToOneWithWhereWithoutPayrollInput = {
-    where?: ExtraWorkSettlementWhereInput
+  export type ExtraWorkSettlementUpdateWithWhereUniqueWithoutPayrollInput = {
+    where: ExtraWorkSettlementWhereUniqueInput
     data: XOR<ExtraWorkSettlementUpdateWithoutPayrollInput, ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput>
   }
 
-  export type ExtraWorkSettlementUpdateWithoutPayrollInput = {
-    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
-    extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
-  }
-
-  export type ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput = {
-    settlementId?: IntFieldUpdateOperationsInput | number
-    employeeId?: IntFieldUpdateOperationsInput | number
-    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput
+  export type ExtraWorkSettlementUpdateManyWithWhereWithoutPayrollInput = {
+    where: ExtraWorkSettlementScalarWhereInput
+    data: XOR<ExtraWorkSettlementUpdateManyMutationInput, ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollInput>
   }
 
   export type EmployeeCreateWithoutExtraWorkRecordsInput = {
@@ -36344,17 +36412,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutExtraWorkRecordsInput = {
@@ -36382,13 +36450,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutExtraWorkRecordsInput = {
@@ -36396,7 +36464,7 @@ export namespace Prisma {
     create: XOR<EmployeeCreateWithoutExtraWorkRecordsInput, EmployeeUncheckedCreateWithoutExtraWorkRecordsInput>
   }
 
-  export type PayrollCreateWithoutExtraWorkRecordInput = {
+  export type PayrollCreateWithoutExtraWorkRecordsInput = {
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
     baseSalary?: Decimal | DecimalJsLike | number | string | null
@@ -36418,10 +36486,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
-    extraWorkSettlement?: ExtraWorkSettlementCreateNestedOneWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutPayrollInput
   }
 
-  export type PayrollUncheckedCreateWithoutExtraWorkRecordInput = {
+  export type PayrollUncheckedCreateWithoutExtraWorkRecordsInput = {
     payrollId?: number
     employeeId: number
     payPeriodStart: Date | string
@@ -36444,12 +36512,12 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutPayrollInput
   }
 
-  export type PayrollCreateOrConnectWithoutExtraWorkRecordInput = {
+  export type PayrollCreateOrConnectWithoutExtraWorkRecordsInput = {
     where: PayrollWhereUniqueInput
-    create: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+    create: XOR<PayrollCreateWithoutExtraWorkRecordsInput, PayrollUncheckedCreateWithoutExtraWorkRecordsInput>
   }
 
   export type ExtraWorkSettlementCreateWithoutExtraWorkRecordsInput = {
@@ -36459,13 +36527,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutExtraWorkSettlementsInput
-    payroll: PayrollCreateNestedOneWithoutExtraWorkSettlementInput
+    payroll?: PayrollCreateNestedOneWithoutExtraWorkSettlementsInput
   }
 
   export type ExtraWorkSettlementUncheckedCreateWithoutExtraWorkRecordsInput = {
     settlementId?: number
     employeeId: number
-    payrollId: number
+    payrollId?: number | null
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
     settlementDate: Date | string
@@ -36509,17 +36577,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutExtraWorkRecordsInput = {
@@ -36547,27 +36615,27 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
-  export type PayrollUpsertWithoutExtraWorkRecordInput = {
-    update: XOR<PayrollUpdateWithoutExtraWorkRecordInput, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
-    create: XOR<PayrollCreateWithoutExtraWorkRecordInput, PayrollUncheckedCreateWithoutExtraWorkRecordInput>
+  export type PayrollUpsertWithoutExtraWorkRecordsInput = {
+    update: XOR<PayrollUpdateWithoutExtraWorkRecordsInput, PayrollUncheckedUpdateWithoutExtraWorkRecordsInput>
+    create: XOR<PayrollCreateWithoutExtraWorkRecordsInput, PayrollUncheckedCreateWithoutExtraWorkRecordsInput>
     where?: PayrollWhereInput
   }
 
-  export type PayrollUpdateToOneWithWhereWithoutExtraWorkRecordInput = {
+  export type PayrollUpdateToOneWithWhereWithoutExtraWorkRecordsInput = {
     where?: PayrollWhereInput
-    data: XOR<PayrollUpdateWithoutExtraWorkRecordInput, PayrollUncheckedUpdateWithoutExtraWorkRecordInput>
+    data: XOR<PayrollUpdateWithoutExtraWorkRecordsInput, PayrollUncheckedUpdateWithoutExtraWorkRecordsInput>
   }
 
-  export type PayrollUpdateWithoutExtraWorkRecordInput = {
+  export type PayrollUpdateWithoutExtraWorkRecordsInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -36589,10 +36657,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutPayrollNestedInput
   }
 
-  export type PayrollUncheckedUpdateWithoutExtraWorkRecordInput = {
+  export type PayrollUncheckedUpdateWithoutExtraWorkRecordsInput = {
     payrollId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36615,7 +36683,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollNestedInput
   }
 
   export type ExtraWorkSettlementUpsertWithoutExtraWorkRecordsInput = {
@@ -36636,13 +36704,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+    payroll?: PayrollUpdateOneWithoutExtraWorkSettlementsNestedInput
   }
 
   export type ExtraWorkSettlementUncheckedUpdateWithoutExtraWorkRecordsInput = {
     settlementId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
-    payrollId?: IntFieldUpdateOperationsInput | number
+    payrollId?: NullableIntFieldUpdateOperationsInput | number | null
     settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36670,17 +36738,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput = {
@@ -36708,13 +36776,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutExtraWorkSettlementsInput = {
@@ -36722,7 +36790,7 @@ export namespace Prisma {
     create: XOR<EmployeeCreateWithoutExtraWorkSettlementsInput, EmployeeUncheckedCreateWithoutExtraWorkSettlementsInput>
   }
 
-  export type PayrollCreateWithoutExtraWorkSettlementInput = {
+  export type PayrollCreateWithoutExtraWorkSettlementsInput = {
     payPeriodStart: Date | string
     payPeriodEnd: Date | string
     baseSalary?: Decimal | DecimalJsLike | number | string | null
@@ -36744,10 +36812,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentCreateNestedOneWithoutDeductedInPayrollInput
     employee: EmployeeCreateNestedOneWithoutPayrollsInput
-    extraWorkRecord?: ExtraWorkCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkCreateNestedManyWithoutPayrollInput
   }
 
-  export type PayrollUncheckedCreateWithoutExtraWorkSettlementInput = {
+  export type PayrollUncheckedCreateWithoutExtraWorkSettlementsInput = {
     payrollId?: number
     employeeId: number
     payPeriodStart: Date | string
@@ -36770,12 +36838,12 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedCreateNestedOneWithoutDeductedInPayrollInput
-    extraWorkRecord?: ExtraWorkUncheckedCreateNestedOneWithoutPayrollInput
+    extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutPayrollInput
   }
 
-  export type PayrollCreateOrConnectWithoutExtraWorkSettlementInput = {
+  export type PayrollCreateOrConnectWithoutExtraWorkSettlementsInput = {
     where: PayrollWhereUniqueInput
-    create: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+    create: XOR<PayrollCreateWithoutExtraWorkSettlementsInput, PayrollUncheckedCreateWithoutExtraWorkSettlementsInput>
   }
 
   export type ExtraWorkCreateWithoutSettlementInput = {
@@ -36784,7 +36852,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutExtraWorkRecordsInput
-    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordInput
+    payroll: PayrollCreateNestedOneWithoutExtraWorkRecordsInput
   }
 
   export type ExtraWorkUncheckedCreateWithoutSettlementInput = {
@@ -36838,17 +36906,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutExtraWorkSettlementsInput = {
@@ -36876,27 +36944,27 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
-  export type PayrollUpsertWithoutExtraWorkSettlementInput = {
-    update: XOR<PayrollUpdateWithoutExtraWorkSettlementInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
-    create: XOR<PayrollCreateWithoutExtraWorkSettlementInput, PayrollUncheckedCreateWithoutExtraWorkSettlementInput>
+  export type PayrollUpsertWithoutExtraWorkSettlementsInput = {
+    update: XOR<PayrollUpdateWithoutExtraWorkSettlementsInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementsInput>
+    create: XOR<PayrollCreateWithoutExtraWorkSettlementsInput, PayrollUncheckedCreateWithoutExtraWorkSettlementsInput>
     where?: PayrollWhereInput
   }
 
-  export type PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementInput = {
+  export type PayrollUpdateToOneWithWhereWithoutExtraWorkSettlementsInput = {
     where?: PayrollWhereInput
-    data: XOR<PayrollUpdateWithoutExtraWorkSettlementInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementInput>
+    data: XOR<PayrollUpdateWithoutExtraWorkSettlementsInput, PayrollUncheckedUpdateWithoutExtraWorkSettlementsInput>
   }
 
-  export type PayrollUpdateWithoutExtraWorkSettlementInput = {
+  export type PayrollUpdateWithoutExtraWorkSettlementsInput = {
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
     payPeriodEnd?: DateTimeFieldUpdateOperationsInput | Date | string
     baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -36918,10 +36986,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
     employee?: EmployeeUpdateOneRequiredWithoutPayrollsNestedInput
-    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutPayrollNestedInput
   }
 
-  export type PayrollUncheckedUpdateWithoutExtraWorkSettlementInput = {
+  export type PayrollUncheckedUpdateWithoutExtraWorkSettlementsInput = {
     payrollId?: IntFieldUpdateOperationsInput | number
     employeeId?: IntFieldUpdateOperationsInput | number
     payPeriodStart?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36944,7 +37012,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
-    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutPayrollNestedInput
   }
 
   export type ExtraWorkUpsertWithWhereUniqueWithoutSettlementInput = {
@@ -36982,11 +37050,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -36994,6 +37057,11 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutActivityLogsInput = {
@@ -37020,7 +37088,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -37028,6 +37095,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutActivityLogsInput = {
@@ -37065,11 +37133,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -37077,6 +37140,11 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutActivityLogsInput = {
@@ -37103,7 +37171,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -37111,6 +37178,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type companiesCreateWithoutSettingsInput = {
@@ -37302,10 +37370,6 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
@@ -37313,6 +37377,10 @@ export namespace Prisma {
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutCompanyInput = {
@@ -37339,7 +37407,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
@@ -37347,6 +37414,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutCompanyInput = {
@@ -37841,17 +37909,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutLeaveBalancesInput = {
@@ -37879,13 +37947,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutLeaveBalancesInput = {
@@ -37962,17 +38030,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutLeaveBalancesInput = {
@@ -38000,13 +38068,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type LeaveTypeUpsertWithoutBalancesInput = {
@@ -38073,17 +38141,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutLeaveRequestsInput = {
@@ -38111,13 +38179,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedCreateNestedManyWithoutEmployeeInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutLeaveRequestsInput = {
@@ -38194,17 +38262,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutLeaveRequestsInput = {
@@ -38232,13 +38300,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type LeaveTypeUpsertWithoutRequestsInput = {
@@ -38305,17 +38373,17 @@ export namespace Prisma {
     attendance?: AttendanceCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentCreateNestedManyWithoutManagerInput
-    branch: BranchCreateNestedOneWithoutEmployeesInput
-    company: companiesCreateNestedOneWithoutEmployeesInput
-    department?: DepartmentCreateNestedOneWithoutEmployeesInput
-    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
-    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
     fingerprintTemplates?: FingerprintTemplateCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementCreateNestedManyWithoutEmployeeInput
+    branch: BranchCreateNestedOneWithoutEmployeesInput
+    company: companiesCreateNestedOneWithoutEmployeesInput
+    department?: DepartmentCreateNestedOneWithoutEmployeesInput
+    manager?: EmployeeCreateNestedOneWithoutSubordinatesInput
+    subordinates?: EmployeeCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeUncheckedCreateWithoutFingerprintEnrollmentsInput = {
@@ -38343,13 +38411,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedCreateNestedManyWithoutEmployeeInput
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutEmployeeInput
     managedDepartments?: DepartmentUncheckedCreateNestedManyWithoutManagerInput
-    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
     fingerprintTemplates?: FingerprintTemplateUncheckedCreateNestedManyWithoutEmployeeInput
     leaveBalances?: LeaveBalanceUncheckedCreateNestedManyWithoutEmployeeInput
     leaveRequests?: LeaveRequestUncheckedCreateNestedManyWithoutEmployeeInput
     payrolls?: PayrollUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkRecords?: ExtraWorkUncheckedCreateNestedManyWithoutEmployeeInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedCreateNestedManyWithoutEmployeeInput
+    subordinates?: EmployeeUncheckedCreateNestedManyWithoutManagerInput
   }
 
   export type EmployeeCreateOrConnectWithoutFingerprintEnrollmentsInput = {
@@ -38388,17 +38456,17 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutFingerprintEnrollmentsInput = {
@@ -38426,13 +38494,13 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type AdvancePaymentCreateManyApproverInput = {
@@ -38585,10 +38653,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -38596,6 +38660,10 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutBranchInput = {
@@ -38622,7 +38690,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -38630,6 +38697,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutBranchInput = {
@@ -38736,10 +38804,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -38747,6 +38811,10 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
@@ -38773,7 +38841,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -38781,6 +38848,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutDepartmentInput = {
@@ -38851,27 +38919,6 @@ export namespace Prisma {
     departmentName: string
     branchId: number
     companyId: number
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type EmployeeCreateManyManagerInput = {
-    employeeId?: number
-    firstName: string
-    lastName: string
-    gender?: string | null
-    email: string
-    phone?: string | null
-    hireDate?: Date | string | null
-    role: string
-    baseSalary?: Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
-    companyId: number
-    branchId: number
-    departmentId?: number | null
-    status: string
-    passwordHash: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -38962,10 +39009,31 @@ export namespace Prisma {
 
   export type ExtraWorkSettlementCreateManyEmployeeInput = {
     settlementId?: number
-    payrollId: number
+    payrollId?: number | null
     settledHours: Decimal | DecimalJsLike | number | string
     incentiveAmount: Decimal | DecimalJsLike | number | string
     settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type EmployeeCreateManyManagerInput = {
+    employeeId?: number
+    firstName: string
+    lastName: string
+    gender?: string | null
+    email: string
+    phone?: string | null
+    hireDate?: Date | string | null
+    role: string
+    baseSalary?: Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: Decimal | DecimalJsLike | number | string | null
+    companyId: number
+    branchId: number
+    departmentId?: number | null
+    status: string
+    passwordHash: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -39118,94 +39186,6 @@ export namespace Prisma {
     departmentName?: StringFieldUpdateOperationsInput | string
     branchId?: IntFieldUpdateOperationsInput | number
     companyId?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EmployeeUpdateWithoutManagerInput = {
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: StringFieldUpdateOperationsInput | string
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    status?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
-    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
-    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
-    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
-    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
-    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
-    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
-    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
-    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
-    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
-    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
-    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
-  }
-
-  export type EmployeeUncheckedUpdateWithoutManagerInput = {
-    employeeId?: IntFieldUpdateOperationsInput | number
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: StringFieldUpdateOperationsInput | string
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    companyId?: IntFieldUpdateOperationsInput | number
-    branchId?: IntFieldUpdateOperationsInput | number
-    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
-    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
-    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
-    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
-    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
-    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
-    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
-    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
-    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
-    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
-    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
-  }
-
-  export type EmployeeUncheckedUpdateManyWithoutManagerInput = {
-    employeeId?: IntFieldUpdateOperationsInput | number
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    gender?: NullableStringFieldUpdateOperationsInput | string | null
-    email?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: StringFieldUpdateOperationsInput | string
-    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    companyId?: IntFieldUpdateOperationsInput | number
-    branchId?: IntFieldUpdateOperationsInput | number
-    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -39380,8 +39360,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUpdateOneWithoutDeductedInPayrollNestedInput
-    extraWorkRecord?: ExtraWorkUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateWithoutEmployeeInput = {
@@ -39406,8 +39386,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     advanceDeductionRecord?: AdvancePaymentUncheckedUpdateOneWithoutDeductedInPayrollNestedInput
-    extraWorkRecord?: ExtraWorkUncheckedUpdateOneWithoutPayrollNestedInput
-    extraWorkSettlement?: ExtraWorkSettlementUncheckedUpdateOneWithoutPayrollNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutPayrollNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollNestedInput
   }
 
   export type PayrollUncheckedUpdateManyWithoutEmployeeInput = {
@@ -39438,7 +39418,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
     settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
   }
 
@@ -39468,13 +39448,13 @@ export namespace Prisma {
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkSettlementNestedInput
+    payroll?: PayrollUpdateOneWithoutExtraWorkSettlementsNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
   }
 
   export type ExtraWorkSettlementUncheckedUpdateWithoutEmployeeInput = {
     settlementId?: IntFieldUpdateOperationsInput | number
-    payrollId?: IntFieldUpdateOperationsInput | number
+    payrollId?: NullableIntFieldUpdateOperationsInput | number | null
     settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39485,10 +39465,98 @@ export namespace Prisma {
 
   export type ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeInput = {
     settlementId?: IntFieldUpdateOperationsInput | number
-    payrollId?: IntFieldUpdateOperationsInput | number
+    payrollId?: NullableIntFieldUpdateOperationsInput | number | null
     settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmployeeUpdateWithoutManagerInput = {
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    company?: companiesUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateWithoutManagerInput = {
+    employeeId?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activityLogs?: ActivityLogUncheckedUpdateManyWithoutEmployeeNestedInput
+    advancePayments?: AdvancePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
+    managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
+    fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
+    fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
+    leaveRequests?: LeaveRequestUncheckedUpdateManyWithoutEmployeeNestedInput
+    payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
+    extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutManagerInput = {
+    employeeId?: IntFieldUpdateOperationsInput | number
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    gender?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    hireDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: StringFieldUpdateOperationsInput | string
+    baseSalary?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    monthlyExpectedHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    salaryRatePerHour?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    departmentId?: NullableIntFieldUpdateOperationsInput | number | null
+    status?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -39557,6 +39625,86 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ExtraWorkCreateManyPayrollInput = {
+    extraWorkId?: number
+    employeeId: number
+    extraHours?: Decimal | DecimalJsLike | number | string
+    status?: string
+    settlementId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkSettlementCreateManyPayrollInput = {
+    settlementId?: number
+    employeeId: number
+    settledHours: Decimal | DecimalJsLike | number | string
+    incentiveAmount: Decimal | DecimalJsLike | number | string
+    settlementDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExtraWorkUpdateWithoutPayrollInput = {
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
+    settlement?: ExtraWorkSettlementUpdateOneWithoutExtraWorkRecordsNestedInput
+  }
+
+  export type ExtraWorkUncheckedUpdateWithoutPayrollInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkUncheckedUpdateManyWithoutPayrollInput = {
+    extraWorkId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: StringFieldUpdateOperationsInput | string
+    settlementId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExtraWorkSettlementUpdateWithoutPayrollInput = {
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutExtraWorkSettlementsNestedInput
+    extraWorkRecords?: ExtraWorkUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateWithoutPayrollInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutSettlementNestedInput
+  }
+
+  export type ExtraWorkSettlementUncheckedUpdateManyWithoutPayrollInput = {
+    settlementId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    settledHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    settlementDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ExtraWorkCreateManySettlementInput = {
     extraWorkId?: number
     employeeId: number
@@ -39573,7 +39721,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
-    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordNestedInput
+    payroll?: PayrollUpdateOneRequiredWithoutExtraWorkRecordsNestedInput
   }
 
   export type ExtraWorkUncheckedUpdateWithoutSettlementInput = {
@@ -39788,10 +39936,6 @@ export namespace Prisma {
     attendance?: AttendanceUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUpdateManyWithoutManagerNestedInput
-    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
-    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
-    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
-    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUpdateManyWithoutEmployeeNestedInput
@@ -39799,6 +39943,10 @@ export namespace Prisma {
     payrolls?: PayrollUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUpdateManyWithoutEmployeeNestedInput
+    branch?: BranchUpdateOneRequiredWithoutEmployeesNestedInput
+    department?: DepartmentUpdateOneWithoutEmployeesNestedInput
+    manager?: EmployeeUpdateOneWithoutSubordinatesNestedInput
+    subordinates?: EmployeeUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutCompanyInput = {
@@ -39825,7 +39973,6 @@ export namespace Prisma {
     attendance?: AttendanceUncheckedUpdateManyWithoutEmployeeNestedInput
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutEmployeeNestedInput
     managedDepartments?: DepartmentUncheckedUpdateManyWithoutManagerNestedInput
-    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
     fingerprintEnrollments?: FingerprintEnrollmentUncheckedUpdateManyWithoutEmployeeNestedInput
     fingerprintTemplates?: FingerprintTemplateUncheckedUpdateManyWithoutEmployeeNestedInput
     leaveBalances?: LeaveBalanceUncheckedUpdateManyWithoutEmployeeNestedInput
@@ -39833,6 +39980,7 @@ export namespace Prisma {
     payrolls?: PayrollUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
+    subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
   export type EmployeeUncheckedUpdateManyWithoutCompanyInput = {

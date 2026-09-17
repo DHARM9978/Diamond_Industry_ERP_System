@@ -451,6 +451,9 @@ const API = {
             // PATCH /api/payroll/extra-work/:id/reject
             reject: (id) =>
                 `/api/payroll/extra-work/${id}/reject`,
+
+            // POST /api/payroll/extra-work/settle
+            settle: "/api/payroll/extra-work/settle",
         },
 
 

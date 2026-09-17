@@ -1275,20 +1275,18 @@ export const payrollService = {
     // Backend sets:
     // status = "PAID"
     // paymentDate = actual payment timestamp
+    //
+    // This method is for normal salary only.
+    // Overtime / variable payment uses extraWork.settle().
     // --------------------------------------------------------
 
     pay: async (
-        id,
-        incentiveAmount = 0
+        id
     ) => {
 
         const response =
             await apiClient.patch(
-                API.payroll.pay(id),
-                {
-                    incentiveAmount:
-                        incentiveAmount
-                }
+                API.payroll.pay(id)
             );
 
         return unwrap(response);
@@ -1338,6 +1336,34 @@ export const payrollService = {
                     {
                         params,
                     }
+                );
+
+            return unwrap(response);
+        },
+
+
+        // ----------------------------------------------------
+        // SETTLE EXTRA WORK / OVERTIME
+        //
+        // POST /api/payroll/extra-work/settle
+        //
+        // This is separate from normal payroll payment.
+        // It does NOT mark the regular payroll as PAID.
+        //
+        // data:
+        // {
+        //     employeeId,
+        //     payrollId,          // optional
+        //     incentiveAmount    // optional
+        // }
+        // ----------------------------------------------------
+        settle: async (
+            data
+        ) => {
+            const response =
+                await apiClient.post(
+                    API.payroll.extraWork.settle,
+                    data
                 );
 
             return unwrap(response);

@@ -906,7 +906,6 @@ const markPayrollPaid = async (
             req.params.id
         );
 
-
     if (
         !Number.isInteger(
             payrollId
@@ -925,18 +924,17 @@ const markPayrollPaid = async (
         throw error;
     }
 
-
-    const incentiveAmount =
-        req.body?.incentiveAmount ??
-        0;
-
+    /*
+     * Normal payroll payment is intentionally kept separate
+     * from overtime / variable payment.
+     *
+     * Overtime must use POST /extra-work/settle.
+     */
     const payroll =
         await payrollService.markPayrollPaid(
             payrollId,
-            req.user.companyId,
-            incentiveAmount
+            req.user.companyId
         );
-
 
     return res.status(200).json({
 
@@ -950,7 +948,6 @@ const markPayrollPaid = async (
             payroll
 
     });
-
 };
 
 
@@ -961,6 +958,83 @@ const markPayrollPaid = async (
 //
 // Optional query parameters are passed directly to the service.
 // ============================================================
+
+// ============================================================
+// SETTLE EXTRA WORK / OVERTIME
+//
+// POST /api/payroll/extra-work/settle
+//
+// Body:
+// {
+//     "employeeId": 12,
+//     "payrollId": 73,          // optional historical reference
+//     "incentiveAmount": 2000   // optional, defaults to 0
+// }
+//
+// IMPORTANT:
+// - This settles accumulated overtime only.
+// - It does NOT mark normal payroll as PAID.
+// - It creates permanent settlement history.
+// ============================================================
+
+const settleExtraWork = async (
+    req,
+    res
+) => {
+
+    const employeeId =
+        Number(
+            req.body?.employeeId
+        );
+
+    if (
+        !Number.isInteger(
+            employeeId
+        ) ||
+        employeeId < 1
+    ) {
+
+        const error =
+            new Error(
+                "Invalid employee ID"
+            );
+
+        error.statusCode =
+            400;
+
+        throw error;
+    }
+
+    const incentiveAmount =
+        req.body?.incentiveAmount ??
+        0;
+
+    const payrollId =
+        req.body?.payrollId ??
+        null;
+
+    const settlement =
+        await payrollService.settleExtraWork(
+            employeeId,
+            req.user.companyId,
+            incentiveAmount,
+            payrollId
+        );
+
+    return res.status(200).json({
+
+        success:
+            true,
+
+        message:
+            "Extra-work settled successfully",
+
+        data:
+            settlement
+
+    });
+};
+
 
 const getExtraWorkRecords = async (
     req,
@@ -1123,6 +1197,7 @@ module.exports = {
 
     // Payroll payment
     markPayrollPaid,
+    settleExtraWork,
 
 
     // Extra work / overtime

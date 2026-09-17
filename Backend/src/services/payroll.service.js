@@ -388,9 +388,9 @@ const payrollInclude = {
     advanceDeductionRecord: true,
 
     // [NEW] Extra-work records and settlement history.
-    extraWorkRecord: true,
+    extraWorkRecords: true,
 
-    extraWorkSettlement: true
+    extraWorkSettlements: true
 };
 
 
@@ -1879,12 +1879,18 @@ const decoratePayroll = async (
     // live attendance. This also backfills ExtraWork for older unpaid
     // payrolls that were created before extra-work persistence was added.
     const existingExtraWork =
-        await prisma.extraWork.findUnique({
+        await prisma.extraWork.findFirst({
 
             where: {
 
                 payrollId:
                     Number(payroll.payrollId)
+            },
+
+            orderBy: {
+
+                extraWorkId:
+                    "desc"
             }
         });
 
@@ -2923,9 +2929,227 @@ const getMyPayroll = async (
     companyId
 ) => {
 
-    return await getEmployeePayroll(
-        employeeId,
+    /*
+     * Employee self-service payroll remains an array of payroll
+     * records so existing employee UI/API consumers are not broken.
+     *
+     * Each payroll already contains its directly related
+     * extraWorkRecords and extraWorkSettlements through
+     * payrollInclude.
+     *
+     * We additionally load the employee's complete overtime history
+     * here. This is important because ExtraWorkSettlement.payrollId
+     * is optional: a settlement can be recorded independently from
+     * the normal salary payment.
+     *
+     * Only the authenticated employee's own records are queried.
+     */
+    const id =
+        Number(employeeId);
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
+
+        throw createServiceError(
+            "Invalid employee ID",
+            400
+        );
+    }
+
+    /*
+     * Verify that the employee belongs to the
+     * authenticated company before returning any
+     * self-service payroll/overtime information.
+     */
+    await getEmployeeById(
+        id,
         companyId
+    );
+
+    const payrolls =
+        await getEmployeePayroll(
+            id,
+            companyId
+        );
+
+    /*
+     * Complete employee-owned overtime records.
+     *
+     * This does NOT expose another employee's data and does
+     * NOT modify normal payroll salary/payment values.
+     */
+    const extraWorkRecords =
+        await prisma.extraWork.findMany({
+
+            where: {
+
+                employeeId:
+                    id
+            },
+
+            include: {
+
+                payroll: true,
+
+                settlement: true
+            },
+
+            orderBy: [
+                {
+                    createdAt:
+                        "desc"
+                },
+                {
+                    extraWorkId:
+                        "desc"
+                }
+            ]
+        });
+
+    /*
+     * Complete employee-owned overtime settlement history.
+     *
+     * This includes incentiveAmount so the employee can see
+     * variable/overtime payment separately from regular salary.
+     */
+    const extraWorkSettlementHistory =
+        await prisma.extraWorkSettlement.findMany({
+
+            where: {
+
+                employeeId:
+                    id,
+
+                employee: {
+
+                    companyId:
+                        Number(companyId)
+                }
+            },
+
+            include: {
+
+                payroll: true,
+
+                extraWorkRecords: true
+            },
+
+            orderBy: [
+                {
+                    settlementDate:
+                        "desc"
+                },
+                {
+                    settlementId:
+                        "desc"
+                }
+            ]
+        });
+
+    const employeeExtraWork =
+        extraWorkRecords.map(
+            (record) => ({
+
+                extraWorkId:
+                    record.extraWorkId,
+
+                payrollId:
+                    record.payrollId,
+
+                payPeriodStart:
+                    record.payroll
+                        ? record.payroll.payPeriodStart
+                        : null,
+
+                payPeriodEnd:
+                    record.payroll
+                        ? record.payroll.payPeriodEnd
+                        : null,
+
+                extraHours:
+                    decimalToNumber(
+                        record.extraHours
+                    ),
+
+                status:
+                    record.status,
+
+                settlementId:
+                    record.settlementId,
+
+                createdAt:
+                    record.createdAt,
+
+                updatedAt:
+                    record.updatedAt
+            })
+        );
+
+    const employeeExtraWorkSettlements =
+        extraWorkSettlementHistory.map(
+            (settlement) => ({
+
+                settlementId:
+                    settlement.settlementId,
+
+                payrollId:
+                    settlement.payrollId,
+
+                settledHours:
+                    decimalToNumber(
+                        settlement.settledHours
+                    ),
+
+                incentiveAmount:
+                    decimalToNumber(
+                        settlement.incentiveAmount
+                    ),
+
+                settlementDate:
+                    settlement.settlementDate,
+
+                extraWorkRecords:
+                    settlement.extraWorkRecords.map(
+                        (record) => ({
+
+                            extraWorkId:
+                                record.extraWorkId,
+
+                            payrollId:
+                                record.payrollId,
+
+                            extraHours:
+                                decimalToNumber(
+                                    record.extraHours
+                                ),
+
+                            status:
+                                record.status
+                        })
+                    )
+            })
+        );
+
+    /*
+     * Preserve the existing payroll array shape while adding
+     * employee-only overtime information to every returned
+     * payroll record.
+     *
+     * The regular payroll fields such as basicSalary, netSalary,
+     * status and paymentDate are NOT changed by overtime settlement.
+     */
+    return payrolls.map(
+        (payroll) => ({
+
+            ...payroll,
+
+            employeeExtraWork,
+
+            employeeExtraWorkSettlementHistory:
+                employeeExtraWorkSettlements
+        })
     );
 };
 
@@ -3740,17 +3964,307 @@ const rejectExtraWork = async (
 // MARK PAYROLL PAID
 // ============================================================
 
-const markPayrollPaid = async (
-    payrollId,
+const settleExtraWork = async (
+    employeeId,
     companyId,
-    incentiveAmount = 0
+    incentiveAmount = 0,
+    payrollId = null
 ) => {
+
+    const id =
+        Number(employeeId);
+
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
+        throw createServiceError(
+            "Invalid employeeId",
+            400
+        );
+    }
 
     const requestedIncentiveAmount =
         validateNonNegativeNumber(
             incentiveAmount,
             "incentiveAmount"
         );
+
+    const employee =
+        await getEmployeeById(
+            id,
+            companyId
+        );
+
+    let referencePayrollId =
+        null;
+
+    if (
+        payrollId !== null &&
+        payrollId !== undefined &&
+        payrollId !== ""
+    ) {
+        referencePayrollId =
+            Number(payrollId);
+
+        if (
+            !Number.isInteger(referencePayrollId) ||
+            referencePayrollId <= 0
+        ) {
+            throw createServiceError(
+                "Invalid payrollId",
+                400
+            );
+        }
+
+        const referencePayroll =
+            await prisma.payroll.findFirst({
+                where: {
+                    payrollId:
+                        referencePayrollId,
+                    employeeId:
+                        employee.employeeId,
+                    employee: {
+                        companyId:
+                            Number(companyId)
+                    }
+                }
+            });
+
+        if (!referencePayroll) {
+            throw createServiceError(
+                "Reference payroll not found for this employee",
+                404
+            );
+        }
+    }
+
+    const settlement =
+        await prisma.$transaction(
+            async (transaction) => {
+
+                /*
+                 * Re-read the accumulated balance inside the
+                 * transaction so the settlement is atomic.
+                 *
+                 * Only records that are still ACCUMULATED and have
+                 * no settlement are eligible. Existing SETTLED and
+                 * REJECTED records are never modified.
+                 */
+                const accumulatedExtraWork =
+                    await transaction.extraWork.findMany({
+
+                        where: {
+
+                            employeeId:
+                                employee.employeeId,
+
+                            status:
+                                "ACCUMULATED",
+
+                            settlementId:
+                                null
+                        },
+
+                        orderBy: {
+
+                            createdAt:
+                                "asc"
+                        }
+                    });
+
+                const settledHours =
+                    roundMoney(
+                        accumulatedExtraWork.reduce(
+                            (
+                                total,
+                                record
+                            ) =>
+                                total +
+                                decimalToNumber(
+                                    record.extraHours
+                                ),
+                            0
+                        )
+                    );
+
+                if (
+                    settledHours <= 0
+                ) {
+                    throw createServiceError(
+                        "There are no accumulated extra hours to settle",
+                        400
+                    );
+                }
+
+                const actualSettlementDate =
+                    startOfDay(
+                        new Date()
+                    );
+
+                const createdSettlement =
+                    await transaction.extraWorkSettlement.create({
+
+                        data: {
+
+                            employeeId:
+                                employee.employeeId,
+
+                            /*
+                             * Optional reference only. This does NOT
+                             * represent normal salary payment and does
+                             * not change Payroll.status.
+                             */
+                            payrollId:
+                                referencePayrollId,
+
+                            settledHours,
+
+                            incentiveAmount:
+                                requestedIncentiveAmount,
+
+                            settlementDate:
+                                actualSettlementDate
+                        }
+                    });
+
+                await transaction.extraWork.updateMany({
+
+                    where: {
+
+                        extraWorkId: {
+
+                            in:
+                                accumulatedExtraWork.map(
+                                    (record) =>
+                                        record.extraWorkId
+                                )
+                        },
+
+                        status:
+                            "ACCUMULATED",
+
+                        settlementId:
+                            null
+                    },
+
+                    data: {
+
+                        status:
+                            "SETTLED",
+
+                        settlementId:
+                            createdSettlement.settlementId
+                    }
+                });
+
+                return createdSettlement;
+            }
+        );
+
+    const result =
+        await prisma.extraWorkSettlement.findUnique({
+
+            where: {
+
+                settlementId:
+                    settlement.settlementId
+            },
+
+            include: {
+
+                employee: {
+                    include: employeeInclude
+                },
+
+                payroll: true,
+
+                extraWorkRecords: true
+            }
+        });
+
+    return {
+
+        settlementId:
+            result.settlementId,
+
+        employeeId:
+            result.employeeId,
+
+        employee:
+            result.employee,
+
+        payrollId:
+            result.payrollId,
+
+        payPeriodStart:
+            result.payroll
+                ? result.payroll.payPeriodStart
+                : null,
+
+        payPeriodEnd:
+            result.payroll
+                ? result.payroll.payPeriodEnd
+                : null,
+
+        settledHours:
+            decimalToNumber(
+                result.settledHours
+            ),
+
+        incentiveAmount:
+            decimalToNumber(
+                result.incentiveAmount
+            ),
+
+        settlementDate:
+            result.settlementDate,
+
+        extraWorkRecords:
+            result.extraWorkRecords,
+
+        createdAt:
+            result.createdAt
+    };
+};
+
+
+// ============================================================
+// MARK PAYROLL PAID
+// ============================================================
+//
+// This operation handles NORMAL SALARY ONLY.
+//
+// Overtime / variable payment is intentionally NOT performed here.
+// Use settleExtraWork() for that operation.
+// ============================================================
+
+const markPayrollPaid = async (
+    payrollId,
+    companyId,
+    incentiveAmount = 0
+) => {
+
+    /*
+     * Keep the old third argument for backwards compatibility with
+     * callers that still pass incentiveAmount. A non-zero value is
+     * explicitly rejected so overtime cannot accidentally be paid
+     * together with normal salary.
+     */
+    const requestedIncentiveAmount =
+        validateNonNegativeNumber(
+            incentiveAmount,
+            "incentiveAmount"
+        );
+
+    if (
+        requestedIncentiveAmount > 0
+    ) {
+        throw createServiceError(
+            "Variable/overtime payment must use the extra-work settlement action",
+            400
+        );
+    }
 
     const payroll =
         await prisma.payroll.findFirst({
@@ -3833,7 +4347,8 @@ const markPayrollPaid = async (
                 transaction
             ) => {
 
-                // [NEW] Re-read inside the transaction.
+                // Re-read inside the transaction to prevent
+                // duplicate normal salary payments.
                 const current =
                     await transaction.payroll.findUnique({
 
@@ -3871,65 +4386,14 @@ const markPayrollPaid = async (
                     );
                 }
 
-                // [NEW] Current unsettled extra-work balance.
-                // Historical SETTLED records are never deleted.
-                const accumulatedExtraWork =
-                    await transaction.extraWork.findMany({
-
-                        where: {
-
-                            employeeId:
-                                current.employeeId,
-
-                            status:
-                                "ACCUMULATED",
-
-                            settlementId:
-                                null
-                        },
-
-                        orderBy: {
-
-                            createdAt:
-                                "asc"
-                        }
-                    });
-
-                const settledHours =
-                    roundMoney(
-                        accumulatedExtraWork.reduce(
-                            (
-                                total,
-                                record
-                            ) =>
-                                total +
-                                decimalToNumber(
-                                    record.extraHours
-                                ),
-                            0
-                        )
-                    );
-
-                if (
-                    requestedIncentiveAmount > 0 &&
-                    settledHours <= 0
-                ) {
-
-                    throw createServiceError(
-                        "Incentive cannot be paid because there are no accumulated extra hours",
-                        400
-                    );
-                }
-
-                // [CHANGED] Regular salary comes from basicSalary,
-                // not the monthly baseSalary snapshot.
+                // Regular salary comes only from basicSalary.
                 const salaryAmount =
                     decimalToNumber(
                         current.basicSalary
                     );
 
-                // [NEW] Latest advances are recalculated immediately
-                // before payment.
+                // Latest paid advances are recalculated immediately
+                // before normal salary payment.
                 const liveAdvanceSummary =
                     await getLiveAdvanceSummary(
                         current.employeeId,
@@ -3958,13 +4422,11 @@ const markPayrollPaid = async (
                 const finalAdvanceDeduction =
                     totalAdvance;
 
-                // [NEW] Incentive is paid on top of regular salary.
                 const finalNetSalary =
                     Math.max(
                         0,
                         roundMoney(
-                            salaryAmount +
-                            requestedIncentiveAmount -
+                            salaryAmount -
                             finalAdvanceDeduction
                         )
                     );
@@ -3986,9 +4448,12 @@ const markPayrollPaid = async (
                             advanceDeduction:
                                 finalAdvanceDeduction,
 
-                            // [NEW] Persist incentive in payroll.
+                            /*
+                             * Normal payroll payment does not contain
+                             * variable/overtime incentive anymore.
+                             */
                             incentiveAmount:
-                                requestedIncentiveAmount,
+                                0,
 
                             netSalary:
                                 finalNetSalary,
@@ -4004,61 +4469,6 @@ const markPayrollPaid = async (
                             payrollInclude
                     });
 
-                // [NEW] Preserve a settlement-history record.
-                if (
-                    settledHours > 0
-                ) {
-
-                    const settlement =
-                        await transaction.extraWorkSettlement.create({
-
-                            data: {
-
-                                employeeId:
-                                    current.employeeId,
-
-                                payrollId:
-                                    current.payrollId,
-
-                                settledHours,
-
-                                incentiveAmount:
-                                    requestedIncentiveAmount,
-
-                                settlementDate:
-                                    actualPaymentDate
-                            }
-                        });
-
-                    // [NEW] Reset current extra-hour balance by marking
-                    // records SETTLED. The records remain in the database.
-                    await transaction.extraWork.updateMany({
-
-                        where: {
-
-                            extraWorkId: {
-
-                                in:
-                                    accumulatedExtraWork.map(
-                                        (
-                                            record
-                                        ) =>
-                                            record.extraWorkId
-                                    )
-                            }
-                        },
-
-                        data: {
-
-                            status:
-                                "SETTLED",
-
-                            settlementId:
-                                settlement.settlementId
-                        }
-                    });
-                }
-
                 return paidPayroll;
             }
         );
@@ -4067,7 +4477,6 @@ const markPayrollPaid = async (
         updated
     );
 };
-
 
 // GET CURRENT PAYROLL PERIOD
 // ============================================================
@@ -4489,6 +4898,8 @@ module.exports = {
     getExtraWorkSettlementHistory,
 
     rejectExtraWork,
+
+    settleExtraWork,
 
     markPayrollPaid,
 

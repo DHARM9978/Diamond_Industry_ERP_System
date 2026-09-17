@@ -192,6 +192,32 @@ router.get(
 
 
 // ------------------------------------------
+// Settle Extra Work / Overtime
+// ------------------------------------------
+//
+// POST /api/payroll/extra-work/settle
+//
+// Body:
+// {
+//     "employeeId": 12,
+//     "payrollId": 73,          // optional historical reference
+//     "incentiveAmount": 2000   // optional, defaults to 0
+// }
+//
+// This settles accumulated overtime independently
+// from normal payroll payment. It does NOT mark the
+// normal payroll as PAID.
+// ------------------------------------------
+
+router.post(
+    "/extra-work/settle",
+    asyncHandler(
+        payrollController.settleExtraWork
+    )
+);
+
+
+// ------------------------------------------
 // Reject Extra Work
 // ------------------------------------------
 //
@@ -217,23 +243,12 @@ router.patch(
 // PATCH /api/payroll/:id/pay
 // ==========================================
 //
-// Body:
+// Normal salary payment only.
 //
-// {
-//     "incentiveAmount": 2000
-// }
+// PATCH /api/payroll/:id/pay
 //
-// incentiveAmount is optional.
-//
-// The controller passes the incentive amount
-// to the payroll service.
-//
-// The payroll service handles:
-// - incentive validation
-// - salary finalization
-// - extra-work settlement
-// - settlement history
-// - resetting the current accumulated balance
+// Overtime / variable payment must use:
+// POST /api/payroll/extra-work/settle
 //
 // ==========================================
 

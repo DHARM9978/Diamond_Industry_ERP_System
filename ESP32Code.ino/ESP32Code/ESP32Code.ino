@@ -101,7 +101,7 @@ const char* WIFI_PASSWORD = "Bhadani@99";
 
 // Use the LAN IPv4 address of the computer running Node.js.
 // Example: http://192.168.1.10:5000
-const char* BACKEND_BASE_URL = "http://10.212.194.69:5000";
+const char* BACKEND_BASE_URL = "http://10.72.179.69:5000";
 
 // Registered device identity.
 const char* DEVICE_CODE = "ESP32-001";
