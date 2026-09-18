@@ -1532,7 +1532,7 @@ const getClosedExtraWorkForPayroll = async (
 
 
 // ============================================================
-// HELPER: Get Paid Advances For Period
+// HELPER: Get Paid Advances For Payroll Period
 // ============================================================
 
 const getPaidAdvancesForPeriod = async (
@@ -1540,6 +1540,18 @@ const getPaidAdvancesForPeriod = async (
     payPeriodStart,
     payPeriodEnd
 ) => {
+
+    const startDate =
+        parseDate(
+            payPeriodStart,
+            "payPeriodStart"
+        );
+
+    const endDate =
+        parseDate(
+            payPeriodEnd,
+            "payPeriodEnd"
+        );
 
     const advances =
         await prisma.advancePayment.findMany({
@@ -1549,32 +1561,32 @@ const getPaidAdvancesForPeriod = async (
                 employeeId:
                     Number(employeeId),
 
-                OR: [
+                // Payroll deduction is based on ACTUALLY PAID
+                // advances, not merely approved requests.
+                status:
+                    "PAID",
 
-                    {
-                        status:
-                            "APPROVED",
+                paidAmount: {
+                    not: null
+                },
 
-                        approvedAmount: {
-                            not: null
-                        }
-                    },
-
-                    {
-                        status:
-                            "PAID",
-
-                        paidAmount: {
-                            not: null
-                        }
-                    }
-
-                ],
-
-                // Only advances that have not already been
-                // deducted by a payroll are outstanding.
+                // Do not deduct the same advance again.
                 deductedInPayrollId:
-                    null
+                    null,
+
+                deductedAt:
+                    null,
+
+                // Use the requested payroll period. The old code
+                // accepted these arguments but did not apply them,
+                // which could cause old advances to appear again
+                // in a later payroll period.
+                paymentDate: {
+                    gte:
+                        startDate,
+                    lte:
+                        endDate
+                }
             },
 
             orderBy: {
@@ -1631,7 +1643,7 @@ const getLiveAdvanceSummary = async (
                 return {
 
                     advancePaymentId:
-                        advance.advancePaymentId,
+                        advance.advanceId,
 
                     amount:
                         decimalToNumber(
@@ -1754,41 +1766,45 @@ const decoratePayroll = async (
         status === "PAID"
     ) {
 
-        const linkedAdvance =
-            payroll.advanceDeductionRecord
-                ? {
+        const linkedAdvances =
+            Array.isArray(
+                payroll.advanceDeductionRecord
+            )
+                ? payroll.advanceDeductionRecord.map(
+                    (advance) => ({
 
-                    advancePaymentId:
-                        payroll.advanceDeductionRecord
-                            .advancePaymentId,
+                        advancePaymentId:
+                            advance.advanceId,
 
-                    amount:
-                        decimalToNumber(
-                            payroll.advanceDeductionRecord
-                                .amount
-                        ),
+                        amount:
+                            decimalToNumber(
+                                advance.amount
+                            ),
 
-                    approvedAmount:
-                        decimalToNumber(
-                            payroll.advanceDeductionRecord
-                                .approvedAmount
-                        ),
+                        approvedAmount:
+                            decimalToNumber(
+                                advance.approvedAmount
+                            ),
 
-                    paidAmount:
-                        decimalToNumber(
-                            payroll.advanceDeductionRecord
-                                .paidAmount
-                        ),
+                        paidAmount:
+                            decimalToNumber(
+                                advance.paidAmount
+                            ),
 
-                    paymentDate:
-                        payroll.advanceDeductionRecord
-                            .paymentDate,
+                        paymentDate:
+                            advance.paymentDate,
 
-                    status:
-                        payroll.advanceDeductionRecord
-                            .status
-                }
-                : null;
+                        status:
+                            advance.status,
+
+                        deductedAt:
+                            advance.deductedAt,
+
+                        deductedInPayrollId:
+                            advance.deductedInPayrollId
+                    })
+                )
+                : [];
 
         return {
 
@@ -1815,9 +1831,7 @@ const decoratePayroll = async (
             scheduledPaymentDate,
 
             advancePayments:
-                linkedAdvance
-                    ? [linkedAdvance]
-                    : []
+                linkedAdvances
         };
     }
 
@@ -4544,18 +4558,54 @@ const markPayrollPaid = async (
                         current.basicSalary
                     );
 
-                // Latest paid advances are recalculated immediately
-                // before normal salary payment.
-                const liveAdvanceSummary =
-                    await getLiveAdvanceSummary(
-                        current.employeeId,
-                        current.payPeriodStart,
-                        current.payPeriodEnd
-                    );
+                // Re-read the actual paid advances INSIDE the same
+                // transaction used to finalize payroll.
+                const advancesForPayment =
+                    await transaction.advancePayment.findMany({
+
+                        where: {
+
+                            employeeId:
+                                current.employeeId,
+
+                            status:
+                                "PAID",
+
+                            paidAmount: {
+                                not: null
+                            },
+
+                            deductedInPayrollId:
+                                null,
+
+                            deductedAt:
+                                null,
+
+                            paymentDate: {
+                                gte:
+                                    current.payPeriodStart,
+                                lte:
+                                    current.payPeriodEnd
+                            }
+                        },
+
+                        orderBy: {
+
+                            paymentDate:
+                                "asc"
+                        }
+                    });
 
                 const totalAdvance =
                     roundMoney(
-                        liveAdvanceSummary.totalAdvance
+                        advancesForPayment.reduce(
+                            (total, advance) =>
+                                total +
+                                decimalToNumber(
+                                    advance.paidAmount
+                                ),
+                            0
+                        )
                     );
 
                 if (
@@ -4620,6 +4670,51 @@ const markPayrollPaid = async (
                         include:
                             payrollInclude
                     });
+
+
+                // Once the payroll is actually PAID, the advances
+                // deducted by this payroll are considered recovered.
+                // This is what releases the employee's future advance
+                // eligibility.
+                if (
+                    advancesForPayment.length > 0
+                ) {
+
+                    await transaction.advancePayment.updateMany({
+
+                        where: {
+
+                            advanceId: {
+                                in:
+                                    advancesForPayment.map(
+                                        (advance) =>
+                                            advance.advanceId
+                                    )
+                            },
+
+                            status:
+                                "PAID",
+
+                            deductedAt:
+                                null
+                        },
+
+                        data: {
+
+                            // Link every recovered advance to the payroll
+                            // that actually recovered it. The relation is
+                            // one payroll -> many advances.
+                            deductedInPayrollId:
+                                Number(
+                                    current.payrollId
+                                ),
+
+                            deductedAt:
+                                actualPaymentDate
+                        }
+                    });
+                }
+
 
                 return paidPayroll;
             }

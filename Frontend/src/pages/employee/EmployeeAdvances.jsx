@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   Banknote,
@@ -33,6 +33,9 @@ export function EmployeeAdvances() {
   const [advances, setAdvances] =
     useState([]);
 
+  const [employeeProfile, setEmployeeProfile] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -44,7 +47,113 @@ export function EmployeeAdvances() {
 
 
   // ==========================================================
-  // Load employee advances
+  // Calculate employee advance eligibility
+  //
+  // Salary comes from the employee profile first. This is important
+  // for employees who have never requested an advance before and
+  // therefore do not yet have an advance record containing salary.
+  // The advance list is kept as a fallback for compatibility.
+  // ==========================================================
+
+  const employeeBaseSalary =
+    useMemo(() => {
+
+      const profileSalary =
+        Number(
+          employeeProfile?.baseSalary
+        );
+
+      if (
+        Number.isFinite(profileSalary) &&
+        profileSalary > 0
+      ) {
+        return profileSalary;
+      }
+
+      const recordWithSalary =
+        advances.find(
+          (advance) =>
+            advance?.employee?.baseSalary !==
+              undefined &&
+            advance?.employee?.baseSalary !==
+              null
+        );
+
+      return recordWithSalary
+        ? Number(
+            recordWithSalary.employee.baseSalary
+          ) || 0
+        : 0;
+    }, [employeeProfile, advances]);
+
+
+  const outstandingAdvance =
+    useMemo(() => {
+
+      return advances.reduce(
+        (total, advance) => {
+
+          const status =
+            String(
+              advance?.status || ''
+            )
+              .trim()
+              .toUpperCase();
+
+          // Already recovered through a paid payroll.
+          if (advance?.deductedAt) {
+            return total;
+          }
+
+          // Legacy safety case: an old record may already point to
+          // a payroll that has been paid even if deductedAt is null.
+          if (
+            status === 'PAID' &&
+            advance?.deductedInPayroll?.status ===
+              'PAID'
+          ) {
+            return total;
+          }
+
+          let amount = 0;
+
+          if (status === 'PENDING') {
+            amount =
+              Number(advance?.amount) ||
+              0;
+          } else if (status === 'APPROVED') {
+            amount =
+              Number(
+                advance?.approvedAmount ??
+                  advance?.amount
+              ) || 0;
+          } else if (status === 'PAID') {
+            amount =
+              Number(advance?.paidAmount) ||
+              0;
+          }
+
+          return total + Math.max(0, amount);
+        },
+        0
+      );
+    }, [advances]);
+
+
+  const availableAdvance =
+    Math.max(
+      0,
+      employeeBaseSalary -
+        outstandingAdvance
+    );
+
+
+  const salaryLimitKnown =
+    employeeBaseSalary > 0;
+
+
+  // ==========================================================
+  // Load employee profile + advances
   // ==========================================================
 
   const loadAdvances = async () => {
@@ -53,40 +162,104 @@ export function EmployeeAdvances() {
 
       setLoading(true);
 
-      const response =
-        await selfService.advances();
+      const [
+        profileResult,
+        advancesResult
+      ] = await Promise.allSettled([
+        selfService.profile(),
+        selfService.advances(),
+      ]);
+
+      let profile = null;
+
+      if (
+        profileResult.status ===
+        'fulfilled'
+      ) {
+
+        profile =
+          profileResult.value?.data ??
+          profileResult.value ??
+          null;
+
+        setEmployeeProfile(profile);
+
+      } else {
+
+        console.error(
+          'Failed to load employee profile:',
+          profileResult.reason
+        );
+
+        setEmployeeProfile(null);
+      }
 
       let records = [];
 
-      if (Array.isArray(response)) {
-
-        records = response;
-
-      } else if (
-        Array.isArray(response?.data)
+      if (
+        advancesResult.status ===
+        'fulfilled'
       ) {
 
-        records = response.data;
+        const response =
+          advancesResult.value;
 
+        if (Array.isArray(response)) {
+
+          records = response;
+
+        } else if (
+          Array.isArray(response?.data)
+        ) {
+
+          records = response.data;
+
+        }
+
+        setAdvances(records);
+
+      } else {
+
+        console.error(
+          'Failed to load advances:',
+          advancesResult.reason
+        );
+
+        setAdvances([]);
       }
 
-      setAdvances(records);
+      if (
+        profileResult.status === 'rejected' &&
+        advancesResult.status === 'rejected'
+      ) {
 
-    } catch (error) {
+        toast(
+          'Failed to load your advance information',
+          'error'
+        );
 
-      console.error(
-        'Failed to load advances:',
-        error
-      );
+      } else if (
+        advancesResult.status === 'rejected'
+      ) {
 
-      setAdvances([]);
+        toast(
+          advancesResult.reason?.response?.data?.message ||
+            advancesResult.reason?.message ||
+            'Failed to load your advance requests',
+          'error'
+        );
 
-      toast(
-        error?.response?.data?.message ||
-          error?.message ||
-          'Failed to load your advance requests',
-        'error'
-      );
+      } else if (
+        profileResult.status === 'rejected' &&
+        records.length === 0
+      ) {
+
+        toast(
+          'Unable to determine your salary limit. Please refresh and try again.',
+          'error'
+        );
+
+      }
 
     } finally {
 
@@ -206,40 +379,10 @@ export function EmployeeAdvances() {
           data
         );
 
-      const createdAdvance =
-        response?.data ??
-        response;
-
-      /*
-       * Only update the UI after
-       * the backend successfully stores
-       * the request.
-       */
-
-      if (
-        createdAdvance &&
-        typeof createdAdvance ===
-          'object'
-      ) {
-
-        setAdvances(
-          (prev) => [
-            createdAdvance,
-            ...prev,
-          ]
-        );
-
-      } else {
-
-        /*
-         * If backend response does not
-         * contain the created record,
-         * reload from database.
-         */
-
-        await loadAdvances();
-
-      }
+      // The backend is the source of truth. Reload the records after
+      // a successful request so the salary/outstanding/available values
+      // immediately reflect the new PENDING advance.
+      await loadAdvances();
 
       toast(
         'Advance request submitted successfully',
@@ -438,8 +581,12 @@ export function EmployeeAdvances() {
             onClick={() =>
               setModalOpen(true)
             }
-            disabled={submitting}
-            className="btn-primary"
+            disabled={
+              submitting ||
+              !salaryLimitKnown ||
+              availableAdvance < 1000
+            }
+            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={18} />
 
@@ -448,6 +595,54 @@ export function EmployeeAdvances() {
 
         }
       />
+
+
+      {!salaryLimitKnown && (
+
+        <div className="mb-5 rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
+          Unable to determine your monthly salary limit. Please refresh the page before requesting an advance.
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          Advance eligibility summary
+          ====================================================== */}
+
+      {salaryLimitKnown && (
+
+        <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+          <div className="rounded-xl border border-navy-100 bg-navy-50 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-navy-400">
+              Monthly Base Salary
+            </p>
+            <p className="mt-1 text-xl font-bold text-navy-900">
+              {formatCurrency(employeeBaseSalary)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-error-100 bg-error-50 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-error-500">
+              Outstanding Advance
+            </p>
+            <p className="mt-1 text-xl font-bold text-error-700">
+              {formatCurrency(outstandingAdvance)}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-success-100 bg-success-50 p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-success-600">
+              Available Advance
+            </p>
+            <p className="mt-1 text-xl font-bold text-success-700">
+              {formatCurrency(availableAdvance)}
+            </p>
+          </div>
+
+        </div>
+      )}
 
 
       {/* ======================================================
@@ -516,6 +711,21 @@ export function EmployeeAdvances() {
           }
           onSave={handleApply}
           submitting={submitting}
+          maxAdvanceAmount={
+            salaryLimitKnown
+              ? availableAdvance
+              : null
+          }
+          outstandingAdvance={
+            salaryLimitKnown
+              ? outstandingAdvance
+              : null
+          }
+          baseSalary={
+            salaryLimitKnown
+              ? employeeBaseSalary
+              : null
+          }
         />
 
       </Modal>
@@ -533,6 +743,9 @@ function AdvanceForm({
   onCancel,
   onSave,
   submitting,
+  maxAdvanceAmount = null,
+  outstandingAdvance = null,
+  baseSalary = null,
 }) {
 
   const [form, setForm] =
@@ -541,6 +754,29 @@ function AdvanceForm({
       reason: '',
       paymentDate: '',
     });
+
+  const [validationError, setValidationError] =
+    useState('');
+
+  const formatFormCurrency = (
+    amount
+  ) => {
+    const numericAmount = Number(amount);
+
+    if (
+      !Number.isFinite(numericAmount)
+    ) {
+      return '₹0';
+    }
+
+    return `₹${numericAmount.toLocaleString(
+      'en-IN',
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }
+    )}`;
+  };
 
 
   // ==========================================================
@@ -551,6 +787,8 @@ function AdvanceForm({
     field,
     value
   ) => {
+
+    setValidationError('');
 
     setForm(
       (prev) => ({
@@ -579,6 +817,21 @@ function AdvanceForm({
       !Number.isFinite(amount) ||
       amount < 1000
     ) {
+      setValidationError(
+        'Advance amount must be at least ₹1,000.'
+      );
+      return;
+    }
+
+    if (
+      maxAdvanceAmount !== null &&
+      amount > Number(maxAdvanceAmount)
+    ) {
+      setValidationError(
+        `You can request a maximum of ${formatFormCurrency(
+          maxAdvanceAmount
+        )}. Your existing outstanding advances are already counted.`
+      );
       return;
     }
 
@@ -641,6 +894,11 @@ function AdvanceForm({
           id="advance-amount"
           type="number"
           min="1000"
+          max={
+            maxAdvanceAmount !== null
+              ? maxAdvanceAmount
+              : undefined
+          }
           step="500"
           className="input-field"
           value={
@@ -659,10 +917,50 @@ function AdvanceForm({
 
 
         <p className="text-xs text-navy-400">
-          Minimum ₹1,000
+          Minimum ₹1,000. Your existing outstanding advances reduce the amount you can request.
         </p>
 
       </div>
+
+
+      {maxAdvanceAmount !== null && (
+
+        <div className="rounded-xl border border-navy-100 bg-navy-50 p-4">
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+
+            <div>
+              <p className="text-xs text-navy-400">Monthly Salary</p>
+              <p className="mt-1 font-semibold text-navy-900">
+                {formatFormCurrency(baseSalary)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-navy-400">Outstanding</p>
+              <p className="mt-1 font-semibold text-error-700">
+                {formatFormCurrency(outstandingAdvance)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-navy-400">Maximum You Can Request</p>
+              <p className="mt-1 font-semibold text-success-700">
+                {formatFormCurrency(maxAdvanceAmount)}
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+
+      {validationError && (
+        <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2.5 text-sm text-error-700">
+          {validationError}
+        </div>
+      )}
 
 
       {/* ======================================================
@@ -761,7 +1059,7 @@ function AdvanceForm({
             PENDING
           </strong>
 
-          . An administrator will review it and may approve an amount lower than the amount you requested.
+          . An administrator will review it and may approve an amount lower than the amount you requested. The requested amount cannot be greater than your monthly base salary.
 
         </p>
 
