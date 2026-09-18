@@ -1069,17 +1069,17 @@ bool verifyStoredFingerprint(
 // ============================================================================
 
 bool isKnownEmptySlotResult(uint8_t result) {
-  if (result == FINGERPRINT_NOTFOUND || result == FINGERPRINT_BADLOCATION) {
+  if (result == FINGERPRINT_NOTFOUND ||
+      result == FINGERPRINT_BADLOCATION) {
     return true;
   }
 
-  // Code 12 was observed after clearing this project's sensor database.
-  // Only accept it as "empty" when the sensor itself confirms the whole
-  // database is empty. Otherwise keep it as a real read/database error.
+  // This sensor/firmware returns code 12 (DBRANGEFAIL) when
+  // loadModel() is called for an unused but valid slot.
+  // Treat it as available here because the slot is already validated
+  // against the sensor capacity before enrollment starts.
   if (result == SENSOR_EMPTY_DB_ERROR_CODE) {
-    if (finger.getTemplateCount() == FINGERPRINT_OK && finger.templateCount == 0) {
-      return true;
-    }
+    return true;
   }
 
   return false;
