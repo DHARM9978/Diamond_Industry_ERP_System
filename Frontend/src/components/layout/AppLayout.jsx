@@ -540,46 +540,79 @@ export function AppLayout({
         hidden
         md:flex
         flex-col
+        relative
       ">
 
         <SidebarContent />
 
+        {/* ==================================================
+            SIDEBAR COLLAPSE HANDLE
+
+            The handle is intentionally narrow and only slightly
+            overlaps the sidebar edge. This keeps it visible while
+            preventing it from covering the centered navigation icons
+            when the sidebar is collapsed.
+        ================================================== */}
 
         <button
           type="button"
           onClick={() =>
             setCollapsed(!collapsed)
           }
+          aria-label={
+            collapsed
+              ? 'Expand sidebar'
+              : 'Collapse sidebar'
+          }
+          title={
+            collapsed
+              ? 'Expand sidebar'
+              : 'Collapse sidebar'
+          }
           className="
             absolute
-            left-0
-            bottom-0
-            p-2
-            text-navy-400
-            hover:text-white
-            transition-colors
-          "
-          style={{
-            left:
-              collapsed
-                ? '56px'
-                : '248px',
-            transition:
-              'left 0.2s',
-          }}
-        >
+            top-[42%]
+            right-0
+            translate-x-1/2
+            -translate-y-1/2
 
+            z-30
+
+            w-7
+            h-12
+
+            flex
+            items-center
+            justify-center
+
+            bg-navy-800
+            text-navy-300
+
+            border
+            border-navy-700
+
+            rounded-l-lg
+            rounded-r-md
+
+            hover:bg-navy-700
+            hover:text-white
+
+            transition-all
+            duration-200
+          "
+        >
           <ChevronLeft
-            size={18}
+            size={17}
+            strokeWidth={2}
             className={`
               transition-transform
+              duration-200
               ${collapsed
                 ? 'rotate-180'
                 : ''
               }
             `}
           />
-
         </button>
 
       </div>

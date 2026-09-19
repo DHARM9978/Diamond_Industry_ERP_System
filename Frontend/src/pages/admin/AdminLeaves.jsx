@@ -17,6 +17,7 @@ import {
 import { StatusBadge } from '@/components/ui/Badge';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Modal } from '@/components/ui/Modal';
 import { SearchInput } from '@/components/ui/Form';
 import { useToast } from '@/context/ToastContext';
 
@@ -139,6 +140,45 @@ const formatDateTime = (date) => {
 };
 
 
+const toInputDate = (date) => {
+  if (!date) {
+    return '';
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return '';
+  }
+
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+  const day = String(parsedDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+
+const calculateInclusiveDays = (startDate, endDate) => {
+  if (!startDate || !endDate) {
+    return 0;
+  }
+
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return 0;
+  }
+
+  if (end < start) {
+    return 0;
+  }
+
+  return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+};
+
+
 const getRequestTime = (leave) => {
   const createdAt =
     leave?.createdAt;
@@ -225,6 +265,18 @@ export function AdminLeaves() {
 
   const [actionLoading, setActionLoading] =
     useState(null);
+
+  const [approvalModalOpen, setApprovalModalOpen] =
+    useState(false);
+
+  const [selectedLeave, setSelectedLeave] =
+    useState(null);
+
+  const [approvedStartDate, setApprovedStartDate] =
+    useState('');
+
+  const [approvedEndDate, setApprovedEndDate] =
+    useState('');
 
   // ==========================================================
   // FILTERS
@@ -555,71 +607,122 @@ export function AdminLeaves() {
   // APPROVE
   // ==========================================================
 
-  const handleApprove =
-    async (id) => {
-      if (!id) {
-        return;
-      }
+  const openApprovalModal = (leave) => {
+    if (!leave || leave.status !== 'PENDING') {
+      return;
+    }
 
-      try {
-        setActionLoading(
-          `approve-${id}`
-        );
+    setSelectedLeave(leave);
+    setApprovedStartDate(toInputDate(leave.startDate));
+    setApprovedEndDate(toInputDate(leave.endDate));
+    setApprovalModalOpen(true);
+  };
 
-        const response =
-          await leaveService.approve(
-            id
-          );
 
-        /*
-         * Update the UI only after the
-         * API successfully approves the
-         * request.
-         */
-        setLeaves(
-          (previous) =>
-            sortNewestFirst(
-              previous.map(
-                (leave) =>
-                  leave.leaveRequestId === id
-                    ? {
-                        ...leave,
-                        status:
-                          'APPROVED',
-                        approvedAt:
-                          response?.approvedAt ??
-                          leave.approvedAt ??
-                          new Date().toISOString(),
-                      }
-                    : leave
-              )
-            )
-        );
+  const closeApprovalModal = () => {
+    if (actionLoading) {
+      return;
+    }
 
-        toast(
-          'Leave request approved successfully',
-          'success'
-        );
-      } catch (error) {
-        console.error(
-          'Approve leave error:',
-          error
-        );
+    setApprovalModalOpen(false);
+    setSelectedLeave(null);
+    setApprovedStartDate('');
+    setApprovedEndDate('');
+  };
 
-        toast(
-          getErrorMessage(
-            error,
-            'Failed to approve leave request'
-          ),
-          'error'
-        );
-      } finally {
-        setActionLoading(
-          null
-        );
-      }
-    };
 
+  const handleApprove = async () => {
+    if (!selectedLeave?.leaveRequestId) {
+      return;
+    }
+
+    const id = selectedLeave.leaveRequestId;
+    const requestedStart = toInputDate(selectedLeave.startDate);
+    const requestedEnd = toInputDate(selectedLeave.endDate);
+
+    if (!approvedStartDate || !approvedEndDate) {
+      toast('Approved start date and end date are required', 'error');
+      return;
+    }
+
+    if (approvedEndDate < approvedStartDate) {
+      toast('Approved end date cannot be before approved start date', 'error');
+      return;
+    }
+
+    if (approvedStartDate < requestedStart || approvedEndDate > requestedEnd) {
+      toast('Approved dates must be within the employee requested dates', 'error');
+      return;
+    }
+
+    const approvedDays = calculateInclusiveDays(
+      approvedStartDate,
+      approvedEndDate
+    );
+
+    if (approvedDays <= 0) {
+      toast('Approved leave must be at least 1 day', 'error');
+      return;
+    }
+
+    try {
+      setActionLoading(`approve-${id}`);
+
+      const response = await leaveService.approve(id, {
+        approvedStartDate,
+        approvedEndDate,
+      });
+
+      const returnedRequest = response?.data || response || {};
+
+      setLeaves((previous) =>
+        sortNewestFirst(
+          previous.map((leave) =>
+            leave.leaveRequestId === id
+              ? {
+                  ...leave,
+                  ...returnedRequest,
+                  status: returnedRequest.status || 'APPROVED',
+                  approvedStartDate:
+                    returnedRequest.approvedStartDate || approvedStartDate,
+                  approvedEndDate:
+                    returnedRequest.approvedEndDate || approvedEndDate,
+                  approvedDays:
+                    returnedRequest.approvedDays ?? approvedDays,
+                  approvedAt:
+                    returnedRequest.approvedAt ||
+                    new Date().toISOString(),
+                }
+              : leave
+          )
+        )
+      );
+
+      toast(
+        approvedDays === Number(selectedLeave.totalDays)
+          ? 'Leave request approved successfully'
+          : `Leave approved for ${approvedDays} day${approvedDays === 1 ? '' : 's'} instead of ${selectedLeave.totalDays} requested day${Number(selectedLeave.totalDays) === 1 ? '' : 's'}`,
+        'success'
+      );
+
+      setApprovalModalOpen(false);
+      setSelectedLeave(null);
+      setApprovedStartDate('');
+      setApprovedEndDate('');
+    } catch (error) {
+      console.error('Approve leave error:', error);
+
+      toast(
+        getErrorMessage(
+          error,
+          'Failed to approve leave request'
+        ),
+        'error'
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   // ==========================================================
   // REJECT
@@ -868,9 +971,7 @@ export function AdminLeaves() {
             <button
               type="button"
               onClick={() =>
-                handleApprove(
-                  row.leaveRequestId
-                )
+                openApprovalModal(row)
               }
               disabled={
                 Boolean(
@@ -1310,6 +1411,147 @@ export function AdminLeaves() {
           }
         />
       )}
+
+
+      <Modal
+        open={approvalModalOpen}
+        onClose={closeApprovalModal}
+        title="Approve Leave Request"
+      >
+        {selectedLeave && (
+          <div className="space-y-5">
+            <div className="rounded-lg border border-navy-100 bg-navy-50 p-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <div className="text-xs font-medium text-navy-400">Employee</div>
+                  <div className="mt-1 font-semibold text-navy-900">
+                    {getEmployeeName(selectedLeave)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-medium text-navy-400">Leave Type</div>
+                  <div className="mt-1 font-semibold text-navy-900">
+                    {selectedLeave.leaveType?.name ||
+                      selectedLeave.leaveType?.leaveTypeName ||
+                      '-'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div>
+                  <div className="text-xs font-medium text-navy-400">Requested Start</div>
+                  <div className="mt-1 text-sm font-semibold text-navy-800">
+                    {formatDate(selectedLeave.startDate)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-medium text-navy-400">Requested End</div>
+                  <div className="mt-1 text-sm font-semibold text-navy-800">
+                    {formatDate(selectedLeave.endDate)}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs font-medium text-navy-400">Requested Days</div>
+                  <div className="mt-1 text-sm font-semibold text-navy-800">
+                    {selectedLeave.totalDays}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-navy-900">Specify approved dates</h3>
+              <p className="mt-1 text-xs text-navy-500">
+                Choose the exact dates negotiated with the employee. The approved dates must remain inside the requested range.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="approved-start-date"
+                  className="mb-1.5 block text-xs font-medium text-navy-500"
+                >
+                  Approved Start Date
+                </label>
+                <input
+                  id="approved-start-date"
+                  type="date"
+                  min={toInputDate(selectedLeave.startDate)}
+                  max={toInputDate(selectedLeave.endDate)}
+                  value={approvedStartDate}
+                  onChange={(event) => setApprovedStartDate(event.target.value)}
+                  disabled={Boolean(actionLoading)}
+                  className="h-10 w-full rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100 disabled:cursor-not-allowed disabled:bg-navy-50"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="approved-end-date"
+                  className="mb-1.5 block text-xs font-medium text-navy-500"
+                >
+                  Approved End Date
+                </label>
+                <input
+                  id="approved-end-date"
+                  type="date"
+                  min={toInputDate(selectedLeave.startDate)}
+                  max={toInputDate(selectedLeave.endDate)}
+                  value={approvedEndDate}
+                  onChange={(event) => setApprovedEndDate(event.target.value)}
+                  disabled={Boolean(actionLoading)}
+                  className="h-10 w-full rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100 disabled:cursor-not-allowed disabled:bg-navy-50"
+                />
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-accent-200 bg-accent-50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-navy-700">Approved Days</span>
+                <span className="text-lg font-bold text-accent-700">
+                  {calculateInclusiveDays(approvedStartDate, approvedEndDate)} / {selectedLeave.totalDays}
+                </span>
+              </div>
+
+              {calculateInclusiveDays(approvedStartDate, approvedEndDate) < Number(selectedLeave.totalDays) && (
+                <p className="mt-2 text-xs text-accent-700">
+                  This is a partial approval. Only the approved dates will be deducted from the employee's leave balance.
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeApprovalModal}
+                disabled={Boolean(actionLoading)}
+                className="inline-flex h-10 items-center justify-center rounded-lg border border-navy-200 bg-white px-4 text-sm font-medium text-navy-700 transition-colors hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleApprove}
+                disabled={Boolean(actionLoading)}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-success-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-success-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {actionLoading === `approve-${selectedLeave.leaveRequestId}` ? (
+                  <RefreshCw size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
+                Approve Leave
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
     </div>
   );
