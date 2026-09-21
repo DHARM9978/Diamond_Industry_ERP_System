@@ -1931,8 +1931,33 @@ const decoratePayroll = async (
             liveHourlyRate
         );
 
-    const liveSalaryAmount =
-        liveAttendanceBreakdown.regularSalary;
+    /*
+     * Pending amount is based on the employee's monthly base salary,
+     * then shortage deduction and advance deduction are applied.
+     *
+     * regularSalary/basicSalary is the attendance-earned salary and
+     * is kept separately for payroll reporting. It must not be used
+     * as the pending base here because shortage deduction is stored
+     * as a separate deduction.
+     */
+    const pendingBaseSalary =
+        Math.max(
+            0,
+            roundMoney(
+                liveBaseSalary
+            )
+        );
+
+    const liveShortageDeduction =
+        Math.min(
+            pendingBaseSalary,
+            Math.max(
+                0,
+                roundMoney(
+                    liveAttendanceBreakdown.shortageDeduction
+                )
+            )
+        );
 
     const liveAdvanceSummary =
         await getLiveAdvanceSummary(
@@ -1941,17 +1966,29 @@ const decoratePayroll = async (
             payroll.payPeriodEnd
         );
 
+    const amountAfterShortage =
+        Math.max(
+            0,
+            roundMoney(
+                pendingBaseSalary -
+                liveShortageDeduction
+            )
+        );
+
     const advanceDeduction =
         Math.min(
-            liveSalaryAmount,
-            liveAdvanceSummary.totalAdvance
+            amountAfterShortage,
+            Math.max(
+                0,
+                liveAdvanceSummary.totalAdvance
+            )
         );
 
     const pendingAmount =
         Math.max(
             0,
             roundMoney(
-                liveSalaryAmount -
+                amountAfterShortage -
                 advanceDeduction
             )
         );
@@ -2133,7 +2170,10 @@ const decoratePayroll = async (
 
         // Regular salary is capped at expected hours.
         basicSalary:
-            liveSalaryAmount,
+            liveAttendanceBreakdown.regularSalary,
+
+        shortageDeduction:
+            liveShortageDeduction,
 
         advanceDeduction:
             roundMoney(
@@ -2302,10 +2342,31 @@ const createPayroll = async (
             )
             : liveAdvanceSummary.totalAdvance;
 
-    // [CHANGED] Advance cannot exceed the actual regular salary.
+    // Shortage deduction is applied before advance deduction.
+    const finalShortageDeduction =
+        Math.min(
+            employeeBaseSalary,
+            Math.max(
+                0,
+                roundMoney(
+                    attendanceBreakdown.shortageDeduction
+                )
+            )
+        );
+
+    const amountAfterShortage =
+        Math.max(
+            0,
+            roundMoney(
+                employeeBaseSalary -
+                finalShortageDeduction
+            )
+        );
+
+    // Advance cannot exceed the amount remaining after shortage deduction.
     const finalAdvanceDeduction =
         Math.min(
-            earnedBasicSalary,
+            amountAfterShortage,
             Math.max(
                 0,
                 requestedAdvanceDeduction
@@ -2316,7 +2377,7 @@ const createPayroll = async (
         Math.max(
             0,
             roundMoney(
-                earnedBasicSalary -
+                amountAfterShortage -
                 finalAdvanceDeduction
             )
         );

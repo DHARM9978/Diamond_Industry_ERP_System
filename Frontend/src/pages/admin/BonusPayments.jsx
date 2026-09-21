@@ -651,8 +651,8 @@ export function BonusPayments() {
 
     try {
 
-      setPayingPayrollId(
-        selectedRecord.payrollId
+      setPayingEmployeeId(
+        selectedRecord.employeeId
       );
 
       setMessage('');
@@ -710,7 +710,7 @@ export function BonusPayments() {
 
     } finally {
 
-      setPayingPayrollId(null);
+      setPayingEmployeeId(null);
 
     }
 

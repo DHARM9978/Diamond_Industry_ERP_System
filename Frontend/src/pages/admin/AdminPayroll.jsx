@@ -1218,10 +1218,12 @@ const handleGenerateCurrentPayroll =
     record
   ) => {
 
+    // baseSalary is the employee's monthly salary.
+    // basicSalary is attendance-earned regular salary and may already
+    // reflect shortage hours, so it must not be used as the pending base.
     const salary =
       record?.baseSalary ??
       record?.monthlySalary ??
-      record?.basicSalary ??
       0;
 
     return Number(salary) || 0;
@@ -1274,11 +1276,14 @@ const handleGenerateCurrentPayroll =
     const salary =
       getBaseSalary(record);
 
+    const shortageDeduction =
+      getShortageDeduction(record);
+
     const advance =
       getAdvanceDeduction(record);
 
     return Math.max(
-      salary - advance,
+      salary - shortageDeduction - advance,
       0
     );
 
@@ -3536,7 +3541,7 @@ const handleGenerateCurrentPayroll =
 
           <div className="mt-1 text-xs text-navy-500">
 
-            After advance deductions
+            After shortage and advance deductions
 
           </div>
 
