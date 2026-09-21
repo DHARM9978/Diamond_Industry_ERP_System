@@ -138,118 +138,8 @@ router.get(
 
 
 // ==========================================
-// EXTRA WORK / OVERTIME
-// ==========================================
-//
-// These routes are intentionally placed BEFORE
-// "/:id" so they are treated as fixed paths.
-//
-// Pending overtime:
-// GET /api/payroll/extra-work
-//
-// Settlement history:
-// GET /api/payroll/extra-work/history
-//
-// Reject overtime:
-// PATCH /api/payroll/extra-work/:id/reject
-// ==========================================
-
-
-// ------------------------------------------
-// Get Pending Extra Work
-// ------------------------------------------
-//
-// Returns employees whose overtime / extra-work
-// hours are currently accumulated and have not
-// yet been settled.
-//
-// GET /api/payroll/extra-work
-// ------------------------------------------
-
-router.get(
-    "/extra-work",
-    asyncHandler(
-        payrollController.getExtraWorkRecords
-    )
-);
-
-
-// ------------------------------------------
-// Get Extra Work Settlement History
-// ------------------------------------------
-//
-// Returns historical overtime settlements.
-//
-// GET /api/payroll/extra-work/history
-// ------------------------------------------
-
-router.get(
-    "/extra-work/history",
-    asyncHandler(
-        payrollController.getExtraWorkSettlementHistory
-    )
-);
-
-
-// ------------------------------------------
-// Settle Extra Work / Overtime
-// ------------------------------------------
-//
-// POST /api/payroll/extra-work/settle
-//
-// Body:
-// {
-//     "employeeId": 12,
-//     "payrollId": 73,          // optional historical reference
-//     "incentiveAmount": 2000   // optional, defaults to 0
-// }
-//
-// This settles accumulated overtime independently
-// from normal payroll payment. It does NOT mark the
-// normal payroll as PAID.
-// ------------------------------------------
-
-router.post(
-    "/extra-work/settle",
-    asyncHandler(
-        payrollController.settleExtraWork
-    )
-);
-
-
-// ------------------------------------------
-// Reject Extra Work
-// ------------------------------------------
-//
-// Rejects the selected overtime record.
-//
-// IMPORTANT:
-// This does NOT delete the record.
-// Historical extra-work data must remain preserved.
-//
-// PATCH /api/payroll/extra-work/:id/reject
-// ------------------------------------------
-
-router.patch(
-    "/extra-work/:id/reject",
-    asyncHandler(
-        payrollController.rejectExtraWork
-    )
-);
-
-
-// ==========================================
 // Mark Payroll As Paid
 // PATCH /api/payroll/:id/pay
-// ==========================================
-//
-// Normal salary payment only.
-//
-// PATCH /api/payroll/:id/pay
-//
-// Overtime / variable payment must use:
-// POST /api/payroll/extra-work/settle
-//
 // ==========================================
 
 router.patch(
@@ -263,17 +153,6 @@ router.patch(
 // ==========================================
 // Get Payroll By ID
 // GET /api/payroll/:id
-// ==========================================
-//
-// IMPORTANT:
-// This route comes AFTER all fixed routes such as:
-//
-// /extra-work
-// /extra-work/history
-// /extra-work/:id/reject
-// /employee/:employeeId
-// /:id/pay
-//
 // ==========================================
 
 router.get(

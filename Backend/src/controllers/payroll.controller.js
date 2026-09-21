@@ -298,6 +298,8 @@ const deletePayroll = async (
     });
 
 };
+
+
 // ============================================================
 // GET PAYROLL CONFIGURATION
 //
@@ -595,6 +597,8 @@ const getNextPayrollPeriod = async (
 
         throw error;
     }
+
+
     const configuration =
         await payrollService.getPayrollConfiguration(
             branchId,
@@ -802,8 +806,6 @@ const generatePayrollForBranch = async (
     });
 
 };
-
-
 // ============================================================
 // GENERATE CURRENT PAYROLL FOR BRANCH
 //
@@ -924,17 +926,13 @@ const markPayrollPaid = async (
         throw error;
     }
 
-    /*
-     * Normal payroll payment is intentionally kept separate
-     * from overtime / variable payment.
-     *
-     * Overtime must use POST /extra-work/settle.
-     */
+
     const payroll =
         await payrollService.markPayrollPaid(
             payrollId,
             req.user.companyId
         );
+
 
     return res.status(200).json({
 
@@ -946,209 +944,6 @@ const markPayrollPaid = async (
 
         data:
             payroll
-
-    });
-};
-
-
-// ============================================================
-// GET EXTRA WORK / OVERTIME RECORDS
-//
-// GET /api/payroll/extra-work
-//
-// Optional query parameters are passed directly to the service.
-// ============================================================
-
-// ============================================================
-// SETTLE EXTRA WORK / OVERTIME
-//
-// POST /api/payroll/extra-work/settle
-//
-// Body:
-// {
-//     "employeeId": 12,
-//     "payrollId": 73,          // optional historical reference
-//     "incentiveAmount": 2000   // optional, defaults to 0
-// }
-//
-// IMPORTANT:
-// - This settles accumulated overtime only.
-// - It does NOT mark normal payroll as PAID.
-// - It creates permanent settlement history.
-// ============================================================
-
-const settleExtraWork = async (
-    req,
-    res
-) => {
-
-    const employeeId =
-        Number(
-            req.body?.employeeId
-        );
-
-    if (
-        !Number.isInteger(
-            employeeId
-        ) ||
-        employeeId < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid employee ID"
-            );
-
-        error.statusCode =
-            400;
-
-        throw error;
-    }
-
-    const incentiveAmount =
-        req.body?.incentiveAmount ??
-        0;
-
-    const payrollId =
-        req.body?.payrollId ??
-        null;
-
-    const settlement =
-        await payrollService.settleExtraWork(
-            employeeId,
-            req.user.companyId,
-            incentiveAmount,
-            payrollId
-        );
-
-    return res.status(200).json({
-
-        success:
-            true,
-
-        message:
-            "Extra-work settled successfully",
-
-        data:
-            settlement
-
-    });
-};
-
-
-const getExtraWorkRecords = async (
-    req,
-    res
-) => {
-
-    const records =
-        await payrollService.getExtraWorkRecords(
-            req.user.companyId,
-            req.query || {}
-        );
-
-    return res.status(200).json({
-
-        success:
-            true,
-
-        message:
-            "Extra-work records fetched successfully",
-
-        data:
-            records
-
-    });
-
-};
-// ============================================================
-// GET EXTRA WORK SETTLEMENT HISTORY
-//
-// GET /api/payroll/extra-work/history
-// ============================================================
-
-const getExtraWorkSettlementHistory = async (
-    req,
-    res
-) => {
-
-    const history =
-        await payrollService.getExtraWorkSettlementHistory(
-            req.user.companyId,
-            req.query || {}
-        );
-
-    return res.status(200).json({
-
-        success:
-            true,
-
-        message:
-            "Extra-work settlement history fetched successfully",
-
-        data:
-            history
-
-    });
-
-};
-
-
-// ============================================================
-// REJECT EXTRA WORK
-//
-// PATCH /api/payroll/extra-work/:id/reject
-//
-// Rejection does not delete the extra-work record. The service
-// changes its status so the historical overtime record remains
-// available while it is excluded from the accumulated balance.
-// ============================================================
-
-const rejectExtraWork = async (
-    req,
-    res
-) => {
-
-    const extraWorkId =
-        Number(
-            req.params.id
-        );
-
-    if (
-        !Number.isInteger(
-            extraWorkId
-        ) ||
-        extraWorkId < 1
-    ) {
-
-        const error =
-            new Error(
-                "Invalid extra-work ID"
-            );
-
-        error.statusCode =
-            400;
-
-        throw error;
-    }
-
-
-    const record =
-        await payrollService.rejectExtraWork(
-            extraWorkId,
-            req.user.companyId
-        );
-
-    return res.status(200).json({
-
-        success:
-            true,
-
-        message:
-            "Extra-work record rejected successfully",
-
-        data:
-            record
 
     });
 
@@ -1196,13 +991,6 @@ module.exports = {
 
 
     // Payroll payment
-    markPayrollPaid,
-    settleExtraWork,
-
-
-    // Extra work / overtime
-    getExtraWorkRecords,
-    getExtraWorkSettlementHistory,
-    rejectExtraWork
+    markPayrollPaid
 
 };

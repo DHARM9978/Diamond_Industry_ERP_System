@@ -437,27 +437,6 @@ const API = {
 
 
         // ----------------------------------------------------
-        // EXTRA WORK / OVERTIME
-        // ----------------------------------------------------
-
-        // GET /api/payroll/extra-work
-        extraWork: {
-            list: "/api/payroll/extra-work",
-
-            // GET /api/payroll/extra-work/history
-            history:
-                "/api/payroll/extra-work/history",
-
-            // PATCH /api/payroll/extra-work/:id/reject
-            reject: (id) =>
-                `/api/payroll/extra-work/${id}/reject`,
-
-            // POST /api/payroll/extra-work/settle
-            settle: "/api/payroll/extra-work/settle",
-        },
-
-
-        // ----------------------------------------------------
         // EMPLOYEE PAYROLL
         // ----------------------------------------------------
 
@@ -513,6 +492,55 @@ const API = {
         // POST /api/payroll/generate/branch/:branchId/current
         generateCurrentBranch: (branchId) =>
             `/api/payroll/generate/branch/${branchId}/current`,
+
+    },
+
+
+    // ========================================================
+    // BONUS PAYMENTS
+    // ========================================================
+    //
+    // Bonus payments are separated from the normal Payroll
+    // module.
+    //
+    // They are based on approved ExtraWork records and use
+    // the existing ExtraWork / ExtraWorkSettlement system.
+    //
+    // Admin:
+    //   - View extra-work records
+    //   - Reject extra-work
+    //   - View bonus payment history
+    //   - Settle/pay bonus
+    //
+    // Employee:
+    //   - View own bonus payment history
+    // ========================================================
+
+    bonuses: {
+
+        // ----------------------------------------------------
+        // ADMIN BONUS / EXTRA WORK
+        // ----------------------------------------------------
+
+        extraWork: {
+
+            // GET /api/bonuses/extra-work
+            list:
+                "/api/bonuses/extra-work",
+
+            // PATCH /api/bonuses/extra-work/:id/reject
+            reject: (id) =>
+                `/api/bonuses/extra-work/${id}/reject`,
+
+        },
+
+        // GET /api/bonuses/history
+        history:
+            "/api/bonuses/history",
+
+        // POST /api/bonuses/pay
+        pay:
+            "/api/bonuses/pay",
 
     },
 
@@ -579,6 +607,13 @@ const API = {
         // POST /api/me/advances
         createAdvance:
             "/api/me/advances",
+
+        // GET /api/me/bonuses
+        //
+        // Employee's own extra-work bonus / incentive
+        // settlement history.
+        bonuses:
+            "/api/me/bonuses",
 
     },
 

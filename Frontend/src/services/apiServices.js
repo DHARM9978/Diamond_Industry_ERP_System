@@ -1277,7 +1277,7 @@ export const payrollService = {
     // paymentDate = actual payment timestamp
     //
     // This method is for normal salary only.
-    // Overtime / variable payment uses extraWork.settle().
+    // Extra-work bonus payment uses bonusService.pay().
     // --------------------------------------------------------
 
     pay: async (
@@ -1290,105 +1290,6 @@ export const payrollService = {
             );
 
         return unwrap(response);
-    },
-
-
-    // ========================================================
-    // EXTRA WORK / OVERTIME
-    // ========================================================
-
-    // --------------------------------------------------------
-    // GET PENDING EXTRA WORK / OVERTIME
-    //
-    // GET /api/payroll/extra-work
-    // --------------------------------------------------------
-
-    extraWork: {
-        list: async (
-            params = {}
-        ) => {
-
-            const response =
-                await apiClient.get(
-                    API.payroll.extraWork.list,
-                    {
-                        params,
-                    }
-                );
-
-            return unwrap(response);
-        },
-
-
-        // ----------------------------------------------------
-        // GET EXTRA WORK SETTLEMENT HISTORY
-        //
-        // GET /api/payroll/extra-work/history
-        // ----------------------------------------------------
-
-        history: async (
-            params = {}
-        ) => {
-
-            const response =
-                await apiClient.get(
-                    API.payroll.extraWork.history,
-                    {
-                        params,
-                    }
-                );
-
-            return unwrap(response);
-        },
-
-
-        // ----------------------------------------------------
-        // SETTLE EXTRA WORK / OVERTIME
-        //
-        // POST /api/payroll/extra-work/settle
-        //
-        // This is separate from normal payroll payment.
-        // It does NOT mark the regular payroll as PAID.
-        //
-        // data:
-        // {
-        //     employeeId,
-        //     payrollId,          // optional
-        //     incentiveAmount    // optional
-        // }
-        // ----------------------------------------------------
-        settle: async (
-            data
-        ) => {
-            const response =
-                await apiClient.post(
-                    API.payroll.extraWork.settle,
-                    data
-                );
-
-            return unwrap(response);
-        },
-
-
-        // ----------------------------------------------------
-        // REJECT EXTRA WORK / OVERTIME
-        //
-        // PATCH /api/payroll/extra-work/:id/reject
-        // ----------------------------------------------------
-
-        reject: async (
-            id,
-            data = {}
-        ) => {
-
-            const response =
-                await apiClient.patch(
-                    API.payroll.extraWork.reject(id),
-                    data
-                );
-
-            return unwrap(response);
-        },
     },
 
 
@@ -1547,6 +1448,117 @@ export const payrollService = {
 
 };
 
+// ============================================================
+// BONUS SERVICE
+//
+// Bonus payments are managed separately from normal payroll.
+// Extra-work records remain the source for bonus settlement.
+// ============================================================
+
+export const bonusService = {
+
+    // --------------------------------------------------------
+    // ADMIN - EXTRA WORK / BONUS RECORDS
+    // --------------------------------------------------------
+
+    extraWork: {
+
+        // GET /api/bonuses/extra-work
+        list: async (
+            params = {}
+        ) => {
+
+            const response =
+                await apiClient.get(
+                    API.bonuses.extraWork.list,
+                    {
+                        params,
+                    }
+                );
+
+            return unwrap(response);
+        },
+
+
+        // PATCH /api/bonuses/extra-work/:id/reject
+        reject: async (
+            id,
+            data = {}
+        ) => {
+
+            const response =
+                await apiClient.patch(
+                    API.bonuses.extraWork.reject(id),
+                    data
+                );
+
+            return unwrap(response);
+        },
+
+    },
+
+
+    // --------------------------------------------------------
+    // ADMIN - BONUS PAYMENT HISTORY
+    // --------------------------------------------------------
+
+    // GET /api/bonuses/history
+    history: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.bonuses.history,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // ADMIN - PAY BONUS
+    // --------------------------------------------------------
+
+    // POST /api/bonuses/pay
+    pay: async (
+        data
+    ) => {
+
+        const response =
+            await apiClient.post(
+                API.bonuses.pay,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // EMPLOYEE - MY BONUSES
+    // --------------------------------------------------------
+
+    // GET /api/me/bonuses
+    myBonuses: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.me.bonuses,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+};
 
 // ============================================================
 // REPORT SERVICE
@@ -1961,6 +1973,7 @@ export default {
     leaveRequestService,
     advanceService,
     payrollService,
+    bonusService,
     reportService,
     selfService,
 };

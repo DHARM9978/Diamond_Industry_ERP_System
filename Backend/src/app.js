@@ -15,6 +15,8 @@ const attendanceRoutes = require("./routes/attendance.routes");
 const deviceEnrollmentRoutes = require("./routes/device-enrollment.routes");
 const employeeSelfRoutes = require("./routes/employee-self.routes");
 const payrollRoutes = require("./routes/payroll.routes");
+const bonusRoutes = require("./routes/bonus.routes");
+const employeeBonusRoutes = require("./routes/employee-bonus.routes");
 const advanceRoutes = require("./routes/advance.routes");
 const leaveTypeRoutes = require("./routes/leaveType.routes");
 const leaveBalanceRoutes = require("./routes/leaveBalance.routes");
@@ -36,19 +38,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/branches", branchRoutes);
-app.use("/api/departments",departmentRoutes);
-app.use("/api/employees",employeeRoutes);
-app.use("/api/fingerprints",fingerprintRoutes);
-app.use("/api/devices",deviceRoutes);
-app.use("/api/attendance",attendanceRoutes);
-app.use("/api/device",deviceEnrollmentRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/fingerprints", fingerprintRoutes);
+app.use("/api/devices", deviceRoutes);
+app.use("/api/attendance", attendanceRoutes);
+app.use("/api/device", deviceEnrollmentRoutes);
 app.use("/api/me", employeeSelfRoutes);
 app.use("/api/payroll", payrollRoutes);
+
+// Bonus / Extra Work Payment Routes
+app.use("/api/bonuses", bonusRoutes);
+app.use("/api/me/bonuses", employeeBonusRoutes);
+
 app.use("/api/advances", advanceRoutes);
-app.use("/api/leave-types",leaveTypeRoutes);
-app.use("/api/leave-balances",leaveBalanceRoutes);
-app.use("/api/leave-requests",leaveRequestRoutes);
-app.use("/api/reports",reportRoutes);
+app.use("/api/leave-types", leaveTypeRoutes);
+app.use("/api/leave-balances", leaveBalanceRoutes);
+app.use("/api/leave-requests", leaveRequestRoutes);
+app.use("/api/reports", reportRoutes);
+
 
 // Health
 app.get("/api/health", (req, res) => {

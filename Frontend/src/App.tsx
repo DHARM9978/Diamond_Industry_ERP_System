@@ -12,13 +12,13 @@ import { AdminLiveAttendance } from '@/pages/admin/AdminLiveAttendance';
 import { AdminLeaves } from '@/pages/admin/AdminLeaves';
 import { AdminAdvances } from '@/pages/admin/AdminAdvances';
 import { AdminPayroll } from '@/pages/admin/AdminPayroll';
-import { AdminOvertime } from '@/pages/admin/AdminOvertime';
 import { AdminFingerprints } from '@/pages/admin/AdminFingerprints';
 import { AdminDevices } from '@/pages/admin/AdminDevices';
 import { AdminCompany } from '@/pages/admin/AdminCompany';
 import { AdminBranches } from '@/pages/admin/AdminBranches';
 import { AdminDepartments } from '@/pages/admin/AdminDepartments';
 import { AdminReports } from '@/pages/admin/AdminReports';
+import { BonusPayments } from '@/pages/admin/BonusPayments';
 
 import { EmployeeDashboard } from '@/pages/employee/EmployeeDashboard';
 import { EmployeeAttendance } from '@/pages/employee/EmployeeAttendance';
@@ -26,6 +26,7 @@ import { EmployeeLeaves } from '@/pages/employee/EmployeeLeaves';
 import { EmployeeAdvances } from '@/pages/employee/EmployeeAdvances';
 import { EmployeePayroll } from '@/pages/employee/EmployeePayroll';
 import { EmployeeProfile } from '@/pages/employee/EmployeeProfile';
+import { EmployeeBonus } from '@/pages/employee/EmployeeBonus';
 
 
 function App() {
@@ -159,6 +160,10 @@ function App() {
             />
 
 
+            {/* ==================================================
+                PAYROLL
+            ================================================== */}
+
             <Route
               path="/admin/payroll"
               element={
@@ -170,12 +175,17 @@ function App() {
               }
             />
 
+
+            {/* ==================================================
+                BONUS PAYMENTS
+            ================================================== */}
+
             <Route
-              path="/admin/overtime"
+              path="/admin/bonus-payments"
               element={
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
-                    <AdminOvertime />
+                    <BonusPayments />
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -327,6 +337,22 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <EmployeePayroll />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* ==================================================
+                EMPLOYEE BONUS
+            ================================================== */}
+
+            <Route
+              path="/employee/bonuses"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <EmployeeBonus />
                   </AppLayout>
                 </ProtectedRoute>
               }

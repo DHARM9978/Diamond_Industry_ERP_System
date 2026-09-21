@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import {
   CheckCircle2,
   Clock3,
@@ -24,7 +25,7 @@ import { bonusService } from '@/services/apiServices';
 // ADMIN BONUS PAYMENTS
 // ============================================================
 
-export function AdminOvertime() {
+export function BonusPayments() {
 
   // ==========================================================
   // DATA
@@ -53,7 +54,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // BONUS REVIEW MODAL
+  // REVIEW MODAL
   // ==========================================================
 
   const [selectedRecord, setSelectedRecord] =
@@ -83,7 +84,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // HELPERS
+  // RESPONSE HELPERS
   // ==========================================================
 
   const unwrap = (response) => {
@@ -314,7 +315,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // LOAD PENDING BONUS / EXTRA WORK
+  // LOAD PENDING BONUS RECORDS
   // ==========================================================
 
   const loadPending = async () => {
@@ -324,11 +325,10 @@ export function AdminOvertime() {
         status: 'ACCUMULATED',
       });
 
-    // Keep the database record even when overtime is zero,
-    // but do not display zero-hour records in the pending UI.
     const pendingRecords =
       getArray(response).filter(
-        (record) => getExtraHours(record) > 0
+        (record) =>
+          getExtraHours(record) > 0
       );
 
     setRecords(
@@ -441,7 +441,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // FILTER PENDING BONUS RECORDS
+  // FILTER PENDING RECORDS
   // ==========================================================
 
   const filteredRecords =
@@ -502,7 +502,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // FILTER BONUS HISTORY
+  // FILTER HISTORY
   // ==========================================================
 
   const filteredHistory =
@@ -551,7 +551,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // OPEN BONUS REVIEW
+  // OPEN REVIEW
   // ==========================================================
 
   const openReview = (record) => {
@@ -567,7 +567,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // CLOSE BONUS REVIEW
+  // CLOSE REVIEW
   // ==========================================================
 
   const closeReview = () => {
@@ -587,12 +587,14 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // APPROVE & PAY BONUS BONUS
+  // PAY BONUS
   // ==========================================================
 
   const handleApproveAndPay = async () => {
 
-    if (!selectedRecord?.employeeId) {
+    if (
+      !selectedRecord?.employeeId
+    ) {
 
       setError(
         'Employee ID is missing for this bonus record.'
@@ -608,6 +610,10 @@ export function AdminOvertime() {
         incentiveAmount || 0
       );
 
+
+    // --------------------------------------------------------
+    // BONUS AMOUNT VALIDATION
+    // --------------------------------------------------------
 
     if (
       !Number.isFinite(amount) ||
@@ -645,8 +651,8 @@ export function AdminOvertime() {
 
     try {
 
-      setPayingEmployeeId(
-        selectedRecord.employeeId
+      setPayingPayrollId(
+        selectedRecord.payrollId
       );
 
       setMessage('');
@@ -654,15 +660,11 @@ export function AdminOvertime() {
 
 
       // ------------------------------------------------------
-      // BONUS SETTLEMENT
-      // ------------------------------------------------------
-      // This settles accumulated ExtraWork and creates the
-      // ExtraWorkSettlement history record.
-      //
-      // Payroll salary is NOT paid here.
+      // BONUS PAYMENT
       // ------------------------------------------------------
 
       await bonusService.pay({
+
         employeeId:
           selectedRecord.employeeId,
 
@@ -671,22 +673,24 @@ export function AdminOvertime() {
 
         incentiveAmount:
           amount,
+
       });
 
-
-      const employeeName =
-        getEmployeeName(
-          selectedRecord
-        );
 
       setSelectedRecord(null);
       setIncentiveAmount('');
 
 
       setMessage(
-        `${employeeName}'s bonus has been settled successfully. Regular payroll remains unchanged.`
+        `${getEmployeeName(
+          selectedRecord
+        )}'s accumulated extra-work bonus was paid successfully. Regular payroll remains unchanged.`
       );
 
+
+      // ------------------------------------------------------
+      // REFRESH
+      // ------------------------------------------------------
 
       await loadPending();
       await loadHistory();
@@ -694,19 +698,19 @@ export function AdminOvertime() {
     } catch (payError) {
 
       console.error(
-        'Failed to settle bonus:',
+        'Failed to pay bonus:',
         payError
       );
 
       setError(
         payError?.response?.data?.message ||
         payError?.message ||
-        'Failed to settle bonus payment.'
+        'Failed to process bonus payment.'
       );
 
     } finally {
 
-      setPayingEmployeeId(null);
+      setPayingPayrollId(null);
 
     }
 
@@ -714,7 +718,7 @@ export function AdminOvertime() {
 
 
   // ==========================================================
-  // REJECT EXTRA WORK / BONUS RECORD
+  // REJECT EXTRA WORK
   // ==========================================================
 
   const handleReject = async (
@@ -789,14 +793,14 @@ export function AdminOvertime() {
     } catch (rejectError) {
 
       console.error(
-        'Failed to reject bonus record:',
+        'Failed to reject extra work:',
         rejectError
       );
 
       setError(
         rejectError?.response?.data?.message ||
         rejectError?.message ||
-        'Failed to reject bonus record.'
+        'Failed to reject extra-work record.'
       );
 
     } finally {
@@ -818,10 +822,6 @@ export function AdminOvertime() {
     useMemo(
       () => [
 
-        // ----------------------------------------------------
-        // EMPLOYEE ID
-        // ----------------------------------------------------
-
         {
           key: 'employeeId',
           label: 'Emp ID',
@@ -835,10 +835,6 @@ export function AdminOvertime() {
           ),
         },
 
-
-        // ----------------------------------------------------
-        // EMPLOYEE
-        // ----------------------------------------------------
 
         {
           key: 'employee',
@@ -866,10 +862,6 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // PERIOD
-        // ----------------------------------------------------
-
         {
           key: 'period',
           label: 'Period',
@@ -883,10 +875,6 @@ export function AdminOvertime() {
           ),
         },
 
-
-        // ----------------------------------------------------
-        // EXTRA HOURS
-        // ----------------------------------------------------
 
         {
           key: 'extraHours',
@@ -905,13 +893,9 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // ACCUMULATED BONUS HOURS
-        // ----------------------------------------------------
-
         {
           key: 'accumulatedExtraHours',
-          label: 'Accumulated Bonus Hours',
+          label: 'Accumulated Balance',
 
           render: (record) => (
 
@@ -925,10 +909,6 @@ export function AdminOvertime() {
           ),
         },
 
-
-        // ----------------------------------------------------
-        // STATUS
-        // ----------------------------------------------------
 
         {
           key: 'status',
@@ -951,10 +931,6 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // ACTIONS
-        // ----------------------------------------------------
-
         {
           key: 'actions',
           label: 'Action',
@@ -963,7 +939,7 @@ export function AdminOvertime() {
 
             const isPaying =
               payingEmployeeId ===
-              record?.payrollId;
+              record?.employeeId;
 
             const isRejecting =
               rejectingExtraWorkId ===
@@ -988,7 +964,7 @@ export function AdminOvertime() {
 
                   <Wallet size={14} />
 
-                  Review & Pay Bonus
+                  Review & Pay
 
                 </button>
 
@@ -1050,10 +1026,6 @@ export function AdminOvertime() {
     useMemo(
       () => [
 
-        // ----------------------------------------------------
-        // SETTLEMENT ID
-        // ----------------------------------------------------
-
         {
           key: 'settlementId',
           label: 'Settlement ID',
@@ -1067,10 +1039,6 @@ export function AdminOvertime() {
           ),
         },
 
-
-        // ----------------------------------------------------
-        // EMPLOYEE
-        // ----------------------------------------------------
 
         {
           key: 'employee',
@@ -1094,10 +1062,6 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // PAYROLL PERIOD
-        // ----------------------------------------------------
-
         {
           key: 'period',
           label: 'Payroll Period',
@@ -1112,13 +1076,9 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // SETTLED HOURS
-        // ----------------------------------------------------
-
         {
           key: 'settledHours',
-          label: 'Settled Bonus Hours',
+          label: 'Settled Hours',
 
           render: (record) => (
 
@@ -1133,13 +1093,9 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // INCENTIVE
-        // ----------------------------------------------------
-
         {
           key: 'incentiveAmount',
-          label: 'Incentive',
+          label: 'Bonus',
 
           render: (record) => (
 
@@ -1153,13 +1109,9 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // SETTLEMENT DATE
-        // ----------------------------------------------------
-
         {
           key: 'settlementDate',
-          label: 'Settlement Date',
+          label: 'Payment Date',
 
           render: (record) => (
 
@@ -1173,10 +1125,6 @@ export function AdminOvertime() {
         },
 
 
-        // ----------------------------------------------------
-        // STATUS
-        // ----------------------------------------------------
-
         {
           key: 'status',
           label: 'Status',
@@ -1187,7 +1135,7 @@ export function AdminOvertime() {
 
               <CheckCircle2 size={13} />
 
-              SETTLED
+              PAID
 
             </span>
 
@@ -1283,12 +1231,12 @@ export function AdminOvertime() {
         title="Bonus Payments"
         subtitle={
           view === 'PENDING'
-            ? `${filteredRecords.length} pending bonus record${
+            ? `${filteredRecords.length} pending bonus payment${
                 filteredRecords.length !== 1
                   ? 's'
                   : ''
               }`
-            : `${filteredHistory.length} bonus settlement record${
+            : `${filteredHistory.length} bonus payment record${
                 filteredHistory.length !== 1
                   ? 's'
                   : ''
@@ -1388,10 +1336,6 @@ export function AdminOvertime() {
 
       <div className="mb-5 flex w-fit items-center gap-1 rounded-xl border border-navy-100 bg-white p-1">
 
-        {/* ----------------------------------------------------
-            PENDING
-        ----------------------------------------------------- */}
-
         <button
           type="button"
           onClick={() => {
@@ -1428,10 +1372,6 @@ export function AdminOvertime() {
         </button>
 
 
-        {/* ----------------------------------------------------
-            HISTORY
-        ----------------------------------------------------- */}
-
         <button
           type="button"
           onClick={() => {
@@ -1451,7 +1391,7 @@ export function AdminOvertime() {
 
           <CheckCircle2 size={16} />
 
-          Bonus Payment History
+          Payment History
 
           <span
             className={`rounded-full px-2 py-0.5 text-xs ${
@@ -1476,14 +1416,10 @@ export function AdminOvertime() {
 
       <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
 
-        {/* ----------------------------------------------------
-            PENDING BALANCE
-        ----------------------------------------------------- */}
-
         <div className="rounded-xl border border-navy-100 bg-white p-4">
 
           <div className="text-xs font-medium text-navy-400">
-            Pending Bonus Hours
+            Pending Extra Hours
           </div>
 
           <div className="mt-1 text-2xl font-bold text-navy-900">
@@ -1496,20 +1432,16 @@ export function AdminOvertime() {
           </div>
 
           <div className="mt-1 text-xs text-navy-500">
-            Currently accumulated extra work awaiting settlement
+            Extra work awaiting bonus settlement
           </div>
 
         </div>
 
 
-        {/* ----------------------------------------------------
-            SETTLED HOURS
-        ----------------------------------------------------- */}
-
         <div className="rounded-xl border border-navy-100 bg-white p-4">
 
           <div className="text-xs font-medium text-navy-400">
-            Settled Bonus Hours
+            Settled Hours
           </div>
 
           <div className="mt-1 text-2xl font-bold text-navy-900">
@@ -1528,10 +1460,6 @@ export function AdminOvertime() {
         </div>
 
 
-        {/* ----------------------------------------------------
-            SETTLED INCENTIVES
-        ----------------------------------------------------- */}
-
         <div className="rounded-xl border border-navy-100 bg-white p-4">
 
           <div className="text-xs font-medium text-navy-400">
@@ -1547,7 +1475,7 @@ export function AdminOvertime() {
           </div>
 
           <div className="mt-1 text-xs text-navy-500">
-            Historical bonus amounts
+            Historical extra-work bonus payments
           </div>
 
         </div>
@@ -1565,11 +1493,11 @@ export function AdminOvertime() {
 
           <EmptyState
             icon={Clock3}
-            title="No pending bonus records"
+            title="No pending bonus payments"
             message={
               search
                 ? 'No bonus records match your search.'
-                : 'Accumulated extra-work records awaiting bonus settlement will appear here.'
+                : 'Accumulated extra-work records will appear here.'
             }
           />
 
@@ -1585,14 +1513,14 @@ export function AdminOvertime() {
       ) : (
 
         /* ====================================================
-           HISTORY VIEW
+           PAYMENT HISTORY
         ==================================================== */
 
         historyLoading ? (
 
           <div className="rounded-xl border border-navy-100 bg-white py-12 text-center text-sm text-navy-500">
 
-            Loading settlement history...
+            Loading bonus payment history...
 
           </div>
 
@@ -1600,11 +1528,11 @@ export function AdminOvertime() {
 
           <EmptyState
             icon={CheckCircle2}
-            title="No bonus settlement history"
+            title="No bonus payment history"
             message={
               search
-                ? 'No bonus settlement records match your search.'
-                : 'Settled bonus records will appear here after payment.'
+                ? 'No payment records match your search.'
+                : 'Paid extra-work bonuses will appear here.'
             }
           />
 
@@ -1621,7 +1549,7 @@ export function AdminOvertime() {
 
 
       {/* ======================================================
-          BONUS REVIEW MODAL
+          REVIEW / BONUS PAYMENT MODAL
       ====================================================== */}
 
       {selectedRecord && (
@@ -1678,10 +1606,6 @@ export function AdminOvertime() {
             ------------------------------------------------- */}
 
             <div className="p-5">
-
-              {/* --------------------------------------------
-                  DETAILS
-              --------------------------------------------- */}
 
               <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
 
@@ -1783,12 +1707,12 @@ export function AdminOvertime() {
                 </div>
 
 
-                {/* ACCUMULATED BONUS HOURS */}
+                {/* ACCUMULATED BALANCE */}
 
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
 
                   <div className="text-xs text-amber-600">
-                    Accumulated Bonus Hours
+                    Accumulated Balance
                   </div>
 
                   <div className="mt-1 text-lg font-bold text-amber-800">
@@ -1807,9 +1731,9 @@ export function AdminOvertime() {
               </div>
 
 
-              {/* --------------------------------------------
-                  INCENTIVE
-              --------------------------------------------- */}
+              {/* ------------------------------------------------
+                  BONUS AMOUNT
+              ------------------------------------------------- */}
 
               <div className="rounded-xl border border-navy-100 bg-white p-4">
 
@@ -1822,8 +1746,8 @@ export function AdminOvertime() {
 
                 <div className="mb-2 text-xs text-navy-500">
 
-                  Enter the bonus amount to settle with
-                  the accumulated extra hours.
+                  Enter the bonus amount to settle against
+                  the employee's accumulated extra work.
 
                 </div>
 
@@ -1859,24 +1783,24 @@ export function AdminOvertime() {
               </div>
 
 
-              {/* --------------------------------------------
-                  IMPORTANT INFO
-              --------------------------------------------- */}
+              {/* ------------------------------------------------
+                  INFORMATION
+              ------------------------------------------------- */}
 
               <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-700">
 
-                Pay Bonus settles the employee's current
-                accumulated overtime balance, records the
-                bonus payment in settlement history, and resets
-                the current accumulated balance to zero.
-                Historical records are preserved.
+                Paying the bonus settles the employee's
+                current accumulated extra-work balance,
+                records the bonus in payment history, and
+                resets the current accumulated balance.
+                Regular salary payroll remains unchanged.
 
               </div>
 
 
-              {/* --------------------------------------------
+              {/* ------------------------------------------------
                   ACTION BUTTONS
-              --------------------------------------------- */}
+              ------------------------------------------------- */}
 
               <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
 
@@ -1914,7 +1838,7 @@ export function AdminOvertime() {
 
                   )}
 
-                  Reject Bonus Record
+                  Reject Record
 
                 </button>
 
@@ -1938,7 +1862,7 @@ export function AdminOvertime() {
                 </button>
 
 
-                {/* APPROVE & PAY BONUS */}
+                {/* PAY BONUS */}
 
                 <button
                   type="button"
@@ -1955,7 +1879,7 @@ export function AdminOvertime() {
                 >
 
                   {payingEmployeeId ===
-                  selectedRecord.payrollId ? (
+                  selectedRecord.employeeId ? (
 
                     <Loader2
                       size={16}
@@ -1971,7 +1895,7 @@ export function AdminOvertime() {
                   )}
 
                   {payingEmployeeId ===
-                  selectedRecord.payrollId
+                  selectedRecord.employeeId
                     ? 'Paying...'
                     : 'Pay Bonus'
                   }
@@ -1999,4 +1923,4 @@ export function AdminOvertime() {
 // DEFAULT EXPORT
 // ============================================================
 
-export default AdminOvertime;
+export default BonusPayments;

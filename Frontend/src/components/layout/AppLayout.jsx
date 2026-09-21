@@ -43,7 +43,7 @@ const adminNav = [
       { to: '/admin/leaves', icon: CalendarDays, label: 'Leave Requests' },
       { to: '/admin/advances', icon: Banknote, label: 'Salary Advances' },
       { to: '/admin/payroll', icon: Wallet, label: 'Payroll' },
-      { to: '/admin/overtime', icon: Clock, label: 'Extra Hours' },
+      { to: '/admin/bonus-payments', icon: Clock, label: 'Bonus Payments' },
     ],
   },
   {
@@ -80,6 +80,7 @@ const employeeNav = [
       { to: '/employee/leaves', icon: CalendarDays, label: 'My Leaves' },
       { to: '/employee/advances', icon: Banknote, label: 'My Advances' },
       { to: '/employee/payroll', icon: Wallet, label: 'My Payroll' },
+      { to: '/employee/bonuses', icon: Wallet, label: 'My Bonuses' },
       { to: '/employee/profile', icon: Users, label: 'My Profile' },
     ],
   },
