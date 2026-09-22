@@ -8,7 +8,85 @@ import {
 
 import { authService } from "@/services/apiServices";
 
+
 const AuthContext = createContext(null);
+
+
+// ==========================================
+// Normalize Authenticated User
+// ==========================================
+//
+// The backend returns different name fields for admin
+// and employee accounts:
+//
+// Admin:
+//     adminName
+//
+// Employee:
+//     firstName + lastName
+//
+// The rest of the frontend expects a common user.name field.
+// This helper keeps that field consistent for both login and
+// restored sessions from localStorage.
+// ==========================================
+
+const normalizeUser = (user) => {
+
+    if (!user || typeof user !== "object") {
+        return null;
+    }
+
+
+    const firstName =
+        String(
+            user.firstName ??
+            ""
+        ).trim();
+
+
+    const lastName =
+        String(
+            user.lastName ??
+            ""
+        ).trim();
+
+
+    const fullName =
+        `${firstName} ${lastName}`.trim();
+
+
+    const existingName =
+        String(
+            user.name ??
+            ""
+        ).trim();
+
+
+    const adminName =
+        String(
+            user.adminName ??
+            ""
+        ).trim();
+
+
+    const username =
+        String(
+            user.username ??
+            ""
+        ).trim();
+
+
+    return {
+        ...user,
+
+        name:
+            existingName ||
+            adminName ||
+            fullName ||
+            username ||
+            "User"
+    };
+};
 
 
 export function AuthProvider({ children }) {
@@ -25,14 +103,61 @@ export function AuthProvider({ children }) {
 
         try {
 
-            const token = localStorage.getItem("erp_token");
-            const storedUser = localStorage.getItem("erp_user");
+            const token =
+                localStorage.getItem(
+                    "erp_token"
+                );
 
-            if (token && storedUser) {
 
-                const parsedUser = JSON.parse(storedUser);
+            const storedUser =
+                localStorage.getItem(
+                    "erp_user"
+                );
 
-                setUser(parsedUser);
+
+            if (
+                token &&
+                storedUser
+            ) {
+
+                const parsedUser =
+                    JSON.parse(
+                        storedUser
+                    );
+
+
+                const normalizedUser =
+                    normalizeUser(
+                        parsedUser
+                    );
+
+
+                if (normalizedUser) {
+
+                    setUser(
+                        normalizedUser
+                    );
+
+
+                    // Refresh the stored user so future sessions
+                    // also contain the normalized name field.
+                    localStorage.setItem(
+                        "erp_user",
+                        JSON.stringify(
+                            normalizedUser
+                        )
+                    );
+
+                } else {
+
+                    localStorage.removeItem(
+                        "erp_user"
+                    );
+
+                    setUser(null);
+
+                }
+
             }
 
         } catch (error) {
@@ -42,8 +167,13 @@ export function AuthProvider({ children }) {
                 error
             );
 
-            localStorage.removeItem("erp_token");
-            localStorage.removeItem("erp_user");
+            localStorage.removeItem(
+                "erp_token"
+            );
+
+            localStorage.removeItem(
+                "erp_user"
+            );
 
             setUser(null);
 
@@ -61,9 +191,15 @@ export function AuthProvider({ children }) {
     // ==========================================
 
     const login = useCallback(
-        async (identifier, password) => {
+        async (
+            identifier,
+            password
+        ) => {
 
-            if (!identifier || !password) {
+            if (
+                !identifier ||
+                !password
+            ) {
 
                 throw new Error(
                     "Username/email and password are required."
@@ -86,9 +222,7 @@ export function AuthProvider({ children }) {
                  *     employee ID / identifier
                  *
                  * We first try the admin login endpoint.
-                 *
-                 * If that fails, we try the employee login
-                 * endpoint.
+                 * If that fails, we try the employee login endpoint.
                  */
 
                 let data = null;
@@ -100,10 +234,11 @@ export function AuthProvider({ children }) {
 
                 try {
 
-                    data = await authService.adminLogin(
-                        identifier,
-                        password
-                    );
+                    data =
+                        await authService.adminLogin(
+                            identifier,
+                            password
+                        );
 
                 } catch (adminError) {
 
@@ -112,10 +247,11 @@ export function AuthProvider({ children }) {
                      * Try employee login.
                      */
 
-                    data = await authService.employeeLogin(
-                        identifier,
-                        password
-                    );
+                    data =
+                        await authService.employeeLogin(
+                            identifier,
+                            password
+                        );
 
                 }
 
@@ -142,89 +278,70 @@ export function AuthProvider({ children }) {
                 }
 
 
-                  // ==========================================
-                  // Validate Backend Response
-                  // ==========================================
+                // ==========================================
+                // Get User From Backend Response
+                // ==========================================
 
-                  if (!data) {
-
-                      throw new Error(
-                          "Invalid response received from server."
-                      );
-
-                  }
-
-                  if (!data.token) {
-
-                      throw new Error(
-                          "Authentication token was not returned by the server."
-                      );
-
-                  }
+                let authenticatedUser = null;
 
 
-                  // ==========================================
-                  // Get User From Backend Response
-                  // ==========================================
+                // Admin login response
+                if (data.admin) {
 
-                  let authenticatedUser = null;
+                    authenticatedUser = {
+                        ...data.admin,
+                        role: "admin"
+                    };
 
-
-                  // Admin login response
-                  if (data.admin) {
-
-                      authenticatedUser = {
-                          ...data.admin,
-                          role: "admin",
-                      };
-
-                  }
+                }
 
 
-                  // Employee login response
-                  else if (data.employee) {
+                // Employee login response
+                else if (data.employee) {
 
-                      authenticatedUser = {
-                          ...data.employee,
-                          role: "employee",
-                      };
+                    authenticatedUser = {
+                        ...data.employee,
+                        role: "employee"
+                    };
 
-                  }
-
-
-                  // Neither admin nor employee returned
-                  else {
-
-                      throw new Error(
-                          "User information was not returned by the server."
-                      );
-
-                  }
+                }
 
 
-                  // ==========================================
-                  // Save Authentication
-                  // ==========================================
+                // Neither admin nor employee returned
+                else if (data.user) {
 
-                  localStorage.setItem(
-                      "erp_token",
-                      data.token
-                  );
+                    authenticatedUser = {
+                        ...data.user
+                    };
 
-                  localStorage.setItem(
-                      "erp_user",
-                      JSON.stringify(authenticatedUser)
-                  );
+                }
 
+                else {
 
-                  // ==========================================
-                  // Update React State
-                  // ==========================================
+                    throw new Error(
+                        "User information was not returned by the server."
+                    );
 
-                  setUser(authenticatedUser);
+                }
 
 
-                  return authenticatedUser;
+                // ==========================================
+                // Normalize User Name
+                // ==========================================
+
+                authenticatedUser =
+                    normalizeUser(
+                        authenticatedUser
+                    );
+
+
+                if (!authenticatedUser) {
+
+                    throw new Error(
+                        "User information could not be normalized."
+                    );
+
+                }
 
 
                 // ==========================================
@@ -238,7 +355,9 @@ export function AuthProvider({ children }) {
 
                 localStorage.setItem(
                     "erp_user",
-                    JSON.stringify(data.user)
+                    JSON.stringify(
+                        authenticatedUser
+                    )
                 );
 
 
@@ -246,10 +365,12 @@ export function AuthProvider({ children }) {
                 // Update React State
                 // ==========================================
 
-                setUser(data.user);
+                setUser(
+                    authenticatedUser
+                );
 
 
-                return data.user;
+                return authenticatedUser;
 
             } catch (error) {
 
@@ -286,8 +407,13 @@ export function AuthProvider({ children }) {
              * the token locally is enough for the frontend.
              */
 
-            localStorage.removeItem("erp_token");
-            localStorage.removeItem("erp_user");
+            localStorage.removeItem(
+                "erp_token"
+            );
+
+            localStorage.removeItem(
+                "erp_user"
+            );
 
             setUser(null);
 
@@ -323,9 +449,13 @@ export function AuthProvider({ children }) {
 
 
     return (
-        <AuthContext.Provider value={value}>
+
+        <AuthContext.Provider
+            value={value}
+        >
             {children}
         </AuthContext.Provider>
+
     );
 
 }
@@ -337,7 +467,11 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
 
-    const ctx = useContext(AuthContext);
+    const ctx =
+        useContext(
+            AuthContext
+        );
+
 
     if (!ctx) {
 
@@ -346,6 +480,7 @@ export function useAuth() {
         );
 
     }
+
 
     return ctx;
 
