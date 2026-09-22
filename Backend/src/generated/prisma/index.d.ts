@@ -79,6 +79,11 @@ export type ExtraWork = $Result.DefaultSelection<Prisma.$ExtraWorkPayload>
  */
 export type ExtraWorkSettlement = $Result.DefaultSelection<Prisma.$ExtraWorkSettlementPayload>
 /**
+ * Model PublicHoliday
+ * 
+ */
+export type PublicHoliday = $Result.DefaultSelection<Prisma.$PublicHolidayPayload>
+/**
  * Model ActivityLog
  * 
  */
@@ -364,6 +369,16 @@ export class PrismaClient<
     * ```
     */
   get extraWorkSettlement(): Prisma.ExtraWorkSettlementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.publicHoliday`: Exposes CRUD operations for the **PublicHoliday** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PublicHolidays
+    * const publicHolidays = await prisma.publicHoliday.findMany()
+    * ```
+    */
+  get publicHoliday(): Prisma.PublicHolidayDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.activityLog`: Exposes CRUD operations for the **ActivityLog** model.
@@ -894,6 +909,7 @@ export namespace Prisma {
     Payroll: 'Payroll',
     ExtraWork: 'ExtraWork',
     ExtraWorkSettlement: 'ExtraWorkSettlement',
+    PublicHoliday: 'PublicHoliday',
     ActivityLog: 'ActivityLog',
     Setting: 'Setting',
     companies: 'companies',
@@ -916,7 +932,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment"
+      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "publicHoliday" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1778,6 +1794,72 @@ export namespace Prisma {
           }
         }
       }
+      PublicHoliday: {
+        payload: Prisma.$PublicHolidayPayload<ExtArgs>
+        fields: Prisma.PublicHolidayFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublicHolidayFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublicHolidayFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          findFirst: {
+            args: Prisma.PublicHolidayFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublicHolidayFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          findMany: {
+            args: Prisma.PublicHolidayFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>[]
+          }
+          create: {
+            args: Prisma.PublicHolidayCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          createMany: {
+            args: Prisma.PublicHolidayCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.PublicHolidayDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          update: {
+            args: Prisma.PublicHolidayUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          deleteMany: {
+            args: Prisma.PublicHolidayDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublicHolidayUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PublicHolidayUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicHolidayPayload>
+          }
+          aggregate: {
+            args: Prisma.PublicHolidayAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublicHoliday>
+          }
+          groupBy: {
+            args: Prisma.PublicHolidayGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublicHolidayGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublicHolidayCountArgs<ExtArgs>
+            result: $Utils.Optional<PublicHolidayCountAggregateOutputType> | number
+          }
+        }
+      }
       ActivityLog: {
         payload: Prisma.$ActivityLogPayload<ExtArgs>
         fields: Prisma.ActivityLogFieldRefs
@@ -2376,6 +2458,7 @@ export namespace Prisma {
     payroll?: PayrollOmit
     extraWork?: ExtraWorkOmit
     extraWorkSettlement?: ExtraWorkSettlementOmit
+    publicHoliday?: PublicHolidayOmit
     activityLog?: ActivityLogOmit
     setting?: SettingOmit
     companies?: companiesOmit
@@ -2497,12 +2580,14 @@ export namespace Prisma {
     departments: number
     employees: number
     devices: number
+    publicHolidays: number
   }
 
   export type BranchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     departments?: boolean | BranchCountOutputTypeCountDepartmentsArgs
     employees?: boolean | BranchCountOutputTypeCountEmployeesArgs
     devices?: boolean | BranchCountOutputTypeCountDevicesArgs
+    publicHolidays?: boolean | BranchCountOutputTypeCountPublicHolidaysArgs
   }
 
   // Custom InputTypes
@@ -2535,6 +2620,13 @@ export namespace Prisma {
    */
   export type BranchCountOutputTypeCountDevicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: IotDeviceWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountPublicHolidaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicHolidayWhereInput
   }
 
 
@@ -2831,6 +2923,7 @@ export namespace Prisma {
     devices: number
     leaveTypes: number
     settings: number
+    publicHolidays: number
   }
 
   export type CompaniesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2841,6 +2934,7 @@ export namespace Prisma {
     devices?: boolean | CompaniesCountOutputTypeCountDevicesArgs
     leaveTypes?: boolean | CompaniesCountOutputTypeCountLeaveTypesArgs
     settings?: boolean | CompaniesCountOutputTypeCountSettingsArgs
+    publicHolidays?: boolean | CompaniesCountOutputTypeCountPublicHolidaysArgs
   }
 
   // Custom InputTypes
@@ -2901,6 +2995,13 @@ export namespace Prisma {
    */
   export type CompaniesCountOutputTypeCountSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SettingWhereInput
+  }
+
+  /**
+   * CompaniesCountOutputType without action
+   */
+  export type CompaniesCountOutputTypeCountPublicHolidaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicHolidayWhereInput
   }
 
 
@@ -4197,6 +4298,7 @@ export namespace Prisma {
     departments?: boolean | Branch$departmentsArgs<ExtArgs>
     employees?: boolean | Branch$employeesArgs<ExtArgs>
     devices?: boolean | Branch$devicesArgs<ExtArgs>
+    publicHolidays?: boolean | Branch$publicHolidaysArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["branch"]>
 
@@ -4217,6 +4319,7 @@ export namespace Prisma {
     departments?: boolean | Branch$departmentsArgs<ExtArgs>
     employees?: boolean | Branch$employeesArgs<ExtArgs>
     devices?: boolean | Branch$devicesArgs<ExtArgs>
+    publicHolidays?: boolean | Branch$publicHolidaysArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -4227,6 +4330,7 @@ export namespace Prisma {
       departments: Prisma.$DepartmentPayload<ExtArgs>[]
       employees: Prisma.$EmployeePayload<ExtArgs>[]
       devices: Prisma.$IotDevicePayload<ExtArgs>[]
+      publicHolidays: Prisma.$PublicHolidayPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       branchId: number
@@ -4579,6 +4683,7 @@ export namespace Prisma {
     departments<T extends Branch$departmentsArgs<ExtArgs> = {}>(args?: Subset<T, Branch$departmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     employees<T extends Branch$employeesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     devices<T extends Branch$devicesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IotDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    publicHolidays<T extends Branch$publicHolidaysArgs<ExtArgs> = {}>(args?: Subset<T, Branch$publicHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5031,6 +5136,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: IotDeviceScalarFieldEnum | IotDeviceScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.publicHolidays
+   */
+  export type Branch$publicHolidaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    where?: PublicHolidayWhereInput
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    cursor?: PublicHolidayWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
   }
 
   /**
@@ -13937,6 +14066,7 @@ export namespace Prisma {
     shortageHours: Decimal | null
     shortageDeduction: Decimal | null
     extraHours: Decimal | null
+    paidHolidayHours: Decimal | null
     basicSalary: Decimal | null
     incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
@@ -13954,6 +14084,7 @@ export namespace Prisma {
     shortageHours: Decimal | null
     shortageDeduction: Decimal | null
     extraHours: Decimal | null
+    paidHolidayHours: Decimal | null
     basicSalary: Decimal | null
     incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
@@ -13973,6 +14104,7 @@ export namespace Prisma {
     shortageHours: Decimal | null
     shortageDeduction: Decimal | null
     extraHours: Decimal | null
+    paidHolidayHours: Decimal | null
     basicSalary: Decimal | null
     incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
@@ -13997,6 +14129,7 @@ export namespace Prisma {
     shortageHours: Decimal | null
     shortageDeduction: Decimal | null
     extraHours: Decimal | null
+    paidHolidayHours: Decimal | null
     basicSalary: Decimal | null
     incentiveAmount: Decimal | null
     advanceDeduction: Decimal | null
@@ -14021,6 +14154,7 @@ export namespace Prisma {
     shortageHours: number
     shortageDeduction: number
     extraHours: number
+    paidHolidayHours: number
     basicSalary: number
     incentiveAmount: number
     advanceDeduction: number
@@ -14045,6 +14179,7 @@ export namespace Prisma {
     shortageHours?: true
     shortageDeduction?: true
     extraHours?: true
+    paidHolidayHours?: true
     basicSalary?: true
     incentiveAmount?: true
     advanceDeduction?: true
@@ -14062,6 +14197,7 @@ export namespace Prisma {
     shortageHours?: true
     shortageDeduction?: true
     extraHours?: true
+    paidHolidayHours?: true
     basicSalary?: true
     incentiveAmount?: true
     advanceDeduction?: true
@@ -14081,6 +14217,7 @@ export namespace Prisma {
     shortageHours?: true
     shortageDeduction?: true
     extraHours?: true
+    paidHolidayHours?: true
     basicSalary?: true
     incentiveAmount?: true
     advanceDeduction?: true
@@ -14105,6 +14242,7 @@ export namespace Prisma {
     shortageHours?: true
     shortageDeduction?: true
     extraHours?: true
+    paidHolidayHours?: true
     basicSalary?: true
     incentiveAmount?: true
     advanceDeduction?: true
@@ -14129,6 +14267,7 @@ export namespace Prisma {
     shortageHours?: true
     shortageDeduction?: true
     extraHours?: true
+    paidHolidayHours?: true
     basicSalary?: true
     incentiveAmount?: true
     advanceDeduction?: true
@@ -14240,6 +14379,7 @@ export namespace Prisma {
     shortageHours: Decimal
     shortageDeduction: Decimal
     extraHours: Decimal
+    paidHolidayHours: Decimal
     basicSalary: Decimal
     incentiveAmount: Decimal
     advanceDeduction: Decimal
@@ -14283,6 +14423,7 @@ export namespace Prisma {
     shortageHours?: boolean
     shortageDeduction?: boolean
     extraHours?: boolean
+    paidHolidayHours?: boolean
     basicSalary?: boolean
     incentiveAmount?: boolean
     advanceDeduction?: boolean
@@ -14314,6 +14455,7 @@ export namespace Prisma {
     shortageHours?: boolean
     shortageDeduction?: boolean
     extraHours?: boolean
+    paidHolidayHours?: boolean
     basicSalary?: boolean
     incentiveAmount?: boolean
     advanceDeduction?: boolean
@@ -14325,7 +14467,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "regularWorkingHours" | "shortageHours" | "shortageDeduction" | "extraHours" | "basicSalary" | "incentiveAmount" | "advanceDeduction" | "netSalary" | "scheduledPaymentDate" | "paymentDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
+  export type PayrollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"payrollId" | "employeeId" | "payPeriodStart" | "payPeriodEnd" | "baseSalary" | "monthlyExpectedHours" | "salaryRatePerHour" | "totalWorkingHours" | "regularWorkingHours" | "shortageHours" | "shortageDeduction" | "extraHours" | "paidHolidayHours" | "basicSalary" | "incentiveAmount" | "advanceDeduction" | "netSalary" | "scheduledPaymentDate" | "paymentDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["payroll"]>
   export type PayrollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     advanceDeductionRecord?: boolean | Payroll$advanceDeductionRecordArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
@@ -14355,6 +14497,7 @@ export namespace Prisma {
       shortageHours: Prisma.Decimal
       shortageDeduction: Prisma.Decimal
       extraHours: Prisma.Decimal
+      paidHolidayHours: Prisma.Decimal
       basicSalary: Prisma.Decimal
       incentiveAmount: Prisma.Decimal
       advanceDeduction: Prisma.Decimal
@@ -14749,6 +14892,7 @@ export namespace Prisma {
     readonly shortageHours: FieldRef<"Payroll", 'Decimal'>
     readonly shortageDeduction: FieldRef<"Payroll", 'Decimal'>
     readonly extraHours: FieldRef<"Payroll", 'Decimal'>
+    readonly paidHolidayHours: FieldRef<"Payroll", 'Decimal'>
     readonly basicSalary: FieldRef<"Payroll", 'Decimal'>
     readonly incentiveAmount: FieldRef<"Payroll", 'Decimal'>
     readonly advanceDeduction: FieldRef<"Payroll", 'Decimal'>
@@ -17306,6 +17450,1034 @@ export namespace Prisma {
 
 
   /**
+   * Model PublicHoliday
+   */
+
+  export type AggregatePublicHoliday = {
+    _count: PublicHolidayCountAggregateOutputType | null
+    _avg: PublicHolidayAvgAggregateOutputType | null
+    _sum: PublicHolidaySumAggregateOutputType | null
+    _min: PublicHolidayMinAggregateOutputType | null
+    _max: PublicHolidayMaxAggregateOutputType | null
+  }
+
+  export type PublicHolidayAvgAggregateOutputType = {
+    publicHolidayId: number | null
+    companyId: number | null
+    branchId: number | null
+    dailyWorkingHours: Decimal | null
+  }
+
+  export type PublicHolidaySumAggregateOutputType = {
+    publicHolidayId: number | null
+    companyId: number | null
+    branchId: number | null
+    dailyWorkingHours: Decimal | null
+  }
+
+  export type PublicHolidayMinAggregateOutputType = {
+    publicHolidayId: number | null
+    companyId: number | null
+    branchId: number | null
+    holidayDate: Date | null
+    holidayName: string | null
+    dailyWorkingHours: Decimal | null
+    isPaid: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicHolidayMaxAggregateOutputType = {
+    publicHolidayId: number | null
+    companyId: number | null
+    branchId: number | null
+    holidayDate: Date | null
+    holidayName: string | null
+    dailyWorkingHours: Decimal | null
+    isPaid: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PublicHolidayCountAggregateOutputType = {
+    publicHolidayId: number
+    companyId: number
+    branchId: number
+    holidayDate: number
+    holidayName: number
+    dailyWorkingHours: number
+    isPaid: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PublicHolidayAvgAggregateInputType = {
+    publicHolidayId?: true
+    companyId?: true
+    branchId?: true
+    dailyWorkingHours?: true
+  }
+
+  export type PublicHolidaySumAggregateInputType = {
+    publicHolidayId?: true
+    companyId?: true
+    branchId?: true
+    dailyWorkingHours?: true
+  }
+
+  export type PublicHolidayMinAggregateInputType = {
+    publicHolidayId?: true
+    companyId?: true
+    branchId?: true
+    holidayDate?: true
+    holidayName?: true
+    dailyWorkingHours?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicHolidayMaxAggregateInputType = {
+    publicHolidayId?: true
+    companyId?: true
+    branchId?: true
+    holidayDate?: true
+    holidayName?: true
+    dailyWorkingHours?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PublicHolidayCountAggregateInputType = {
+    publicHolidayId?: true
+    companyId?: true
+    branchId?: true
+    holidayDate?: true
+    holidayName?: true
+    dailyWorkingHours?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PublicHolidayAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicHoliday to aggregate.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PublicHolidays
+    **/
+    _count?: true | PublicHolidayCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PublicHolidayAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PublicHolidaySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublicHolidayMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublicHolidayMaxAggregateInputType
+  }
+
+  export type GetPublicHolidayAggregateType<T extends PublicHolidayAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublicHoliday]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublicHoliday[P]>
+      : GetScalarType<T[P], AggregatePublicHoliday[P]>
+  }
+
+
+
+
+  export type PublicHolidayGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicHolidayWhereInput
+    orderBy?: PublicHolidayOrderByWithAggregationInput | PublicHolidayOrderByWithAggregationInput[]
+    by: PublicHolidayScalarFieldEnum[] | PublicHolidayScalarFieldEnum
+    having?: PublicHolidayScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublicHolidayCountAggregateInputType | true
+    _avg?: PublicHolidayAvgAggregateInputType
+    _sum?: PublicHolidaySumAggregateInputType
+    _min?: PublicHolidayMinAggregateInputType
+    _max?: PublicHolidayMaxAggregateInputType
+  }
+
+  export type PublicHolidayGroupByOutputType = {
+    publicHolidayId: number
+    companyId: number
+    branchId: number
+    holidayDate: Date
+    holidayName: string
+    dailyWorkingHours: Decimal
+    isPaid: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: PublicHolidayCountAggregateOutputType | null
+    _avg: PublicHolidayAvgAggregateOutputType | null
+    _sum: PublicHolidaySumAggregateOutputType | null
+    _min: PublicHolidayMinAggregateOutputType | null
+    _max: PublicHolidayMaxAggregateOutputType | null
+  }
+
+  type GetPublicHolidayGroupByPayload<T extends PublicHolidayGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublicHolidayGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublicHolidayGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublicHolidayGroupByOutputType[P]>
+            : GetScalarType<T[P], PublicHolidayGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublicHolidaySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    publicHolidayId?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    holidayDate?: boolean
+    holidayName?: boolean
+    dailyWorkingHours?: boolean
+    isPaid?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["publicHoliday"]>
+
+
+
+  export type PublicHolidaySelectScalar = {
+    publicHolidayId?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    holidayDate?: boolean
+    holidayName?: boolean
+    dailyWorkingHours?: boolean
+    isPaid?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PublicHolidayOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"publicHolidayId" | "companyId" | "branchId" | "holidayDate" | "holidayName" | "dailyWorkingHours" | "isPaid" | "createdAt" | "updatedAt", ExtArgs["result"]["publicHoliday"]>
+  export type PublicHolidayInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+  }
+
+  export type $PublicHolidayPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PublicHoliday"
+    objects: {
+      company: Prisma.$companiesPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      publicHolidayId: number
+      companyId: number
+      branchId: number
+      holidayDate: Date
+      holidayName: string
+      dailyWorkingHours: Prisma.Decimal
+      isPaid: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["publicHoliday"]>
+    composites: {}
+  }
+
+  type PublicHolidayGetPayload<S extends boolean | null | undefined | PublicHolidayDefaultArgs> = $Result.GetResult<Prisma.$PublicHolidayPayload, S>
+
+  type PublicHolidayCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublicHolidayFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublicHolidayCountAggregateInputType | true
+    }
+
+  export interface PublicHolidayDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PublicHoliday'], meta: { name: 'PublicHoliday' } }
+    /**
+     * Find zero or one PublicHoliday that matches the filter.
+     * @param {PublicHolidayFindUniqueArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublicHolidayFindUniqueArgs>(args: SelectSubset<T, PublicHolidayFindUniqueArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PublicHoliday that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublicHolidayFindUniqueOrThrowArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublicHolidayFindUniqueOrThrowArgs>(args: SelectSubset<T, PublicHolidayFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicHoliday that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindFirstArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublicHolidayFindFirstArgs>(args?: SelectSubset<T, PublicHolidayFindFirstArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicHoliday that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindFirstOrThrowArgs} args - Arguments to find a PublicHoliday
+     * @example
+     * // Get one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublicHolidayFindFirstOrThrowArgs>(args?: SelectSubset<T, PublicHolidayFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PublicHolidays that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PublicHolidays
+     * const publicHolidays = await prisma.publicHoliday.findMany()
+     * 
+     * // Get first 10 PublicHolidays
+     * const publicHolidays = await prisma.publicHoliday.findMany({ take: 10 })
+     * 
+     * // Only select the `publicHolidayId`
+     * const publicHolidayWithPublicHolidayIdOnly = await prisma.publicHoliday.findMany({ select: { publicHolidayId: true } })
+     * 
+     */
+    findMany<T extends PublicHolidayFindManyArgs>(args?: SelectSubset<T, PublicHolidayFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PublicHoliday.
+     * @param {PublicHolidayCreateArgs} args - Arguments to create a PublicHoliday.
+     * @example
+     * // Create one PublicHoliday
+     * const PublicHoliday = await prisma.publicHoliday.create({
+     *   data: {
+     *     // ... data to create a PublicHoliday
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublicHolidayCreateArgs>(args: SelectSubset<T, PublicHolidayCreateArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PublicHolidays.
+     * @param {PublicHolidayCreateManyArgs} args - Arguments to create many PublicHolidays.
+     * @example
+     * // Create many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublicHolidayCreateManyArgs>(args?: SelectSubset<T, PublicHolidayCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a PublicHoliday.
+     * @param {PublicHolidayDeleteArgs} args - Arguments to delete one PublicHoliday.
+     * @example
+     * // Delete one PublicHoliday
+     * const PublicHoliday = await prisma.publicHoliday.delete({
+     *   where: {
+     *     // ... filter to delete one PublicHoliday
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublicHolidayDeleteArgs>(args: SelectSubset<T, PublicHolidayDeleteArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PublicHoliday.
+     * @param {PublicHolidayUpdateArgs} args - Arguments to update one PublicHoliday.
+     * @example
+     * // Update one PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublicHolidayUpdateArgs>(args: SelectSubset<T, PublicHolidayUpdateArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PublicHolidays.
+     * @param {PublicHolidayDeleteManyArgs} args - Arguments to filter PublicHolidays to delete.
+     * @example
+     * // Delete a few PublicHolidays
+     * const { count } = await prisma.publicHoliday.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublicHolidayDeleteManyArgs>(args?: SelectSubset<T, PublicHolidayDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PublicHolidays
+     * const publicHoliday = await prisma.publicHoliday.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublicHolidayUpdateManyArgs>(args: SelectSubset<T, PublicHolidayUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one PublicHoliday.
+     * @param {PublicHolidayUpsertArgs} args - Arguments to update or create a PublicHoliday.
+     * @example
+     * // Update or create a PublicHoliday
+     * const publicHoliday = await prisma.publicHoliday.upsert({
+     *   create: {
+     *     // ... data to create a PublicHoliday
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PublicHoliday we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublicHolidayUpsertArgs>(args: SelectSubset<T, PublicHolidayUpsertArgs<ExtArgs>>): Prisma__PublicHolidayClient<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PublicHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayCountArgs} args - Arguments to filter PublicHolidays to count.
+     * @example
+     * // Count the number of PublicHolidays
+     * const count = await prisma.publicHoliday.count({
+     *   where: {
+     *     // ... the filter for the PublicHolidays we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublicHolidayCountArgs>(
+      args?: Subset<T, PublicHolidayCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublicHolidayCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PublicHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublicHolidayAggregateArgs>(args: Subset<T, PublicHolidayAggregateArgs>): Prisma.PrismaPromise<GetPublicHolidayAggregateType<T>>
+
+    /**
+     * Group by PublicHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicHolidayGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublicHolidayGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublicHolidayGroupByArgs['orderBy'] }
+        : { orderBy?: PublicHolidayGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublicHolidayGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublicHolidayGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PublicHoliday model
+   */
+  readonly fields: PublicHolidayFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PublicHoliday.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublicHolidayClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PublicHoliday model
+   */
+  interface PublicHolidayFieldRefs {
+    readonly publicHolidayId: FieldRef<"PublicHoliday", 'Int'>
+    readonly companyId: FieldRef<"PublicHoliday", 'Int'>
+    readonly branchId: FieldRef<"PublicHoliday", 'Int'>
+    readonly holidayDate: FieldRef<"PublicHoliday", 'DateTime'>
+    readonly holidayName: FieldRef<"PublicHoliday", 'String'>
+    readonly dailyWorkingHours: FieldRef<"PublicHoliday", 'Decimal'>
+    readonly isPaid: FieldRef<"PublicHoliday", 'Boolean'>
+    readonly createdAt: FieldRef<"PublicHoliday", 'DateTime'>
+    readonly updatedAt: FieldRef<"PublicHoliday", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PublicHoliday findUnique
+   */
+  export type PublicHolidayFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday findUniqueOrThrow
+   */
+  export type PublicHolidayFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday findFirst
+   */
+  export type PublicHolidayFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday findFirstOrThrow
+   */
+  export type PublicHolidayFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicHoliday to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday findMany
+   */
+  export type PublicHolidayFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicHolidays to fetch.
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicHolidays to fetch.
+     */
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PublicHolidays.
+     */
+    cursor?: PublicHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicHolidays.
+     */
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * PublicHoliday create
+   */
+  export type PublicHolidayCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PublicHoliday.
+     */
+    data: XOR<PublicHolidayCreateInput, PublicHolidayUncheckedCreateInput>
+  }
+
+  /**
+   * PublicHoliday createMany
+   */
+  export type PublicHolidayCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PublicHolidays.
+     */
+    data: PublicHolidayCreateManyInput | PublicHolidayCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublicHoliday update
+   */
+  export type PublicHolidayUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PublicHoliday.
+     */
+    data: XOR<PublicHolidayUpdateInput, PublicHolidayUncheckedUpdateInput>
+    /**
+     * Choose, which PublicHoliday to update.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday updateMany
+   */
+  export type PublicHolidayUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PublicHolidays.
+     */
+    data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicHolidays to update
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * Limit how many PublicHolidays to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicHoliday upsert
+   */
+  export type PublicHolidayUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PublicHoliday to update in case it exists.
+     */
+    where: PublicHolidayWhereUniqueInput
+    /**
+     * In case the PublicHoliday found by the `where` argument doesn't exist, create a new PublicHoliday with this data.
+     */
+    create: XOR<PublicHolidayCreateInput, PublicHolidayUncheckedCreateInput>
+    /**
+     * In case the PublicHoliday was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublicHolidayUpdateInput, PublicHolidayUncheckedUpdateInput>
+  }
+
+  /**
+   * PublicHoliday delete
+   */
+  export type PublicHolidayDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    /**
+     * Filter which PublicHoliday to delete.
+     */
+    where: PublicHolidayWhereUniqueInput
+  }
+
+  /**
+   * PublicHoliday deleteMany
+   */
+  export type PublicHolidayDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicHolidays to delete
+     */
+    where?: PublicHolidayWhereInput
+    /**
+     * Limit how many PublicHolidays to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicHoliday without action
+   */
+  export type PublicHolidayDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model ActivityLog
    */
 
@@ -19500,6 +20672,7 @@ export namespace Prisma {
     devices?: boolean | companies$devicesArgs<ExtArgs>
     leaveTypes?: boolean | companies$leaveTypesArgs<ExtArgs>
     settings?: boolean | companies$settingsArgs<ExtArgs>
+    publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
     _count?: boolean | CompaniesCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["companies"]>
 
@@ -19524,6 +20697,7 @@ export namespace Prisma {
     devices?: boolean | companies$devicesArgs<ExtArgs>
     leaveTypes?: boolean | companies$leaveTypesArgs<ExtArgs>
     settings?: boolean | companies$settingsArgs<ExtArgs>
+    publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
     _count?: boolean | CompaniesCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -19537,6 +20711,7 @@ export namespace Prisma {
       devices: Prisma.$IotDevicePayload<ExtArgs>[]
       leaveTypes: Prisma.$LeaveTypePayload<ExtArgs>[]
       settings: Prisma.$SettingPayload<ExtArgs>[]
+      publicHolidays: Prisma.$PublicHolidayPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       company_id: number
@@ -19893,6 +21068,7 @@ export namespace Prisma {
     devices<T extends companies$devicesArgs<ExtArgs> = {}>(args?: Subset<T, companies$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IotDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     leaveTypes<T extends companies$leaveTypesArgs<ExtArgs> = {}>(args?: Subset<T, companies$leaveTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeaveTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     settings<T extends companies$settingsArgs<ExtArgs> = {}>(args?: Subset<T, companies$settingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    publicHolidays<T extends companies$publicHolidaysArgs<ExtArgs> = {}>(args?: Subset<T, companies$publicHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -20442,6 +21618,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SettingScalarFieldEnum | SettingScalarFieldEnum[]
+  }
+
+  /**
+   * companies.publicHolidays
+   */
+  export type companies$publicHolidaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicHoliday
+     */
+    select?: PublicHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicHoliday
+     */
+    omit?: PublicHolidayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicHolidayInclude<ExtArgs> | null
+    where?: PublicHolidayWhereInput
+    orderBy?: PublicHolidayOrderByWithRelationInput | PublicHolidayOrderByWithRelationInput[]
+    cursor?: PublicHolidayWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
   }
 
   /**
@@ -24953,6 +26153,7 @@ export namespace Prisma {
     shortageHours: 'shortageHours',
     shortageDeduction: 'shortageDeduction',
     extraHours: 'extraHours',
+    paidHolidayHours: 'paidHolidayHours',
     basicSalary: 'basicSalary',
     incentiveAmount: 'incentiveAmount',
     advanceDeduction: 'advanceDeduction',
@@ -24993,6 +26194,21 @@ export namespace Prisma {
   };
 
   export type ExtraWorkSettlementScalarFieldEnum = (typeof ExtraWorkSettlementScalarFieldEnum)[keyof typeof ExtraWorkSettlementScalarFieldEnum]
+
+
+  export const PublicHolidayScalarFieldEnum: {
+    publicHolidayId: 'publicHolidayId',
+    companyId: 'companyId',
+    branchId: 'branchId',
+    holidayDate: 'holidayDate',
+    holidayName: 'holidayName',
+    dailyWorkingHours: 'dailyWorkingHours',
+    isPaid: 'isPaid',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PublicHolidayScalarFieldEnum = (typeof PublicHolidayScalarFieldEnum)[keyof typeof PublicHolidayScalarFieldEnum]
 
 
   export const ActivityLogScalarFieldEnum: {
@@ -25221,6 +26437,13 @@ export namespace Prisma {
   export type ExtraWorkOrderByRelevanceFieldEnum = (typeof ExtraWorkOrderByRelevanceFieldEnum)[keyof typeof ExtraWorkOrderByRelevanceFieldEnum]
 
 
+  export const PublicHolidayOrderByRelevanceFieldEnum: {
+    holidayName: 'holidayName'
+  };
+
+  export type PublicHolidayOrderByRelevanceFieldEnum = (typeof PublicHolidayOrderByRelevanceFieldEnum)[keyof typeof PublicHolidayOrderByRelevanceFieldEnum]
+
+
   export const ActivityLogOrderByRelevanceFieldEnum: {
     actionType: 'actionType',
     description: 'description'
@@ -25422,6 +26645,7 @@ export namespace Prisma {
     departments?: DepartmentListRelationFilter
     employees?: EmployeeListRelationFilter
     devices?: IotDeviceListRelationFilter
+    publicHolidays?: PublicHolidayListRelationFilter
   }
 
   export type BranchOrderByWithRelationInput = {
@@ -25435,6 +26659,7 @@ export namespace Prisma {
     departments?: DepartmentOrderByRelationAggregateInput
     employees?: EmployeeOrderByRelationAggregateInput
     devices?: IotDeviceOrderByRelationAggregateInput
+    publicHolidays?: PublicHolidayOrderByRelationAggregateInput
     _relevance?: BranchOrderByRelevanceInput
   }
 
@@ -25452,6 +26677,7 @@ export namespace Prisma {
     departments?: DepartmentListRelationFilter
     employees?: EmployeeListRelationFilter
     devices?: IotDeviceListRelationFilter
+    publicHolidays?: PublicHolidayListRelationFilter
   }, "branchId">
 
   export type BranchOrderByWithAggregationInput = {
@@ -26231,6 +27457,7 @@ export namespace Prisma {
     shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -26259,6 +27486,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -26291,6 +27519,7 @@ export namespace Prisma {
     shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -26319,6 +27548,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -26351,6 +27581,7 @@ export namespace Prisma {
     shortageHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalWithAggregatesFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -26519,6 +27750,88 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ExtraWorkSettlement"> | Date | string
   }
 
+  export type PublicHolidayWhereInput = {
+    AND?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    OR?: PublicHolidayWhereInput[]
+    NOT?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    publicHolidayId?: IntFilter<"PublicHoliday"> | number
+    companyId?: IntFilter<"PublicHoliday"> | number
+    branchId?: IntFilter<"PublicHoliday"> | number
+    holidayDate?: DateTimeFilter<"PublicHoliday"> | Date | string
+    holidayName?: StringFilter<"PublicHoliday"> | string
+    dailyWorkingHours?: DecimalFilter<"PublicHoliday"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+  }
+
+  export type PublicHolidayOrderByWithRelationInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    holidayDate?: SortOrder
+    holidayName?: SortOrder
+    dailyWorkingHours?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: companiesOrderByWithRelationInput
+    branch?: BranchOrderByWithRelationInput
+    _relevance?: PublicHolidayOrderByRelevanceInput
+  }
+
+  export type PublicHolidayWhereUniqueInput = Prisma.AtLeast<{
+    publicHolidayId?: number
+    branchId_holidayDate?: PublicHolidayBranchIdHolidayDateCompoundUniqueInput
+    AND?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    OR?: PublicHolidayWhereInput[]
+    NOT?: PublicHolidayWhereInput | PublicHolidayWhereInput[]
+    companyId?: IntFilter<"PublicHoliday"> | number
+    branchId?: IntFilter<"PublicHoliday"> | number
+    holidayDate?: DateTimeFilter<"PublicHoliday"> | Date | string
+    holidayName?: StringFilter<"PublicHoliday"> | string
+    dailyWorkingHours?: DecimalFilter<"PublicHoliday"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+  }, "publicHolidayId" | "branchId_holidayDate">
+
+  export type PublicHolidayOrderByWithAggregationInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    holidayDate?: SortOrder
+    holidayName?: SortOrder
+    dailyWorkingHours?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PublicHolidayCountOrderByAggregateInput
+    _avg?: PublicHolidayAvgOrderByAggregateInput
+    _max?: PublicHolidayMaxOrderByAggregateInput
+    _min?: PublicHolidayMinOrderByAggregateInput
+    _sum?: PublicHolidaySumOrderByAggregateInput
+  }
+
+  export type PublicHolidayScalarWhereWithAggregatesInput = {
+    AND?: PublicHolidayScalarWhereWithAggregatesInput | PublicHolidayScalarWhereWithAggregatesInput[]
+    OR?: PublicHolidayScalarWhereWithAggregatesInput[]
+    NOT?: PublicHolidayScalarWhereWithAggregatesInput | PublicHolidayScalarWhereWithAggregatesInput[]
+    publicHolidayId?: IntWithAggregatesFilter<"PublicHoliday"> | number
+    companyId?: IntWithAggregatesFilter<"PublicHoliday"> | number
+    branchId?: IntWithAggregatesFilter<"PublicHoliday"> | number
+    holidayDate?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+    holidayName?: StringWithAggregatesFilter<"PublicHoliday"> | string
+    dailyWorkingHours?: DecimalWithAggregatesFilter<"PublicHoliday"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolWithAggregatesFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PublicHoliday"> | Date | string
+  }
+
   export type ActivityLogWhereInput = {
     AND?: ActivityLogWhereInput | ActivityLogWhereInput[]
     OR?: ActivityLogWhereInput[]
@@ -26659,6 +27972,7 @@ export namespace Prisma {
     devices?: IotDeviceListRelationFilter
     leaveTypes?: LeaveTypeListRelationFilter
     settings?: SettingListRelationFilter
+    publicHolidays?: PublicHolidayListRelationFilter
   }
 
   export type companiesOrderByWithRelationInput = {
@@ -26676,6 +27990,7 @@ export namespace Prisma {
     devices?: IotDeviceOrderByRelationAggregateInput
     leaveTypes?: LeaveTypeOrderByRelationAggregateInput
     settings?: SettingOrderByRelationAggregateInput
+    publicHolidays?: PublicHolidayOrderByRelationAggregateInput
     _relevance?: companiesOrderByRelevanceInput
   }
 
@@ -26697,6 +28012,7 @@ export namespace Prisma {
     devices?: IotDeviceListRelationFilter
     leaveTypes?: LeaveTypeListRelationFilter
     settings?: SettingListRelationFilter
+    publicHolidays?: PublicHolidayListRelationFilter
   }, "company_id">
 
   export type companiesOrderByWithAggregationInput = {
@@ -27199,6 +28515,7 @@ export namespace Prisma {
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateInput = {
@@ -27211,6 +28528,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUpdateInput = {
@@ -27222,6 +28540,7 @@ export namespace Prisma {
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateInput = {
@@ -27234,6 +28553,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchCreateManyInput = {
@@ -28022,6 +29342,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -28050,6 +29371,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -28075,6 +29397,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -28103,6 +29426,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -28130,6 +29454,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -28152,6 +29477,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -28176,6 +29502,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -28334,6 +29661,85 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PublicHolidayCreateInput = {
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutPublicHolidaysInput
+    branch: BranchCreateNestedOneWithoutPublicHolidaysInput
+  }
+
+  export type PublicHolidayUncheckedCreateInput = {
+    publicHolidayId?: number
+    companyId: number
+    branchId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayUpdateInput = {
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutPublicHolidaysNestedInput
+    branch?: BranchUpdateOneRequiredWithoutPublicHolidaysNestedInput
+  }
+
+  export type PublicHolidayUncheckedUpdateInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayCreateManyInput = {
+    publicHolidayId?: number
+    companyId: number
+    branchId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayUpdateManyMutationInput = {
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUncheckedUpdateManyInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ActivityLogCreateInput = {
     logId?: bigint | number
     actionType: string
@@ -28462,6 +29868,7 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateInput = {
@@ -28479,6 +29886,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUpdateInput = {
@@ -28495,6 +29903,7 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateInput = {
@@ -28512,6 +29921,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesCreateManyInput = {
@@ -29158,6 +30568,12 @@ export namespace Prisma {
     none?: IotDeviceWhereInput
   }
 
+  export type PublicHolidayListRelationFilter = {
+    every?: PublicHolidayWhereInput
+    some?: PublicHolidayWhereInput
+    none?: PublicHolidayWhereInput
+  }
+
   export type DepartmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -29167,6 +30583,10 @@ export namespace Prisma {
   }
 
   export type IotDeviceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PublicHolidayOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -29993,6 +31413,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -30015,6 +31436,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -30034,6 +31456,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -30058,6 +31481,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -30080,6 +31504,7 @@ export namespace Prisma {
     shortageHours?: SortOrder
     shortageDeduction?: SortOrder
     extraHours?: SortOrder
+    paidHolidayHours?: SortOrder
     basicSalary?: SortOrder
     incentiveAmount?: SortOrder
     advanceDeduction?: SortOrder
@@ -30198,6 +31623,80 @@ export namespace Prisma {
     payrollId?: SortOrder
     settledHours?: SortOrder
     incentiveAmount?: SortOrder
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type PublicHolidayOrderByRelevanceInput = {
+    fields: PublicHolidayOrderByRelevanceFieldEnum | PublicHolidayOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type PublicHolidayBranchIdHolidayDateCompoundUniqueInput = {
+    branchId: number
+    holidayDate: Date | string
+  }
+
+  export type PublicHolidayCountOrderByAggregateInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    holidayDate?: SortOrder
+    holidayName?: SortOrder
+    dailyWorkingHours?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidayAvgOrderByAggregateInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    dailyWorkingHours?: SortOrder
+  }
+
+  export type PublicHolidayMaxOrderByAggregateInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    holidayDate?: SortOrder
+    holidayName?: SortOrder
+    dailyWorkingHours?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidayMinOrderByAggregateInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    holidayDate?: SortOrder
+    holidayName?: SortOrder
+    dailyWorkingHours?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PublicHolidaySumOrderByAggregateInput = {
+    publicHolidayId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    dailyWorkingHours?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type ActivityLogOrderByRelevanceInput = {
@@ -30372,11 +31871,6 @@ export namespace Prisma {
     company_id?: SortOrder
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type LeaveTypeOrderByRelevanceInput = {
     fields: LeaveTypeOrderByRelevanceFieldEnum | LeaveTypeOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -30451,14 +31945,6 @@ export namespace Prisma {
     leaveTypeId?: SortOrder
     companyId?: SortOrder
     annualQuota?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type LeaveTypeScalarRelationFilter = {
@@ -30771,6 +32257,13 @@ export namespace Prisma {
     connect?: IotDeviceWhereUniqueInput | IotDeviceWhereUniqueInput[]
   }
 
+  export type PublicHolidayCreateNestedManyWithoutBranchInput = {
+    create?: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput> | PublicHolidayCreateWithoutBranchInput[] | PublicHolidayUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutBranchInput | PublicHolidayCreateOrConnectWithoutBranchInput[]
+    createMany?: PublicHolidayCreateManyBranchInputEnvelope
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+  }
+
   export type DepartmentUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<DepartmentCreateWithoutBranchInput, DepartmentUncheckedCreateWithoutBranchInput> | DepartmentCreateWithoutBranchInput[] | DepartmentUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: DepartmentCreateOrConnectWithoutBranchInput | DepartmentCreateOrConnectWithoutBranchInput[]
@@ -30790,6 +32283,13 @@ export namespace Prisma {
     connectOrCreate?: IotDeviceCreateOrConnectWithoutBranchInput | IotDeviceCreateOrConnectWithoutBranchInput[]
     createMany?: IotDeviceCreateManyBranchInputEnvelope
     connect?: IotDeviceWhereUniqueInput | IotDeviceWhereUniqueInput[]
+  }
+
+  export type PublicHolidayUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput> | PublicHolidayCreateWithoutBranchInput[] | PublicHolidayUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutBranchInput | PublicHolidayCreateOrConnectWithoutBranchInput[]
+    createMany?: PublicHolidayCreateManyBranchInputEnvelope
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
   }
 
   export type companiesUpdateOneRequiredWithoutBranchesNestedInput = {
@@ -30842,6 +32342,20 @@ export namespace Prisma {
     deleteMany?: IotDeviceScalarWhereInput | IotDeviceScalarWhereInput[]
   }
 
+  export type PublicHolidayUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput> | PublicHolidayCreateWithoutBranchInput[] | PublicHolidayUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutBranchInput | PublicHolidayCreateOrConnectWithoutBranchInput[]
+    upsert?: PublicHolidayUpsertWithWhereUniqueWithoutBranchInput | PublicHolidayUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: PublicHolidayCreateManyBranchInputEnvelope
+    set?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    disconnect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    delete?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    update?: PublicHolidayUpdateWithWhereUniqueWithoutBranchInput | PublicHolidayUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: PublicHolidayUpdateManyWithWhereWithoutBranchInput | PublicHolidayUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+  }
+
   export type DepartmentUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<DepartmentCreateWithoutBranchInput, DepartmentUncheckedCreateWithoutBranchInput> | DepartmentCreateWithoutBranchInput[] | DepartmentUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: DepartmentCreateOrConnectWithoutBranchInput | DepartmentCreateOrConnectWithoutBranchInput[]
@@ -30882,6 +32396,20 @@ export namespace Prisma {
     update?: IotDeviceUpdateWithWhereUniqueWithoutBranchInput | IotDeviceUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: IotDeviceUpdateManyWithWhereWithoutBranchInput | IotDeviceUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: IotDeviceScalarWhereInput | IotDeviceScalarWhereInput[]
+  }
+
+  export type PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput> | PublicHolidayCreateWithoutBranchInput[] | PublicHolidayUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutBranchInput | PublicHolidayCreateOrConnectWithoutBranchInput[]
+    upsert?: PublicHolidayUpsertWithWhereUniqueWithoutBranchInput | PublicHolidayUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: PublicHolidayCreateManyBranchInputEnvelope
+    set?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    disconnect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    delete?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    update?: PublicHolidayUpdateWithWhereUniqueWithoutBranchInput | PublicHolidayUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: PublicHolidayUpdateManyWithWhereWithoutBranchInput | PublicHolidayUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
   }
 
   export type BranchCreateNestedOneWithoutDepartmentsInput = {
@@ -32086,6 +33614,38 @@ export namespace Prisma {
     deleteMany?: ExtraWorkScalarWhereInput | ExtraWorkScalarWhereInput[]
   }
 
+  export type companiesCreateNestedOneWithoutPublicHolidaysInput = {
+    create?: XOR<companiesCreateWithoutPublicHolidaysInput, companiesUncheckedCreateWithoutPublicHolidaysInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutPublicHolidaysInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type BranchCreateNestedOneWithoutPublicHolidaysInput = {
+    create?: XOR<BranchCreateWithoutPublicHolidaysInput, BranchUncheckedCreateWithoutPublicHolidaysInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutPublicHolidaysInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type companiesUpdateOneRequiredWithoutPublicHolidaysNestedInput = {
+    create?: XOR<companiesCreateWithoutPublicHolidaysInput, companiesUncheckedCreateWithoutPublicHolidaysInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutPublicHolidaysInput
+    upsert?: companiesUpsertWithoutPublicHolidaysInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutPublicHolidaysInput, companiesUpdateWithoutPublicHolidaysInput>, companiesUncheckedUpdateWithoutPublicHolidaysInput>
+  }
+
+  export type BranchUpdateOneRequiredWithoutPublicHolidaysNestedInput = {
+    create?: XOR<BranchCreateWithoutPublicHolidaysInput, BranchUncheckedCreateWithoutPublicHolidaysInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutPublicHolidaysInput
+    upsert?: BranchUpsertWithoutPublicHolidaysInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutPublicHolidaysInput, BranchUpdateWithoutPublicHolidaysInput>, BranchUncheckedUpdateWithoutPublicHolidaysInput>
+  }
+
   export type EmployeeCreateNestedOneWithoutActivityLogsInput = {
     create?: XOR<EmployeeCreateWithoutActivityLogsInput, EmployeeUncheckedCreateWithoutActivityLogsInput>
     connectOrCreate?: EmployeeCreateOrConnectWithoutActivityLogsInput
@@ -32165,6 +33725,13 @@ export namespace Prisma {
     connect?: SettingWhereUniqueInput | SettingWhereUniqueInput[]
   }
 
+  export type PublicHolidayCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput> | PublicHolidayCreateWithoutCompanyInput[] | PublicHolidayUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutCompanyInput | PublicHolidayCreateOrConnectWithoutCompanyInput[]
+    createMany?: PublicHolidayCreateManyCompanyInputEnvelope
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+  }
+
   export type AdminUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<AdminCreateWithoutCompanyInput, AdminUncheckedCreateWithoutCompanyInput> | AdminCreateWithoutCompanyInput[] | AdminUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: AdminCreateOrConnectWithoutCompanyInput | AdminCreateOrConnectWithoutCompanyInput[]
@@ -32212,6 +33779,13 @@ export namespace Prisma {
     connectOrCreate?: SettingCreateOrConnectWithoutCompanyInput | SettingCreateOrConnectWithoutCompanyInput[]
     createMany?: SettingCreateManyCompanyInputEnvelope
     connect?: SettingWhereUniqueInput | SettingWhereUniqueInput[]
+  }
+
+  export type PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput> | PublicHolidayCreateWithoutCompanyInput[] | PublicHolidayUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutCompanyInput | PublicHolidayCreateOrConnectWithoutCompanyInput[]
+    createMany?: PublicHolidayCreateManyCompanyInputEnvelope
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
   }
 
   export type AdminUpdateManyWithoutCompanyNestedInput = {
@@ -32312,6 +33886,20 @@ export namespace Prisma {
     deleteMany?: SettingScalarWhereInput | SettingScalarWhereInput[]
   }
 
+  export type PublicHolidayUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput> | PublicHolidayCreateWithoutCompanyInput[] | PublicHolidayUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutCompanyInput | PublicHolidayCreateOrConnectWithoutCompanyInput[]
+    upsert?: PublicHolidayUpsertWithWhereUniqueWithoutCompanyInput | PublicHolidayUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: PublicHolidayCreateManyCompanyInputEnvelope
+    set?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    disconnect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    delete?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    update?: PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput | PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: PublicHolidayUpdateManyWithWhereWithoutCompanyInput | PublicHolidayUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+  }
+
   export type AdminUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<AdminCreateWithoutCompanyInput, AdminUncheckedCreateWithoutCompanyInput> | AdminCreateWithoutCompanyInput[] | AdminUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: AdminCreateOrConnectWithoutCompanyInput | AdminCreateOrConnectWithoutCompanyInput[]
@@ -32410,6 +33998,20 @@ export namespace Prisma {
     deleteMany?: SettingScalarWhereInput | SettingScalarWhereInput[]
   }
 
+  export type PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput> | PublicHolidayCreateWithoutCompanyInput[] | PublicHolidayUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PublicHolidayCreateOrConnectWithoutCompanyInput | PublicHolidayCreateOrConnectWithoutCompanyInput[]
+    upsert?: PublicHolidayUpsertWithWhereUniqueWithoutCompanyInput | PublicHolidayUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: PublicHolidayCreateManyCompanyInputEnvelope
+    set?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    disconnect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    delete?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+    update?: PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput | PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: PublicHolidayUpdateManyWithWhereWithoutCompanyInput | PublicHolidayUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+  }
+
   export type LeaveBalanceCreateNestedManyWithoutLeaveTypeInput = {
     create?: XOR<LeaveBalanceCreateWithoutLeaveTypeInput, LeaveBalanceUncheckedCreateWithoutLeaveTypeInput> | LeaveBalanceCreateWithoutLeaveTypeInput[] | LeaveBalanceUncheckedCreateWithoutLeaveTypeInput[]
     connectOrCreate?: LeaveBalanceCreateOrConnectWithoutLeaveTypeInput | LeaveBalanceCreateOrConnectWithoutLeaveTypeInput[]
@@ -32442,10 +34044,6 @@ export namespace Prisma {
     connectOrCreate?: LeaveRequestCreateOrConnectWithoutLeaveTypeInput | LeaveRequestCreateOrConnectWithoutLeaveTypeInput[]
     createMany?: LeaveRequestCreateManyLeaveTypeInputEnvelope
     connect?: LeaveRequestWhereUniqueInput | LeaveRequestWhereUniqueInput[]
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type LeaveBalanceUpdateManyWithoutLeaveTypeNestedInput = {
@@ -32881,6 +34479,7 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutAdminsInput = {
@@ -32897,6 +34496,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutAdminsInput = {
@@ -32967,6 +34567,7 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutAdminsInput = {
@@ -32983,6 +34584,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type AdvancePaymentUpsertWithWhereUniqueWithoutApproverInput = {
@@ -33033,6 +34635,7 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutBranchesInput = {
@@ -33049,6 +34652,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutBranchesInput = {
@@ -33201,6 +34805,37 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PublicHolidayCreateWithoutBranchInput = {
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutPublicHolidaysInput
+  }
+
+  export type PublicHolidayUncheckedCreateWithoutBranchInput = {
+    publicHolidayId?: number
+    companyId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayCreateOrConnectWithoutBranchInput = {
+    where: PublicHolidayWhereUniqueInput
+    create: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput>
+  }
+
+  export type PublicHolidayCreateManyBranchInputEnvelope = {
+    data: PublicHolidayCreateManyBranchInput | PublicHolidayCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
   export type companiesUpsertWithoutBranchesInput = {
     update: XOR<companiesUpdateWithoutBranchesInput, companiesUncheckedUpdateWithoutBranchesInput>
     create: XOR<companiesCreateWithoutBranchesInput, companiesUncheckedCreateWithoutBranchesInput>
@@ -33225,6 +34860,7 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutBranchesInput = {
@@ -33241,6 +34877,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type DepartmentUpsertWithWhereUniqueWithoutBranchInput = {
@@ -33346,6 +34983,37 @@ export namespace Prisma {
     deviceSecretHash?: StringNullableFilter<"IotDevice"> | string | null
   }
 
+  export type PublicHolidayUpsertWithWhereUniqueWithoutBranchInput = {
+    where: PublicHolidayWhereUniqueInput
+    update: XOR<PublicHolidayUpdateWithoutBranchInput, PublicHolidayUncheckedUpdateWithoutBranchInput>
+    create: XOR<PublicHolidayCreateWithoutBranchInput, PublicHolidayUncheckedCreateWithoutBranchInput>
+  }
+
+  export type PublicHolidayUpdateWithWhereUniqueWithoutBranchInput = {
+    where: PublicHolidayWhereUniqueInput
+    data: XOR<PublicHolidayUpdateWithoutBranchInput, PublicHolidayUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type PublicHolidayUpdateManyWithWhereWithoutBranchInput = {
+    where: PublicHolidayScalarWhereInput
+    data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyWithoutBranchInput>
+  }
+
+  export type PublicHolidayScalarWhereInput = {
+    AND?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+    OR?: PublicHolidayScalarWhereInput[]
+    NOT?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+    publicHolidayId?: IntFilter<"PublicHoliday"> | number
+    companyId?: IntFilter<"PublicHoliday"> | number
+    branchId?: IntFilter<"PublicHoliday"> | number
+    holidayDate?: DateTimeFilter<"PublicHoliday"> | Date | string
+    holidayName?: StringFilter<"PublicHoliday"> | string
+    dailyWorkingHours?: DecimalFilter<"PublicHoliday"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"PublicHoliday"> | boolean
+    createdAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
+  }
+
   export type BranchCreateWithoutDepartmentsInput = {
     branchName: string
     location: string
@@ -33354,6 +35022,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutBranchesInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDepartmentsInput = {
@@ -33365,6 +35034,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDepartmentsInput = {
@@ -33385,6 +35055,7 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutDepartmentsInput = {
@@ -33401,6 +35072,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutDepartmentsInput = {
@@ -33576,6 +35248,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDepartmentsInput = {
@@ -33587,6 +35260,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutDepartmentsInput = {
@@ -33613,6 +35287,7 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutDepartmentsInput = {
@@ -33629,6 +35304,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeUpsertWithoutManagedDepartmentsInput = {
@@ -34025,6 +35701,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -34051,6 +35728,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -34143,6 +35821,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutBranchesInput
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutEmployeesInput = {
@@ -34154,6 +35833,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutEmployeesInput = {
@@ -34174,6 +35854,7 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutEmployeesInput = {
@@ -34190,6 +35871,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutEmployeesInput = {
@@ -34652,6 +36334,7 @@ export namespace Prisma {
     shortageHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFilter<"Payroll"> | Decimal | DecimalJsLike | number | string
@@ -34742,6 +36425,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutEmployeesInput = {
@@ -34753,6 +36437,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutEmployeesInput = {
@@ -34779,6 +36464,7 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutEmployeesInput = {
@@ -34795,6 +36481,7 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type DepartmentUpsertWithoutEmployeesInput = {
@@ -34981,6 +36668,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutBranchesInput
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDevicesInput = {
@@ -34992,6 +36680,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDevicesInput = {
@@ -35012,6 +36701,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutDevicesInput = {
@@ -35028,6 +36718,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutDevicesInput = {
@@ -35097,6 +36788,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDevicesInput = {
@@ -35108,6 +36800,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutDevicesInput = {
@@ -35134,6 +36827,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutDevicesInput = {
@@ -35150,6 +36844,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeCreateWithoutFingerprintTemplatesInput = {
@@ -35787,6 +37482,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -35814,6 +37510,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -35958,6 +37655,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -35985,6 +37683,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36475,6 +38174,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -36502,6 +38202,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -36646,6 +38347,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36673,6 +38375,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -36801,6 +38504,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -36828,6 +38532,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -36975,6 +38680,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -37002,6 +38708,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -37029,6 +38736,150 @@ export namespace Prisma {
   export type ExtraWorkUpdateManyWithWhereWithoutSettlementInput = {
     where: ExtraWorkScalarWhereInput
     data: XOR<ExtraWorkUpdateManyMutationInput, ExtraWorkUncheckedUpdateManyWithoutSettlementInput>
+  }
+
+  export type companiesCreateWithoutPublicHolidaysInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutPublicHolidaysInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutPublicHolidaysInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutPublicHolidaysInput, companiesUncheckedCreateWithoutPublicHolidaysInput>
+  }
+
+  export type BranchCreateWithoutPublicHolidaysInput = {
+    branchName: string
+    location: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutBranchesInput
+    departments?: DepartmentCreateNestedManyWithoutBranchInput
+    employees?: EmployeeCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutPublicHolidaysInput = {
+    branchId?: number
+    branchName: string
+    location: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutPublicHolidaysInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutPublicHolidaysInput, BranchUncheckedCreateWithoutPublicHolidaysInput>
+  }
+
+  export type companiesUpsertWithoutPublicHolidaysInput = {
+    update: XOR<companiesUpdateWithoutPublicHolidaysInput, companiesUncheckedUpdateWithoutPublicHolidaysInput>
+    create: XOR<companiesCreateWithoutPublicHolidaysInput, companiesUncheckedCreateWithoutPublicHolidaysInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutPublicHolidaysInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutPublicHolidaysInput, companiesUncheckedUpdateWithoutPublicHolidaysInput>
+  }
+
+  export type companiesUpdateWithoutPublicHolidaysInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutPublicHolidaysInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type BranchUpsertWithoutPublicHolidaysInput = {
+    update: XOR<BranchUpdateWithoutPublicHolidaysInput, BranchUncheckedUpdateWithoutPublicHolidaysInput>
+    create: XOR<BranchCreateWithoutPublicHolidaysInput, BranchUncheckedCreateWithoutPublicHolidaysInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutPublicHolidaysInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutPublicHolidaysInput, BranchUncheckedUpdateWithoutPublicHolidaysInput>
+  }
+
+  export type BranchUpdateWithoutPublicHolidaysInput = {
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
+    departments?: DepartmentUpdateManyWithoutBranchNestedInput
+    employees?: EmployeeUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutPublicHolidaysInput = {
+    branchId?: IntFieldUpdateOperationsInput | number
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type EmployeeCreateWithoutActivityLogsInput = {
@@ -37194,6 +39045,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutCompanyInput
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutSettingsInput = {
@@ -37210,6 +39062,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutSettingsInput = {
@@ -37241,6 +39094,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutCompanyNestedInput
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutSettingsInput = {
@@ -37257,6 +39111,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type AdminCreateWithoutCompanyInput = {
@@ -37298,6 +39153,7 @@ export namespace Prisma {
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutCompanyInput = {
@@ -37309,6 +39165,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutCompanyInput = {
@@ -37534,6 +39391,37 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PublicHolidayCreateWithoutCompanyInput = {
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutPublicHolidaysInput
+  }
+
+  export type PublicHolidayUncheckedCreateWithoutCompanyInput = {
+    publicHolidayId?: number
+    branchId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PublicHolidayCreateOrConnectWithoutCompanyInput = {
+    where: PublicHolidayWhereUniqueInput
+    create: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type PublicHolidayCreateManyCompanyInputEnvelope = {
+    data: PublicHolidayCreateManyCompanyInput | PublicHolidayCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AdminUpsertWithWhereUniqueWithoutCompanyInput = {
     where: AdminWhereUniqueInput
     update: XOR<AdminUpdateWithoutCompanyInput, AdminUncheckedUpdateWithoutCompanyInput>
@@ -37703,6 +39591,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Setting"> | Date | string
   }
 
+  export type PublicHolidayUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: PublicHolidayWhereUniqueInput
+    update: XOR<PublicHolidayUpdateWithoutCompanyInput, PublicHolidayUncheckedUpdateWithoutCompanyInput>
+    create: XOR<PublicHolidayCreateWithoutCompanyInput, PublicHolidayUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: PublicHolidayWhereUniqueInput
+    data: XOR<PublicHolidayUpdateWithoutCompanyInput, PublicHolidayUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type PublicHolidayUpdateManyWithWhereWithoutCompanyInput = {
+    where: PublicHolidayScalarWhereInput
+    data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyWithoutCompanyInput>
+  }
+
   export type LeaveBalanceCreateWithoutLeaveTypeInput = {
     year: number
     allocated?: Decimal | DecimalJsLike | number | string
@@ -37792,6 +39696,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutCompanyInput
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutLeaveTypesInput = {
@@ -37808,6 +39713,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutLeaveTypesInput = {
@@ -37871,6 +39777,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutCompanyNestedInput
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutLeaveTypesInput = {
@@ -37887,6 +39794,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeCreateWithoutLeaveBalancesInput = {
@@ -38605,6 +40513,17 @@ export namespace Prisma {
     deviceSecretHash?: string | null
   }
 
+  export type PublicHolidayCreateManyBranchInput = {
+    publicHolidayId?: number
+    companyId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type DepartmentUpdateWithoutBranchInput = {
     departmentName?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38761,6 +40680,38 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PublicHolidayUpdateWithoutBranchInput = {
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutPublicHolidaysNestedInput
+  }
+
+  export type PublicHolidayUncheckedUpdateWithoutBranchInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUncheckedUpdateManyWithoutBranchInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type EmployeeCreateManyDepartmentInput = {
@@ -38986,6 +40937,7 @@ export namespace Prisma {
     shortageHours?: Decimal | DecimalJsLike | number | string
     shortageDeduction?: Decimal | DecimalJsLike | number | string
     extraHours?: Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: Decimal | DecimalJsLike | number | string
     basicSalary: Decimal | DecimalJsLike | number | string
     incentiveAmount?: Decimal | DecimalJsLike | number | string
     advanceDeduction?: Decimal | DecimalJsLike | number | string
@@ -39350,6 +41302,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39376,6 +41329,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39402,6 +41356,7 @@ export namespace Prisma {
     shortageHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     shortageDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     extraHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    paidHolidayHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     basicSalary?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     incentiveAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     advanceDeduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39828,6 +41783,17 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type PublicHolidayCreateManyCompanyInput = {
+    publicHolidayId?: number
+    branchId: number
+    holidayDate: Date | string
+    holidayName: string
+    dailyWorkingHours?: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AdminUpdateWithoutCompanyInput = {
     adminName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -39867,6 +41833,7 @@ export namespace Prisma {
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutCompanyInput = {
@@ -39878,6 +41845,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateManyWithoutCompanyInput = {
@@ -40113,6 +42081,38 @@ export namespace Prisma {
     settingId?: IntFieldUpdateOperationsInput | number
     key?: StringFieldUpdateOperationsInput | string
     value?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUpdateWithoutCompanyInput = {
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutPublicHolidaysNestedInput
+  }
+
+  export type PublicHolidayUncheckedUpdateWithoutCompanyInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicHolidayUncheckedUpdateManyWithoutCompanyInput = {
+    publicHolidayId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    holidayDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    holidayName?: StringFieldUpdateOperationsInput | string
+    dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

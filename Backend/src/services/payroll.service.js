@@ -1306,6 +1306,158 @@ const getAttendanceWorkingHoursForPeriod = async (
 
 
 // ============================================================
+// [NEW] HELPER: Get Paid Public Holiday Hours For Period
+// ============================================================
+//
+// Paid public holidays belong to the employee's branch.
+//
+// Important payroll rule:
+// - Public holidays NEVER create Attendance records.
+// - Only paid holidays contribute credited payroll hours.
+// - Actual fingerprint attendance remains separate.
+// - Paid holiday hours first fill the employee's expected
+//   working hours.
+// - When actual attendance has already reached the expected
+//   hours, the paid holiday hours become extra hours.
+// - When both attendance and paid holiday hours exceed the
+//   expected hours, the excess is extra work.
+//
+// The calculation therefore treats:
+//     effectiveHours = actualAttendanceHours + paidHolidayHours
+//
+// while keeping the actual attendance value untouched in the
+// Attendance / AttendancePunch records.
+// ============================================================
+
+const getPaidPublicHolidayHoursForPeriod = async (
+    employeeId,
+    companyId,
+    payPeriodStart,
+    payPeriodEnd
+) => {
+
+    const employee =
+        await prisma.employee.findFirst({
+
+            where: {
+
+                employeeId:
+                    Number(employeeId),
+
+                companyId:
+                    Number(companyId)
+            },
+
+            select: {
+
+                employeeId:
+                    true,
+
+                branchId:
+                    true
+            }
+        });
+
+
+    if (
+        !employee ||
+        !employee.branchId
+    ) {
+
+        return 0;
+    }
+
+
+    const periodStart =
+        parseDate(
+            payPeriodStart,
+            "payPeriodStart"
+        );
+
+    const periodEnd =
+        parseDate(
+            payPeriodEnd,
+            "payPeriodEnd"
+        );
+
+
+    /*
+     * PublicHoliday.holidayDate is a DATE field stored at
+     * UTC midnight. Build UTC calendar boundaries so the
+     * branch holiday date is not shifted by timezone conversion.
+     */
+    const startDate =
+        new Date(
+            Date.UTC(
+                periodStart.getFullYear(),
+                periodStart.getMonth(),
+                periodStart.getDate()
+            )
+        );
+
+    const endDate =
+        new Date(
+            Date.UTC(
+                periodEnd.getFullYear(),
+                periodEnd.getMonth(),
+                periodEnd.getDate()
+            )
+        );
+
+
+    const holidays =
+        await prisma.publicHoliday.findMany({
+
+            where: {
+
+                companyId:
+                    Number(companyId),
+
+                branchId:
+                    Number(employee.branchId),
+
+                isPaid:
+                    true,
+
+                holidayDate: {
+
+                    gte:
+                        startDate,
+
+                    lte:
+                        endDate
+                }
+            },
+
+            select: {
+
+                dailyWorkingHours:
+                    true
+            }
+        });
+
+
+    const totalPaidHolidayHours =
+        holidays.reduce(
+            (
+                total,
+                holiday
+            ) =>
+                total +
+                decimalToNumber(
+                    holiday.dailyWorkingHours
+                ),
+            0
+        );
+
+
+    return roundMoney(
+        totalPaidHolidayHours
+    );
+};
+
+
+// ============================================================
 // [NEW] HELPER: Calculate Attendance Breakdown
 // ============================================================
 //
@@ -1316,7 +1468,8 @@ const getAttendanceWorkingHoursForPeriod = async (
 const calculateAttendanceBreakdown = (
     totalWorkingHours,
     expectedHours,
-    salaryRatePerHour
+    salaryRatePerHour,
+    paidHolidayHours = 0
 ) => {
 
     const actualHours =
@@ -1343,21 +1496,100 @@ const calculateAttendanceBreakdown = (
             )
         );
 
+    const holidayHours =
+        Math.max(
+            0,
+            decimalToNumber(
+                paidHolidayHours
+            )
+        );
+
+    /*
+     * A paid public holiday is credited as working time for
+     * payroll calculation.
+     *
+     * The actual fingerprint attendance is never modified.
+     * We only combine the two values for determining whether
+     * the employee has reached the expected working hours.
+     */
+    const effectiveHours =
+        actualHours +
+        holidayHours;
+
+    /*
+     * Regular payable hours can never exceed the expected
+     * monthly hours.
+     */
     const regularWorkingHours =
+        Math.min(
+            effectiveHours,
+            expected
+        );
+
+    /*
+     * Show how much of the regular requirement was supplied
+     * specifically by the paid public holiday.
+     *
+     * Example:
+     * Expected = 176
+     * Attendance = 168
+     * Holiday = 8
+     *
+     * Regular = 176
+     * Credited holiday = 8
+     */
+    const regularAttendanceHours =
         Math.min(
             actualHours,
             expected
         );
 
+    const creditedHolidayHours =
+        Math.max(
+            0,
+            regularWorkingHours -
+            regularAttendanceHours
+        );
+
+    /*
+     * IMPORTANT BUSINESS RULE:
+     *
+     * If the employee has already completed the expected
+     * working hours, paid public-holiday hours become extra
+     * hours.
+     *
+     * Example:
+     * Expected = 176
+     * Attendance = 176
+     * Holiday = 8
+     *
+     * Effective = 184
+     * Regular = 176
+     * Extra = 8
+     */
     const extraHours =
         Math.max(
-            actualHours - expected,
+            effectiveHours -
+            expected,
             0
         );
 
+    /*
+     * Shortage is calculated from effective hours, so paid
+     * holiday entitlement can remove a shortage.
+     *
+     * Example:
+     * Expected = 176
+     * Attendance = 160
+     * Holiday = 8
+     *
+     * Effective = 168
+     * Shortage = 8
+     */
     const shortageHours =
         Math.max(
-            expected - actualHours,
+            expected -
+            effectiveHours,
             0
         );
 
@@ -1378,6 +1610,16 @@ const calculateAttendanceBreakdown = (
         regularWorkingHours:
             roundMoney(
                 regularWorkingHours
+            ),
+
+        paidHolidayHours:
+            roundMoney(
+                holidayHours
+            ),
+
+        creditedHolidayHours:
+            roundMoney(
+                creditedHolidayHours
             ),
 
         extraHours:
@@ -1924,11 +2166,20 @@ const decoratePayroll = async (
                 )
             );
 
+    const livePaidHolidayHours =
+        await getPaidPublicHolidayHoursForPeriod(
+            payroll.employeeId,
+            payroll.employee?.companyId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
+
     const liveAttendanceBreakdown =
         calculateAttendanceBreakdown(
             liveWorkingHours,
             liveExpectedHours,
-            liveHourlyRate
+            liveHourlyRate,
+            livePaidHolidayHours
         );
 
     /*
@@ -2151,6 +2402,11 @@ const decoratePayroll = async (
         totalWorkingHours:
             liveWorkingHours,
 
+        // Paid public-holiday entitlement for this payroll period.
+        // This is separate from actual fingerprint attendance.
+        paidHolidayHours:
+            liveAttendanceBreakdown.paidHolidayHours,
+
         regularWorkingHours:
             liveAttendanceBreakdown.regularWorkingHours,
 
@@ -2200,6 +2456,292 @@ const decoratePayroll = async (
             liveAdvanceSummary.advances
     };
 };
+
+// ============================================================
+// [NEW] REFRESH PAYROLLS FOR PUBLIC HOLIDAY CHANGE
+// ============================================================
+//
+// Called by the Public Holiday service immediately after a
+// holiday is created, updated, or deleted.
+//
+// Only UNPAID payrolls are recalculated. PAID payrolls are
+// historical snapshots and must not be changed.
+//
+// This helper:
+// 1. Finds unpaid payrolls for the affected branch whose
+//    payroll period contains the holiday date.
+// 2. Re-reads actual fingerprint attendance.
+// 3. Re-reads the current paid public-holiday entitlement.
+// 4. Recalculates regular/shortage/extra hours.
+// 5. Persists the attendance-derived payroll fields.
+// 6. Runs decoratePayroll() so the ExtraWork accumulation is
+//    immediately synchronized with the new extra-hour value.
+// ============================================================
+
+const refreshPayrollsForPublicHolidayChange = async (
+    companyId,
+    branchId,
+    holidayDate
+) => {
+
+    const company =
+        Number(companyId);
+
+    const branch =
+        Number(branchId);
+
+    if (
+        !Number.isInteger(company) ||
+        company < 1
+    ) {
+
+        throw createServiceError(
+            "Invalid company ID"
+        );
+    }
+
+    if (
+        !Number.isInteger(branch) ||
+        branch < 1
+    ) {
+
+        throw createServiceError(
+            "Invalid branch ID"
+        );
+    }
+
+    const parsedHolidayDate =
+        parseDate(
+            holidayDate,
+            "holidayDate"
+        );
+
+    /*
+     * Public holidays are date-only values. Use UTC calendar
+     * boundaries so the affected payroll period is matched
+     * against the actual holiday date, independent of server
+     * timezone.
+     */
+    const holidayDayStart =
+        new Date(
+            Date.UTC(
+                parsedHolidayDate.getUTCFullYear(),
+                parsedHolidayDate.getUTCMonth(),
+                parsedHolidayDate.getUTCDate()
+            )
+        );
+
+    const holidayDayEnd =
+        new Date(
+            holidayDayStart.getTime() +
+            (
+                24 *
+                60 *
+                60 *
+                1000
+            ) -
+            1
+        );
+
+    const affectedPayrolls =
+        await prisma.payroll.findMany({
+
+            where: {
+
+                status:
+                    "UNPAID",
+
+                payPeriodStart: {
+
+                    lte:
+                        holidayDayEnd
+                },
+
+                payPeriodEnd: {
+
+                    gte:
+                        holidayDayStart
+                },
+
+                employee: {
+
+                    companyId:
+                        company,
+
+                    branchId:
+                        branch
+                }
+            },
+
+            include:
+                payrollInclude,
+
+            orderBy: {
+
+                payrollId:
+                    "asc"
+            }
+        });
+
+    const refreshedPayrollIds = [];
+
+    for (
+        const payroll
+        of affectedPayrolls
+    ) {
+
+        const liveWorkingHours =
+            await getAttendanceWorkingHoursForPeriod(
+                payroll.employeeId,
+                payroll.payPeriodStart,
+                payroll.payPeriodEnd
+            );
+
+        const employee =
+            await prisma.employee.findUnique({
+
+                where: {
+
+                    employeeId:
+                        Number(payroll.employeeId)
+                },
+
+                select: {
+
+                    baseSalary:
+                        true,
+
+                    monthlyExpectedHours:
+                        true,
+
+                    salaryRatePerHour:
+                        true
+                }
+            });
+
+        const liveBaseSalary =
+            employee
+                ? decimalToNumber(
+                    employee.baseSalary
+                )
+                : decimalToNumber(
+                    payroll.baseSalary
+                );
+
+        const liveExpectedHours =
+            employee
+                ? decimalToNumber(
+                    employee.monthlyExpectedHours
+                )
+                : decimalToNumber(
+                    payroll.monthlyExpectedHours
+                );
+
+        const liveHourlyRate =
+            employee
+                ? (
+                    decimalToNumber(
+                        employee.salaryRatePerHour
+                    ) ||
+                    calculateHourlyRate(
+                        liveBaseSalary,
+                        liveExpectedHours
+                    )
+                )
+                : (
+                    decimalToNumber(
+                        payroll.salaryRatePerHour
+                    ) ||
+                    calculateHourlyRate(
+                        liveBaseSalary,
+                        liveExpectedHours
+                    )
+                );
+
+        const livePaidHolidayHours =
+            await getPaidPublicHolidayHoursForPeriod(
+                payroll.employeeId,
+                company,
+                payroll.payPeriodStart,
+                payroll.payPeriodEnd
+            );
+
+        const attendanceBreakdown =
+            calculateAttendanceBreakdown(
+                liveWorkingHours,
+                liveExpectedHours,
+                liveHourlyRate,
+                livePaidHolidayHours
+            );
+
+        /*
+         * Persist the period-level attendance calculations.
+         *
+         * extraHours here means total extra hours inside the
+         * payroll period. decoratePayroll() separately handles
+         * the active ExtraWork accumulation cycle by subtracting
+         * already SETTLED/REJECTED hours.
+         */
+        const refreshedPayroll =
+            await prisma.payroll.update({
+
+                where: {
+
+                    payrollId:
+                        Number(payroll.payrollId)
+                },
+
+                data: {
+
+                    totalWorkingHours:
+                        liveWorkingHours,
+
+                    paidHolidayHours:
+                        attendanceBreakdown.paidHolidayHours,
+
+                    regularWorkingHours:
+                        attendanceBreakdown.regularWorkingHours,
+
+                    shortageHours:
+                        attendanceBreakdown.shortageHours,
+
+                    shortageDeduction:
+                        attendanceBreakdown.shortageDeduction,
+
+                    extraHours:
+                        attendanceBreakdown.extraHours,
+
+                    basicSalary:
+                        attendanceBreakdown.regularSalary
+                },
+
+                include:
+                    payrollInclude
+            });
+
+        /*
+         * Re-run the existing live payroll logic. This keeps
+         * ExtraWork accumulation in one place and immediately
+         * updates the employee's active bonus balance.
+         */
+        await decoratePayroll(
+            refreshedPayroll
+        );
+
+        refreshedPayrollIds.push(
+            refreshedPayroll.payrollId
+        );
+    }
+
+    return {
+
+        affectedPayrollCount:
+            refreshedPayrollIds.length,
+
+        refreshedPayrollIds
+    };
+};
+
 
 // ============================================================
 // CREATE PAYROLL
@@ -2311,12 +2853,21 @@ const createPayroll = async (
             totalWorkingHours
         );
 
-    // [NEW] Authoritative attendance breakdown.
+    const paidHolidayHours =
+        await getPaidPublicHolidayHoursForPeriod(
+            employee.employeeId,
+            companyId,
+            periodStart,
+            periodEnd
+        );
+
+    // [NEW] Authoritative attendance + paid-holiday breakdown.
     const attendanceBreakdown =
         calculateAttendanceBreakdown(
             workingHours,
             employeeExpectedHours,
-            employeeHourlyRate
+            employeeHourlyRate,
+            paidHolidayHours
         );
 
     const earnedBasicSalary =
@@ -2458,6 +3009,11 @@ const createPayroll = async (
 
                             totalWorkingHours:
                                 workingHours,
+
+                            // Paid public holidays are separate from
+                            // fingerprint attendance hours.
+                            paidHolidayHours:
+                                attendanceBreakdown.paidHolidayHours,
 
                             basicSalary:
                                 earnedBasicSalary,
@@ -3427,6 +3983,8 @@ const updatePayroll = async (
     // [NEW] Recalculate all attendance-derived fields when an unpaid
     // payroll's working hours/salary configuration is manually changed.
     if (
+        data.payPeriodStart !== undefined ||
+        data.payPeriodEnd !== undefined ||
         data.totalWorkingHours !== undefined ||
         data.monthlyExpectedHours !== undefined ||
         data.salaryRatePerHour !== undefined ||
@@ -3476,12 +4034,24 @@ const updatePayroll = async (
                     finalExpectedHours
                 );
 
+        const finalPaidHolidayHours =
+            await getPaidPublicHolidayHoursForPeriod(
+                existing.employeeId,
+                companyId,
+                finalStart,
+                finalEnd
+            );
+
         const breakdown =
             calculateAttendanceBreakdown(
                 finalWorkingHours,
                 finalExpectedHours,
-                finalHourlyRate
+                finalHourlyRate,
+                finalPaidHolidayHours
             );
+
+        updateData.paidHolidayHours =
+            breakdown.paidHolidayHours;
 
         updateData.basicSalary =
             breakdown.regularSalary;
@@ -3687,6 +4257,101 @@ const markPayrollPaid = async (
         );
     }
 
+    /*
+     * Refresh the unpaid payroll immediately before final payment.
+     *
+     * This is important for public holidays because an admin can
+     * add, edit, or remove a holiday after payroll generation but
+     * before the salary is actually paid.
+     *
+     * Attendance remains actual fingerprint attendance.
+     * Paid public-holiday hours are applied only to the expected-hour
+     * calculation and are stored separately.
+     */
+    const liveWorkingHours =
+        await getAttendanceWorkingHoursForPeriod(
+            payroll.employeeId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
+
+    const liveEmployee =
+        await prisma.employee.findUnique({
+
+            where: {
+
+                employeeId:
+                    Number(payroll.employeeId)
+            },
+
+            select: {
+
+                baseSalary:
+                    true,
+
+                monthlyExpectedHours:
+                    true,
+
+                salaryRatePerHour:
+                    true
+            }
+        });
+
+    const liveBaseSalary =
+        liveEmployee
+            ? decimalToNumber(
+                liveEmployee.baseSalary
+            )
+            : decimalToNumber(
+                payroll.baseSalary
+            );
+
+    const liveExpectedHours =
+        liveEmployee
+            ? decimalToNumber(
+                liveEmployee.monthlyExpectedHours
+            )
+            : decimalToNumber(
+                payroll.monthlyExpectedHours
+            );
+
+    const liveHourlyRate =
+        liveEmployee
+            ? (
+                decimalToNumber(
+                    liveEmployee.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            )
+            : (
+                decimalToNumber(
+                    payroll.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            );
+
+    const livePaidHolidayHours =
+        await getPaidPublicHolidayHoursForPeriod(
+            payroll.employeeId,
+            payroll.employee?.companyId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
+
+    const liveAttendanceBreakdown =
+        calculateAttendanceBreakdown(
+            liveWorkingHours,
+            liveExpectedHours,
+            liveHourlyRate,
+            livePaidHolidayHours
+        );
+
     const actualPaymentDate =
         startOfDay(
             new Date()
@@ -3737,11 +4402,10 @@ const markPayrollPaid = async (
                     );
                 }
 
-                // Regular salary comes only from basicSalary.
+                // Final normal salary is based on the live payroll
+                // calculation immediately before payment.
                 const salaryAmount =
-                    decimalToNumber(
-                        current.basicSalary
-                    );
+                    liveAttendanceBreakdown.regularSalary;
 
                 // Re-read the actual paid advances INSIDE the same
                 // transaction used to finalize payroll.
@@ -3828,6 +4492,29 @@ const markPayrollPaid = async (
                         },
 
                         data: {
+
+                            // Finalize the live attendance/payroll values
+                            // that were calculated immediately before payment.
+                            totalWorkingHours:
+                                liveWorkingHours,
+
+                            regularWorkingHours:
+                                liveAttendanceBreakdown.regularWorkingHours,
+
+                            shortageHours:
+                                liveAttendanceBreakdown.shortageHours,
+
+                            shortageDeduction:
+                                liveAttendanceBreakdown.shortageDeduction,
+
+                            extraHours:
+                                liveAttendanceBreakdown.extraHours,
+
+                            paidHolidayHours:
+                                liveAttendanceBreakdown.paidHolidayHours,
+
+                            basicSalary:
+                                liveAttendanceBreakdown.regularSalary,
 
                             status:
                                 "PAID",
@@ -4337,5 +5024,7 @@ module.exports = {
 
     updateConfiguration,
 
-    getPayrollConfiguration
+    getPayrollConfiguration,
+
+    refreshPayrollsForPublicHolidayChange
 };

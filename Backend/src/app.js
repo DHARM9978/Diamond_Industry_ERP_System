@@ -22,6 +22,7 @@ const leaveTypeRoutes = require("./routes/leaveType.routes");
 const leaveBalanceRoutes = require("./routes/leaveBalance.routes");
 const leaveRequestRoutes = require("./routes/leaveRequest.routes");
 const reportRoutes = require("./routes/report.routes");
+const publicHolidayRoutes = require("./routes/public-holiday.routes");
 
 
 const app = express();
@@ -31,7 +32,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 
 
 // Routes
@@ -56,6 +56,9 @@ app.use("/api/leave-types", leaveTypeRoutes);
 app.use("/api/leave-balances", leaveBalanceRoutes);
 app.use("/api/leave-requests", leaveRequestRoutes);
 app.use("/api/reports", reportRoutes);
+
+// Public Holiday Routes
+app.use("/api/holidays", publicHolidayRoutes);
 
 
 // Health

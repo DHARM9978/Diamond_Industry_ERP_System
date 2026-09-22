@@ -22,6 +22,7 @@ import { FullPageSpinner } from '@/components/ui/Spinner';
 
 import {
   selfService,
+  publicHolidayService,
 } from '@/services/apiServices';
 
 
@@ -41,6 +42,9 @@ export function EmployeeDashboard() {
     useState([]);
 
   const [advances, setAdvances] =
+    useState([]);
+
+  const [publicHolidays, setPublicHolidays] =
     useState([]);
 
   const [loading, setLoading] =
@@ -169,6 +173,10 @@ export function EmployeeDashboard() {
 
               selfService.advances(),
 
+              publicHolidayService.my({
+                year: new Date().getFullYear(),
+              }),
+
             ]);
 
 
@@ -291,6 +299,38 @@ export function EmployeeDashboard() {
             if (mounted) {
 
               setAdvances([]);
+            }
+          }
+
+
+          // ======================================================
+          // Public Holidays
+          // ======================================================
+
+          if (
+            results[4].status ===
+            'fulfilled'
+          ) {
+
+            if (mounted) {
+
+              setPublicHolidays(
+                normalizeArray(
+                  results[4].value
+                )
+              );
+            }
+
+          } else {
+
+            console.error(
+              'Public holiday loading failed:',
+              results[4].reason
+            );
+
+            if (mounted) {
+
+              setPublicHolidays([]);
             }
           }
 
@@ -754,6 +794,71 @@ export function EmployeeDashboard() {
 
 
   // ============================================================
+  // Public Holiday Banner
+  // ============================================================
+
+  const normalizeHolidayDate = (value) => {
+
+    if (!value) {
+      return null;
+    }
+
+    const text = String(value);
+
+    const dateOnly = text.match(/^\d{4}-\d{2}-\d{2}/);
+
+    if (dateOnly) {
+      return dateOnly[0];
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const getLocalDateKey = (offsetDays = 0) => {
+
+    const date = new Date();
+
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() + offsetDays);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayKey = getLocalDateKey(0);
+  const tomorrowKey = getLocalDateKey(1);
+
+  const findHolidayForDate = (dateKey) => {
+
+    return publicHolidays.find((holiday) => {
+      const holidayDate =
+        holiday?.holidayDate ||
+        holiday?.date;
+
+      return normalizeHolidayDate(holidayDate) === dateKey;
+    }) || null;
+  };
+
+  const todayHoliday = findHolidayForDate(todayKey);
+  const tomorrowHoliday = findHolidayForDate(tomorrowKey);
+
+  const holidayBanner = todayHoliday || tomorrowHoliday;
+  const holidayBannerDateLabel = todayHoliday ? 'Today' : 'Tomorrow';
+
+  // ============================================================
   // Render
   // ============================================================
 
@@ -769,6 +874,59 @@ export function EmployeeDashboard() {
         title={`Welcome, ${firstName || 'Employee'}!`}
         subtitle={`${role} · ${department}`}
       />
+
+
+      {/* ======================================================
+          PUBLIC HOLIDAY NOTICE
+      ====================================================== */}
+
+      {holidayBanner && (
+
+        <div
+          className="
+            mb-6
+            rounded-xl
+            border
+            border-accent-200
+            bg-accent-50
+            p-4
+          "
+        >
+
+          <div className="flex items-start gap-3">
+
+            <CalendarDays
+              size={22}
+              className="mt-0.5 shrink-0 text-accent-700"
+            />
+
+            <div>
+
+              <p className="font-semibold text-accent-900">
+                {holidayBannerDateLabel} is a Public Holiday
+              </p>
+
+              <p className="mt-1 text-sm text-accent-800">
+                {holidayBanner?.holidayName ||
+                  holidayBanner?.name ||
+                  'Public Holiday'}
+              </p>
+
+              <p className="mt-1 text-xs text-accent-700">
+                {holidayBanner?.isPaid
+                  ? `Paid holiday · ${toNumber(
+                      holidayBanner?.dailyWorkingHours
+                    )} working hours`
+                  : 'Unpaid holiday · no working hours are added'}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
 
 
       {/* ======================================================

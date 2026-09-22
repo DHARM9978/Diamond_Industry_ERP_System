@@ -1561,6 +1561,186 @@ export const bonusService = {
 };
 
 // ============================================================
+// PUBLIC HOLIDAY SERVICE
+//
+// Public holidays are branch-specific. Admin manages holiday
+// records, while employees can retrieve the holidays that
+// apply to their own branch through the /my endpoint.
+// ============================================================
+
+export const publicHolidayService = {
+
+    // --------------------------------------------------------
+    // ADMIN - LIST PUBLIC HOLIDAYS
+    //
+    // GET /api/holidays
+    // Optional params:
+    //   year
+    //   branchId
+    // --------------------------------------------------------
+
+    list: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.holidays.list,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // GET SINGLE PUBLIC HOLIDAY
+    //
+    // GET /api/holidays/:id
+    // --------------------------------------------------------
+
+    get: async (id) => {
+
+        const response =
+            await apiClient.get(
+                API.holidays.get(id)
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // CREATE PUBLIC HOLIDAY
+    //
+    // POST /api/holidays
+    // --------------------------------------------------------
+
+    create: async (data) => {
+
+        const response =
+            await apiClient.post(
+                API.holidays.create,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // UPDATE PUBLIC HOLIDAY
+    //
+    // PUT /api/holidays/:id
+    // --------------------------------------------------------
+
+    update: async (
+        id,
+        data
+    ) => {
+
+        const response =
+            await apiClient.put(
+                API.holidays.update(id),
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // DELETE PUBLIC HOLIDAY
+    //
+    // DELETE /api/holidays/:id
+    // --------------------------------------------------------
+
+    delete: async (id) => {
+
+        const response =
+            await apiClient.delete(
+                API.holidays.delete(id)
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // PUBLIC HOLIDAY CALENDAR
+    //
+    // GET /api/holidays/calendar
+    // --------------------------------------------------------
+
+    calendar: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.holidays.calendar,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // CHECK HOLIDAY FOR A DATE / BRANCH
+    //
+    // GET /api/holidays/check
+    // --------------------------------------------------------
+
+    check: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.holidays.check,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // EMPLOYEE - MY PUBLIC HOLIDAYS
+    //
+    // GET /api/holidays/my
+    //
+    // The backend determines the authenticated employee's
+    // company and branch. The frontend does not send a branch
+    // id for this call.
+    // --------------------------------------------------------
+
+    my: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.holidays.my,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+};
+
+
+// ============================================================
 // REPORT SERVICE
 // ============================================================
 
@@ -1974,6 +2154,7 @@ export default {
     advanceService,
     payrollService,
     bonusService,
+    publicHolidayService,
     reportService,
     selfService,
 };

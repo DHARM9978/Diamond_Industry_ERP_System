@@ -40,10 +40,11 @@ model Branch {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  company     companies    @relation(fields: [companyId], references: [company_id])
-  departments Department[]
-  employees   Employee[]
-  devices     IotDevice[]
+  company        companies       @relation(fields: [companyId], references: [company_id])
+  departments    Department[]
+  employees      Employee[]
+  devices        IotDevice[]
+  publicHolidays PublicHoliday[]
 
   @@index([companyId])
   @@map("branches")
@@ -309,7 +310,9 @@ model Payroll {
   // ATTENDANCE CALCULATION
   // ====================================================
 
-  // Total actual attendance hours in this payroll period
+  // Total actual attendance hours in this payroll period.
+  //
+  // These are actual fingerprint/attendance hours only.
   totalWorkingHours Decimal @map("total_working_hours") @db.Decimal(8, 2)
 
   // Hours that are payable at the normal salary rate.
@@ -325,6 +328,19 @@ model Payroll {
   // Hours above the expected monthly hours.
   // These are stored separately and accumulated across payroll periods.
   extraHours Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
+
+  // ====================================================
+  // PUBLIC HOLIDAY HOURS
+  // ====================================================
+
+  // Total paid public-holiday hours included in this
+  // payroll period.
+  //
+  // These are NOT fingerprint attendance hours.
+  //
+  // They represent paid public-holiday entitlement for
+  // the employee's branch.
+  paidHolidayHours Decimal @default(0.00) @map("paid_holiday_hours") @db.Decimal(8, 2)
 
   // ====================================================
   // SALARY
@@ -375,7 +391,7 @@ model Payroll {
   // ----------------------------------------------------
   // EXTRA WORK
   // ----------------------------------------------------
-  //
+
   // A payroll can have multiple ExtraWork records.
   //
   // This is intentional because an employee can:
@@ -389,20 +405,18 @@ model Payroll {
   //   settle it again
   //
   // Historical ExtraWork records are preserved.
-  // ----------------------------------------------------
 
   extraWorkRecords ExtraWork[]
 
   // ----------------------------------------------------
   // EXTRA WORK SETTLEMENTS
   // ----------------------------------------------------
-  //
+
   // A payroll may have zero or more historical settlement
   // references.
   //
   // Variable/overtime payment does NOT require normal
   // payroll payment.
-  // ----------------------------------------------------
 
   extraWorkSettlements ExtraWorkSettlement[]
 
@@ -447,7 +461,7 @@ model ExtraWork {
   // ----------------------------------------------------
   // PAYROLL SOURCE
   // ----------------------------------------------------
-  //
+
   // The payroll period that generated these extra hours.
   //
   // IMPORTANT:
@@ -455,7 +469,6 @@ model ExtraWork {
   //
   // The same payroll period can have multiple ExtraWork
   // accumulation records over time.
-  // ----------------------------------------------------
 
   payrollId Int @map("payroll_id")
 
@@ -529,7 +542,7 @@ model ExtraWorkSettlement {
   // ----------------------------------------------------
   // OPTIONAL PAYROLL REFERENCE
   // ----------------------------------------------------
-  //
+
   // A settlement may optionally be associated with the
   // payroll period that generated the overtime.
   //
@@ -538,7 +551,6 @@ model ExtraWorkSettlement {
   //
   // It is also NOT unique because multiple settlement
   // records can exist for the same payroll period.
-  // ----------------------------------------------------
 
   payrollId Int? @map("payroll_id")
 
@@ -570,6 +582,78 @@ model ExtraWorkSettlement {
   @@index([payrollId])
   @@index([settlementDate])
   @@map("extra_work_settlements")
+}
+
+// ======================================================
+// PUBLIC HOLIDAY
+// ======================================================
+//
+// Public holidays are branch-specific.
+//
+// One database record represents one branch holiday
+// on one specific date.
+//
+// For a multi-day holiday, the application creates
+// one PublicHoliday record for each date.
+//
+// Example:
+//
+// 2026-10-02 -> Gandhi Jayanti
+// 2026-10-03 -> Company Holiday
+//
+// This allows individual dates to be edited or deleted.
+//
+// Paid holiday:
+//   isPaid = true
+//   dailyWorkingHours contributes to payroll.
+//
+// Unpaid holiday:
+//   isPaid = false
+//   contributes 0 hours to payroll.
+//
+// The holiday does NOT create an Attendance record.
+// Fingerprint attendance remains actual attendance.
+// ======================================================
+
+model PublicHoliday {
+  publicHolidayId Int @id @default(autoincrement()) @map("public_holiday_id")
+
+  // Company that owns this public holiday.
+  companyId Int
+
+  // Branch to which this public holiday applies.
+  branchId Int
+
+  // Specific holiday date.
+  holidayDate DateTime @map("holiday_date") @db.Date
+
+  // Display name of the public holiday.
+  holidayName String @map("holiday_name") @db.VarChar(150)
+
+  // Working hours credited for a paid public holiday.
+  //
+  // Example:
+  // 8.00 = eight paid hours
+  // 7.50 = seven and a half paid hours
+  dailyWorkingHours Decimal @default(0.00) @map("daily_working_hours") @db.Decimal(5, 2)
+
+  // true  = paid public holiday
+  // false = unpaid public holiday
+  isPaid Boolean @default(true) @map("is_paid")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company companies @relation(fields: [companyId], references: [company_id])
+  branch  Branch    @relation(fields: [branchId], references: [branchId])
+
+  // A branch cannot have two public-holiday records
+  // for the same date.
+  @@unique([branchId, holidayDate])
+  @@index([companyId])
+  @@index([branchId])
+  @@index([holidayDate])
+  @@map("public_holidays")
 }
 
 // ======================================================
@@ -623,13 +707,14 @@ model companies {
   created_at    DateTime @default(now())
   updated_at    DateTime
 
-  admins      Admin[]
-  branches    Branch[]
-  departments Department[]
-  employees   Employee[]
-  devices     IotDevice[]
-  leaveTypes  LeaveType[]
-  settings    Setting[]
+  admins         Admin[]
+  branches       Branch[]
+  departments    Department[]
+  employees      Employee[]
+  devices        IotDevice[]
+  leaveTypes     LeaveType[]
+  settings       Setting[]
+  publicHolidays PublicHoliday[]
 }
 
 // ======================================================

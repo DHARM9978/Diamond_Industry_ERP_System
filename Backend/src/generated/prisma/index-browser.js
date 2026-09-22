@@ -256,6 +256,7 @@ exports.Prisma.PayrollScalarFieldEnum = {
   shortageHours: 'shortageHours',
   shortageDeduction: 'shortageDeduction',
   extraHours: 'extraHours',
+  paidHolidayHours: 'paidHolidayHours',
   basicSalary: 'basicSalary',
   incentiveAmount: 'incentiveAmount',
   advanceDeduction: 'advanceDeduction',
@@ -285,6 +286,18 @@ exports.Prisma.ExtraWorkSettlementScalarFieldEnum = {
   settledHours: 'settledHours',
   incentiveAmount: 'incentiveAmount',
   settlementDate: 'settlementDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PublicHolidayScalarFieldEnum = {
+  publicHolidayId: 'publicHolidayId',
+  companyId: 'companyId',
+  branchId: 'branchId',
+  holidayDate: 'holidayDate',
+  holidayName: 'holidayName',
+  dailyWorkingHours: 'dailyWorkingHours',
+  isPaid: 'isPaid',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -452,6 +465,10 @@ exports.Prisma.ExtraWorkOrderByRelevanceFieldEnum = {
   status: 'status'
 };
 
+exports.Prisma.PublicHolidayOrderByRelevanceFieldEnum = {
+  holidayName: 'holidayName'
+};
+
 exports.Prisma.ActivityLogOrderByRelevanceFieldEnum = {
   actionType: 'actionType',
   description: 'description'
@@ -503,6 +520,7 @@ exports.Prisma.ModelName = {
   Payroll: 'Payroll',
   ExtraWork: 'ExtraWork',
   ExtraWorkSettlement: 'ExtraWorkSettlement',
+  PublicHoliday: 'PublicHoliday',
   ActivityLog: 'ActivityLog',
   Setting: 'Setting',
   companies: 'companies',

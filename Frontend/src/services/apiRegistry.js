@@ -545,6 +545,63 @@ const API = {
     },
 
 
+
+    // ========================================================
+    // PUBLIC HOLIDAYS
+    // ========================================================
+    //
+    // Branch-specific public holiday endpoints.
+    //
+    // Admin:
+    // GET    /api/holidays
+    // GET    /api/holidays/:id
+    // POST   /api/holidays
+    // PUT    /api/holidays/:id
+    // DELETE /api/holidays/:id
+    // GET    /api/holidays/calendar
+    // GET    /api/holidays/check
+    //
+    // Employee:
+    // GET    /api/holidays/my
+    // ========================================================
+
+    holidays: {
+
+        // GET /api/holidays
+        list:
+            "/api/holidays",
+
+        // GET /api/holidays/:id
+        get: (id) =>
+            `/api/holidays/${id}`,
+
+        // POST /api/holidays
+        create:
+            "/api/holidays",
+
+        // PUT /api/holidays/:id
+        update: (id) =>
+            `/api/holidays/${id}`,
+
+        // DELETE /api/holidays/:id
+        delete: (id) =>
+            `/api/holidays/${id}`,
+
+        // GET /api/holidays/calendar
+        calendar:
+            "/api/holidays/calendar",
+
+        // GET /api/holidays/check
+        check:
+            "/api/holidays/check",
+
+        // GET /api/holidays/my
+        my:
+            "/api/holidays/my",
+
+    },
+
+
     // ========================================================
     // REPORTS
     // ========================================================

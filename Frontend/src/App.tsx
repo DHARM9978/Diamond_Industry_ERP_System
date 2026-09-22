@@ -19,6 +19,7 @@ import { AdminBranches } from '@/pages/admin/AdminBranches';
 import { AdminDepartments } from '@/pages/admin/AdminDepartments';
 import { AdminReports } from '@/pages/admin/AdminReports';
 import { BonusPayments } from '@/pages/admin/BonusPayments';
+import { AdminPublicHolidays } from '@/pages/admin/AdminPublicHolidays';
 
 import { EmployeeDashboard } from '@/pages/employee/EmployeeDashboard';
 import { EmployeeAttendance } from '@/pages/employee/EmployeeAttendance';
@@ -27,6 +28,7 @@ import { EmployeeAdvances } from '@/pages/employee/EmployeeAdvances';
 import { EmployeePayroll } from '@/pages/employee/EmployeePayroll';
 import { EmployeeProfile } from '@/pages/employee/EmployeeProfile';
 import { EmployeeBonus } from '@/pages/employee/EmployeeBonus';
+import { EmployeePublicHolidays } from '@/pages/employee/EmployeePublicHolidays';
 
 
 function App() {
@@ -120,22 +122,6 @@ function App() {
             />
 
 
-            {/* ==================================================
-                LIVE ATTENDANCE
-            ================================================== */}
-
-            <Route
-              path="/admin/live-attendance"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminLiveAttendance />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-
             <Route
               path="/admin/leaves"
               element={
@@ -186,6 +172,22 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <BonusPayments />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* ==================================================
+                PUBLIC HOLIDAYS
+            ================================================== */}
+
+            <Route
+              path="/admin/public-holidays"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminPublicHolidays />
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -353,6 +355,22 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <EmployeeBonus />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* ==================================================
+                EMPLOYEE PUBLIC HOLIDAYS
+            ================================================== */}
+
+            <Route
+              path="/employee/public-holidays"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <EmployeePublicHolidays />
                   </AppLayout>
                 </ProtectedRoute>
               }
