@@ -600,6 +600,38 @@ export function EmployeeDashboard() {
     );
 
 
+  // ============================================================
+  // CURRENT MONTH WORKING HOURS
+  //
+  // The self-service attendance summary returns:
+  //
+  // monthlyHours.completedHours
+  // monthlyHours.expectedHours
+  // monthlyHours.display
+  //
+  // The controller calculates this for the current month,
+  // starting from the employee's hire date when applicable.
+  // ============================================================
+
+  const monthlyCompletedHours =
+    toNumber(
+      s?.monthlyHours?.completedHours ??
+      totalHours
+    );
+
+
+  const monthlyExpectedHoursTarget =
+    toNumber(
+      s?.monthlyHours?.expectedHours ??
+      monthlyExpectedHours
+    );
+
+
+  const monthlyHoursDisplay =
+    s?.monthlyHours?.display ||
+    `${monthlyCompletedHours} / ${monthlyExpectedHoursTarget} hours`;
+
+
   const averageHours =
     toNumber(
       s?.averageHours ??
@@ -1379,7 +1411,7 @@ export function EmployeeDashboard() {
                     text-navy-500
                   "
                 >
-                  Total Hours Worked
+                  Monthly Working Hours
                 </p>
 
                 <p
@@ -1389,7 +1421,7 @@ export function EmployeeDashboard() {
                     text-navy-900
                   "
                 >
-                  {totalHours} hrs
+                  {monthlyHoursDisplay}
                 </p>
 
               </div>
@@ -1410,7 +1442,7 @@ export function EmployeeDashboard() {
                 text-navy-500
               "
             >
-              Average: {averageHours} hrs/day
+              Current month · Average: {averageHours} hrs/day
             </p>
 
           </div>

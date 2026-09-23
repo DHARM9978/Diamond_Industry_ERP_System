@@ -12,6 +12,81 @@ const advanceService =
 
 
 // ==========================================
+// Helpers
+// ==========================================
+
+const padNumber = (value) =>
+    String(value).padStart(2, "0");
+
+
+const getISTDateString = (date = new Date()) => {
+
+    const parts =
+        new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).formatToParts(date);
+
+
+    const values = {};
+
+
+    for (const part of parts) {
+
+        if (
+            part.type === "year" ||
+            part.type === "month" ||
+            part.type === "day"
+        ) {
+            values[part.type] =
+                part.value;
+        }
+    }
+
+
+    return `${values.year}-${values.month}-${values.day}`;
+};
+
+
+const getCurrentMonthStart = () => {
+
+    const today =
+        getISTDateString();
+
+    const [year, month] =
+        today.split("-");
+
+
+    return `${year}-${padNumber(month)}-01`;
+};
+
+
+const getDateValueOrNull = (value) => {
+
+    if (!value) {
+        return null;
+    }
+
+
+    const parsed = new Date(value);
+
+
+    if (
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ) {
+        return null;
+    }
+
+
+    return parsed;
+};
+
+
+// ==========================================
 // Get My Profile
 // GET /api/me/profile
 // ==========================================
@@ -183,16 +258,110 @@ const getMyAttendance = async (
 // Get My Attendance Summary
 // GET /api/me/attendance/summary
 // ==========================================
+//
+// Default behavior for the employee dashboard:
+// - Current calendar month only.
+// - From the later of:
+//     1. first day of the current month
+//     2. employee hire date
+// - Through today.
+//
+// The response also includes monthlyHours so the
+// frontend can display:
+//
+//     completed / expected hours
+//
+// Example:
+//     100 / 150 hours
+//
+// Explicit from/to query parameters are still
+// respected for attendance pages and reports.
+// ==========================================
 
 const getMyAttendanceSummary = async (
     req,
     res
 ) => {
 
-    const {
+    let {
         from,
         to
     } = req.query;
+
+
+    const employee =
+        await prisma.employee.findFirst({
+
+            where: {
+
+                employeeId:
+                    req.user.employeeId,
+
+                companyId:
+                    req.user.companyId
+            },
+
+            select: {
+
+                employeeId: true,
+
+                hireDate: true,
+
+                monthlyExpectedHours: true
+            }
+        });
+
+
+    if (!employee) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message:
+                "Employee profile not found"
+        });
+    }
+
+
+    // ------------------------------------------
+    // Default date range = current month to today
+    // ------------------------------------------
+
+    if (!from) {
+
+        from =
+            getCurrentMonthStart();
+
+
+        const hireDate =
+            getDateValueOrNull(
+                employee.hireDate
+            );
+
+
+        if (hireDate) {
+
+            const hireDateKey =
+                getISTDateString(
+                    hireDate
+                );
+
+
+            if (
+                hireDateKey > from
+            ) {
+                from = hireDateKey;
+            }
+        }
+    }
+
+
+    if (!to) {
+
+        to =
+            getISTDateString();
+    }
 
 
     const summary =
@@ -204,6 +373,22 @@ const getMyAttendanceSummary = async (
                 from,
                 to
             }
+        );
+
+
+    const completedHours =
+        Number(
+            Number(
+                summary?.totalHours ?? 0
+            ).toFixed(2)
+        );
+
+
+    const expectedHours =
+        Number(
+            Number(
+                employee.monthlyExpectedHours ?? 0
+            ).toFixed(2)
         );
 
 
@@ -223,8 +408,20 @@ const getMyAttendanceSummary = async (
                 to || null
         },
 
-        data:
-            summary
+        data: {
+
+            ...summary,
+
+            monthlyHours: {
+
+                completedHours,
+
+                expectedHours,
+
+                display:
+                    `${completedHours} / ${expectedHours} hours`
+            }
+        }
     });
 };
 
