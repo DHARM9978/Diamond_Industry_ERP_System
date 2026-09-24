@@ -42,6 +42,33 @@ const formatTime = (value) => {
 };
 
 
+const formatClockTime = (value) => {
+  if (!value) return '--';
+
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
+
+    if (match) {
+      const date = new Date();
+      date.setHours(
+        Number(match[1]),
+        Number(match[2]),
+        Number(match[3] || 0),
+        0
+      );
+
+      return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    }
+  }
+
+  return formatTime(value);
+};
+
+
 const formatDateTime = (value) => {
   if (!value) return '--';
 
@@ -196,6 +223,12 @@ export function AdminLiveAttendance() {
           )
             ? data.currentlyWorking
             : [],
+        pendingCheckout:
+          Array.isArray(
+            data?.pendingCheckout
+          )
+            ? data.pendingCheckout
+            : [],
         punches:
           Array.isArray(data?.punches)
             ? data.punches
@@ -282,6 +315,14 @@ export function AdminLiveAttendance() {
       liveData?.currentlyWorking
     )
       ? liveData.currentlyWorking
+      : [];
+
+
+  const pendingCheckout =
+    Array.isArray(
+      liveData?.pendingCheckout
+    )
+      ? liveData.pendingCheckout
       : [];
 
 
@@ -551,7 +592,7 @@ export function AdminLiveAttendance() {
           grid-cols-1
           gap-4
           sm:grid-cols-2
-          lg:grid-cols-4
+          lg:grid-cols-5
         "
       >
 
@@ -592,6 +633,15 @@ export function AdminLiveAttendance() {
           }
           icon={LogOut}
           color="warning"
+        />
+
+        <StatCard
+          label="Pending Checkout"
+          value={
+            pendingCheckout.length
+          }
+          icon={Clock}
+          color="error"
         />
 
       </div>
@@ -850,6 +900,159 @@ export function AdminLiveAttendance() {
                   }
                 )}
 
+              </tbody>
+
+            </table>
+
+          </div>
+
+        )}
+
+      </div>
+
+
+      {/* ======================================================
+          PENDING CHECKOUTS
+          ====================================================== */}
+
+      <div className="card overflow-hidden">
+
+        <div
+          className="
+            flex
+            flex-col
+            gap-2
+            border-b
+            border-navy-100
+            p-5
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          "
+        >
+
+          <div>
+
+            <div className="flex items-center gap-2">
+
+              <Clock
+                size={19}
+                className="text-error-600"
+              />
+
+              <h2 className="font-semibold text-navy-900">
+                Pending Checkout
+              </h2>
+
+            </div>
+
+            <p className="mt-1 text-sm text-navy-500">
+              Previous attendance records with a check-in but no checkout. Resolve these before the employee scans again.
+            </p>
+
+          </div>
+
+
+          <span
+            className="
+              inline-flex
+              w-fit
+              items-center
+              rounded-full
+              bg-error-100
+              px-3
+              py-1
+              text-sm
+              font-semibold
+              text-error-800
+            "
+          >
+            {pendingCheckout.length} pending
+          </span>
+
+        </div>
+
+
+        {pendingCheckout.length === 0 ? (
+
+          <div className="p-8 text-center">
+
+            <Clock
+              size={32}
+              className="mx-auto text-navy-300"
+            />
+
+            <p className="mt-3 font-medium text-navy-700">
+              No pending checkouts
+            </p>
+
+            <p className="mt-1 text-sm text-navy-500">
+              All previous attendance records have a checkout time.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full">
+
+              <thead>
+                <tr className="border-b border-navy-100 bg-navy-50">
+                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-navy-500">
+                    Employee
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-navy-500">
+                    Date
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-navy-500">
+                    Check In
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-navy-500">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {pendingCheckout.map((record, index) => (
+                  <tr
+                    key={record?.attendanceId ?? index}
+                    className="border-b border-navy-100 last:border-0"
+                  >
+                    <td className="px-5 py-4">
+                      <p className="font-medium text-navy-900">
+                        {getEmployeeName(record?.employee)}
+                      </p>
+                      <p className="text-xs text-navy-500">
+                        {record?.employee?.email || '--'}
+                      </p>
+                    </td>
+
+                    <td className="px-5 py-4 text-sm text-navy-700">
+                      {record?.date || '--'}
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2">
+                        <LogIn
+                          size={15}
+                          className="text-error-500"
+                        />
+                        <span className="text-sm font-medium text-navy-700">
+                          {formatClockTime(record?.checkInTime)}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center rounded-full bg-error-100 px-3 py-1 text-xs font-semibold text-error-800">
+                        MISSING CHECKOUT
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
 
             </table>

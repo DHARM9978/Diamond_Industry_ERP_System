@@ -458,6 +458,18 @@ export const attendanceService = {
     },
 
 
+    update: async (id, data) => {
+
+        const response =
+            await apiClient.put(
+                API.attendance.update(id),
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
     punches: async (
         params = {}
     ) => {

@@ -171,6 +171,10 @@ const API = {
         get: (id) =>
             `/api/attendance/${id}`,
 
+        // PUT /api/attendance/:id
+        update: (id) =>
+            `/api/attendance/${id}`,
+
         // GET /api/attendance/punches
         punches:
             "/api/attendance/punches",

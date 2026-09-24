@@ -153,6 +153,119 @@ const getLiveAttendance = async (req, res) => {
                 take: 200
             });
 
+        // ======================================================
+        // FIND PREVIOUS OPEN ATTENDANCE
+        // ======================================================
+        //
+        // These are previous calendar days where an employee has
+        // a check-in but no checkout. They are kept separate from
+        // "Currently Working" because they are attendance
+        // exceptions, not confirmed work happening today.
+        // ======================================================
+
+        const todayCalendarDate =
+            new Date(
+                Date.UTC(
+                    year,
+                    month,
+                    day,
+                    0,
+                    0,
+                    0,
+                    0
+                )
+            );
+
+        const pendingCheckoutRecords =
+            await prisma.attendance.findMany({
+                where: {
+                    date: {
+                        lt: todayCalendarDate
+                    },
+
+                    checkInTime: {
+                        not: null
+                    },
+
+                    checkOutTime: null,
+
+                    employee: {
+                        companyId: companyId
+                    }
+                },
+
+                include: {
+                    employee: {
+                        select: {
+                            employeeId: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            companyId: true,
+                            branchId: true,
+                            departmentId: true,
+                            status: true
+                        }
+                    }
+                },
+
+                orderBy: {
+                    date: "asc"
+                },
+
+                take: 100
+            });
+
+        const pendingCheckout =
+            pendingCheckoutRecords.map((attendance) => ({
+                attendanceId:
+                    attendance.attendanceId,
+
+                employeeId:
+                    attendance.employeeId,
+
+                employee:
+                    attendance.employee
+                        ? {
+                            ...attendance.employee,
+                            employeeId:
+                                Number(
+                                    attendance.employee.employeeId
+                                )
+                        }
+                        : null,
+
+                date:
+                    `${attendance.date.getUTCFullYear()}-${String(
+                        attendance.date.getUTCMonth() + 1
+                    ).padStart(2, "0")}-${String(
+                        attendance.date.getUTCDate()
+                    ).padStart(2, "0")}`,
+
+                checkInTime:
+                    attendance.checkInTime
+                        ? `${String(
+                            attendance.checkInTime.getUTCHours()
+                        ).padStart(2, "0")}:${String(
+                            attendance.checkInTime.getUTCMinutes()
+                        ).padStart(2, "0")}:${String(
+                            attendance.checkInTime.getUTCSeconds()
+                        ).padStart(2, "0")}`
+                        : null,
+
+                checkOutTime: null,
+
+                totalHours:
+                    attendance.totalHours !== null &&
+                    attendance.totalHours !== undefined
+                        ? Number(attendance.totalHours)
+                        : null,
+
+                status:
+                    attendance.status
+            }));
+
+
         // Convert BigInt IDs to numbers/strings that can safely
         // be returned through JSON.
         const safePunches =
@@ -305,12 +418,17 @@ const getLiveAttendance = async (req, res) => {
                     employeesToday,
 
                     currentlyWorking:
-                        currentlyWorking.length
+                        currentlyWorking.length,
+
+                    pendingCheckout:
+                        pendingCheckout.length
                 },
 
                 lastPunch,
 
                 currentlyWorking,
+
+                pendingCheckout,
 
                 punches:
                     safePunches

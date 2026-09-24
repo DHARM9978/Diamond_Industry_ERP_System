@@ -171,13 +171,13 @@ unsigned long lastWiFiAttempt = 0;
 
 #define GREEN_LED 25
 #define RED_LED   26
-#define BUZZER    27
+#define BUZZER    21
 
 // ============================================================================
 // OLED CONFIGURATION
 // ============================================================================
 
-#define OLED_SDA 21
+#define OLED_SDA 23
 #define OLED_SCL 22
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64

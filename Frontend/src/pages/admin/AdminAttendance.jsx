@@ -7,7 +7,10 @@ import {
 import {
   CalendarCheck,
   Download,
+  Pencil,
   RefreshCw,
+  Save,
+  XCircle,
 } from 'lucide-react';
 
 import {
@@ -20,6 +23,10 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 
 import { EmptyState } from '@/components/ui/EmptyState';
+
+import { Modal } from '@/components/ui/Modal';
+
+import { useToast } from '@/context/ToastContext';
 
 import {
   SearchInput,
@@ -62,6 +69,12 @@ export function AdminAttendance() {
   const [statusFilter, setStatusFilter] = useState('');
 
   const [dateFilter, setDateFilter] = useState('');
+
+  const { toast } = useToast();
+
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [checkoutTime, setCheckoutTime] = useState('');
+  const [savingCorrection, setSavingCorrection] = useState(false);
 
 
   // ============================================================
@@ -177,6 +190,77 @@ export function AdminAttendance() {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+  };
+
+
+  // ============================================================
+  // ATTENDANCE CORRECTION
+  // ============================================================
+
+  const openCheckoutCorrection = (record) => {
+    setEditingRecord(record);
+
+    if (record?.checkOutTime) {
+      setCheckoutTime(
+        String(record.checkOutTime).slice(0, 5)
+      );
+    } else {
+      setCheckoutTime('');
+    }
+  };
+
+
+  const closeCheckoutCorrection = () => {
+    setEditingRecord(null);
+    setCheckoutTime('');
+  };
+
+
+  const saveCheckoutCorrection = async () => {
+    if (!editingRecord?.attendanceId) {
+      return;
+    }
+
+    if (!/^\d{2}:\d{2}$/.test(checkoutTime)) {
+      toast(
+        'Please enter a valid checkout time.',
+        'error'
+      );
+      return;
+    }
+
+    try {
+      setSavingCorrection(true);
+
+      await attendanceService.update(
+        editingRecord.attendanceId,
+        {
+          checkOutTime: `${checkoutTime}:00`,
+        }
+      );
+
+      toast(
+        'Checkout time corrected successfully.',
+        'success'
+      );
+
+      closeCheckoutCorrection();
+      await loadAttendance(false, false);
+    } catch (error) {
+      console.error(
+        'Failed to correct checkout:',
+        error
+      );
+
+      toast(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to correct checkout time.',
+        'error'
+      );
+    } finally {
+      setSavingCorrection(false);
+    }
   };
 
 
@@ -822,10 +906,99 @@ export function AdminAttendance() {
                 />
               ),
             },
+
+            {
+              key: 'actions',
+              label: 'Actions',
+              align: 'center',
+              render: (record) => (
+                record.checkInTime && !record.checkOutTime ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      openCheckoutCorrection(record)
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-warning-300 bg-warning-50 px-3 py-1.5 text-xs font-semibold text-warning-800 hover:bg-warning-100"
+                    title="Resolve missing checkout"
+                  >
+                    <Pencil size={14} />
+                    Resolve
+                  </button>
+                ) : (
+                  <span className="text-xs text-navy-300">--</span>
+                )
+              ),
+            },
           ]}
           data={filtered}
         />
       )}
+
+
+      <Modal
+        open={Boolean(editingRecord)}
+        onClose={closeCheckoutCorrection}
+        title="Resolve Missing Checkout"
+        size="sm"
+      >
+        <div className="space-y-5">
+
+          <div className="rounded-lg bg-warning-50 p-4">
+            <p className="font-semibold text-warning-900">
+              {editingRecord?.employeeName || 'Employee'}
+            </p>
+            <p className="mt-1 text-sm text-warning-800">
+              {formatDate(editingRecord?.date)} · Check in {formatTime(editingRecord?.checkInTime)}
+            </p>
+            <p className="mt-2 text-xs text-warning-700">
+              Enter the actual checkout time recorded by the employee or confirmed by an administrator. The system will recalculate total hours.
+            </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="attendance-checkout-time"
+              className="mb-1.5 block text-sm font-medium text-navy-700"
+            >
+              Checkout Time
+            </label>
+
+            <input
+              id="attendance-checkout-time"
+              type="time"
+              value={checkoutTime}
+              onChange={(event) =>
+                setCheckoutTime(event.target.value)
+              }
+              className="input-field w-full"
+              disabled={savingCorrection}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={closeCheckoutCorrection}
+              disabled={savingCorrection}
+              className="btn-secondary inline-flex items-center gap-2"
+            >
+              <XCircle size={16} />
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              onClick={saveCheckoutCorrection}
+              disabled={savingCorrection || !checkoutTime}
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              <Save size={16} />
+              {savingCorrection ? 'Saving...' : 'Save Checkout'}
+            </button>
+          </div>
+
+        </div>
+      </Modal>
 
     </div>
   );

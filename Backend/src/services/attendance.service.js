@@ -790,6 +790,58 @@ const processDevicePunch = async (data) => {
 
 
     // ==================================================
+    // CHECK FOR PREVIOUS OPEN ATTENDANCE
+    // ==================================================
+    //
+    // A previous calendar day with an IN but no OUT must be
+    // resolved by an administrator before another fingerprint
+    // punch is accepted. This prevents consecutive open
+    // attendance records and avoids guessing a checkout time.
+    // ==================================================
+
+    const todayCalendarDate =
+        getISTCalendarDate(punchedAt);
+
+    const previousOpenAttendance =
+        await prisma.attendance.findFirst({
+            where: {
+                employeeId:
+                    employee.employeeId,
+
+                date: {
+                    lt:
+                        todayCalendarDate
+                },
+
+                checkInTime: {
+                    not: null
+                },
+
+                checkOutTime: null
+            },
+
+            orderBy: {
+                date: "desc"
+            }
+        });
+
+    if (previousOpenAttendance) {
+        const openDate =
+            getISTDateString(
+                previousOpenAttendance.date
+            );
+
+        const error = new Error(
+            `Previous attendance on ${openDate} has no checkout. Please ask an administrator to resolve the missing checkout before scanning again.`
+        );
+
+        error.statusCode = 409;
+
+        throw error;
+    }
+
+
+    // ==================================================
     // GET TODAY'S PUNCHES
     // ==================================================
 
