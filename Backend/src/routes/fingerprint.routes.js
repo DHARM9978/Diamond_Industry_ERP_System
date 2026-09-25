@@ -65,6 +65,19 @@ router.get(
 
 
 // ==========================================
+// Cancel Fingerprint Enrollment
+// POST /api/fingerprints/enrollment/:id/cancel
+// ==========================================
+
+router.post(
+    "/enrollment/:id/cancel",
+    asyncHandler(
+        fingerprintController.cancelEnrollment
+    )
+);
+
+
+// ==========================================
 // Get Fingerprint
 // GET /api/fingerprints/:id
 // ==========================================
@@ -75,6 +88,7 @@ router.get(
         fingerprintController.getFingerprint
     )
 );
+
 
 // ==========================================
 // Update Fingerprint
@@ -100,6 +114,7 @@ router.delete(
         fingerprintController.deleteFingerprint
     )
 );
+
 
 // ==========================================
 // Adding new fingerprint

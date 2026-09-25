@@ -53,6 +53,7 @@ export function AdminFingerprints() {
 
   const [enrollmentProgress, setEnrollmentProgress] = useState(null);
   const [enrollmentPollingError, setEnrollmentPollingError] = useState('');
+  const [cancellingEnrollment, setCancellingEnrollment] = useState(false);
 
   const loadFingerprints = async (showFullPageLoading = true) => {
     try {
@@ -160,7 +161,8 @@ export function AdminFingerprints() {
 
         if (
           normalizedStatus === 'COMPLETED' ||
-          normalizedStatus === 'FAILED'
+          normalizedStatus === 'FAILED' ||
+          normalizedStatus === 'CANCELLED'
         ) {
           /*
            * STOP polling permanently at the terminal state.
@@ -416,6 +418,77 @@ export function AdminFingerprints() {
     }
   };
 
+  const handleCancelEnrollment = async () => {
+    const enrollmentId = Number(enrollmentProgress?.enrollmentId);
+    const currentStatus = String(
+      enrollmentProgress?.status || ''
+    ).toUpperCase();
+
+    if (!enrollmentId) {
+      toast('Enrollment ID is missing', 'error');
+      return;
+    }
+
+    if (!['PENDING', 'IN_PROGRESS'].includes(currentStatus)) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      'Cancel this fingerprint enrollment? The fingerprint machine will be instructed to stop this enrollment.'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setCancellingEnrollment(true);
+      setEnrollmentPollingError('');
+
+      const response =
+        await fingerprintService.cancelEnrollment(
+          enrollmentId
+        );
+
+      const cancelledEnrollment =
+        response?.data || response;
+
+      setEnrollmentProgress((previous) => ({
+        ...previous,
+        ...cancelledEnrollment,
+        status: cancelledEnrollment?.status || 'CANCELLED',
+        errorMessage:
+          cancelledEnrollment?.errorMessage ||
+          'Enrollment cancelled by administrator.',
+        logs: Array.isArray(cancelledEnrollment?.logs)
+          ? cancelledEnrollment.logs
+          : previous?.logs || [],
+      }));
+
+      toast(
+        'Fingerprint enrollment cancelled successfully.',
+        'success'
+      );
+
+      await loadFingerprints(false);
+      await loadEmployees();
+    } catch (error) {
+      console.error(
+        'Failed to cancel fingerprint enrollment:',
+        error
+      );
+
+      toast(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to cancel fingerprint enrollment',
+        'error'
+      );
+    } finally {
+      setCancellingEnrollment(false);
+    }
+  };
+
   const columns = [
     {
       key: 'employeeId',
@@ -598,11 +671,18 @@ export function AdminFingerprints() {
         pollingError={enrollmentPollingError}
         onClose={() => {
           const status = String(enrollmentProgress?.status || '').toUpperCase();
-          if (status === 'COMPLETED' || status === 'FAILED') {
+          if (
+            status === 'COMPLETED' ||
+            status === 'FAILED' ||
+            status === 'CANCELLED'
+          ) {
             setEnrollmentProgress(null);
             setEnrollmentPollingError('');
+            setCancellingEnrollment(false);
           }
         }}
+        onCancelEnrollment={handleCancelEnrollment}
+        cancellingEnrollment={cancellingEnrollment}
       />
     </div>
   );
@@ -612,13 +692,16 @@ function EnrollmentProgressModal({
   enrollment,
   pollingError,
   onClose,
+  onCancelEnrollment,
+  cancellingEnrollment,
 }) {
   if (!enrollment) return null;
 
   const status = String(enrollment.status || 'PENDING').toUpperCase();
   const isCompleted = status === 'COMPLETED';
   const isFailed = status === 'FAILED';
-  const isActive = !isCompleted && !isFailed;
+  const isCancelled = status === 'CANCELLED';
+  const isActive = !isCompleted && !isFailed && !isCancelled;
 
   const logs = Array.isArray(enrollment.logs)
     ? enrollment.logs
@@ -690,7 +773,9 @@ function EnrollmentProgressModal({
               ? 'border-green-200 bg-green-50'
               : isFailed
                 ? 'border-red-200 bg-red-50'
-                : 'border-navy-100 bg-navy-50'
+                : isCancelled
+                  ? 'border-slate-200 bg-slate-50'
+                  : 'border-navy-100 bg-navy-50'
             }`}
         >
           <div className="flex items-center gap-3">
@@ -698,6 +783,8 @@ function EnrollmentProgressModal({
               <CheckCircle2 className="text-green-600" size={22} />
             ) : isFailed ? (
               <XCircle className="text-red-600" size={22} />
+            ) : isCancelled ? (
+              <XCircle className="text-slate-500" size={22} />
             ) : (
               <Loader2 className="text-navy-600 animate-spin" size={22} />
             )}
@@ -708,14 +795,18 @@ function EnrollmentProgressModal({
                   ? 'Fingerprint enrolled successfully'
                   : isFailed
                     ? 'Fingerprint enrollment failed'
-                    : 'Fingerprint enrollment in progress'}
+                    : isCancelled
+                      ? 'Fingerprint enrollment cancelled'
+                      : 'Fingerprint enrollment in progress'}
               </p>
               <p className="text-xs text-navy-500 mt-0.5">
                 {isCompleted
                   ? `Enrollment completed${enrollment.confidence != null ? ` with confidence ${enrollment.confidence}` : ''}.`
                   : isFailed
                     ? enrollment.errorMessage || 'The fingerprint machine reported a failure.'
-                    : 'Keep this window open and follow the instructions on the fingerprint machine.'}
+                    : isCancelled
+                      ? enrollment.errorMessage || 'The enrollment was cancelled by the administrator.'
+                      : 'Keep this window open and follow the instructions on the fingerprint machine.'}
               </p>
             </div>
           </div>
@@ -788,11 +879,32 @@ function EnrollmentProgressModal({
           </div>
         )}
 
-        <div className="flex justify-end pt-1">
+        <div className="flex justify-end gap-3 pt-1">
+          {isActive && (
+            <button
+              type="button"
+              onClick={onCancelEnrollment}
+              disabled={cancellingEnrollment}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {cancellingEnrollment ? (
+                <>
+                  <RefreshCw size={16} className="animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <XCircle size={16} />
+                  Cancel Enrollment
+                </>
+              )}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onClose}
-            disabled={isActive}
+            disabled={isActive || cancellingEnrollment}
             className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isActive ? 'Enrollment Running...' : 'Close'}

@@ -111,6 +111,46 @@ const getEnrollmentStatus = async (req, res) => {
 
 
 // ==========================================
+// Cancel Enrollment
+// POST /api/fingerprints/enrollment/:id/cancel
+// ==========================================
+
+const cancelEnrollment = async (req, res) => {
+    const enrollment =
+        await fingerprintService.cancelEnrollment(
+            req.params.id,
+            req.user.companyId
+        );
+
+    return res.status(200).json({
+        success: true,
+        message: "Fingerprint enrollment cancelled successfully",
+        data: enrollment
+    });
+};
+
+
+// ==========================================
+// DEVICE: Get Enrollment Status
+// GET /api/device/fingerprint-enroll/:id/status
+// ==========================================
+
+const getDeviceEnrollmentStatus = async (req, res) => {
+    const enrollment =
+        await fingerprintService.getEnrollmentStatus(
+            req.params.id,
+            req.device.companyId
+        );
+
+    return res.status(200).json({
+        success: true,
+        message: "Device fingerprint enrollment status fetched successfully",
+        data: enrollment
+    });
+};
+
+
+// ==========================================
 // DEVICE: Append enrollment log
 // ==========================================
 
@@ -197,5 +237,7 @@ module.exports = {
     getPendingEnrollment,
     reportEnrollmentResult,
     reportEnrollmentLog,
+    getDeviceEnrollmentStatus,
+    cancelEnrollment,
     enrollFingerprintFromDevice
 };

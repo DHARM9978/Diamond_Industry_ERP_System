@@ -458,6 +458,127 @@ const getPendingEnrollment = async (
 };
 
 // ==========================================
+// CANCEL ENROLLMENT
+// Admin can cancel a PENDING or IN_PROGRESS
+// enrollment so the device can stop the
+// physical enrollment process.
+// ==========================================
+
+const cancelEnrollment = async (
+    enrollmentId,
+    companyId
+) => {
+    const id = Number(enrollmentId);
+
+    if (!id) {
+        throw createError(
+            "Valid enrollment ID is required",
+            400
+        );
+    }
+
+    const updatedEnrollment =
+        await prisma.$transaction(
+            async (tx) => {
+                const enrollment =
+                    await tx.fingerprintEnrollment.findFirst({
+                        where: {
+                            enrollmentId: id,
+                            employee: {
+                                companyId: Number(companyId)
+                            }
+                        },
+                        include: {
+                            employee: {
+                                select: {
+                                    employeeId: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true
+                                }
+                            }
+                        }
+                    });
+
+                if (!enrollment) {
+                    throw createError(
+                        "Fingerprint enrollment request not found",
+                        404
+                    );
+                }
+
+                if (
+                    enrollment.status ===
+                        "COMPLETED"
+                ) {
+                    throw createError(
+                        "Completed fingerprint enrollment cannot be cancelled",
+                        409
+                    );
+                }
+
+                if (
+                    enrollment.status ===
+                        "FAILED"
+                ) {
+                    throw createError(
+                        "Failed fingerprint enrollment cannot be cancelled",
+                        409
+                    );
+                }
+
+                if (
+                    enrollment.status ===
+                        "CANCELLED"
+                ) {
+                    return enrollment;
+                }
+
+                if (
+                    ![
+                        "PENDING",
+                        "IN_PROGRESS"
+                    ].includes(enrollment.status)
+                ) {
+                    throw createError(
+                        "This fingerprint enrollment cannot be cancelled",
+                        409
+                    );
+                }
+
+                return await tx.fingerprintEnrollment.update({
+                    where: {
+                        enrollmentId: id
+                    },
+                    data: {
+                        status: "CANCELLED",
+                        errorMessage:
+                            "Enrollment cancelled by administrator"
+                    },
+                    include: {
+                        employee: {
+                            select: {
+                                employeeId: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true
+                            }
+                        }
+                    }
+                });
+            }
+        );
+
+    enrollmentLogStore.append(
+        id,
+        "Fingerprint enrollment cancelled by administrator."
+    );
+
+    return updatedEnrollment;
+};
+
+
+// ==========================================
 // DEVICE: Report Result
 // ==========================================
 
@@ -576,6 +697,16 @@ const reportEnrollmentResult = async (
             ) {
                 throw createError(
                     "This enrollment request has already failed",
+                    409
+                );
+            }
+
+            if (
+                enrollment.status ===
+                    "CANCELLED"
+            ) {
+                throw createError(
+                    "This enrollment request has been cancelled",
                     409
                 );
             }
@@ -884,6 +1015,7 @@ module.exports = {
     getEnrollmentStatus,
     appendEnrollmentLog,
     getPendingEnrollment,
+    cancelEnrollment,
     reportEnrollmentResult,
     enrollFingerprint,
     updateFingerprint,

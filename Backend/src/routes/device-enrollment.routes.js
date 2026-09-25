@@ -49,6 +49,25 @@ router.get(
 
 
 // ======================================================
+// DEVICE: CHECK ENROLLMENT STATUS
+// ======================================================
+// GET /api/device/fingerprint-enroll/:id/status
+//
+// Used by the ESP32 while physical enrollment is running.
+// This allows the machine to detect when the admin cancelled
+// the enrollment from the ERP frontend.
+// ======================================================
+
+router.get(
+    "/fingerprint-enroll/:id/status",
+    authenticateDevice,
+    asyncHandler(
+        fingerprintController.getDeviceEnrollmentStatus
+    )
+);
+
+
+// ======================================================
 // DEVICE: REPORT ENROLLMENT PROGRESS LOG
 // ======================================================
 // POST /api/device/fingerprint-enroll/log

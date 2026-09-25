@@ -68,6 +68,20 @@
       Body:
         { "enrollmentId": 12, "message": "..." }
 
+  GET /api/device/fingerprint-enroll/{enrollmentId}/status
+      Headers: x-device-code, x-device-secret
+      Response:
+        {
+          "success": true,
+          "data": {
+            "enrollmentId": 12,
+            "status": "IN_PROGRESS"
+          }
+        }
+      When the admin cancels the enrollment, the status becomes
+      "CANCELLED". The ESP32 must stop physical enrollment and clean up
+      any template already stored in the assigned sensor slot.
+
   POST /api/attendance/punch
       Headers: x-device-code, x-device-secret, Idempotency-Key
       Body:
@@ -114,6 +128,7 @@ const char* ATTENDANCE_ENDPOINT = "/api/attendance/punch";
 const char* ENROLLMENT_PENDING_ENDPOINT = "/api/device/fingerprint-enroll/pending";
 const char* ENROLLMENT_RESULT_ENDPOINT = "/api/device/fingerprint-enroll/result";
 const char* ENROLLMENT_LOG_ENDPOINT = "/api/device/fingerprint-enroll/log";
+const char* ENROLLMENT_STATUS_ENDPOINT = "/api/device/fingerprint-enroll";
 
 // ============================================================================
 // TIMING
@@ -121,6 +136,7 @@ const char* ENROLLMENT_LOG_ENDPOINT = "/api/device/fingerprint-enroll/log";
 
 const unsigned long ENROLLMENT_POLL_INTERVAL = 5000;
 const unsigned long ENROLLMENT_RESULT_RETRY_INTERVAL = 10000;
+const unsigned long ENROLLMENT_STATUS_CHECK_INTERVAL = 1500;
 const unsigned long ATTENDANCE_SCAN_INTERVAL = 150;
 const unsigned long ATTENDANCE_EVENT_COOLDOWN = 2500;
 
@@ -155,6 +171,7 @@ const uint8_t SENSOR_EMPTY_DB_ERROR_CODE = 12;
 unsigned long lastAttendanceScan = 0;
 unsigned long lastEnrollmentPoll = 0;
 unsigned long lastEnrollmentResultRetry = 0;
+unsigned long lastEnrollmentStatusCheck = 0;
 unsigned long lastAttendanceEvent = 0;
 unsigned long lastWiFiAttempt = 0;
 
@@ -239,6 +256,13 @@ EnrollmentJob currentEnrollment = {
   0,
   ""
 };
+
+// Set when the ERP admin cancels the active enrollment. The physical sensor
+// is cleaned up before the ESP32 returns to attendance mode.
+bool enrollmentCancelRequested = false;
+
+// Internal return code used only by the enrollment wait helpers.
+const uint8_t ENROLLMENT_CANCELLED_RESULT = 0xFE;
 
 // ============================================================================
 // PERSISTENT ENROLLMENT RESULT
@@ -774,6 +798,113 @@ void showAttendanceReady() {
 }
 
 // ============================================================================
+// ENROLLMENT CANCELLATION CHECK
+// ============================================================================
+// The frontend cancellation changes the backend enrollment status to
+// CANCELLED. Because the ESP32 performs physical enrollment locally, it must
+// poll this status while waiting for user interaction and between sensor
+// operations.
+// ============================================================================
+
+bool checkEnrollmentCancellation(bool force = false) {
+  if (!currentEnrollment.valid || currentEnrollment.enrollmentId <= 0) {
+    return false;
+  }
+
+  if (enrollmentCancelRequested) {
+    return true;
+  }
+
+  unsigned long now = millis();
+
+  if (
+    !force &&
+    now - lastEnrollmentStatusCheck < ENROLLMENT_STATUS_CHECK_INTERVAL
+  ) {
+    return false;
+  }
+
+  lastEnrollmentStatusCheck = now;
+
+  // A network outage must not accidentally abort the physical enrollment.
+  // The ESP32 will check again after Wi-Fi is restored.
+  if (WiFi.status() != WL_CONNECTED) {
+    return false;
+  }
+
+  HTTPClient http;
+  String url =
+    makeUrl(ENROLLMENT_STATUS_ENDPOINT) +
+    "/" + String(currentEnrollment.enrollmentId) +
+    "/status";
+
+  http.setConnectTimeout(1200);
+  http.setTimeout(2000);
+
+  if (!http.begin(url)) {
+    return false;
+  }
+
+  addDeviceHeaders(http);
+
+  int httpCode = http.GET();
+
+  if (httpCode <= 0) {
+    http.end();
+    return false;
+  }
+
+  String response = http.getString();
+
+  if (httpCode == 404) {
+    // Keep the current physical job alive if the status request itself is
+    // temporarily unavailable. Do not interpret a transient HTTP problem as
+    // a cancellation.
+    http.end();
+    return false;
+  }
+
+  if (httpCode < 200 || httpCode >= 300) {
+    http.end();
+    return false;
+  }
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, response);
+
+  if (error) {
+    http.end();
+    return false;
+  }
+
+  String status = doc["data"]["status"] | "";
+
+  http.end();
+
+  if (status == "CANCELLED") {
+    enrollmentCancelRequested = true;
+
+    Serial.println();
+    Serial.println("====================================");
+    Serial.println(" ENROLLMENT CANCELLED BY ADMIN");
+    Serial.println("====================================");
+    Serial.print("Enrollment ID: ");
+    Serial.println(currentEnrollment.enrollmentId);
+
+    showOLED(
+      "Enrollment Cancelled",
+      "Admin stopped process",
+      "Cleaning Sensor...",
+      "Please wait"
+    );
+
+    return true;
+  }
+
+  return false;
+}
+
+// ============================================================================
 // FINGER WAIT HELPERS
 // ============================================================================
 
@@ -782,6 +913,10 @@ uint8_t waitForFingerImage(unsigned long timeoutMs) {
 
   while (millis() - startTime < timeoutMs) {
     serviceOLED();
+
+    if (checkEnrollmentCancellation()) {
+      return ENROLLMENT_CANCELLED_RESULT;
+    }
 
     uint8_t result = finger.getImage();
 
@@ -806,6 +941,10 @@ bool waitForFingerRemoval(unsigned long timeoutMs) {
   while (millis() - startTime < timeoutMs) {
     serviceOLED();
 
+    if (checkEnrollmentCancellation()) {
+      return true;
+    }
+
     uint8_t result = finger.getImage();
 
     if (result == FINGERPRINT_NOFINGER) {
@@ -827,6 +966,10 @@ uint8_t waitForStableFingerImage(unsigned long timeoutMs) {
 
   while (millis() - startTime < timeoutMs) {
     serviceOLED();
+
+    if (checkEnrollmentCancellation()) {
+      return ENROLLMENT_CANCELLED_RESULT;
+    }
 
     uint8_t first = finger.getImage();
 
@@ -1014,6 +1157,11 @@ bool verifyStoredFingerprint(
 
   uint8_t result = waitForStableFingerImage(ENROLLMENT_STAGE_TIMEOUT);
 
+  if (result == ENROLLMENT_CANCELLED_RESULT || enrollmentCancelRequested) {
+    errorMessageOut = "Enrollment cancelled by administrator.";
+    return false;
+  }
+
   if (result != FINGERPRINT_OK) {
     errorMessageOut =
       "Verification scan failed. Sensor code: " + String(result);
@@ -1086,6 +1234,84 @@ bool isKnownEmptySlotResult(uint8_t result) {
 }
 
 // ============================================================================
+// CANCELLED ENROLLMENT CLEANUP
+// ============================================================================
+
+bool deleteEnrollmentTemplateAfterCancellation(int sensorSlot) {
+  if (sensorSlot < 1) {
+    return true;
+  }
+
+  Serial.print("Checking physical sensor slot for cancellation cleanup: ");
+  Serial.println(sensorSlot);
+
+  uint8_t loadResult = finger.loadModel(sensorSlot);
+
+  if (loadResult != FINGERPRINT_OK) {
+    if (isKnownEmptySlotResult(loadResult)) {
+      Serial.println("Cancellation cleanup: slot is already empty.");
+      return true;
+    }
+
+    Serial.print("Cancellation cleanup could not safely load slot. Sensor code: ");
+    Serial.println(loadResult);
+    return false;
+  }
+
+  uint8_t deleteResult = finger.deleteModel(sensorSlot);
+
+  if (deleteResult == FINGERPRINT_OK) {
+    Serial.println("Cancellation cleanup: physical template deleted.");
+    return true;
+  }
+
+  Serial.print("Cancellation cleanup FAILED. Sensor code: ");
+  Serial.println(deleteResult);
+  return false;
+}
+
+bool finishCancelledEnrollment(
+  int sensorSlot,
+  String& errorMessageOut
+) {
+  errorMessageOut = "Enrollment cancelled by administrator.";
+
+  if (!currentEnrollment.valid) {
+    return false;
+  }
+
+  reportEnrollmentLog(errorMessageOut);
+  reportEnrollmentLog(
+    "Stopping physical enrollment and checking sensor slot " +
+    String(sensorSlot) + " for cleanup."
+  );
+
+  bool cleaned = deleteEnrollmentTemplateAfterCancellation(sensorSlot);
+
+  if (cleaned) {
+    reportEnrollmentLog(
+      "Cancellation cleanup complete. The physical sensor slot is available."
+    );
+  } else {
+    errorMessageOut +=
+      " Physical sensor cleanup could not be confirmed; check the assigned sensor slot.";
+
+    reportEnrollmentLog(errorMessageOut);
+  }
+
+  showOLED(
+    "Enrollment Cancelled",
+    cleaned ? "Sensor Cleaned" : "Check Sensor Slot",
+    "Returning to",
+    "Attendance Mode"
+  );
+
+  // Cancellation is not an enrollment failure. Do not emit the red failure
+  // signal because the administrator intentionally stopped the operation.
+  return false;
+}
+
+// ============================================================================
 // ENROLL FINGERPRINT
 // ============================================================================
 
@@ -1096,6 +1322,8 @@ bool enrollFingerprint(
 ) {
   verificationConfidence = 0;
   errorMessageOut = "";
+  enrollmentCancelRequested = false;
+  lastEnrollmentStatusCheck = 0;
 
   Serial.println();
   Serial.println("====================================");
@@ -1119,6 +1347,10 @@ bool enrollFingerprint(
   // ----------------------------------------------------------
   // CHECK SLOT
   // ----------------------------------------------------------
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   reportEnrollmentLog("Checking physical sensor slot " + String(sensorSlot) + "...");
 
@@ -1174,6 +1406,10 @@ bool enrollFingerprint(
 
   result = waitForFingerImage(ENROLLMENT_STAGE_TIMEOUT);
 
+  if (result == ENROLLMENT_CANCELLED_RESULT || enrollmentCancelRequested) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   if (result != FINGERPRINT_OK) {
     errorMessageOut =
       "First fingerprint scan failed. Sensor code: " + String(result) + ".";
@@ -1183,6 +1419,10 @@ bool enrollFingerprint(
   }
 
   reportEnrollmentLog("First fingerprint image captured.");
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   result = finger.image2Tz(1);
 
@@ -1223,6 +1463,10 @@ bool enrollFingerprint(
   // SECOND SCAN
   // ----------------------------------------------------------
 
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   showOLED(
     "ENROLLMENT MODE",
     "Place SAME Finger",
@@ -1234,6 +1478,10 @@ bool enrollFingerprint(
 
   result = waitForFingerImage(ENROLLMENT_STAGE_TIMEOUT);
 
+  if (result == ENROLLMENT_CANCELLED_RESULT || enrollmentCancelRequested) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   if (result != FINGERPRINT_OK) {
     errorMessageOut =
       "Second fingerprint scan failed. Sensor code: " + String(result) + ".";
@@ -1243,6 +1491,10 @@ bool enrollFingerprint(
   }
 
   reportEnrollmentLog("Second fingerprint image captured.");
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   result = finger.image2Tz(2);
 
@@ -1260,6 +1512,10 @@ bool enrollFingerprint(
   // ----------------------------------------------------------
   // CREATE MODEL
   // ----------------------------------------------------------
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   showOLED(
     "ENROLLMENT MODE",
@@ -1287,6 +1543,10 @@ bool enrollFingerprint(
 
   reportEnrollmentLog("Fingerprint template created successfully.");
 
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   // ----------------------------------------------------------
   // STORE MODEL
   // ----------------------------------------------------------
@@ -1297,6 +1557,10 @@ bool enrollFingerprint(
     "Slot: " + String(sensorSlot),
     "Please wait"
   );
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   result = finger.storeModel(sensorSlot);
 
@@ -1315,6 +1579,12 @@ bool enrollFingerprint(
     String(sensorSlot) + "."
   );
 
+  // The model now physically exists in the sensor. From this point onward,
+  // any admin cancellation must delete the physical template before returning.
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   // ----------------------------------------------------------
   // REMOVE FINGER BEFORE TEST
   // ----------------------------------------------------------
@@ -1326,7 +1596,15 @@ bool enrollFingerprint(
     "Do not skip test"
   );
 
+  if (enrollmentCancelRequested) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   if (!waitForFingerRemoval(FINGER_REMOVAL_TIMEOUT)) {
+    if (enrollmentCancelRequested) {
+      return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+    }
+
     // IMPORTANT: physical template exists, but verification did not happen.
     // Do NOT report success. Delete the unverified model when possible.
     errorMessageOut =
@@ -1371,11 +1649,19 @@ bool enrollFingerprint(
   // IMMEDIATE VERIFICATION
   // ----------------------------------------------------------
 
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
+
   bool verified = verifyStoredFingerprint(
     sensorSlot,
     verificationConfidence,
     errorMessageOut
   );
+
+  if (enrollmentCancelRequested) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
+  }
 
   // Always require finger removal before leaving enrollment mode.
   waitForFingerRemoval(5000);
@@ -1423,6 +1709,10 @@ bool enrollFingerprint(
 
     errorSignal();
     return false;
+  }
+
+  if (checkEnrollmentCancellation(true)) {
+    return finishCancelledEnrollment(sensorSlot, errorMessageOut);
   }
 
   reportEnrollmentLog(
@@ -1711,6 +2001,8 @@ void processEnrollmentJob(const EnrollmentJob& job) {
 
   currentEnrollment = job;
   currentMode = ENROLLMENT_MODE;
+  enrollmentCancelRequested = false;
+  lastEnrollmentStatusCheck = 0;
 
   showOLED(
     "ENROLLMENT REQUEST",
@@ -1729,6 +2021,36 @@ void processEnrollmentJob(const EnrollmentJob& job) {
     verificationConfidence,
     errorMessage
   );
+
+  // A cancelled job is already terminal in the backend. Do NOT send a
+  // FAILED/COMPLETED result afterward, because doing so could race with the
+  // administrator cancellation and incorrectly change the enrollment state.
+  if (enrollmentCancelRequested) {
+    Serial.println("Enrollment was cancelled by the administrator.");
+
+    currentEnrollment.valid = false;
+    currentMode = ATTENDANCE_MODE;
+    enrollmentCancelRequested = false;
+
+    delay(700);
+    waitForFingerRemoval(3000);
+    showAttendanceReady();
+    return;
+  }
+
+  // Final cancellation check immediately before reporting completion.
+  if (checkEnrollmentCancellation(true)) {
+    finishCancelledEnrollment(job.sensorSlot, errorMessage);
+
+    currentEnrollment.valid = false;
+    currentMode = ATTENDANCE_MODE;
+    enrollmentCancelRequested = false;
+
+    delay(700);
+    waitForFingerRemoval(3000);
+    showAttendanceReady();
+    return;
+  }
 
   if (enrollmentSuccess) {
     reportEnrollmentLog(
@@ -1751,6 +2073,7 @@ void processEnrollmentJob(const EnrollmentJob& job) {
 
   currentEnrollment.valid = false;
   currentMode = ATTENDANCE_MODE;
+  enrollmentCancelRequested = false;
 
   showOLED(
     enrollmentSuccess ? "Enrollment Complete" : "Enrollment Failed",
@@ -2215,6 +2538,7 @@ void handleSerialCommands() {
 
   if (command == "A") {
     currentEnrollment.valid = false;
+    enrollmentCancelRequested = false;
     showAttendanceReady();
     Serial.println("Switched to ATTENDANCE MODE.");
     return;

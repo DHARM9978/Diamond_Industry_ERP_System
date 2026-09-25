@@ -634,6 +634,23 @@ export const fingerprintService = {
     },
 
 
+    // --------------------------------------------------------
+    // CANCEL ENROLLMENT
+    // --------------------------------------------------------
+
+    cancelEnrollment: async (
+        enrollmentId
+    ) => {
+
+        const response =
+            await apiClient.post(
+                `/api/fingerprints/enrollment/${enrollmentId}/cancel`
+            );
+
+        return unwrap(response);
+    },
+
+
     update: async (
         id,
         data
