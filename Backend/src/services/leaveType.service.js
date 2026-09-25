@@ -3,6 +3,12 @@ const prisma = require("../config/database");
 const VALID_STATUSES = ["ACTIVE", "INACTIVE"];
 
 /**
+ * ============================================================
+ * HELPERS
+ * ============================================================
+ */
+
+/**
  * Normalize leave code
  */
 function normalizeCode(code) {
@@ -12,7 +18,7 @@ function normalizeCode(code) {
 /**
  * Validate Leave Type data
  */
-function validateLeaveTypeData(data, isUpdate = false) {
+function validateLeaveTypeData(data = {}, isUpdate = false) {
     const errors = [];
 
     if (!isUpdate && !data.name) {
@@ -24,7 +30,9 @@ function validateLeaveTypeData(data, isUpdate = false) {
             typeof data.name !== "string" ||
             !data.name.trim()
         ) {
-            errors.push("name must be a non-empty string");
+            errors.push(
+                "name must be a non-empty string"
+            );
         }
     }
 
@@ -37,7 +45,9 @@ function validateLeaveTypeData(data, isUpdate = false) {
             typeof data.code !== "string" ||
             !data.code.trim()
         ) {
-            errors.push("code must be a non-empty string");
+            errors.push(
+                "code must be a non-empty string"
+            );
         }
     }
 
@@ -46,15 +56,20 @@ function validateLeaveTypeData(data, isUpdate = false) {
         data.description !== null &&
         typeof data.description !== "string"
     ) {
-        errors.push("description must be a string");
+        errors.push(
+            "description must be a string"
+        );
     }
 
     if (data.annualQuota !== undefined) {
         const quota = Number(data.annualQuota);
 
-        if (!Number.isFinite(quota) || quota < 0) {
+        if (
+            !Number.isFinite(quota) ||
+            quota <= 0
+        ) {
             errors.push(
-                "annualQuota must be a non-negative number"
+                "annualQuota must be greater than zero"
             );
         }
     }
@@ -71,7 +86,9 @@ function validateLeaveTypeData(data, isUpdate = false) {
             data[field] !== undefined &&
             typeof data[field] !== "boolean"
         ) {
-            errors.push(`${field} must be a boolean`);
+            errors.push(
+                `${field} must be a boolean`
+            );
         }
     }
 
@@ -87,35 +104,73 @@ function validateLeaveTypeData(data, isUpdate = false) {
     return errors;
 }
 
+
 /**
- * Create Leave Type
+ * ============================================================
+ * CREATE LEAVE TYPE
+ * ============================================================
+ *
+ * Client-created leave types are always quota-controlled.
+ *
+ * The system-default Casual Leave is created separately by
+ * the migration and cannot be created through this API.
  */
-async function createLeaveType(companyId, data) {
+async function createLeaveType(
+    companyId,
+    data
+) {
     const company = Number(companyId);
 
-    if (!Number.isInteger(company) || company <= 0) {
-        const error = new Error("Invalid company ID");
+    if (
+        !Number.isInteger(company) ||
+        company <= 0
+    ) {
+        const error = new Error(
+            "Invalid company ID"
+        );
+
         error.statusCode = 400;
         throw error;
     }
 
-    const errors = validateLeaveTypeData(data);
+    const errors =
+        validateLeaveTypeData(data);
 
     if (errors.length > 0) {
-        const error = new Error(errors.join(", "));
+        const error = new Error(
+            errors.join(", ")
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (
+        data.annualQuota === undefined ||
+        data.annualQuota === null ||
+        data.annualQuota === ""
+    ) {
+        const error = new Error(
+            "annualQuota is required for client-created leave types"
+        );
+
         error.statusCode = 400;
         throw error;
     }
 
     const name = data.name.trim();
     const code = normalizeCode(data.code);
+    const annualQuota = Number(
+        data.annualQuota
+    );
 
-    const existingCode = await prisma.leaveType.findFirst({
-        where: {
-            companyId: company,
-            code
-        }
-    });
+    const existingCode =
+        await prisma.leaveType.findFirst({
+            where: {
+                companyId: company,
+                code
+            }
+        });
 
     if (existingCode) {
         const error = new Error(
@@ -126,12 +181,13 @@ async function createLeaveType(companyId, data) {
         throw error;
     }
 
-    const existingName = await prisma.leaveType.findFirst({
-        where: {
-            companyId: company,
-            name
-        }
-    });
+    const existingName =
+        await prisma.leaveType.findFirst({
+            where: {
+                companyId: company,
+                name
+            }
+        });
 
     if (existingName) {
         const error = new Error(
@@ -142,55 +198,76 @@ async function createLeaveType(companyId, data) {
         throw error;
     }
 
-    const leaveType = await prisma.leaveType.create({
-        data: {
-            companyId: company,
-            name,
-            code,
-            description:
-                data.description?.trim() || null,
+    const leaveType =
+        await prisma.leaveType.create({
+            data: {
+                companyId: company,
 
-            annualQuota:
-                data.annualQuota !== undefined
-                    ? Number(data.annualQuota)
-                    : null,
+                name,
 
-            isPaid:
-                data.isPaid !== undefined
-                    ? data.isPaid
-                    : true,
+                code,
 
-            requiresApproval:
-                data.requiresApproval !== undefined
-                    ? data.requiresApproval
-                    : true,
+                description:
+                    data.description?.trim() || null,
 
-            allowHalfDay:
-                data.allowHalfDay !== undefined
-                    ? data.allowHalfDay
-                    : true,
+                annualQuota,
 
-            allowCarryForward:
-                data.allowCarryForward !== undefined
-                    ? data.allowCarryForward
-                    : false,
+                // Client-created leave types must
+                // always be normal/client leave types.
+                isSystemDefault: false,
 
-            status:
-                data.status || "ACTIVE"
-        }
-    });
+                isPaid:
+                    data.isPaid !== undefined
+                        ? data.isPaid
+                        : true,
+
+                requiresApproval:
+                    data.requiresApproval !== undefined
+                        ? data.requiresApproval
+                        : true,
+
+                allowHalfDay:
+                    data.allowHalfDay !== undefined
+                        ? data.allowHalfDay
+                        : true,
+
+                allowCarryForward:
+                    data.allowCarryForward !== undefined
+                        ? data.allowCarryForward
+                        : false,
+
+                status:
+                    data.status || "ACTIVE"
+            }
+        });
 
     return leaveType;
 }
 
+
 /**
- * Get all Leave Types
+ * ============================================================
+ * GET ALL LEAVE TYPES
+ * ============================================================
+ *
+ * The system-default Casual Leave is returned here because
+ * employees need it when the company has no client-created
+ * leave types.
  */
-async function getLeaveTypes(companyId, filters = {}) {
+async function getLeaveTypes(
+    companyId,
+    filters = {}
+) {
     const company = Number(companyId);
 
-    if (!Number.isInteger(company) || company <= 0) {
-        const error = new Error("Invalid company ID");
+    if (
+        !Number.isInteger(company) ||
+        company <= 0
+    ) {
+        const error = new Error(
+            "Invalid company ID"
+        );
+
         error.statusCode = 400;
         throw error;
     }
@@ -200,7 +277,11 @@ async function getLeaveTypes(companyId, filters = {}) {
     };
 
     if (filters.status !== undefined) {
-        if (!VALID_STATUSES.includes(filters.status)) {
+        if (
+            !VALID_STATUSES.includes(
+                filters.status
+            )
+        ) {
             const error = new Error(
                 `status must be one of: ${VALID_STATUSES.join(", ")}`
             );
@@ -214,14 +295,18 @@ async function getLeaveTypes(companyId, filters = {}) {
 
     return await prisma.leaveType.findMany({
         where,
+
         orderBy: {
             name: "asc"
         }
     });
 }
 
+
 /**
- * Get Leave Type by ID
+ * ============================================================
+ * GET LEAVE TYPE BY ID
+ * ============================================================
  */
 async function getLeaveTypeById(
     companyId,
@@ -230,13 +315,22 @@ async function getLeaveTypeById(
     const company = Number(companyId);
     const id = Number(leaveTypeId);
 
-    if (!Number.isInteger(company) || company <= 0) {
-        const error = new Error("Invalid company ID");
+    if (
+        !Number.isInteger(company) ||
+        company <= 0
+    ) {
+        const error = new Error(
+            "Invalid company ID"
+        );
+
         error.statusCode = 400;
         throw error;
     }
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
         const error = new Error(
             "Invalid leave type ID"
         );
@@ -265,8 +359,14 @@ async function getLeaveTypeById(
     return leaveType;
 }
 
+
 /**
- * Update Leave Type
+ * ============================================================
+ * UPDATE LEAVE TYPE
+ * ============================================================
+ *
+ * System-default Casual Leave is managed by the system and
+ * cannot be changed through the client leave-type API.
  */
 async function updateLeaveType(
     companyId,
@@ -276,13 +376,22 @@ async function updateLeaveType(
     const company = Number(companyId);
     const id = Number(leaveTypeId);
 
-    if (!Number.isInteger(company) || company <= 0) {
-        const error = new Error("Invalid company ID");
+    if (
+        !Number.isInteger(company) ||
+        company <= 0
+    ) {
+        const error = new Error(
+            "Invalid company ID"
+        );
+
         error.statusCode = 400;
         throw error;
     }
 
-    if (!Number.isInteger(id) || id <= 0) {
+    if (
+        !Number.isInteger(id) ||
+        id <= 0
+    ) {
         const error = new Error(
             "Invalid leave type ID"
         );
@@ -292,10 +401,16 @@ async function updateLeaveType(
     }
 
     const errors =
-        validateLeaveTypeData(data, true);
+        validateLeaveTypeData(
+            data,
+            true
+        );
 
     if (errors.length > 0) {
-        const error = new Error(errors.join(", "));
+        const error = new Error(
+            errors.join(", ")
+        );
+
         error.statusCode = 400;
         throw error;
     }
@@ -317,6 +432,17 @@ async function updateLeaveType(
         throw error;
     }
 
+    if (
+        existing.isSystemDefault === true
+    ) {
+        const error = new Error(
+            "System default Casual Leave cannot be modified"
+        );
+
+        error.statusCode = 403;
+        throw error;
+    }
+
     const updateData = {};
 
     if (data.name !== undefined) {
@@ -327,6 +453,7 @@ async function updateLeaveType(
                 where: {
                     companyId: company,
                     name,
+
                     NOT: {
                         leaveTypeId: id
                     }
@@ -346,13 +473,15 @@ async function updateLeaveType(
     }
 
     if (data.code !== undefined) {
-        const code = normalizeCode(data.code);
+        const code =
+            normalizeCode(data.code);
 
         const duplicateCode =
             await prisma.leaveType.findFirst({
                 where: {
                     companyId: company,
                     code,
+
                     NOT: {
                         leaveTypeId: id
                     }
@@ -382,7 +511,8 @@ async function updateLeaveType(
     }
 
     if (data.isPaid !== undefined) {
-        updateData.isPaid = data.isPaid;
+        updateData.isPaid =
+            data.isPaid;
     }
 
     if (data.requiresApproval !== undefined) {
@@ -401,19 +531,43 @@ async function updateLeaveType(
     }
 
     if (data.status !== undefined) {
-        updateData.status = data.status;
+        updateData.status =
+            data.status;
     }
 
     return await prisma.leaveType.update({
         where: {
             leaveTypeId: id
         },
+
         data: updateData
     });
 }
 
+
 /**
- * Delete Leave Type
+ * ============================================================
+ * DELETE LEAVE TYPE
+ * ============================================================
+ *
+ * Business rules:
+ *
+ * 1. System-default Casual Leave cannot be deleted.
+ *
+ * 2. If the client-created leave type has any leave request,
+ *    it cannot be deleted because request history must remain.
+ *
+ * 3. Automatically-created LeaveBalance rows with used = 0
+ *    do not prevent deletion.
+ *
+ * 4. If a LeaveBalance contains actual used leave, deletion
+ *    is blocked and the leave type must be deactivated instead.
+ *
+ * 5. Unused balance rows are removed in the same transaction
+ *    before deleting the leave type.
+ *
+ * 6. The balance cleanup and leave-type deletion are atomic:
+ *    if either operation fails, neither operation is committed.
  */
 async function deleteLeaveType(
     companyId,
@@ -423,7 +577,10 @@ async function deleteLeaveType(
     const id = Number(leaveTypeId);
 
     if (!Number.isInteger(company) || company <= 0) {
-        const error = new Error("Invalid company ID");
+        const error = new Error(
+            "Invalid company ID"
+        );
+
         error.statusCode = 400;
         throw error;
     }
@@ -437,56 +594,107 @@ async function deleteLeaveType(
         throw error;
     }
 
-    const existing =
-        await prisma.leaveType.findFirst({
+    return await prisma.$transaction(async (tx) => {
+        const existing =
+            await tx.leaveType.findFirst({
+                where: {
+                    leaveTypeId: id,
+                    companyId: company
+                }
+            });
+
+        if (!existing) {
+            const error = new Error(
+                "Leave type not found"
+            );
+
+            error.statusCode = 404;
+            throw error;
+        }
+
+        /**
+         * System fallback is permanent.
+         */
+        if (existing.isSystemDefault === true) {
+            const error = new Error(
+                "System default Casual Leave cannot be deleted"
+            );
+
+            error.statusCode = 403;
+            throw error;
+        }
+
+        /**
+         * Any existing leave request means the leave type
+         * has historical usage and must be retained.
+         */
+        const requestCount =
+            await tx.leaveRequest.count({
+                where: {
+                    leaveTypeId: id
+                }
+            });
+
+        if (requestCount > 0) {
+            const error = new Error(
+                "Leave type cannot be deleted because it has leave request history. Deactivate it instead."
+            );
+
+            error.statusCode = 409;
+            throw error;
+        }
+
+        /**
+         * Automatically-created balances with used = 0 are not
+         * historical usage and can therefore be cleaned up.
+         *
+         * A balance with used > 0 means employees have actually
+         * consumed this leave type, so deletion would destroy
+         * meaningful balance history.
+         */
+        const usedBalance =
+            await tx.leaveBalance.findFirst({
+                where: {
+                    leaveTypeId: id,
+                    used: {
+                        gt: 0
+                    }
+                },
+                select: {
+                    leaveBalanceId: true
+                }
+            });
+
+        if (usedBalance) {
+            const error = new Error(
+                "Leave type cannot be deleted because leave has already been used. Deactivate it instead."
+            );
+
+            error.statusCode = 409;
+            throw error;
+        }
+
+        /**
+         * Remove unused automatically-created balances first so
+         * the LeaveType foreign-key constraint is satisfied.
+         */
+        await tx.leaveBalance.deleteMany({
             where: {
                 leaveTypeId: id,
-                companyId: company
+                used: {
+                    equals: 0
+                }
             }
         });
 
-    if (!existing) {
-        const error = new Error(
-            "Leave type not found"
-        );
-
-        error.statusCode = 404;
-        throw error;
-    }
-
-    const balanceCount =
-        await prisma.leaveBalance.count({
+        await tx.leaveType.delete({
             where: {
                 leaveTypeId: id
             }
         });
 
-    const requestCount =
-        await prisma.leaveRequest.count({
-            where: {
-                leaveTypeId: id
-            }
-        });
-
-    if (
-        balanceCount > 0 ||
-        requestCount > 0
-    ) {
-        const error = new Error(
-            "Leave type cannot be deleted because it is already in use. Deactivate it instead."
-        );
-
-        error.statusCode = 409;
-        throw error;
-    }
-
-    await prisma.leaveType.delete({
-        where: {
-            leaveTypeId: id
-        }
+        return true;
     });
-
-    return true;
 }
 
 module.exports = {

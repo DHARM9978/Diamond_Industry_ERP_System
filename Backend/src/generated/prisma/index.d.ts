@@ -21694,6 +21694,7 @@ export namespace Prisma {
     code: string | null
     description: string | null
     annualQuota: Decimal | null
+    isSystemDefault: boolean | null
     isPaid: boolean | null
     requiresApproval: boolean | null
     allowHalfDay: boolean | null
@@ -21710,6 +21711,7 @@ export namespace Prisma {
     code: string | null
     description: string | null
     annualQuota: Decimal | null
+    isSystemDefault: boolean | null
     isPaid: boolean | null
     requiresApproval: boolean | null
     allowHalfDay: boolean | null
@@ -21726,6 +21728,7 @@ export namespace Prisma {
     code: number
     description: number
     annualQuota: number
+    isSystemDefault: number
     isPaid: number
     requiresApproval: number
     allowHalfDay: number
@@ -21756,6 +21759,7 @@ export namespace Prisma {
     code?: true
     description?: true
     annualQuota?: true
+    isSystemDefault?: true
     isPaid?: true
     requiresApproval?: true
     allowHalfDay?: true
@@ -21772,6 +21776,7 @@ export namespace Prisma {
     code?: true
     description?: true
     annualQuota?: true
+    isSystemDefault?: true
     isPaid?: true
     requiresApproval?: true
     allowHalfDay?: true
@@ -21788,6 +21793,7 @@ export namespace Prisma {
     code?: true
     description?: true
     annualQuota?: true
+    isSystemDefault?: true
     isPaid?: true
     requiresApproval?: true
     allowHalfDay?: true
@@ -21891,6 +21897,7 @@ export namespace Prisma {
     code: string
     description: string | null
     annualQuota: Decimal | null
+    isSystemDefault: boolean
     isPaid: boolean
     requiresApproval: boolean
     allowHalfDay: boolean
@@ -21926,6 +21933,7 @@ export namespace Prisma {
     code?: boolean
     description?: boolean
     annualQuota?: boolean
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -21948,6 +21956,7 @@ export namespace Prisma {
     code?: boolean
     description?: boolean
     annualQuota?: boolean
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -21957,7 +21966,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type LeaveTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"leaveTypeId" | "companyId" | "name" | "code" | "description" | "annualQuota" | "isPaid" | "requiresApproval" | "allowHalfDay" | "allowCarryForward" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["leaveType"]>
+  export type LeaveTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"leaveTypeId" | "companyId" | "name" | "code" | "description" | "annualQuota" | "isSystemDefault" | "isPaid" | "requiresApproval" | "allowHalfDay" | "allowCarryForward" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["leaveType"]>
   export type LeaveTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     balances?: boolean | LeaveType$balancesArgs<ExtArgs>
     requests?: boolean | LeaveType$requestsArgs<ExtArgs>
@@ -21979,6 +21988,7 @@ export namespace Prisma {
       code: string
       description: string | null
       annualQuota: Prisma.Decimal | null
+      isSystemDefault: boolean
       isPaid: boolean
       requiresApproval: boolean
       allowHalfDay: boolean
@@ -22364,6 +22374,7 @@ export namespace Prisma {
     readonly code: FieldRef<"LeaveType", 'String'>
     readonly description: FieldRef<"LeaveType", 'String'>
     readonly annualQuota: FieldRef<"LeaveType", 'Decimal'>
+    readonly isSystemDefault: FieldRef<"LeaveType", 'Boolean'>
     readonly isPaid: FieldRef<"LeaveType", 'Boolean'>
     readonly requiresApproval: FieldRef<"LeaveType", 'Boolean'>
     readonly allowHalfDay: FieldRef<"LeaveType", 'Boolean'>
@@ -26254,6 +26265,7 @@ export namespace Prisma {
     code: 'code',
     description: 'description',
     annualQuota: 'annualQuota',
+    isSystemDefault: 'isSystemDefault',
     isPaid: 'isPaid',
     requiresApproval: 'requiresApproval',
     allowHalfDay: 'allowHalfDay',
@@ -28053,6 +28065,7 @@ export namespace Prisma {
     code?: StringFilter<"LeaveType"> | string
     description?: StringNullableFilter<"LeaveType"> | string | null
     annualQuota?: DecimalNullableFilter<"LeaveType"> | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFilter<"LeaveType"> | boolean
     isPaid?: BoolFilter<"LeaveType"> | boolean
     requiresApproval?: BoolFilter<"LeaveType"> | boolean
     allowHalfDay?: BoolFilter<"LeaveType"> | boolean
@@ -28072,6 +28085,7 @@ export namespace Prisma {
     code?: SortOrder
     description?: SortOrderInput | SortOrder
     annualQuota?: SortOrderInput | SortOrder
+    isSystemDefault?: SortOrder
     isPaid?: SortOrder
     requiresApproval?: SortOrder
     allowHalfDay?: SortOrder
@@ -28097,6 +28111,7 @@ export namespace Prisma {
     code?: StringFilter<"LeaveType"> | string
     description?: StringNullableFilter<"LeaveType"> | string | null
     annualQuota?: DecimalNullableFilter<"LeaveType"> | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFilter<"LeaveType"> | boolean
     isPaid?: BoolFilter<"LeaveType"> | boolean
     requiresApproval?: BoolFilter<"LeaveType"> | boolean
     allowHalfDay?: BoolFilter<"LeaveType"> | boolean
@@ -28116,6 +28131,7 @@ export namespace Prisma {
     code?: SortOrder
     description?: SortOrderInput | SortOrder
     annualQuota?: SortOrderInput | SortOrder
+    isSystemDefault?: SortOrder
     isPaid?: SortOrder
     requiresApproval?: SortOrder
     allowHalfDay?: SortOrder
@@ -28140,6 +28156,7 @@ export namespace Prisma {
     code?: StringWithAggregatesFilter<"LeaveType"> | string
     description?: StringNullableWithAggregatesFilter<"LeaveType"> | string | null
     annualQuota?: DecimalNullableWithAggregatesFilter<"LeaveType"> | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolWithAggregatesFilter<"LeaveType"> | boolean
     isPaid?: BoolWithAggregatesFilter<"LeaveType"> | boolean
     requiresApproval?: BoolWithAggregatesFilter<"LeaveType"> | boolean
     allowHalfDay?: BoolWithAggregatesFilter<"LeaveType"> | boolean
@@ -29958,6 +29975,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -29977,6 +29995,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -29993,6 +30012,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -30012,6 +30032,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -30030,6 +30051,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -30044,6 +30066,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -30060,6 +30083,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -31894,6 +31918,7 @@ export namespace Prisma {
     code?: SortOrder
     description?: SortOrder
     annualQuota?: SortOrder
+    isSystemDefault?: SortOrder
     isPaid?: SortOrder
     requiresApproval?: SortOrder
     allowHalfDay?: SortOrder
@@ -31916,6 +31941,7 @@ export namespace Prisma {
     code?: SortOrder
     description?: SortOrder
     annualQuota?: SortOrder
+    isSystemDefault?: SortOrder
     isPaid?: SortOrder
     requiresApproval?: SortOrder
     allowHalfDay?: SortOrder
@@ -31932,6 +31958,7 @@ export namespace Prisma {
     code?: SortOrder
     description?: SortOrder
     annualQuota?: SortOrder
+    isSystemDefault?: SortOrder
     isPaid?: SortOrder
     requiresApproval?: SortOrder
     allowHalfDay?: SortOrder
@@ -39328,6 +39355,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -39345,6 +39373,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -39554,6 +39583,7 @@ export namespace Prisma {
     code?: StringFilter<"LeaveType"> | string
     description?: StringNullableFilter<"LeaveType"> | string | null
     annualQuota?: DecimalNullableFilter<"LeaveType"> | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFilter<"LeaveType"> | boolean
     isPaid?: BoolFilter<"LeaveType"> | boolean
     requiresApproval?: BoolFilter<"LeaveType"> | boolean
     allowHalfDay?: BoolFilter<"LeaveType"> | boolean
@@ -39874,6 +39904,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -39892,6 +39923,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -40001,6 +40033,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -40019,6 +40052,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -40106,6 +40140,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -40124,6 +40159,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -40233,6 +40269,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -40251,6 +40288,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -41766,6 +41804,7 @@ export namespace Prisma {
     code: string
     description?: string | null
     annualQuota?: Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: boolean
     isPaid?: boolean
     requiresApproval?: boolean
     allowHalfDay?: boolean
@@ -42019,6 +42058,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -42036,6 +42076,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean
@@ -42053,6 +42094,7 @@ export namespace Prisma {
     code?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     annualQuota?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isSystemDefault?: BoolFieldUpdateOperationsInput | boolean
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     requiresApproval?: BoolFieldUpdateOperationsInput | boolean
     allowHalfDay?: BoolFieldUpdateOperationsInput | boolean

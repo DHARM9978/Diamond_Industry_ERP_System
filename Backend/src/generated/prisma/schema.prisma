@@ -722,12 +722,21 @@ model companies {
 // ======================================================
 
 model LeaveType {
-  leaveTypeId       Int      @id @default(autoincrement()) @map("leave_type_id")
-  companyId         Int      @map("company_id")
-  name              String   @db.VarChar(100)
-  code              String   @db.VarChar(30)
-  description       String?  @db.Text
-  annualQuota       Decimal? @map("annual_quota") @db.Decimal(6, 2)
+  leaveTypeId Int      @id @default(autoincrement()) @map("leave_type_id")
+  companyId   Int      @map("company_id")
+  name        String   @db.VarChar(100)
+  code        String   @db.VarChar(30)
+  description String?  @db.Text
+  annualQuota Decimal? @map("annual_quota") @db.Decimal(6, 2)
+
+  // System-provided fallback leave type.
+  //
+  // true  -> this is the built-in Casual Leave fallback and
+  //           does not use an annual quota.
+  // false -> this is a leave type configured by the client admin
+  //           and its annualQuota is enforced.
+  isSystemDefault Boolean @default(false) @map("is_system_default")
+
   isPaid            Boolean  @default(true) @map("is_paid")
   requiresApproval  Boolean  @default(true) @map("requires_approval")
   allowHalfDay      Boolean  @default(true) @map("allow_half_day")
@@ -743,6 +752,7 @@ model LeaveType {
   @@unique([companyId, code])
   @@unique([companyId, name])
   @@index([companyId])
+  @@index([companyId, isSystemDefault])
   @@index([status])
   @@map("leave_types")
 }

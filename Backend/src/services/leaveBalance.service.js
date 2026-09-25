@@ -245,6 +245,12 @@ async function ensureCompanyLeaveBalances(
                 companyId: company,
                 status: "ACTIVE",
 
+                // The built-in Casual Leave is an unlimited
+                // system fallback and therefore never receives
+                // a LeaveBalance row. Only client-created leave
+                // types participate in quota accounting.
+                isSystemDefault: false,
+
                 annualQuota: {
                     not: null
                 }
@@ -286,7 +292,7 @@ async function ensureCompanyLeaveBalances(
              */
             if (
                 !Number.isFinite(allocated) ||
-                allocated < 0
+                allocated <= 0
             ) {
                 continue;
             }
@@ -315,28 +321,62 @@ async function ensureCompanyLeaveBalances(
              * ----------------------------------------------------
              */
             if (!existing) {
-                const created =
-                    await transactionClient.leaveBalance.create({
-                        data: {
-                            employeeId:
-                                employee.employeeId,
+                try {
+                    const created =
+                        await transactionClient.leaveBalance.create({
+                            data: {
+                                employeeId:
+                                    employee.employeeId,
 
-                            leaveTypeId:
-                                leaveType.leaveTypeId,
+                                leaveTypeId:
+                                    leaveType.leaveTypeId,
 
-                            year: targetYear,
+                                year: targetYear,
 
-                            allocated,
+                                allocated,
 
-                            used: 0,
+                                used: 0,
 
-                            remaining: allocated
-                        }
-                    });
+                                remaining: allocated
+                            }
+                        });
 
-                synchronizedBalances.push(
-                    created
-                );
+                    synchronizedBalances.push(
+                        created
+                    );
+                } catch (error) {
+                    // Multiple frontend requests can call this function at
+                    // the same time. Another request may create the same
+                    // balance after our findUnique() check but before this
+                    // create(). Treat that unique-constraint race as an
+                    // existing balance and continue normally.
+                    if (error?.code !== "P2002") {
+                        throw error;
+                    }
+
+                    const racedBalance =
+                        await transactionClient.leaveBalance.findUnique({
+                            where: {
+                                employeeId_leaveTypeId_year: {
+                                    employeeId:
+                                        employee.employeeId,
+
+                                    leaveTypeId:
+                                        leaveType.leaveTypeId,
+
+                                    year: targetYear
+                                }
+                            }
+                        });
+
+                    if (!racedBalance) {
+                        throw error;
+                    }
+
+                    synchronizedBalances.push(
+                        racedBalance
+                    );
+                }
 
                 continue;
             }
@@ -430,7 +470,7 @@ async function ensureCompanyLeaveBalances(
 
 
 /**
- ============================================================
+ * ============================================================
  * CREATE LEAVE BALANCE
  * ============================================================
  */
@@ -492,10 +532,46 @@ async function createLeaveBalance(
         company
     );
 
-    await verifyLeaveType(
-        leaveTypeId,
-        company
-    );
+    const leaveType =
+        await verifyLeaveType(
+            leaveTypeId,
+            company
+        );
+
+    // System fallback Casual Leave is unlimited and must never
+    // be represented by an employee LeaveBalance row.
+    if (leaveType.isSystemDefault === true) {
+        const error = new Error(
+            "System default Casual Leave does not use leave balances"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const quota =
+        Number(leaveType.annualQuota);
+
+    if (
+        !Number.isFinite(quota) ||
+        quota <= 0
+    ) {
+        const error = new Error(
+            "Leave type must have a positive annual quota"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (allocated > quota) {
+        const error = new Error(
+            `Allocated leave cannot exceed the leave type quota of ${quota}`
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
 
     const existing =
         await prisma.leaveBalance.findUnique({
@@ -600,6 +676,12 @@ async function getLeaveBalances(
             companyId: company
         },
 
+        // System fallback Casual Leave is unlimited and therefore
+        // must not appear in finite employee balance listings.
+        leaveType: {
+            isSystemDefault: false
+        },
+
         year: targetYear
     };
 
@@ -679,6 +761,10 @@ async function getLeaveBalanceById(
 
                 employee: {
                     companyId: company
+                },
+
+                leaveType: {
+                    isSystemDefault: false
                 }
             },
 
@@ -760,7 +846,15 @@ async function updateLeaveBalance(
 
                 employee: {
                     companyId: company
+                },
+
+                leaveType: {
+                    isSystemDefault: false
                 }
+            },
+
+            include: {
+                leaveType: true
             }
         });
 
@@ -792,6 +886,30 @@ async function updateLeaveBalance(
                 data.allocated,
                 "allocated"
             );
+
+        const quota =
+            Number(existing.leaveType?.annualQuota);
+
+        if (
+            !Number.isFinite(quota) ||
+            quota <= 0
+        ) {
+            const error = new Error(
+                "Leave type must have a positive annual quota"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (allocated > quota) {
+            const error = new Error(
+                `Allocated leave cannot exceed the leave type quota of ${quota}`
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
     }
 
     /**

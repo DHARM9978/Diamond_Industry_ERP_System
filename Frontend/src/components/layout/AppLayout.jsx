@@ -41,6 +41,7 @@ const adminNav = [
       { to: '/admin/attendance', icon: CalendarCheck, label: 'Attendance' },
       { to: '/admin/live-attendance', icon: Activity, label: 'Live Attendance' },
       { to: '/admin/leaves', icon: CalendarDays, label: 'Leave Requests' },
+      { to: '/admin/leave-types', icon: CalendarDays, label: 'Leave Types' },
       { to: '/admin/advances', icon: Banknote, label: 'Salary Advances' },
       { to: '/admin/payroll', icon: Wallet, label: 'Payroll' },
       { to: '/admin/bonus-payments', icon: Clock, label: 'Bonus Payments' },

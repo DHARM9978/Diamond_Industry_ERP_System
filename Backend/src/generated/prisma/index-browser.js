@@ -336,6 +336,7 @@ exports.Prisma.LeaveTypeScalarFieldEnum = {
   code: 'code',
   description: 'description',
   annualQuota: 'annualQuota',
+  isSystemDefault: 'isSystemDefault',
   isPaid: 'isPaid',
   requiresApproval: 'requiresApproval',
   allowHalfDay: 'allowHalfDay',

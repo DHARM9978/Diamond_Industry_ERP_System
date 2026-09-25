@@ -147,6 +147,18 @@ const getLeaveTypeName = (item) => {
 };
 
 
+const isSystemDefaultLeaveType = (leaveType) => {
+  return leaveType?.isSystemDefault === true;
+};
+
+
+const isActiveLeaveType = (leaveType) => {
+  return String(
+    leaveType?.status ?? 'ACTIVE'
+  ).toUpperCase() === 'ACTIVE';
+};
+
+
 const getRequestStatus = (request) => {
   return String(
     request?.status ??
@@ -616,6 +628,9 @@ export function EmployeeLeaves() {
   const [modalOpen, setModalOpen] =
     useState(false);
 
+  const [openingModal, setOpeningModal] =
+    useState(false);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -701,6 +716,82 @@ export function EmployeeLeaves() {
 
   /*
   |--------------------------------------------------------------------------
+  | Effective leave-type selection
+  |--------------------------------------------------------------------------
+  |
+  | BUSINESS RULE:
+  | 1. No client-created leave types -> system Casual Leave is the
+  |    only selectable fallback and it is unlimited.
+  | 2. Once any client-created leave type exists -> Casual Leave is
+  |    hidden and only ACTIVE client-created types are selectable.
+  | 3. If configured types exist but all are INACTIVE -> nothing is
+  |    selectable and the employee is informed accordingly.
+  */
+
+  const configuredLeaveTypes = leaveTypes.filter(
+    (leaveType) => !isSystemDefaultLeaveType(leaveType)
+  );
+
+  const activeConfiguredLeaveTypes =
+    configuredLeaveTypes.filter(
+      (leaveType) => isActiveLeaveType(leaveType)
+    );
+
+  const systemFallbackLeaveTypes = leaveTypes.filter(
+    (leaveType) =>
+      isSystemDefaultLeaveType(leaveType) &&
+      isActiveLeaveType(leaveType)
+  );
+
+  const hasConfiguredLeaveTypes =
+    configuredLeaveTypes.length > 0;
+
+  const selectableLeaveTypes =
+    hasConfiguredLeaveTypes
+      ? activeConfiguredLeaveTypes
+      : systemFallbackLeaveTypes;
+
+  const hasSelectableLeaveTypes =
+    selectableLeaveTypes.length > 0;
+
+  const showingUnlimitedFallback =
+    !hasConfiguredLeaveTypes &&
+    systemFallbackLeaveTypes.length > 0;
+
+  const configuredTypesHaveNoActiveOption =
+    hasConfiguredLeaveTypes &&
+    activeConfiguredLeaveTypes.length === 0;
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Open Apply Leave modal
+  |--------------------------------------------------------------------------
+  |
+  | Refresh leave types from the backend immediately before opening the
+  | modal so a deleted/deactivated leave type cannot remain selectable
+  | because the employee page has stale data.
+  */
+
+  const handleOpenApplyLeave =
+    async () => {
+      if (openingModal) {
+        return;
+      }
+
+      setOpeningModal(true);
+
+      try {
+        await loadLeaveData();
+        setModalOpen(true);
+      } finally {
+        setOpeningModal(false);
+      }
+    };
+
+
+  /*
+  |--------------------------------------------------------------------------
   | Apply Leave
   |--------------------------------------------------------------------------
   */
@@ -712,6 +803,23 @@ export function EmployeeLeaves() {
       setSubmitting(true);
 
       try {
+        const selectedLeaveType =
+          selectableLeaveTypes.find(
+            (leaveType) =>
+              String(
+                getLeaveTypeId(leaveType)
+              ) ===
+              String(
+                formData.leaveTypeId
+              )
+          );
+
+        if (!selectedLeaveType) {
+          throw new Error(
+            'The selected leave type is no longer available.'
+          );
+        }
+
         const payload = {
           leaveTypeId:
             Number(
@@ -910,8 +1018,30 @@ export function EmployeeLeaves() {
   |--------------------------------------------------------------------------
   */
 
+  const activeConfiguredTypeIds =
+    new Set(
+      activeConfiguredLeaveTypes.map(
+        (leaveType) =>
+          String(
+            getLeaveTypeId(leaveType)
+          )
+      )
+    );
+
+  const visibleBalances =
+    hasConfiguredLeaveTypes
+      ? balances.filter(
+          (balance) =>
+            activeConfiguredTypeIds.has(
+              String(
+                getLeaveTypeId(balance)
+              )
+            )
+        )
+      : [];
+
   const balanceCards =
-    balances.map(
+    visibleBalances.map(
       (balance) => {
         const total =
           getBalanceTotal(
@@ -1315,8 +1445,12 @@ export function EmployeeLeaves() {
         actions={
           <button
             type="button"
-            onClick={() =>
-              setModalOpen(true)
+            onClick={
+              handleOpenApplyLeave
+            }
+            disabled={
+              openingModal ||
+              !hasSelectableLeaveTypes
             }
             className="
               inline-flex items-center gap-2
@@ -1326,12 +1460,16 @@ export function EmployeeLeaves() {
               text-white
               text-sm font-semibold
               hover:bg-navy-800
+              disabled:opacity-50
+              disabled:cursor-not-allowed
               transition
             "
           >
             <Plus size={17} />
 
-            Apply Leave
+            {openingModal
+              ? 'Checking leave types...'
+              : 'Apply Leave'}
           </button>
         }
       />
@@ -1343,7 +1481,68 @@ export function EmployeeLeaves() {
       |--------------------------------------------------------------------------
       */}
 
-      {balanceCards.length > 0 ? (
+      {showingUnlimitedFallback ? (
+        <div
+          className="
+            mb-8
+            rounded-xl
+            border border-accent-200
+            bg-accent-50
+            p-5
+          "
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="
+                w-10 h-10
+                shrink-0
+                rounded-lg
+                bg-white
+                flex
+                items-center
+                justify-center
+              "
+            >
+              <CalendarDays
+                size={20}
+                className="text-accent-700"
+              />
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-accent-900">
+                Casual Leave — Unlimited
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-accent-800">
+                No client leave types are configured yet. Casual Leave is
+                available as the system fallback and does not use an annual
+                balance.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : configuredTypesHaveNoActiveOption ? (
+        <div
+          className="
+            mb-8
+            rounded-xl
+            border border-amber-200
+            bg-amber-50
+            p-5
+          "
+        >
+          <p className="text-sm font-semibold text-amber-900">
+            No active leave types currently available
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-amber-800">
+            Your administrator has configured leave types, but none are
+            currently active. The system Casual Leave fallback remains hidden
+            while configured leave types exist.
+          </p>
+        </div>
+      ) : balanceCards.length > 0 ? (
         <div
           className="
             grid
@@ -1541,7 +1740,7 @@ export function EmployeeLeaves() {
               mt-1
             "
           >
-            Your leave balances will appear
+            Leave balances for your active leave types will appear
             here when they are assigned.
           </p>
         </div>
@@ -1607,8 +1806,8 @@ export function EmployeeLeaves() {
         title="Apply for Leave"
       >
         <LeaveForm
-          balances={balances}
-          leaveTypes={leaveTypes}
+          balances={visibleBalances}
+          leaveTypes={selectableLeaveTypes}
           submitting={submitting}
           onSubmit={handleApply}
           onCancel={() => {
@@ -1714,26 +1913,41 @@ function LeaveForm({
   |--------------------------------------------------------------------------
   */
 
-  const selectedBalance =
-    balances.find(
-      (balance) =>
+  const selectedLeaveType =
+    leaveTypes.find(
+      (leaveType) =>
         String(
-          getLeaveTypeId(
-            balance
-          )
+          getLeaveTypeId(leaveType)
         ) ===
         String(
           form.leaveTypeId
         )
     );
 
+  const selectedBalance =
+    balances.find(
+      (balance) =>
+        String(
+          getLeaveTypeId(balance)
+        ) ===
+        String(
+          form.leaveTypeId
+        )
+    );
+
+  const selectedLeaveIsUnlimited =
+    isSystemDefaultLeaveType(
+      selectedLeaveType
+    );
 
   const availableDays =
-    selectedBalance
-      ? getBalanceRemaining(
-          selectedBalance
-        )
-      : null;
+    selectedLeaveIsUnlimited
+      ? null
+      : selectedBalance
+        ? getBalanceRemaining(
+            selectedBalance
+          )
+        : null;
 
 
   /*
@@ -1776,6 +1990,15 @@ function LeaveForm({
       event.preventDefault();
 
       setError('');
+
+
+      if (leaveTypes.length === 0) {
+        setError(
+          'No active leave types are currently available.'
+        );
+
+        return;
+      }
 
 
       if (
@@ -1923,29 +2146,51 @@ function LeaveForm({
           </option>
 
 
-          {leaveTypes.map(
-            (type) => (
-              <option
-                key={
-                  type.leaveTypeId ??
-                  type.id
-                }
-                value={
-                  type.leaveTypeId ??
-                  type.id
-                }
-              >
-                {type.name ??
-                  type.leaveTypeName ??
-                  type.code ??
-                  'Leave'}
-              </option>
+          {leaveTypes.length === 0 ? (
+            <option value="" disabled>
+              No active leave types available
+            </option>
+          ) : (
+            leaveTypes.map(
+              (type) => (
+                <option
+                  key={
+                    type.leaveTypeId ??
+                    type.id
+                  }
+                  value={
+                    type.leaveTypeId ??
+                    type.id
+                  }
+                >
+                  {type.name ??
+                    type.leaveTypeName ??
+                    type.code ??
+                    'Leave'}
+                  {isSystemDefaultLeaveType(type)
+                    ? ' (Unlimited)'
+                    : ''}
+                </option>
+              )
             )
           )}
         </select>
 
 
-        {selectedBalance && (
+        {selectedLeaveIsUnlimited ? (
+          <p
+            className="
+              mt-1.5
+              text-xs
+              text-accent-700
+            "
+          >
+            Available:{' '}
+            <span className="font-semibold">
+              Unlimited
+            </span>
+          </p>
+        ) : selectedBalance ? (
           <p
             className="
               mt-1.5
@@ -1963,7 +2208,18 @@ function LeaveForm({
                 : 's'}
             </span>
           </p>
-        )}
+        ) : selectedLeaveType ? (
+          <p
+            className="
+              mt-1.5
+              text-xs
+              text-amber-700
+            "
+          >
+            Leave balance is not available yet. The server will verify
+            the request against the current balance.
+          </p>
+        ) : null}
       </div>
 
 

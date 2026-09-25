@@ -10,6 +10,7 @@ import { AdminEmployees } from '@/pages/admin/AdminEmployees';
 import { AdminAttendance } from '@/pages/admin/AdminAttendance';
 import { AdminLiveAttendance } from '@/pages/admin/AdminLiveAttendance';
 import { AdminLeaves } from '@/pages/admin/AdminLeaves';
+import { AdminLeaveTypes } from '@/pages/admin/AdminLeaveTypes';
 import { AdminAdvances } from '@/pages/admin/AdminAdvances';
 import { AdminPayroll } from '@/pages/admin/AdminPayroll';
 import { AdminFingerprints } from '@/pages/admin/AdminFingerprints';
@@ -128,6 +129,18 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <AdminLeaves />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+
+            <Route
+              path="/admin/leave-types"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminLeaveTypes />
                   </AppLayout>
                 </ProtectedRoute>
               }

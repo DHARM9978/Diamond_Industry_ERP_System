@@ -116,6 +116,16 @@ function rangesOverlap(
     );
 }
 
+function getCalendarYearRange(year) {
+    const start = new Date(year, 0, 1, 0, 0, 0, 0);
+    const end = new Date(year + 1, 0, 1, 0, 0, 0, 0);
+
+    return {
+        start,
+        end
+    };
+}
+
 async function verifyEmployee(
     employeeId,
     companyId,
@@ -168,6 +178,137 @@ function getEmployeeInclude() {
     };
 }
 
+/**
+ * ============================================================
+ * GET LEAVE TYPE FOR A REQUEST
+ * ============================================================
+ *
+ * BUSINESS RULE:
+ *
+ * 1. If the company has no client-created leave types,
+ *    the system-default Casual Leave is available and unlimited.
+ *
+ * 2. If the company has one or more client-created leave types,
+ *    the system-default Casual Leave is no longer available for
+ *    new requests.
+ *
+ * 3. Every client-created leave type must have a positive quota.
+ */
+async function getRequestLeaveType(
+    companyId,
+    leaveTypeId,
+    transactionClient
+) {
+    const client = transactionClient || prisma;
+
+    const leaveType = await client.leaveType.findFirst({
+        where: {
+            leaveTypeId: leaveTypeId,
+            companyId: companyId
+        }
+    });
+
+    if (!leaveType) {
+        throw createError(
+            "Leave type not found in your company",
+            404
+        );
+    }
+
+    if (leaveType.status !== "ACTIVE") {
+        throw createError(
+            "Leave type is inactive",
+            400
+        );
+    }
+
+    if (leaveType.isSystemDefault === true) {
+        const configuredLeaveTypeCount =
+            await client.leaveType.count({
+                where: {
+                    companyId: companyId,
+                    isSystemDefault: false
+                }
+            });
+
+        if (configuredLeaveTypeCount > 0) {
+            throw createError(
+                "Casual Leave is no longer available because your administrator has configured leave types",
+                409,
+                "DEFAULT_LEAVE_TYPE_NOT_AVAILABLE"
+            );
+        }
+
+        return {
+            leaveType,
+            isUnlimited: true
+        };
+    }
+
+    const quota = Number(leaveType.annualQuota);
+
+    if (!Number.isFinite(quota) || quota <= 0) {
+        throw createError(
+            "This leave type does not have a valid annual leave limit",
+            400,
+            "INVALID_LEAVE_TYPE_QUOTA"
+        );
+    }
+
+    return {
+        leaveType,
+        isUnlimited: false,
+        annualQuota: quota
+    };
+}
+
+/**
+ * ============================================================
+ * GET PENDING LEAVE DAYS
+ * ============================================================
+ *
+ * Pending requests reserve leave quota for the purpose of new
+ * submissions. Approved leave is already represented by the
+ * LeaveBalance.used value and therefore is not counted here.
+ */
+async function getPendingLeaveDays(
+    employeeId,
+    leaveTypeId,
+    year,
+    transactionClient
+) {
+    const client = transactionClient || prisma;
+    const range = getCalendarYearRange(year);
+
+    const pending = await client.leaveRequest.aggregate({
+        where: {
+            employeeId: employeeId,
+            leaveTypeId: leaveTypeId,
+            status: "PENDING",
+            startDate: {
+                gte: range.start,
+                lt: range.end
+            }
+        },
+        _sum: {
+            totalDays: true
+        }
+    });
+
+    const pendingDays = Number(
+        pending?._sum?.totalDays || 0
+    );
+
+    if (!Number.isFinite(pendingDays) || pendingDays < 0) {
+        throw createError(
+            "Invalid pending leave calculation",
+            400
+        );
+    }
+
+    return pendingDays;
+}
+
 async function createLeaveRequest(companyId, employeeId, data) {
     const company = validateId(companyId, "company ID");
     const employee = validateId(employeeId, "employee ID");
@@ -199,6 +340,24 @@ async function createLeaveRequest(companyId, employeeId, data) {
         );
     }
 
+    const requestedStartYear = startDate.getFullYear();
+    const requestedEndYear = endDate.getFullYear();
+
+    /**
+     * Leave quota is annual, so requests must belong to one
+     * calendar year. Approval already enforces this rule; doing
+     * it at creation time prevents an invalid pending request
+     * from being created in the first place.
+     */
+    if (requestedStartYear !== requestedEndYear) {
+        throw createError(
+            "Leave requests cannot currently span multiple calendar years",
+            400
+        );
+    }
+
+    const year = validateYear(requestedStartYear);
+
     const calculatedTotalDays = calculateInclusiveDays(
         startDate,
         endDate
@@ -229,26 +388,14 @@ async function createLeaveRequest(companyId, employeeId, data) {
 
     await verifyEmployee(employee, company);
 
-    const leaveType = await prisma.leaveType.findFirst({
-        where: {
-            leaveTypeId: leaveTypeId,
-            companyId: company
-        }
-    });
-
-    if (!leaveType) {
-        throw createError(
-            "Leave type not found in your company",
-            404
-        );
-    }
-
-    if (leaveType.status !== "ACTIVE") {
-        throw createError(
-            "Leave type is inactive",
-            400
-        );
-    }
+    const {
+        leaveType,
+        isUnlimited
+    } = await getRequestLeaveType(
+        company,
+        leaveTypeId,
+        prisma
+    );
 
     if (
         totalDays % 1 !== 0 &&
@@ -317,6 +464,79 @@ async function createLeaveRequest(companyId, employeeId, data) {
                 leaveTypeId: overlappingRequest.leaveTypeId
             }
         );
+    }
+
+    /**
+     * ------------------------------------------------------------
+     * UNLIMITED SYSTEM CASUAL LEAVE
+     * ------------------------------------------------------------
+     *
+     * No LeaveBalance is required for the system fallback.
+     */
+    if (!isUnlimited) {
+        /**
+         * Make sure the employee has a current balance for this
+         * configured leave type.
+         */
+        await ensureCompanyLeaveBalances(
+            company,
+            year,
+            prisma
+        );
+
+        const balance = await prisma.leaveBalance.findUnique({
+            where: {
+                employeeId_leaveTypeId_year: {
+                    employeeId: employee,
+                    leaveTypeId: leaveTypeId,
+                    year: year
+                }
+            }
+        });
+
+        if (!balance) {
+            throw createError(
+                "Leave balance could not be created for this employee and leave type",
+                400
+            );
+        }
+
+        const remaining = Number(balance.remaining);
+
+        if (!Number.isFinite(remaining) || remaining < 0) {
+            throw createError(
+                "Invalid leave balance",
+                400
+            );
+        }
+
+        const pendingDays = await getPendingLeaveDays(
+            employee,
+            leaveTypeId,
+            year,
+            prisma
+        );
+
+        const availableToRequest = Math.max(
+            0,
+            remaining - pendingDays
+        );
+
+        if (totalDays > availableToRequest) {
+            throw createError(
+                "Insufficient available leave balance",
+                400,
+                "INSUFFICIENT_AVAILABLE_LEAVE",
+                {
+                    allocated: Number(balance.allocated),
+                    used: Number(balance.used),
+                    remaining: remaining,
+                    pendingDays: pendingDays,
+                    availableToRequest: availableToRequest,
+                    requestedDays: totalDays
+                }
+            );
+        }
     }
 
     return prisma.leaveRequest.create({
@@ -599,6 +819,56 @@ async function approveLeaveRequest(
             approvalData || {}
         );
 
+        const leaveType = await tx.leaveType.findFirst({
+            where: {
+                leaveTypeId: currentRequest.leaveTypeId,
+                companyId: company
+            }
+        });
+
+        if (!leaveType) {
+            throw createError(
+                "Leave type not found in your company",
+                404
+            );
+        }
+
+        /**
+         * --------------------------------------------------------
+         * SYSTEM CASUAL LEAVE
+         * --------------------------------------------------------
+         *
+         * Existing pending requests for the fallback Casual Leave
+         * remain valid even if the administrator later configures
+         * custom leave types. There is no balance to deduct.
+         */
+        if (leaveType.isSystemDefault === true) {
+            return tx.leaveRequest.update({
+                where: {
+                    leaveRequestId: requestId
+                },
+                data: {
+                    status: "APPROVED",
+                    approvedBy: admin,
+                    approvedAt: new Date(),
+                    approvedStartDate: currentApproval.approvedStartDate,
+                    approvedEndDate: currentApproval.approvedEndDate,
+                    approvedDays: currentApproval.approvedDays
+                },
+                include: getEmployeeInclude()
+            });
+        }
+
+        const quota = Number(leaveType.annualQuota);
+
+        if (!Number.isFinite(quota) || quota <= 0) {
+            throw createError(
+                "This leave type does not have a valid annual leave limit",
+                400,
+                "INVALID_LEAVE_TYPE_QUOTA"
+            );
+        }
+
         await ensureCompanyLeaveBalances(
             company,
             year,
@@ -632,7 +902,29 @@ async function approveLeaveRequest(
             );
         }
 
-        if (remaining < approvedDays) {
+        /**
+         * Use an atomic conditional update so two admins cannot
+         * approve requests simultaneously and drive the balance
+         * below zero.
+         */
+        const balanceUpdate = await tx.leaveBalance.updateMany({
+            where: {
+                leaveBalanceId: balance.leaveBalanceId,
+                remaining: {
+                    gte: approvedDays
+                }
+            },
+            data: {
+                used: {
+                    increment: approvedDays
+                },
+                remaining: {
+                    decrement: approvedDays
+                }
+            }
+        });
+
+        if (balanceUpdate.count !== 1) {
             throw createError(
                 "Insufficient leave balance",
                 400,
@@ -660,16 +952,6 @@ async function approveLeaveRequest(
                 approvedDays: approvedDays
             },
             include: getEmployeeInclude()
-        });
-
-        await tx.leaveBalance.update({
-            where: {
-                leaveBalanceId: balance.leaveBalanceId
-            },
-            data: {
-                used: Number(balance.used) + approvedDays,
-                remaining: remaining - approvedDays
-            }
         });
 
         return updatedRequest;
@@ -755,10 +1037,7 @@ async function cancelLeaveRequest(
         throw createError("Leave request not found", 404);
     }
 
-    if (![
-        "PENDING",
-        "APPROVED"
-    ].includes(request.status)) {
+    if (!["PENDING", "APPROVED"].includes(request.status)) {
         throw createError(
             "Leave request cannot be cancelled because its current status is " + request.status,
             409
@@ -826,17 +1105,42 @@ async function cancelLeaveRequest(
             );
         }
 
+        /**
+         * System Casual Leave is unlimited, so there is no
+         * balance to restore when an approved fallback request
+         * is cancelled.
+         */
         if (balance) {
             const used = Number(balance.used);
             const remaining = Number(balance.remaining);
+
+            if (
+                !Number.isFinite(used) ||
+                !Number.isFinite(remaining) ||
+                used < 0 ||
+                remaining < 0
+            ) {
+                throw createError(
+                    "Invalid leave balance",
+                    400
+                );
+            }
+
+            const restoredUsed = Math.max(
+                0,
+                used - approvedDays
+            );
+
+            const restoredRemaining =
+                remaining + approvedDays;
 
             await tx.leaveBalance.update({
                 where: {
                     leaveBalanceId: balance.leaveBalanceId
                 },
                 data: {
-                    used: Math.max(0, used - approvedDays),
-                    remaining: remaining + approvedDays
+                    used: restoredUsed,
+                    remaining: restoredRemaining
                 }
             });
         }

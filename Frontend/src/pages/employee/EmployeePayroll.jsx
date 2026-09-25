@@ -57,6 +57,7 @@ const formatPayPeriod = (record) => {
 export function EmployeePayroll() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     let isMounted = true;
 
