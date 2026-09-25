@@ -1315,6 +1315,8 @@ const getAttendanceWorkingHoursForPeriod = async (
 // - Public holidays NEVER create Attendance records.
 // - Only paid holidays contribute credited payroll hours.
 // - Actual fingerprint attendance remains separate.
+// - A paid public holiday is eligible only when the employee's
+//   hire date is on or before the holiday date.
 // - Paid holiday hours first fill the employee's expected
 //   working hours.
 // - When actual attendance has already reached the expected
@@ -1354,6 +1356,9 @@ const getPaidPublicHolidayHoursForPeriod = async (
                     true,
 
                 branchId:
+                    true,
+
+                hireDate:
                     true
             }
         });
@@ -1404,6 +1409,71 @@ const getPaidPublicHolidayHoursForPeriod = async (
             )
         );
 
+    /*
+     * A public holiday is payable only when the employee was
+     * already employed on that holiday date.
+     *
+     * The employee hireDate is stored as the employee's joining
+     * date. Convert it to a UTC calendar date before comparing it
+     * with PublicHoliday.holidayDate, which is a DATE value stored
+     * at UTC midnight.
+     *
+     * Examples:
+     *
+     *   Holiday   = 23 Sep
+     *   Hire date = 24 Sep
+     *   Result    = holiday is NOT eligible
+     *
+     *   Holiday   = 24 Sep
+     *   Hire date = 24 Sep
+     *   Result    = holiday IS eligible
+     */
+    let effectiveStartDate =
+        startDate;
+
+    if (
+        employee.hireDate
+    ) {
+        const hireDate =
+            new Date(
+                employee.hireDate
+            );
+
+        if (
+            !Number.isNaN(
+                hireDate.getTime()
+            )
+        ) {
+            const hireDateUTC =
+                new Date(
+                    Date.UTC(
+                        hireDate.getUTCFullYear(),
+                        hireDate.getUTCMonth(),
+                        hireDate.getUTCDate()
+                    )
+                );
+
+            if (
+                hireDateUTC.getTime() >
+                effectiveStartDate.getTime()
+            ) {
+                effectiveStartDate =
+                    hireDateUTC;
+            }
+        }
+    }
+
+    /*
+     * If the employee joined after the payroll period ended,
+     * there are no eligible public holidays in this payroll
+     * period.
+     */
+    if (
+        effectiveStartDate.getTime() >
+        endDate.getTime()
+    ) {
+        return 0;
+    }
 
     const holidays =
         await prisma.publicHoliday.findMany({
@@ -1421,8 +1491,12 @@ const getPaidPublicHolidayHoursForPeriod = async (
 
                 holidayDate: {
 
+                    /*
+                     * Do not include public holidays that occurred
+                     * before the employee's hire date.
+                     */
                     gte:
-                        startDate,
+                        effectiveStartDate,
 
                     lte:
                         endDate
