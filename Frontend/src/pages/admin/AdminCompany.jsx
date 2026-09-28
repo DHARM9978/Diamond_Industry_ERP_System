@@ -25,6 +25,8 @@ import {
   employeeService,
 } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ======================================================
 // ADMIN COMPANY
@@ -243,25 +245,11 @@ export function AdminCompany() {
       return '—';
     }
 
-    const parsedDate =
-      new Date(date);
-
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-      return '—';
-    }
-
-    return parsedDate.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
+    return formatISTDate(date, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
 

@@ -25,6 +25,8 @@ import {
   publicHolidayService,
 } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 export function EmployeeDashboard() {
 
@@ -117,25 +119,11 @@ export function EmployeeDashboard() {
       return 'N/A';
     }
 
-    const date =
-      new Date(value);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return 'N/A';
-    }
-
-    return date.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
+    return formatISTDate(value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
 

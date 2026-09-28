@@ -13,6 +13,7 @@ import { useToast } from '@/context/ToastContext';
 
 import { branchService } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
 
 export function AdminBranches() {
 
@@ -344,14 +345,15 @@ export function AdminBranches() {
           );
         }
 
-        const date =
-          new Date(branch.createdAt);
-
         return (
 
           <span className="text-sm text-navy-600">
 
-            {date.toLocaleDateString()}
+            {formatISTDate(branch.createdAt, {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })}
 
           </span>
 

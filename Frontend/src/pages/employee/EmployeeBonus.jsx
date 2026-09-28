@@ -16,6 +16,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 
 import { bonusService } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // HELPERS
@@ -85,24 +87,11 @@ const formatCurrency = (value) => {
 
 
 const formatDate = (value) => {
-  if (!value) {
-    return '—';
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return '—';
-  }
-
-  return date.toLocaleDateString(
-    'en-IN',
-    {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }
-  );
+  return formatISTDate(value, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 };
 
 

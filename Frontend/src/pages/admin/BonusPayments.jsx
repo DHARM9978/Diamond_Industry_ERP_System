@@ -19,6 +19,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SearchInput } from '@/components/ui/Form';
 
 import { bonusService } from '@/services/apiServices';
+import { formatISTDate } from '@/utils/dateTime';
 
 
 // ============================================================
@@ -210,25 +211,19 @@ export function BonusPayments() {
       return '-';
     }
 
-    const date =
-      new Date(value);
+    const formatted =
+      formatISTDate(
+        value,
+        {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }
+      );
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return '-';
-    }
-
-    return date.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
+    return formatted === '—'
+      ? '-'
+      : formatted;
 
   };
 

@@ -26,6 +26,8 @@ import {
 
 import apiClient from '@/services/apiClient';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // ADMIN PAYROLL
@@ -1091,23 +1093,8 @@ const handleGenerateCurrentPayroll =
       return '-';
     }
 
-    const date =
-      new Date(
-        record.payPeriodStart
-      );
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-
-      return '-';
-
-    }
-
-    return date.toLocaleDateString(
-      'en-IN',
+    return formatISTDate(
+      record.payPeriodStart,
       {
         month: 'short',
         year: 'numeric',
@@ -1125,25 +1112,8 @@ const handleGenerateCurrentPayroll =
     date
   ) => {
 
-    if (!date) {
-      return '-';
-    }
-
-    const parsedDate =
-      new Date(date);
-
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-
-      return '-';
-
-    }
-
-    return parsedDate.toLocaleDateString(
-      'en-IN',
+    return formatISTDate(
+      date,
       {
         day: '2-digit',
         month: 'short',

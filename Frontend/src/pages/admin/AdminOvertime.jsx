@@ -19,6 +19,8 @@ import { SearchInput } from '@/components/ui/Form';
 
 import { bonusService } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // ADMIN BONUS PAYMENTS
@@ -209,25 +211,16 @@ export function AdminOvertime() {
       return '-';
     }
 
-    const date =
-      new Date(value);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return '-';
-    }
-
-    return date.toLocaleDateString(
-      'en-IN',
-      {
+    const formatted =
+      formatISTDate(value, {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-      }
-    );
+      });
+
+    return formatted === '—'
+      ? '-'
+      : formatted;
 
   };
 

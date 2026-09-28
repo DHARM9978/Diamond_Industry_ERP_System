@@ -21,6 +21,8 @@ import {
   selfService,
 } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // EMPLOYEE ADVANCES
@@ -329,25 +331,16 @@ export function EmployeeAdvances() {
       return '-';
     }
 
-    const parsedDate =
-      new Date(date);
-
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-      return '-';
-    }
-
-    return parsedDate.toLocaleDateString(
-      'en-IN',
-      {
+    const formatted =
+      formatISTDate(date, {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-      }
-    );
+      });
+
+    return formatted === '—'
+      ? '-'
+      : formatted;
   };
 
 

@@ -21,6 +21,8 @@ import { FullPageSpinner } from '@/components/ui/Spinner';
 
 import { selfService } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // Helpers
@@ -59,17 +61,15 @@ const formatDate = (value) => {
     return '—';
   }
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return String(value);
-  }
-
-  return date.toLocaleDateString('en-IN', {
+  const formatted = formatISTDate(value, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
+
+  return formatted === '—'
+    ? String(value)
+    : formatted;
 };
 
 

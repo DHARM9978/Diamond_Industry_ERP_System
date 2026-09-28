@@ -18,6 +18,11 @@ import { EmptyState } from '@/components/ui/EmptyState';
 
 import { publicHolidayService } from '@/services/apiServices';
 
+import {
+  formatISTDate,
+  getISTDateString,
+} from '@/utils/dateTime';
+
 
 // ============================================================
 // HELPERS
@@ -69,58 +74,24 @@ const getDateKey = (value) => {
     return '';
   }
 
-  if (typeof value === 'string') {
-    const match = value.match(
-      /^\d{4}-\d{2}-\d{2}/
-    );
-
-    if (match) {
-      return match[0];
-    }
+  if (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+    return value;
   }
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return '';
-  }
-
-  const year = date.getFullYear();
-  const month = String(
-    date.getMonth() + 1
-  ).padStart(2, '0');
-  const day = String(
-    date.getDate()
-  ).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
+  return getISTDateString(value);
 };
 
 
 const formatDate = (value) => {
-  const dateKey = getDateKey(value);
-
-  if (!dateKey) {
-    return '—';
-  }
-
-  const date = new Date(
-    `${dateKey}T00:00:00`
-  );
-
-  if (Number.isNaN(date.getTime())) {
-    return '—';
-  }
-
-  return date.toLocaleDateString(
-    'en-IN',
-    {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }
-  );
+  return formatISTDate(value, {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 };
 
 
@@ -1201,3 +1172,4 @@ export function EmployeePublicHolidays() {
 // ============================================================
 
 export default EmployeePublicHolidays;
+

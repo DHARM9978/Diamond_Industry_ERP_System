@@ -22,6 +22,8 @@ import { SearchInput } from '@/components/ui/Form';
 import { useToast } from '@/context/ToastContext';
 import { advanceService } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 // ============================================================
 // ADMIN ADVANCES
@@ -156,25 +158,16 @@ export function AdminAdvances() {
       return '-';
     }
 
-    const parsedDate =
-      new Date(date);
-
-    if (
-      Number.isNaN(
-        parsedDate.getTime()
-      )
-    ) {
-      return '-';
-    }
-
-    return parsedDate.toLocaleDateString(
-      'en-IN',
-      {
+    const formatted =
+      formatISTDate(date, {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-      }
-    );
+      });
+
+    return formatted === '—'
+      ? '-'
+      : formatted;
   };
 
 

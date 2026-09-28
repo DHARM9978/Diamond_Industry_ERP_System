@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { selfService } from '@/services/apiServices';
+import { formatISTDate } from '@/utils/dateTime';
 
 const formatCurrency = (value) => {
   const number = Number(value || 0);
@@ -27,11 +28,7 @@ const formatNumber = (value) => {
 const formatDate = (value) => {
   if (!value) return '—';
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return '—';
-
-  return date.toLocaleDateString('en-IN', {
+  return formatISTDate(value, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

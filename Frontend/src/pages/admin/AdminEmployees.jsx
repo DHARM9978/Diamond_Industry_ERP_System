@@ -26,6 +26,8 @@ import {
   departmentService,
 } from '@/services/apiServices';
 
+import { getISTDateString } from '@/utils/dateTime';
+
 
 // ============================================================
 // Helpers
@@ -1172,9 +1174,9 @@ function EmployeeModal({
 
       const hireDate =
         editing?.hireDate
-          ? String(
+          ? getISTDateString(
               editing.hireDate
-            ).substring(0, 10)
+            )
           : '';
 
 

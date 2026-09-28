@@ -31,6 +31,12 @@ import {
   leaveService,
 } from '@/services/apiServices';
 
+import {
+  formatISTDate,
+  formatISTTime,
+  getISTDateString,
+} from '@/utils/dateTime';
+
 
 // ============================================================================
 // ADMIN REPORTS
@@ -180,96 +186,69 @@ export function AdminReports() {
 
   // ==========================================================================
   // FORMAT DATE
-  // ==========================================================================
+  // ============================================================================
 
   const formatDate = (value) => {
     if (!value) {
       return '—';
     }
 
-    const date =
-      new Date(value);
+    const formatted = formatISTDate(value, {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return String(value);
-    }
-
-    return date.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }
-    );
+    return formatted === '—'
+      ? String(value)
+      : formatted;
   };
 
 
-  // ==========================================================================
+  // ============================================================================
   // FORMAT MONTH
-  // ==========================================================================
+  // ============================================================================
 
   const formatMonth = (value) => {
     if (!value) {
       return '—';
     }
 
-    const date =
-      new Date(value);
+    const date = new Date(value);
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
+    if (Number.isNaN(date.getTime())) {
       return String(value);
     }
 
-    return date.toLocaleDateString(
-      'en-IN',
-      {
-        month: 'long',
-        year: 'numeric',
-      }
-    );
+    return new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      month: 'long',
+      year: 'numeric',
+    }).format(date);
   };
 
 
-  // ==========================================================================
+  // ============================================================================
   // FORMAT TIME
-  // ==========================================================================
+  // ============================================================================
 
   const formatTime = (value) => {
     if (!value) {
       return '--';
     }
 
-    const date =
-      new Date(value);
+    const formatted = formatISTTime(value, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
 
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return String(value);
-    }
-
-    return date.toLocaleTimeString(
-      'en-IN',
-      {
-        hour: '2-digit',
-        minute: '2-digit',
-      }
-    );
+    return formatted === '—'
+      ? String(value)
+      : formatted;
   };
 
 
-  // ==========================================================================
   // FORMAT CURRENCY
   // ==========================================================================
 
@@ -1801,9 +1780,7 @@ export function AdminReports() {
 
 
     link.download =
-      `${reportType}-report-${new Date()
-        .toISOString()
-        .slice(0, 10)}.csv`;
+      `${reportType}-report-${getISTDateString(new Date())}.csv`;
 
 
     document.body.appendChild(

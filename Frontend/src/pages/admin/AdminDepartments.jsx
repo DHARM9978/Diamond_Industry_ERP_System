@@ -17,6 +17,8 @@ import {
   employeeService,
 } from '@/services/apiServices';
 
+import { formatISTDate } from '@/utils/dateTime';
+
 
 export function AdminDepartments() {
 
@@ -625,17 +627,18 @@ export function AdminDepartments() {
         }
 
 
-        const date =
-          new Date(
-            department.createdAt
-          );
-
-
         return (
 
           <span className="text-sm text-navy-600">
 
-            {date.toLocaleDateString()}
+            {formatISTDate(
+              department.createdAt,
+              {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              }
+            )}
 
           </span>
 

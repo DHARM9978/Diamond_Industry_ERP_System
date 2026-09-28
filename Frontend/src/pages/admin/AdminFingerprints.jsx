@@ -18,10 +18,21 @@ import { SearchInput } from '@/components/ui/Form';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/context/ToastContext';
 
-import { employeeService, fingerprintService } from '@/services/apiServices';
+import {
+  employeeService,
+  fingerprintService
+} from '@/services/apiServices';
+
+import {
+  formatISTDate,
+  formatISTTime,
+} from '@/utils/dateTime';
 
 const getEmployeeId = (employee) =>
-  employee?.employeeId ?? employee?.employee_id ?? employee?.id ?? '';
+  employee?.employeeId ??
+  employee?.employee_id ??
+  employee?.id ??
+  '';
 
 const getEmployeeName = (employee) => {
   if (!employee) return 'Unknown Employee';
@@ -29,12 +40,20 @@ const getEmployeeName = (employee) => {
 
   const firstName = employee?.firstName || '';
   const lastName = employee?.lastName || '';
-  return `${firstName} ${lastName}`.trim() || 'Unknown Employee';
+
+  return (
+    `${firstName} ${lastName}`.trim() ||
+    'Unknown Employee'
+  );
 };
 
 const normalizeList = (response) => {
   if (Array.isArray(response)) return response;
-  if (Array.isArray(response?.data)) return response.data;
+
+  if (Array.isArray(response?.data)) {
+    return response.data;
+  }
+
   return [];
 };
 
@@ -43,28 +62,47 @@ export function AdminFingerprints() {
 
   const [records, setRecords] = useState([]);
   const [employees, setEmployees] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [employeesLoading, setEmployeesLoading] = useState(true);
+
   const [search, setSearch] = useState('');
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const [enrollmentProgress, setEnrollmentProgress] = useState(null);
-  const [enrollmentPollingError, setEnrollmentPollingError] = useState('');
-  const [cancellingEnrollment, setCancellingEnrollment] = useState(false);
+  const [enrollmentProgress, setEnrollmentProgress] =
+    useState(null);
 
-  const loadFingerprints = async (showFullPageLoading = true) => {
+  const [enrollmentPollingError, setEnrollmentPollingError] =
+    useState('');
+
+  const [cancellingEnrollment, setCancellingEnrollment] =
+    useState(false);
+
+  const loadFingerprints = async (
+    showFullPageLoading = true
+  ) => {
     try {
       if (showFullPageLoading) {
         setLoading(true);
       }
 
-      const response = await fingerprintService.list();
-      setRecords(normalizeList(response));
+      const response =
+        await fingerprintService.list();
+
+      setRecords(
+        normalizeList(response)
+      );
+
     } catch (error) {
-      console.error('Failed to load fingerprints:', error);
+
+      console.error(
+        'Failed to load fingerprints:',
+        error
+      );
+
       setRecords([]);
 
       toast(
@@ -73,27 +111,42 @@ export function AdminFingerprints() {
         'Failed to load fingerprints',
         'error'
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
   const loadEmployees = async () => {
     try {
+
       setEmployeesLoading(true);
 
-      const response = await employeeService.list();
-      const employeeRecords = normalizeList(response);
+      const response =
+        await employeeService.list();
 
-      const activeEmployees = employeeRecords.filter(
-        (employee) =>
-          !employee?.status ||
-          String(employee.status).toUpperCase() === 'ACTIVE'
-      );
+      const employeeRecords =
+        normalizeList(response);
+
+      const activeEmployees =
+        employeeRecords.filter(
+          (employee) =>
+            !employee?.status ||
+            String(employee.status).toUpperCase() ===
+              'ACTIVE'
+        );
 
       setEmployees(activeEmployees);
+
     } catch (error) {
-      console.error('Failed to load employees:', error);
+
+      console.error(
+        'Failed to load employees:',
+        error
+      );
+
       setEmployees([]);
 
       toast(
@@ -102,8 +155,11 @@ export function AdminFingerprints() {
         'Failed to load employees',
         'error'
       );
+
     } finally {
+
       setEmployeesLoading(false);
+
     }
   };
 
@@ -117,7 +173,9 @@ export function AdminFingerprints() {
   // --------------------------------------------------
 
   useEffect(() => {
-    const enrollmentId = enrollmentProgress?.enrollmentId;
+
+    const enrollmentId =
+      enrollmentProgress?.enrollmentId;
 
     if (!enrollmentId) {
       return undefined;
@@ -129,41 +187,60 @@ export function AdminFingerprints() {
     let requestInFlight = false;
 
     const poll = async () => {
-      if (cancelled || terminalHandled || requestInFlight) {
+
+      if (
+        cancelled ||
+        terminalHandled ||
+        requestInFlight
+      ) {
         return;
       }
 
       requestInFlight = true;
 
       try {
+
         const response =
           await fingerprintService.getEnrollmentStatus(
             enrollmentId
           );
 
-        if (cancelled || terminalHandled) {
+        if (
+          cancelled ||
+          terminalHandled
+        ) {
           return;
         }
 
-        const status = response?.data || response;
+        const status =
+          response?.data ||
+          response;
 
         setEnrollmentPollingError('');
-        setEnrollmentProgress((previous) => ({
-          ...previous,
-          ...status,
-          logs: Array.isArray(status?.logs)
-            ? status.logs
-            : previous?.logs || [],
-        }));
+
+        setEnrollmentProgress(
+          (previous) => ({
+            ...previous,
+            ...status,
+
+            logs:
+              Array.isArray(status?.logs)
+                ? status.logs
+                : previous?.logs || [],
+          })
+        );
 
         const normalizedStatus =
-          String(status?.status || '').toUpperCase();
+          String(
+            status?.status || ''
+          ).toUpperCase();
 
         if (
           normalizedStatus === 'COMPLETED' ||
           normalizedStatus === 'FAILED' ||
           normalizedStatus === 'CANCELLED'
         ) {
+
           /*
            * STOP polling permanently at the terminal state.
            *
@@ -173,6 +250,7 @@ export function AdminFingerprints() {
            * which repeatedly replaced the page with the
            * full-page loading screen.
            */
+
           terminalHandled = true;
 
           if (intervalId) {
@@ -185,11 +263,17 @@ export function AdminFingerprints() {
            * full-page loading spinner while the final enrollment
            * result modal is visible.
            */
+
           await loadFingerprints(false);
           await loadEmployees();
         }
+
       } catch (error) {
-        if (cancelled || terminalHandled) {
+
+        if (
+          cancelled ||
+          terminalHandled
+        ) {
           return;
         }
 
@@ -203,18 +287,28 @@ export function AdminFingerprints() {
           error?.message ||
           'Unable to read machine progress. Retrying...'
         );
+
       } finally {
+
         requestInFlight = false;
+
       }
     };
 
     /*
      * Fetch immediately, then check once per second.
      */
+
     poll();
-    intervalId = setInterval(poll, 1000);
+
+    intervalId =
+      setInterval(
+        poll,
+        1000
+      );
 
     return () => {
+
       cancelled = true;
       terminalHandled = true;
 
@@ -222,12 +316,17 @@ export function AdminFingerprints() {
         clearInterval(intervalId);
         intervalId = null;
       }
-    };
-  }, [enrollmentProgress?.enrollmentId]);
 
+    };
+
+  }, [
+    enrollmentProgress?.enrollmentId
+  ]);
 
   const getRecordEmployeeName = (record) =>
-    getEmployeeName(record?.employee);
+    getEmployeeName(
+      record?.employee
+    );
 
   /*
    * Only employees without an existing fingerprint record
@@ -238,76 +337,167 @@ export function AdminFingerprints() {
    * who is already enrolled is selectable and then produces
    * HTTP 409.
    */
-  const enrolledEmployeeIds = useMemo(() => {
-    return new Set(
-      records
-        .map((record) => Number(record?.employeeId))
-        .filter((id) => Number.isInteger(id) && id > 0)
-    );
-  }, [records]);
 
-  const availableEmployees = useMemo(() => {
-    return employees.filter(
-      (employee) =>
-        !enrolledEmployeeIds.has(
-          Number(getEmployeeId(employee))
-        )
-    );
-  }, [employees, enrolledEmployeeIds]);
+  const enrolledEmployeeIds =
+    useMemo(() => {
+
+      return new Set(
+        records
+          .map(
+            (record) =>
+              Number(
+                record?.employeeId
+              )
+          )
+          .filter(
+            (id) =>
+              Number.isInteger(id) &&
+              id > 0
+          )
+      );
+
+    }, [records]);
+
+  const availableEmployees =
+    useMemo(() => {
+
+      return employees.filter(
+        (employee) =>
+          !enrolledEmployeeIds.has(
+            Number(
+              getEmployeeId(employee)
+            )
+          )
+      );
+
+    }, [
+      employees,
+      enrolledEmployeeIds
+    ]);
+
+  // ==================================================
+  // IST DATE FORMATTER
+  // ==================================================
 
   const formatDate = (date) => {
-    if (!date) return '—';
 
-    const parsedDate = new Date(date);
-    if (Number.isNaN(parsedDate.getTime())) return '—';
+    if (!date) {
+      return '—';
+    }
 
-    return parsedDate.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatISTDate(
+      date,
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }
+    );
+
   };
 
-  const filtered = useMemo(() => {
-    const searchTerm = search.trim().toLowerCase();
+  const filtered =
+    useMemo(() => {
 
-    if (!searchTerm) return records;
+      const searchTerm =
+        search.trim().toLowerCase();
 
-    return records.filter((record) => {
-      const employeeName =
-        getRecordEmployeeName(record).toLowerCase();
+      if (!searchTerm) {
+        return records;
+      }
 
-      const employeeId = String(record?.employeeId ?? '').toLowerCase();
-      const fingerName = String(record?.fingerName ?? '').toLowerCase();
-      const sensorSlot = String(record?.sensorSlot ?? '').toLowerCase();
-      const templateId = String(record?.templateId ?? '').toLowerCase();
-      const status = String(record?.status ?? '').toLowerCase();
+      return records.filter(
+        (record) => {
 
-      return (
-        employeeName.includes(searchTerm) ||
-        employeeId.includes(searchTerm) ||
-        fingerName.includes(searchTerm) ||
-        sensorSlot.includes(searchTerm) ||
-        templateId.includes(searchTerm) ||
-        status.includes(searchTerm)
+          const employeeName =
+            getRecordEmployeeName(
+              record
+            ).toLowerCase();
+
+          const employeeId =
+            String(
+              record?.employeeId ?? ''
+            ).toLowerCase();
+
+          const fingerName =
+            String(
+              record?.fingerName ?? ''
+            ).toLowerCase();
+
+          const sensorSlot =
+            String(
+              record?.sensorSlot ?? ''
+            ).toLowerCase();
+
+          const templateId =
+            String(
+              record?.templateId ?? ''
+            ).toLowerCase();
+
+          const status =
+            String(
+              record?.status ?? ''
+            ).toLowerCase();
+
+          return (
+            employeeName.includes(
+              searchTerm
+            ) ||
+            employeeId.includes(
+              searchTerm
+            ) ||
+            fingerName.includes(
+              searchTerm
+            ) ||
+            sensorSlot.includes(
+              searchTerm
+            ) ||
+            templateId.includes(
+              searchTerm
+            ) ||
+            status.includes(
+              searchTerm
+            )
+          );
+        }
       );
-    });
-  }, [records, search]);
+
+    }, [
+      records,
+      search
+    ]);
 
   const handleSave = async (form) => {
+
     try {
+
       setSaving(true);
 
-      const employeeId = Number(form.employeeId);
-      const fingerName = form.fingerName.trim();
+      const employeeId =
+        Number(
+          form.employeeId
+        );
+
+      const fingerName =
+        form.fingerName.trim();
 
       if (!employeeId) {
-        toast('Please select an employee', 'error');
+
+        toast(
+          'Please select an employee',
+          'error'
+        );
+
         return;
       }
 
       if (!fingerName) {
-        toast('Please select a finger', 'error');
+
+        toast(
+          'Please select a finger',
+          'error'
+        );
+
         return;
       }
 
@@ -316,47 +506,67 @@ export function AdminFingerprints() {
        * was not refreshed, never intentionally start a second
        * enrollment for an employee already present in records.
        */
+
       if (
         !editing &&
         records.some(
           (record) =>
-            Number(record?.employeeId) === employeeId
+            Number(
+              record?.employeeId
+            ) === employeeId
         )
       ) {
+
         toast(
           'This employee already has a fingerprint. Refresh the list before enrolling again.',
           'error'
         );
 
         await loadFingerprints();
+
         return;
       }
 
       if (editing) {
-        const response = await fingerprintService.update(
-          editing.templateId,
-          { fingerName }
+
+        const response =
+          await fingerprintService.update(
+            editing.templateId,
+            {
+              fingerName
+            }
+          );
+
+        const updatedRecord =
+          response?.data ||
+          response;
+
+        setRecords(
+          (prev) =>
+            prev.map(
+              (record) =>
+                record.templateId ===
+                editing.templateId
+                  ? {
+                      ...record,
+                      ...updatedRecord,
+
+                      employee:
+                        updatedRecord.employee ||
+                        record.employee,
+                    }
+                  : record
+            )
         );
 
-        const updatedRecord = response?.data || response;
-
-        setRecords((prev) =>
-          prev.map((record) =>
-            record.templateId === editing.templateId
-              ? {
-                ...record,
-                ...updatedRecord,
-                employee:
-                  updatedRecord.employee || record.employee,
-              }
-              : record
-          )
+        toast(
+          'Fingerprint updated successfully',
+          'success'
         );
-
-        toast('Fingerprint updated successfully', 'success');
 
         setModalOpen(false);
         setEditing(null);
+
         return;
       }
 
@@ -370,12 +580,16 @@ export function AdminFingerprints() {
        * available sensor slot and creates the PENDING
        * enrollment job consumed by the ESP32.
        */
-      const response = await fingerprintService.create({
-        employeeId,
-        fingerName,
-      });
 
-      const enrollment = response?.data || response;
+      const response =
+        await fingerprintService.create({
+          employeeId,
+          fingerName,
+        });
+
+      const enrollment =
+        response?.data ||
+        response;
 
       console.log(
         'Fingerprint enrollment job created:',
@@ -386,14 +600,32 @@ export function AdminFingerprints() {
       setEditing(null);
 
       setEnrollmentPollingError('');
+
       setEnrollmentProgress({
-        enrollmentId: enrollment?.enrollmentId,
-        employeeId: enrollment?.employeeId,
-        sensorSlot: enrollment?.sensorSlot,
-        fingerName: enrollment?.fingerName,
-        status: enrollment?.status || 'PENDING',
-        confidence: enrollment?.confidence ?? null,
-        errorMessage: enrollment?.errorMessage || '',
+        enrollmentId:
+          enrollment?.enrollmentId,
+
+        employeeId:
+          enrollment?.employeeId,
+
+        sensorSlot:
+          enrollment?.sensorSlot,
+
+        fingerName:
+          enrollment?.fingerName,
+
+        status:
+          enrollment?.status ||
+          'PENDING',
+
+        confidence:
+          enrollment?.confidence ??
+          null,
+
+        errorMessage:
+          enrollment?.errorMessage ||
+          '',
+
         logs: []
       });
 
@@ -401,7 +633,9 @@ export function AdminFingerprints() {
         'Enrollment request created. Waiting for the fingerprint machine...',
         'success'
       );
+
     } catch (error) {
+
       console.error(
         'Fingerprint enrollment/update error:',
         error
@@ -413,158 +647,272 @@ export function AdminFingerprints() {
         'Failed to process fingerprint enrollment',
         'error'
       );
+
     } finally {
+
       setSaving(false);
+
     }
   };
 
-  const handleCancelEnrollment = async () => {
-    const enrollmentId = Number(enrollmentProgress?.enrollmentId);
-    const currentStatus = String(
-      enrollmentProgress?.status || ''
-    ).toUpperCase();
+  const handleCancelEnrollment =
+    async () => {
 
-    if (!enrollmentId) {
-      toast('Enrollment ID is missing', 'error');
-      return;
-    }
-
-    if (!['PENDING', 'IN_PROGRESS'].includes(currentStatus)) {
-      return;
-    }
-
-    const confirmed = window.confirm(
-      'Cancel this fingerprint enrollment? The fingerprint machine will be instructed to stop this enrollment.'
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setCancellingEnrollment(true);
-      setEnrollmentPollingError('');
-
-      const response =
-        await fingerprintService.cancelEnrollment(
-          enrollmentId
+      const enrollmentId =
+        Number(
+          enrollmentProgress?.enrollmentId
         );
 
-      const cancelledEnrollment =
-        response?.data || response;
+      const currentStatus =
+        String(
+          enrollmentProgress?.status ||
+          ''
+        ).toUpperCase();
 
-      setEnrollmentProgress((previous) => ({
-        ...previous,
-        ...cancelledEnrollment,
-        status: cancelledEnrollment?.status || 'CANCELLED',
-        errorMessage:
-          cancelledEnrollment?.errorMessage ||
-          'Enrollment cancelled by administrator.',
-        logs: Array.isArray(cancelledEnrollment?.logs)
-          ? cancelledEnrollment.logs
-          : previous?.logs || [],
-      }));
+      if (!enrollmentId) {
 
-      toast(
-        'Fingerprint enrollment cancelled successfully.',
-        'success'
-      );
+        toast(
+          'Enrollment ID is missing',
+          'error'
+        );
 
-      await loadFingerprints(false);
-      await loadEmployees();
-    } catch (error) {
-      console.error(
-        'Failed to cancel fingerprint enrollment:',
-        error
-      );
+        return;
+      }
 
-      toast(
-        error?.response?.data?.message ||
-        error?.message ||
-        'Failed to cancel fingerprint enrollment',
-        'error'
-      );
-    } finally {
-      setCancellingEnrollment(false);
-    }
-  };
+      if (
+        ![
+          'PENDING',
+          'IN_PROGRESS'
+        ].includes(
+          currentStatus
+        )
+      ) {
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          'Cancel this fingerprint enrollment? The fingerprint machine will be instructed to stop this enrollment.'
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+
+        setCancellingEnrollment(
+          true
+        );
+
+        setEnrollmentPollingError('');
+
+        const response =
+          await fingerprintService.cancelEnrollment(
+            enrollmentId
+          );
+
+        const cancelledEnrollment =
+          response?.data ||
+          response;
+
+        setEnrollmentProgress(
+          (previous) => ({
+            ...previous,
+
+            ...cancelledEnrollment,
+
+            status:
+              cancelledEnrollment?.status ||
+              'CANCELLED',
+
+            errorMessage:
+              cancelledEnrollment?.errorMessage ||
+              'Enrollment cancelled by administrator.',
+
+            logs:
+              Array.isArray(
+                cancelledEnrollment?.logs
+              )
+                ? cancelledEnrollment.logs
+                : previous?.logs || [],
+          })
+        );
+
+        toast(
+          'Fingerprint enrollment cancelled successfully.',
+          'success'
+        );
+
+        await loadFingerprints(
+          false
+        );
+
+        await loadEmployees();
+
+      } catch (error) {
+
+        console.error(
+          'Failed to cancel fingerprint enrollment:',
+          error
+        );
+
+        toast(
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to cancel fingerprint enrollment',
+          'error'
+        );
+
+      } finally {
+
+        setCancellingEnrollment(
+          false
+        );
+
+      }
+    };
 
   const columns = [
     {
       key: 'employeeId',
+
       label: 'Emp ID',
+
       render: (record) => (
+
         <span className="font-mono text-xs font-semibold text-navy-600">
+
           {record.employeeId}
+
         </span>
+
       ),
     },
+
     {
       key: 'employee',
+
       label: 'Employee',
+
       render: (record) => (
+
         <div>
+
           <div className="font-medium text-navy-900">
-            {getRecordEmployeeName(record)}
+
+            {getRecordEmployeeName(
+              record
+            )}
+
           </div>
 
           {record.employee?.email && (
+
             <div className="text-xs text-navy-400">
+
               {record.employee.email}
+
             </div>
+
           )}
+
         </div>
+
       ),
     },
+
     {
       key: 'fingerName',
+
       label: 'Finger',
+
       render: (record) => (
+
         <span className="text-navy-600">
+
           {record.fingerName || '—'}
+
         </span>
+
       ),
     },
+
     {
       key: 'templateId',
+
       label: 'Template ID',
+
       render: (record) => (
+
         <span className="font-mono text-xs text-navy-500">
+
           {record.templateId || '—'}
+
         </span>
+
       ),
     },
+
     {
       key: 'sensorSlot',
+
       label: 'Sensor Slot',
+
       render: (record) => (
+
         <span className="font-mono text-xs text-navy-600">
+
           {record.sensorSlot || '—'}
+
         </span>
+
       ),
     },
+
     {
       key: 'enrolledAt',
+
       label: 'Enrolled On',
+
       render: (record) => (
+
         <span className="text-navy-500 text-sm">
-          {formatDate(record.enrolledAt)}
+
+          {formatDate(
+            record.enrolledAt
+          )}
+
         </span>
+
       ),
     },
+
     {
       key: 'status',
+
       label: 'Status',
+
       align: 'center',
+
       render: (record) => (
-        <StatusBadge status={record.status} />
+
+        <StatusBadge
+          status={record.status}
+        />
+
       ),
     },
+
     {
       key: 'actions',
+
       label: '',
+
       align: 'right',
+
       render: (record) => (
+
         <button
           type="button"
           onClick={() => {
@@ -574,23 +922,40 @@ export function AdminFingerprints() {
           className="p-2 rounded-lg text-navy-400 hover:bg-navy-100 hover:text-navy-700 transition-colors"
           title="Edit fingerprint"
         >
+
           <Pencil size={16} />
+
         </button>
+
       ),
     },
   ];
 
   if (loading) {
-    return <FullPageSpinner message="Loading fingerprints..." />;
+
+    return (
+      <FullPageSpinner
+        message="Loading fingerprints..."
+      />
+    );
+
   }
 
   return (
+
     <div>
+
       <PageHeader
         title="Fingerprints"
-        subtitle={`${filtered.length} record${filtered.length !== 1 ? 's' : ''
-          }`}
+        subtitle={
+          `${filtered.length} record${
+            filtered.length !== 1
+              ? 's'
+              : ''
+          }`
+        }
         actions={
+
           <button
             type="button"
             onClick={() => {
@@ -599,19 +964,26 @@ export function AdminFingerprints() {
             }}
             className="btn-primary"
           >
+
             <Plus size={18} />
+
             Enroll
+
           </button>
+
         }
       />
 
       <div className="mb-5 flex items-center gap-3">
+
         <div className="flex-1">
+
           <SearchInput
             value={search}
             onChange={setSearch}
             placeholder="Search by employee name, ID, finger or slot..."
           />
+
         </div>
 
         <button
@@ -620,12 +992,17 @@ export function AdminFingerprints() {
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50"
         >
+
           <RefreshCw size={16} />
+
           Refresh
+
         </button>
+
       </div>
 
       {filtered.length === 0 ? (
+
         <EmptyState
           icon={Fingerprint}
           title="No fingerprints enrolled"
@@ -635,57 +1012,116 @@ export function AdminFingerprints() {
               : 'Enroll employee fingerprints to enable biometric attendance.'
           }
         />
+
       ) : (
-        <DataTable columns={columns} data={filtered} />
+
+        <DataTable
+          columns={columns}
+          data={filtered}
+        />
+
       )}
 
       <Modal
         open={modalOpen}
         onClose={() => {
+
           if (!saving) {
+
             setModalOpen(false);
             setEditing(null);
+
           }
+
         }}
-        title={editing ? 'Edit Fingerprint' : 'Enroll Fingerprint'}
+        title={
+          editing
+            ? 'Edit Fingerprint'
+            : 'Enroll Fingerprint'
+        }
       >
+
         <FingerprintForm
           editing={editing}
+
           employees={
             editing
               ? employees
               : availableEmployees
           }
-          employeesLoading={employeesLoading}
+
+          employeesLoading={
+            employeesLoading
+          }
+
           saving={saving}
+
           onCancel={() => {
+
             setModalOpen(false);
             setEditing(null);
+
           }}
+
           onSave={handleSave}
         />
+
       </Modal>
 
       <EnrollmentProgressModal
-        enrollment={enrollmentProgress}
-        pollingError={enrollmentPollingError}
+
+        enrollment={
+          enrollmentProgress
+        }
+
+        pollingError={
+          enrollmentPollingError
+        }
+
         onClose={() => {
-          const status = String(enrollmentProgress?.status || '').toUpperCase();
+
+          const status =
+            String(
+              enrollmentProgress?.status ||
+              ''
+            ).toUpperCase();
+
           if (
             status === 'COMPLETED' ||
             status === 'FAILED' ||
             status === 'CANCELLED'
           ) {
-            setEnrollmentProgress(null);
-            setEnrollmentPollingError('');
-            setCancellingEnrollment(false);
+
+            setEnrollmentProgress(
+              null
+            );
+
+            setEnrollmentPollingError(
+              ''
+            );
+
+            setCancellingEnrollment(
+              false
+            );
+
           }
+
         }}
-        onCancelEnrollment={handleCancelEnrollment}
-        cancellingEnrollment={cancellingEnrollment}
+
+        onCancelEnrollment={
+          handleCancelEnrollment
+        }
+
+        cancellingEnrollment={
+          cancellingEnrollment
+        }
+
       />
+
     </div>
+
   );
+
 }
 
 function EnrollmentProgressModal({
@@ -695,226 +1131,456 @@ function EnrollmentProgressModal({
   onCancelEnrollment,
   cancellingEnrollment,
 }) {
-  if (!enrollment) return null;
 
-  const status = String(enrollment.status || 'PENDING').toUpperCase();
-  const isCompleted = status === 'COMPLETED';
-  const isFailed = status === 'FAILED';
-  const isCancelled = status === 'CANCELLED';
-  const isActive = !isCompleted && !isFailed && !isCancelled;
+  if (!enrollment) {
+    return null;
+  }
 
-  const logs = Array.isArray(enrollment.logs)
-    ? enrollment.logs
-    : [];
+  const status =
+    String(
+      enrollment.status ||
+      'PENDING'
+    ).toUpperCase();
 
-  const logContainerRef = useRef(null);
+  const isCompleted =
+    status === 'COMPLETED';
+
+  const isFailed =
+    status === 'FAILED';
+
+  const isCancelled =
+    status === 'CANCELLED';
+
+  const isActive =
+    !isCompleted &&
+    !isFailed &&
+    !isCancelled;
+
+  const logs =
+    Array.isArray(
+      enrollment.logs
+    )
+      ? enrollment.logs
+      : [];
+
+  const logContainerRef =
+    useRef(null);
 
   useEffect(() => {
-    const container = logContainerRef.current;
 
-    if (!container) return;
+    const container =
+      logContainerRef.current;
+
+    if (!container) {
+      return;
+    }
 
     container.scrollTo({
       top: container.scrollHeight,
       behavior: 'smooth',
     });
+
   }, [logs]);
 
-  const employeeName = getEmployeeName(enrollment.employee);
+  const employeeName =
+    getEmployeeName(
+      enrollment.employee
+    );
 
-  const formatLogTime = (value) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '--:--:--';
+  // ==================================================
+  // IST LOG TIME FORMATTER
+  // ==================================================
 
-    return date.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
+  const formatLogTime = (
+    value
+  ) => {
+
+    if (!value) {
+      return '--:--:--';
+    }
+
+    const formatted =
+      formatISTTime(
+        value,
+        {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+        }
+      );
+
+    return formatted === '—'
+      ? '--:--:--'
+      : formatted;
   };
 
   return (
+
     <Modal
       open={true}
-      onClose={isActive ? () => { } : onClose}
+      onClose={
+        isActive
+          ? () => {}
+          : onClose
+      }
       title="Fingerprint Enrollment"
     >
+
       <div className="space-y-5">
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
           <div className="rounded-lg border border-navy-100 bg-navy-50 p-3">
-            <p className="text-xs text-navy-400">Employee</p>
-            <p className="mt-1 text-sm font-semibold text-navy-900">
-              {employeeName !== 'Unknown Employee'
-                ? employeeName
-                : `Employee ${enrollment.employeeId || '—'}`}
+
+            <p className="text-xs text-navy-400">
+              Employee
             </p>
+
+            <p className="mt-1 text-sm font-semibold text-navy-900">
+
+              {
+                employeeName !==
+                'Unknown Employee'
+                  ? employeeName
+                  : `Employee ${
+                      enrollment.employeeId ||
+                      '—'
+                    }`
+              }
+
+            </p>
+
             <p className="text-xs text-navy-500 mt-0.5">
-              ID: {enrollment.employeeId || '—'}
+
+              ID: {
+                enrollment.employeeId ||
+                '—'
+              }
+
             </p>
+
           </div>
 
           <div className="rounded-lg border border-navy-100 bg-navy-50 p-3">
-            <p className="text-xs text-navy-400">Finger</p>
+
+            <p className="text-xs text-navy-400">
+              Finger
+            </p>
+
             <p className="mt-1 text-sm font-semibold text-navy-900">
-              {enrollment.fingerName || '—'}
+
+              {
+                enrollment.fingerName ||
+                '—'
+              }
+
             </p>
+
           </div>
 
           <div className="rounded-lg border border-navy-100 bg-navy-50 p-3">
-            <p className="text-xs text-navy-400">Sensor Slot</p>
-            <p className="mt-1 text-sm font-semibold text-navy-900 font-mono">
-              {enrollment.sensorSlot || '—'}
+
+            <p className="text-xs text-navy-400">
+              Sensor Slot
             </p>
+
+            <p className="mt-1 text-sm font-semibold text-navy-900 font-mono">
+
+              {
+                enrollment.sensorSlot ||
+                '—'
+              }
+
+            </p>
+
           </div>
+
         </div>
 
         <div
-          className={`rounded-lg border p-4 ${isCompleted
+          className={`rounded-lg border p-4 ${
+            isCompleted
               ? 'border-green-200 bg-green-50'
               : isFailed
                 ? 'border-red-200 bg-red-50'
                 : isCancelled
                   ? 'border-slate-200 bg-slate-50'
                   : 'border-navy-100 bg-navy-50'
-            }`}
+          }`}
         >
+
           <div className="flex items-center gap-3">
+
             {isCompleted ? (
-              <CheckCircle2 className="text-green-600" size={22} />
+
+              <CheckCircle2
+                className="text-green-600"
+                size={22}
+              />
+
             ) : isFailed ? (
-              <XCircle className="text-red-600" size={22} />
+
+              <XCircle
+                className="text-red-600"
+                size={22}
+              />
+
             ) : isCancelled ? (
-              <XCircle className="text-slate-500" size={22} />
+
+              <XCircle
+                className="text-slate-500"
+                size={22}
+              />
+
             ) : (
-              <Loader2 className="text-navy-600 animate-spin" size={22} />
+
+              <Loader2
+                className="text-navy-600 animate-spin"
+                size={22}
+              />
+
             )}
 
             <div>
+
               <p className="text-sm font-semibold text-navy-900">
-                {isCompleted
-                  ? 'Fingerprint enrolled successfully'
-                  : isFailed
-                    ? 'Fingerprint enrollment failed'
-                    : isCancelled
-                      ? 'Fingerprint enrollment cancelled'
-                      : 'Fingerprint enrollment in progress'}
+
+                {
+                  isCompleted
+                    ? 'Fingerprint enrolled successfully'
+                    : isFailed
+                      ? 'Fingerprint enrollment failed'
+                      : isCancelled
+                        ? 'Fingerprint enrollment cancelled'
+                        : 'Fingerprint enrollment in progress'
+                }
+
               </p>
+
               <p className="text-xs text-navy-500 mt-0.5">
-                {isCompleted
-                  ? `Enrollment completed${enrollment.confidence != null ? ` with confidence ${enrollment.confidence}` : ''}.`
-                  : isFailed
-                    ? enrollment.errorMessage || 'The fingerprint machine reported a failure.'
-                    : isCancelled
-                      ? enrollment.errorMessage || 'The enrollment was cancelled by the administrator.'
-                      : 'Keep this window open and follow the instructions on the fingerprint machine.'}
+
+                {
+                  isCompleted
+                    ? `Enrollment completed${
+                        enrollment.confidence != null
+                          ? ` with confidence ${enrollment.confidence}`
+                          : ''
+                      }.`
+                    : isFailed
+                      ? enrollment.errorMessage ||
+                        'The fingerprint machine reported a failure.'
+                      : isCancelled
+                        ? enrollment.errorMessage ||
+                          'The enrollment was cancelled by the administrator.'
+                        : 'Keep this window open and follow the instructions on the fingerprint machine.'
+                }
+
               </p>
+
             </div>
+
           </div>
+
         </div>
 
-        {pollingError && isActive && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-            {pollingError}
-          </div>
-        )}
+        {pollingError &&
+          isActive && (
+
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+
+              {pollingError}
+
+            </div>
+
+          )}
 
         <div>
+
           <div className="flex items-center justify-between mb-2">
+
             <div>
+
               <p className="text-sm font-semibold text-navy-800">
                 Machine Activity
               </p>
+
               <p className="text-xs text-navy-400">
                 Live progress from the fingerprint machine
               </p>
+
             </div>
 
             {isActive && (
+
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-navy-500">
-                <Circle size={8} className="fill-current" />
+
+                <Circle
+                  size={8}
+                  className="fill-current"
+                />
+
                 Live
+
               </span>
+
             )}
+
           </div>
 
           <div
             ref={logContainerRef}
             className="h-64 overflow-y-auto rounded-lg border border-navy-200 bg-slate-950 p-3 space-y-1.5"
           >
+
             {logs.length === 0 ? (
+
               <div className="h-full flex items-center justify-center text-sm text-slate-400">
+
                 Waiting for the fingerprint machine...
+
               </div>
+
             ) : (
-              logs.map((log, index) => (
-                <div
-                  key={`${log?.timestamp || index}-${index}`}
-                  className="flex items-start gap-3 text-xs font-mono"
-                >
-                  <span className="shrink-0 text-slate-500">
-                    {formatLogTime(log?.timestamp)}
-                  </span>
-                  <span className="text-slate-200 break-words">
-                    {log?.message || ''}
-                  </span>
-                </div>
-              ))
+
+              logs.map(
+                (log, index) => (
+
+                  <div
+                    key={`${
+                      log?.timestamp ||
+                      index
+                    }-${index}`}
+                    className="flex items-start gap-3 text-xs font-mono"
+                  >
+
+                    <span className="shrink-0 text-slate-500">
+
+                      {
+                        formatLogTime(
+                          log?.timestamp
+                        )
+                      }
+
+                    </span>
+
+                    <span className="text-slate-200 break-words">
+
+                      {
+                        log?.message ||
+                        ''
+                      }
+
+                    </span>
+
+                  </div>
+
+                )
+              )
+
             )}
+
           </div>
+
         </div>
 
         {isActive && (
+
           <div className="rounded-lg bg-navy-50 border border-navy-100 p-4">
+
             <div className="flex items-start gap-3">
-              <Fingerprint size={20} className="text-navy-600 mt-0.5" />
+
+              <Fingerprint
+                size={20}
+                className="text-navy-600 mt-0.5"
+              />
+
               <div>
+
                 <p className="text-sm font-medium text-navy-800">
                   What to do now
                 </p>
+
                 <p className="text-xs text-navy-500 mt-1 leading-relaxed">
+
                   Follow the machine instructions. The ERP page will update automatically after each enrollment step and will only report success after the ESP32 confirms the physical fingerprint was stored and verified.
+
                 </p>
+
               </div>
+
             </div>
+
           </div>
+
         )}
 
         <div className="flex justify-end gap-3 pt-1">
+
           {isActive && (
+
             <button
               type="button"
-              onClick={onCancelEnrollment}
-              disabled={cancellingEnrollment}
+              onClick={
+                onCancelEnrollment
+              }
+              disabled={
+                cancellingEnrollment
+              }
               className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
+
               {cancellingEnrollment ? (
+
                 <>
-                  <RefreshCw size={16} className="animate-spin" />
+                  <RefreshCw
+                    size={16}
+                    className="animate-spin"
+                  />
+
                   Cancelling...
                 </>
+
               ) : (
+
                 <>
                   <XCircle size={16} />
                   Cancel Enrollment
                 </>
+
               )}
+
             </button>
+
           )}
 
           <button
             type="button"
             onClick={onClose}
-            disabled={isActive || cancellingEnrollment}
+            disabled={
+              isActive ||
+              cancellingEnrollment
+            }
             className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isActive ? 'Enrollment Running...' : 'Close'}
-          </button>
-        </div>
-      </div>
-    </Modal>
-  );
-}
 
+            {
+              isActive
+                ? 'Enrollment Running...'
+                : 'Close'
+            }
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </Modal>
+
+  );
+
+}
 
 function FingerprintForm({
   editing,
@@ -924,46 +1590,89 @@ function FingerprintForm({
   onCancel,
   onSave,
 }) {
-  const [form, setForm] = useState({
-    employeeId: editing?.employeeId
-      ? String(editing.employeeId)
-      : '',
-    fingerName: editing?.fingerName || 'Right Index',
-  });
+
+  const [form, setForm] =
+    useState({
+
+      employeeId:
+        editing?.employeeId
+          ? String(
+              editing.employeeId
+            )
+          : '',
+
+      fingerName:
+        editing?.fingerName ||
+        'Right Index',
+
+    });
 
   useEffect(() => {
+
     setForm({
-      employeeId: editing?.employeeId
-        ? String(editing.employeeId)
-        : '',
-      fingerName: editing?.fingerName || 'Right Index',
+
+      employeeId:
+        editing?.employeeId
+          ? String(
+              editing.employeeId
+            )
+          : '',
+
+      fingerName:
+        editing?.fingerName ||
+        'Right Index',
+
     });
+
   }, [editing]);
 
-  const handleChange = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleChange = (
+    field,
+    value
+  ) => {
+
+    setForm(
+      (prev) => ({
+        ...prev,
+        [field]: value,
+      })
+    );
+
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (
+    event
+  ) => {
+
     event.preventDefault();
+
     onSave(form);
+
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5"
+    >
+
       <div className="flex flex-col gap-1.5">
+
         <label className="text-sm font-medium text-navy-700">
           Employee
         </label>
 
         <select
           className="input-field"
-          value={form.employeeId}
+          value={
+            form.employeeId
+          }
           onChange={(event) =>
-            handleChange('employeeId', event.target.value)
+            handleChange(
+              'employeeId',
+              event.target.value
+            )
           }
           required
           disabled={
@@ -972,42 +1681,87 @@ function FingerprintForm({
             Boolean(editing)
           }
         >
+
           <option value="">
-            {employeesLoading
-              ? 'Loading employees...'
-              : employees.length === 0
-                ? 'No employees available for enrollment'
-                : 'Select employee'}
+
+            {
+              employeesLoading
+                ? 'Loading employees...'
+                : employees.length === 0
+                  ? 'No employees available for enrollment'
+                  : 'Select employee'
+            }
+
           </option>
 
-          {employees.map((employee) => {
-            const employeeId = getEmployeeId(employee);
-            if (!employeeId) return null;
+          {employees.map(
+            (employee) => {
 
-            return (
-              <option key={employeeId} value={employeeId}>
-                {employeeId} — {getEmployeeName(employee)}
-                {employee.email ? ` — ${employee.email}` : ''}
-              </option>
-            );
-          })}
+              const employeeId =
+                getEmployeeId(
+                  employee
+                );
+
+              if (!employeeId) {
+                return null;
+              }
+
+              return (
+
+                <option
+                  key={employeeId}
+                  value={employeeId}
+                >
+
+                  {employeeId}
+                  {' — '}
+                  {
+                    getEmployeeName(
+                      employee
+                    )
+                  }
+
+                  {
+                    employee.email
+                      ? ` — ${employee.email}`
+                      : ''
+                  }
+
+                </option>
+
+              );
+
+            }
+          )}
+
         </select>
 
         <p className="text-xs text-navy-400">
+
           Select an active employee who does not already have
           a fingerprint record.
+
         </p>
 
-        {!editing && !employeesLoading && employees.length === 0 && (
-          <p className="text-xs text-amber-600">
-            All active employees already have a fingerprint
-            record, or no active employees are available.
-          </p>
-        )}
+        {!editing &&
+          !employeesLoading &&
+          employees.length === 0 && (
+
+            <p className="text-xs text-amber-600">
+
+              All active employees already have a fingerprint
+              record, or no active employees are available.
+
+            </p>
+
+          )}
+
       </div>
 
       {editing && (
+
         <div className="flex flex-col gap-1.5">
+
           <label className="text-sm font-medium text-navy-700">
             Sensor Slot
           </label>
@@ -1015,108 +1769,181 @@ function FingerprintForm({
           <input
             type="number"
             className="input-field bg-navy-50"
-            value={editing.sensorSlot ?? ''}
+            value={
+              editing.sensorSlot ?? ''
+            }
             readOnly
           />
 
           <p className="text-xs text-navy-400">
+
             This slot was assigned by the backend during
             enrollment and cannot be changed here.
+
           </p>
+
         </div>
+
       )}
 
       <div className="flex flex-col gap-1.5">
+
         <label className="text-sm font-medium text-navy-700">
           Finger
         </label>
 
         <select
           className="input-field"
-          value={form.fingerName}
+          value={
+            form.fingerName
+          }
           onChange={(event) =>
-            handleChange('fingerName', event.target.value)
+            handleChange(
+              'fingerName',
+              event.target.value
+            )
           }
           disabled={saving}
         >
-          <option value="Right Thumb">Right Thumb</option>
-          <option value="Left Thumb">Left Thumb</option>
-          <option value="Right Index">Right Index</option>
-          <option value="Left Index">Left Index</option>
-          <option value="Right Middle">Right Middle</option>
-          <option value="Left Middle">Left Middle</option>
-          <option value="Right Ring">Right Ring</option>
-          <option value="Left Ring">Left Ring</option>
-          <option value="Right Pinky">Right Pinky</option>
-          <option value="Left Pinky">Left Pinky</option>
+
+          <option value="Right Thumb">
+            Right Thumb
+          </option>
+
+          <option value="Left Thumb">
+            Left Thumb
+          </option>
+
+          <option value="Right Index">
+            Right Index
+          </option>
+
+          <option value="Left Index">
+            Left Index
+          </option>
+
+          <option value="Right Middle">
+            Right Middle
+          </option>
+
+          <option value="Left Middle">
+            Left Middle
+          </option>
+
+          <option value="Right Ring">
+            Right Ring
+          </option>
+
+          <option value="Left Ring">
+            Left Ring
+          </option>
+
+          <option value="Right Pinky">
+            Right Pinky
+          </option>
+
+          <option value="Left Pinky">
+            Left Pinky
+          </option>
+
         </select>
+
       </div>
 
       {!editing && (
+
         <div className="rounded-lg bg-navy-50 border border-navy-100 p-4">
+
           <div className="flex items-start gap-3">
+
             <Fingerprint
               size={20}
               className="text-navy-600 mt-0.5"
             />
 
             <div>
+
               <p className="text-sm font-medium text-navy-800">
+
                 Fingerprint enrollment
+
               </p>
 
               <p className="text-xs text-navy-500 mt-1 leading-relaxed">
+
                 Select the employee and finger, then click
                 Enroll. The backend will automatically assign
                 the next available sensor slot and send the
                 enrollment request to the connected fingerprint
                 machine.
+
               </p>
 
               <p className="text-xs text-navy-500 mt-2 leading-relaxed">
+
                 After clicking Enroll, follow the fingerprint
                 machine instructions to scan the same finger
                 twice. The fingerprint table will show the
                 record only after the ESP32 successfully stores
                 the physical template and reports success.
+
               </p>
+
             </div>
+
           </div>
+
         </div>
+
       )}
 
       {editing && (
+
         <div className="rounded-lg bg-navy-50 border border-navy-100 p-4">
+
           <div className="flex items-start gap-3">
+
             <Fingerprint
               size={20}
               className="text-navy-600 mt-0.5"
             />
 
             <div>
+
               <p className="text-sm font-medium text-navy-800">
+
                 Fingerprint metadata
+
               </p>
 
               <p className="text-xs text-navy-500 mt-1 leading-relaxed">
+
                 Editing changes the fingerprint record
                 metadata only. It does not re-enroll or replace
                 the physical fingerprint template stored in the
                 sensor.
+
               </p>
+
             </div>
+
           </div>
+
         </div>
+
       )}
 
       <div className="flex justify-end gap-3 pt-2">
+
         <button
           type="button"
           onClick={onCancel}
           disabled={saving}
           className="btn-secondary disabled:opacity-50"
         >
+
           Cancel
+
         </button>
 
         <button
@@ -1124,23 +1951,53 @@ function FingerprintForm({
           disabled={
             saving ||
             employeesLoading ||
-            (!editing && employees.length === 0)
+            (
+              !editing &&
+              employees.length === 0
+            )
           }
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
+
           {saving ? (
+
             <>
-              <RefreshCw size={16} className="animate-spin" />
-              {editing ? 'Updating...' : 'Starting Enrollment...'}
+              <RefreshCw
+                size={16}
+                className="animate-spin"
+              />
+
+              {
+                editing
+                  ? 'Updating...'
+                  : 'Starting Enrollment...'
+              }
+
             </>
+
           ) : (
+
             <>
-              <Fingerprint size={16} />
-              {editing ? 'Update' : 'Enroll'}
+
+              <Fingerprint
+                size={16}
+              />
+
+              {
+                editing
+                  ? 'Update'
+                  : 'Enroll'
+              }
+
             </>
+
           )}
+
         </button>
+
       </div>
+
     </form>
+
   );
 }
