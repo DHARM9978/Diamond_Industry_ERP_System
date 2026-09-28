@@ -5,66 +5,65 @@ const prisma = require("../config/database");
 // ======================================================
 
 const IST_OFFSET_MS =
-    5.5 * 60 * 60 * 1000;
-
+5.5 * 60 * 60 * 1000;
 
 // ======================================================
 // DATE / TIME HELPERS
 // ======================================================
 
 const getISTDateParts = (date) => {
-    const utcDate = new Date(date);
+const utcDate = new Date(date);
 
-    const istDate = new Date(
-        utcDate.getTime() + IST_OFFSET_MS
-    );
+const istDate = new Date(
+    utcDate.getTime() + IST_OFFSET_MS
+);
 
-    return {
-        year: istDate.getUTCFullYear(),
-        month: istDate.getUTCMonth(),
-        day: istDate.getUTCDate()
-    };
+return {
+    year: istDate.getUTCFullYear(),
+    month: istDate.getUTCMonth(),
+    day: istDate.getUTCDate()
 };
 
+};
 
 const getStartOfDay = (date) => {
-    const {
+const {
+year,
+month,
+day
+} = getISTDateParts(date);
+
+return new Date(
+    Date.UTC(
         year,
         month,
-        day
-    } = getISTDateParts(date);
+        day,
+        0,
+        0,
+        0,
+        0
+    ) - IST_OFFSET_MS
+);
 
-    return new Date(
-        Date.UTC(
-            year,
-            month,
-            day,
-            0,
-            0,
-            0,
-            0
-        ) - IST_OFFSET_MS
-    );
 };
-
 
 const getEndOfDay = (date) => {
-    return new Date(
-        getStartOfDay(date).getTime() +
-        (24 * 60 * 60 * 1000) -
-        1
-    );
+return new Date(
+getStartOfDay(date).getTime() +
+(24 * 60 * 60 * 1000) -
+1
+);
 };
 
-
 const getISTDateString = (date) => {
-    const {
-        year,
-        month,
-        day
-    } = getISTDateParts(date);
+const {
+year,
+month,
+day
+} = getISTDateParts(date);
 
-    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
 };
 
 // ======================================================
@@ -86,35 +85,36 @@ const getISTDateString = (date) => {
 // ======================================================
 
 const getISTCalendarDate = (date) => {
-    const {
+const {
+year,
+month,
+day
+} = getISTDateParts(date);
+
+return new Date(
+    Date.UTC(
         year,
         month,
-        day
-    } = getISTDateParts(date);
+        day,
+        0,
+        0,
+        0,
+        0
+    )
+);
 
-    return new Date(
-        Date.UTC(
-            year,
-            month,
-            day,
-            0,
-            0,
-            0,
-            0
-        )
-    );
 };
 
 const getNextISTCalendarDate = (date) => {
-    const calendarDate =
-        getISTCalendarDate(date);
+const calendarDate =
+getISTCalendarDate(date);
 
-    return new Date(
-        calendarDate.getTime() +
-        (24 * 60 * 60 * 1000)
-    );
+return new Date(
+    calendarDate.getTime() +
+    (24 * 60 * 60 * 1000)
+);
+
 };
-
 
 // ======================================================
 // MYSQL TIME HELPERS
@@ -129,79 +129,79 @@ const getNextISTCalendarDate = (date) => {
 // ======================================================
 
 const timeValueToMinutes = (timeValue) => {
-    if (!timeValue) {
-        return null;
-    }
+if (!timeValue) {
+return null;
+}
 
-    if (typeof timeValue === "string") {
-        const parts = timeValue
-            .split(":")
-            .map(Number);
-
-        return (
-            parts[0] * 60 +
-            parts[1] +
-            ((parts[2] || 0) / 60)
-        );
-    }
+if (typeof timeValue === "string") {
+    const parts = timeValue
+        .split(":")
+        .map(Number);
 
     return (
-        timeValue.getUTCHours() * 60 +
-        timeValue.getUTCMinutes() +
-        (
-            timeValue.getUTCSeconds() / 60
-        )
+        parts[0] * 60 +
+        parts[1] +
+        ((parts[2] || 0) / 60)
     );
+}
+
+return (
+    timeValue.getUTCHours() * 60 +
+    timeValue.getUTCMinutes() +
+    (
+        timeValue.getUTCSeconds() / 60
+    )
+);
+
 };
 
-
 const formatTimeValue = (timeValue) => {
-    if (!timeValue) {
+if (!timeValue) {
+return null;
+}
+
+// Already a time string
+if (typeof timeValue === "string") {
+    const match = timeValue.match(
+        /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
+    );
+
+    if (!match) {
         return null;
     }
 
-    // Already a time string
-    if (typeof timeValue === "string") {
-        const match = timeValue.match(
-            /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
-        );
+    const hours = String(
+        Number(match[1])
+    ).padStart(2, "0");
 
-        if (!match) {
-            return null;
-        }
+    const minutes = match[2];
 
-        const hours = String(
-            Number(match[1])
-        ).padStart(2, "0");
+    const seconds =
+        match[3] || "00";
 
-        const minutes = match[2];
+    return `${hours}:${minutes}:${seconds}`;
+}
 
-        const seconds =
-            match[3] || "00";
+// Prisma MySQL TIME -> Date
+if (timeValue instanceof Date) {
+    return [
+        String(
+            timeValue.getUTCHours()
+        ).padStart(2, "0"),
 
-        return `${hours}:${minutes}:${seconds}`;
-    }
+        String(
+            timeValue.getUTCMinutes()
+        ).padStart(2, "0"),
 
-    // Prisma MySQL TIME -> Date
-    if (timeValue instanceof Date) {
-        return [
-            String(
-                timeValue.getUTCHours()
-            ).padStart(2, "0"),
+        String(
+            timeValue.getUTCSeconds()
+        ).padStart(2, "0")
+    ].join(":");
+}
 
-            String(
-                timeValue.getUTCMinutes()
-            ).padStart(2, "0"),
+return null;
 
-            String(
-                timeValue.getUTCSeconds()
-            ).padStart(2, "0")
-        ].join(":");
-    }
-
-    return null;
 };
-
 
 // ======================================================
 // CONVERT REAL TIMESTAMP TO IST MYSQL TIME
@@ -209,37 +209,37 @@ const formatTimeValue = (timeValue) => {
 //
 // AttendancePunch.punchedAt is a real DateTime instant.
 // Attendance.checkInTime/checkOutTime are MySQL TIME values.
-// Convert the instant to the Indian clock and keep only HH:mm:ss.
+// Convert the instant to the Indian clock and keep only HH:mm.
 // ======================================================
 
 const createMySQLTimeFromIST = (dateValue) => {
-    if (!dateValue) {
-        return null;
-    }
+if (!dateValue) {
+return null;
+}
 
-    const date = new Date(dateValue);
+const date = new Date(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
+if (Number.isNaN(date.getTime())) {
+    return null;
+}
 
-    const istDate = new Date(
-        date.getTime() + IST_OFFSET_MS
-    );
+const istDate = new Date(
+    date.getTime() + IST_OFFSET_MS
+);
 
-    return new Date(
-        Date.UTC(
-            1970,
-            0,
-            1,
-            istDate.getUTCHours(),
-            istDate.getUTCMinutes(),
-            istDate.getUTCSeconds(),
-            0
-        )
-    );
+return new Date(
+    Date.UTC(
+        1970,
+        0,
+        1,
+        istDate.getUTCHours(),
+        istDate.getUTCMinutes(),
+        istDate.getUTCSeconds(),
+        0
+    )
+);
+
 };
-
 
 // ======================================================
 // BUILD TODAY'S ATTENDANCE VIEW FROM RAW PUNCHES
@@ -251,321 +251,411 @@ const createMySQLTimeFromIST = (dateValue) => {
 // ======================================================
 
 const buildTodayAttendanceFromPunches = (punches, now) => {
-    const groups = new Map();
+const groups = new Map();
 
-    for (const punch of punches) {
-        const key =
-            `${punch.employeeId}|${getISTDateString(punch.punchedAt)}`;
+for (const punch of punches) {
+    const key =
+        `${punch.employeeId}|${getISTDateString(punch.punchedAt)}`;
 
-        if (!groups.has(key)) {
-            groups.set(key, {
-                employeeId: punch.employeeId,
-                employee: punch.employee || null,
-                date: getStartOfDay(punch.punchedAt),
-                punches: []
-            });
-        }
-
-        groups.get(key).punches.push(punch);
-    }
-
-    const result = [];
-
-    for (const group of groups.values()) {
-        let firstIn = null;
-        let lastOut = null;
-        let openIn = null;
-        let totalMilliseconds = 0;
-
-        for (const punch of group.punches) {
-            if (punch.punchType === "IN") {
-                if (firstIn === null) {
-                    firstIn = new Date(punch.punchedAt);
-                }
-
-                if (openIn === null) {
-                    openIn = new Date(punch.punchedAt);
-                }
-            }
-            else if (punch.punchType === "OUT") {
-                lastOut = new Date(punch.punchedAt);
-
-                if (openIn !== null) {
-                    const duration =
-                        lastOut.getTime() - openIn.getTime();
-
-                    if (duration > 0) {
-                        totalMilliseconds += duration;
-                    }
-
-                    openIn = null;
-                }
-            }
-        }
-
-        // Still checked in: count time from the unmatched IN until now.
-        if (openIn !== null) {
-            const ongoingDuration =
-                now.getTime() - openIn.getTime();
-
-            if (ongoingDuration > 0) {
-                totalMilliseconds += ongoingDuration;
-            }
-        }
-
-        const totalHours =
-            totalMilliseconds /
-            (1000 * 60 * 60);
-
-        result.push({
-            employeeId: group.employeeId,
-            date: group.date,
-            checkInTime: firstIn
-                ? createMySQLTimeFromIST(firstIn)
-                : null,
-            checkOutTime: lastOut
-                ? createMySQLTimeFromIST(lastOut)
-                : null,
-            totalHours: totalHours > 0
-                ? Number(totalHours.toFixed(2))
-                : null,
-            status: "PRESENT",
-            employee: group.employee
+    if (!groups.has(key)) {
+        groups.set(key, {
+            employeeId: punch.employeeId,
+            employee: punch.employee || null,
+            date: getStartOfDay(punch.punchedAt),
+            punches: []
         });
     }
 
-    return result;
+    groups.get(key).punches.push(punch);
+}
+
+const result = [];
+
+for (const group of groups.values()) {
+    let firstIn = null;
+    let lastOut = null;
+    let openIn = null;
+    let totalMilliseconds = 0;
+
+    for (const punch of group.punches) {
+        if (punch.punchType === "IN") {
+            if (firstIn === null) {
+                firstIn = new Date(punch.punchedAt);
+            }
+
+            if (openIn === null) {
+                openIn = new Date(punch.punchedAt);
+            }
+        }
+        else if (punch.punchType === "OUT") {
+            lastOut = new Date(punch.punchedAt);
+
+            if (openIn !== null) {
+                const duration =
+                    lastOut.getTime() - openIn.getTime();
+
+                if (duration > 0) {
+                    totalMilliseconds += duration;
+                }
+
+                openIn = null;
+            }
+        }
+    }
+
+    // Still checked in: count time from the unmatched IN until now.
+    if (openIn !== null) {
+        const ongoingDuration =
+            now.getTime() - openIn.getTime();
+
+        if (ongoingDuration > 0) {
+            totalMilliseconds += ongoingDuration;
+        }
+    }
+
+    const totalHours =
+        totalMilliseconds /
+        (1000 * 60 * 60);
+
+    result.push({
+        employeeId: group.employeeId,
+        date: group.date,
+        checkInTime: firstIn
+            ? createMySQLTimeFromIST(firstIn)
+            : null,
+        checkOutTime: lastOut
+            ? createMySQLTimeFromIST(lastOut)
+            : null,
+        totalHours: totalHours > 0
+            ? Number(totalHours.toFixed(2))
+            : null,
+        status: "PRESENT",
+        employee: group.employee
+    });
+}
+
+return result;
+
 };
+
+// ======================================================
+// CALCULATE RAW PUNCH SESSION STATE
+// ======================================================
+//
+// AttendancePunch is the source of truth for whether the final
+// session of a day is still open.
+//
+// Examples:
+//
+//   IN -> OUT
+//       hasOpenSession = false
+//
+//   IN -> OUT -> IN
+//       hasOpenSession = true
+//
+// The helper also calculates the completed-session hours without
+// counting the final unmatched IN.
+// ======================================================
+
+const calculatePunchSessionState = (
+punches = []
+) => {
+const sortedPunches =
+[...punches].sort(
+(a, b) =>
+new Date(a.punchedAt).getTime() -
+new Date(b.punchedAt).getTime()
+);
+
+let firstIn = null;
+let lastOut = null;
+let openIn = null;
+let completedMilliseconds = 0;
+
+for (const punch of sortedPunches) {
+    if (punch.punchType === "IN") {
+        if (firstIn === null) {
+            firstIn = new Date(punch.punchedAt);
+        }
+
+        if (openIn === null) {
+            openIn = new Date(punch.punchedAt);
+        }
+    }
+    else if (punch.punchType === "OUT") {
+        const outTime =
+            new Date(punch.punchedAt);
+
+        lastOut = outTime;
+
+        if (openIn !== null) {
+            const duration =
+                outTime.getTime() -
+                openIn.getTime();
+
+            if (duration > 0) {
+                completedMilliseconds +=
+                    duration;
+            }
+
+            openIn = null;
+        }
+    }
+}
+
+return {
+    punches: sortedPunches,
+
+    firstIn,
+
+    lastOut,
+
+    openIn,
+
+    hasOpenSession:
+        openIn !== null,
+
+    completedHours:
+        Number(
+            (
+                completedMilliseconds /
+                (1000 * 60 * 60)
+            ).toFixed(2)
+        )
+};
+
+};
+
 
 
 const parseTime = (
-    value,
-    fieldName
+value,
+fieldName
 ) => {
-    if (value === null) {
-        return null;
-    }
+if (value === null) {
+return null;
+}
 
-    if (
-        typeof value !== "string" ||
-        !/^\d{2}:\d{2}(:\d{2})?$/.test(value)
-    ) {
-        const error = new Error(
-            `${fieldName} must use HH:mm or HH:mm:ss format`
-        );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-    const parts =
-        value.split(":").map(Number);
-
-    const hours = parts[0];
-    const minutes = parts[1];
-    const seconds = parts[2] ?? 0;
-
-    if (
-        hours < 0 ||
-        hours > 23 ||
-        minutes < 0 ||
-        minutes > 59 ||
-        seconds < 0 ||
-        seconds > 59
-    ) {
-        const error = new Error(
-            `${fieldName} contains an invalid time`
-        );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-    return new Date(
-        Date.UTC(
-            1970,
-            0,
-            1,
-            hours,
-            minutes,
-            seconds,
-            0
-        )
+if (
+    typeof value !== "string" ||
+    !/^\d{2}:\d{2}(:\d{2})?$/.test(value)
+) {
+    const error = new Error(
+        `${fieldName} must use HH:mm or HH:mm:ss format`
     );
-};
 
+    error.statusCode = 400;
+
+    throw error;
+}
+
+const parts =
+    value.split(":").map(Number);
+
+const hours = parts[0];
+const minutes = parts[1];
+const seconds = parts[2] ?? 0;
+
+if (
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59 ||
+    seconds < 0 ||
+    seconds > 59
+) {
+    const error = new Error(
+        `${fieldName} contains an invalid time`
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+return new Date(
+    Date.UTC(
+        1970,
+        0,
+        1,
+        hours,
+        minutes,
+        seconds,
+        0
+    )
+);
+
+};
 
 // ======================================================
 // COMBINE ATTENDANCE DATE + TIME
 // ======================================================
 
 const combineAttendanceDateAndTime = (
-    attendanceDate,
-    timeValue
+attendanceDate,
+timeValue
 ) => {
-    if (
-        !attendanceDate ||
-        !timeValue
-    ) {
-        return null;
-    }
+if (
+!attendanceDate ||
+!timeValue
+) {
+return null;
+}
 
-    const {
+const {
+    year,
+    month,
+    day
+} = getISTDateParts(attendanceDate);
+
+const hours =
+    timeValue instanceof Date
+        ? timeValue.getUTCHours()
+        : Number(
+            String(timeValue)
+                .split(":")[0]
+        );
+
+const minutes =
+    timeValue instanceof Date
+        ? timeValue.getUTCMinutes()
+        : Number(
+            String(timeValue)
+                .split(":")[1]
+        );
+
+const seconds =
+    timeValue instanceof Date
+        ? timeValue.getUTCSeconds()
+        : Number(
+            String(timeValue)
+                .split(":")[2] || 0
+        );
+
+const milliseconds =
+    timeValue instanceof Date
+        ? timeValue.getUTCMilliseconds()
+        : 0;
+
+return new Date(
+    Date.UTC(
         year,
         month,
-        day
-    } = getISTDateParts(attendanceDate);
+        day,
+        hours,
+        minutes,
+        seconds,
+        milliseconds
+    ) - IST_OFFSET_MS
+);
 
-    const hours =
-        timeValue instanceof Date
-            ? timeValue.getUTCHours()
-            : Number(
-                String(timeValue)
-                    .split(":")[0]
-            );
-
-    const minutes =
-        timeValue instanceof Date
-            ? timeValue.getUTCMinutes()
-            : Number(
-                String(timeValue)
-                    .split(":")[1]
-            );
-
-    const seconds =
-        timeValue instanceof Date
-            ? timeValue.getUTCSeconds()
-            : Number(
-                String(timeValue)
-                    .split(":")[2] || 0
-            );
-
-    const milliseconds =
-        timeValue instanceof Date
-            ? timeValue.getUTCMilliseconds()
-            : 0;
-
-    return new Date(
-        Date.UTC(
-            year,
-            month,
-            day,
-            hours,
-            minutes,
-            seconds,
-            milliseconds
-        ) - IST_OFFSET_MS
-    );
 };
-
 
 // ======================================================
 // CALCULATE TOTAL HOURS
 // ======================================================
 
 const calculateTotalHours = (
-    attendanceDate,
-    checkInTime,
-    checkOutTime
+attendanceDate,
+checkInTime,
+checkOutTime
 ) => {
-    if (
-        !attendanceDate ||
-        !checkInTime ||
-        !checkOutTime
-    ) {
-        return null;
-    }
+if (
+!attendanceDate ||
+!checkInTime ||
+!checkOutTime
+) {
+return null;
+}
 
-    const checkInInstant =
-        combineAttendanceDateAndTime(
-            attendanceDate,
-            checkInTime
-        );
-
-    if (!checkInInstant) {
-        return null;
-    }
-
-    const checkOutInstant =
-        new Date(checkOutTime);
-
-    let milliseconds =
-        checkOutInstant.getTime() -
-        checkInInstant.getTime();
-
-    /*
-     * If the OUT time is earlier because the
-     * attendance crossed midnight, add one day.
-     */
-    if (milliseconds < 0) {
-        milliseconds +=
-            24 * 60 * 60 * 1000;
-    }
-
-    const hours =
-        milliseconds /
-        (1000 * 60 * 60);
-
-    return Number(
-        hours.toFixed(2)
+const checkInInstant =
+    combineAttendanceDateAndTime(
+        attendanceDate,
+        checkInTime
     );
-};
 
+if (!checkInInstant) {
+    return null;
+}
+
+const checkOutInstant =
+    new Date(checkOutTime);
+
+let milliseconds =
+    checkOutInstant.getTime() -
+    checkInInstant.getTime();
+
+/*
+ * If the OUT time is earlier because the
+ * attendance crossed midnight, add one day.
+ */
+if (milliseconds < 0) {
+    milliseconds +=
+        24 * 60 * 60 * 1000;
+}
+
+const hours =
+    milliseconds /
+    (1000 * 60 * 60);
+
+return Number(
+    hours.toFixed(2)
+);
+
+};
 
 // ======================================================
 // FORMAT TOTAL HOURS
 // ======================================================
 
 const formatDuration = (hours) => {
-    const totalMinutes =
-        Math.round(
-            Number(hours || 0) * 60
-        );
+const totalMinutes =
+Math.round(
+Number(hours || 0) * 60
+);
 
-    const wholeHours =
-        Math.floor(
-            totalMinutes / 60
-        );
+const wholeHours =
+    Math.floor(
+        totalMinutes / 60
+    );
 
-    const minutes =
-        totalMinutes % 60;
+const minutes =
+    totalMinutes % 60;
 
-    if (
-        wholeHours === 0 &&
-        minutes === 0
-    ) {
-        return "0 minutes";
-    }
+if (
+    wholeHours === 0 &&
+    minutes === 0
+) {
+    return "0 minutes";
+}
 
-    if (wholeHours === 0) {
-        return `${minutes} ${
-            minutes === 1
-                ? "minute"
-                : "minutes"
-        }`;
-    }
-
-    if (minutes === 0) {
-        return `${wholeHours} ${
-            wholeHours === 1
-                ? "hour"
-                : "hours"
-        }`;
-    }
-
-    return `${wholeHours} ${
-        wholeHours === 1
-            ? "hour"
-            : "hours"
-    } ${minutes} ${
+if (wholeHours === 0) {
+    return `${minutes} ${
         minutes === 1
             ? "minute"
             : "minutes"
     }`;
-};
+}
 
+if (minutes === 0) {
+    return `${wholeHours} ${
+        wholeHours === 1
+            ? "hour"
+            : "hours"
+    }`;
+}
+
+return `${wholeHours} ${
+    wholeHours === 1
+        ? "hour"
+        : "hours"
+} ${minutes} ${
+    minutes === 1
+        ? "minute"
+        : "minutes"
+}`;
+
+};
 
 // ======================================================
 // SERIALIZE ATTENDANCE RECORD
@@ -591,424 +681,527 @@ const formatDuration = (hours) => {
 // ======================================================
 
 const serializeAttendance = (
-    attendance
+attendance
 ) => {
-    if (!attendance) {
-        return null;
-    }
+if (!attendance) {
+return null;
+}
 
-    return {
-        ...attendance,
+return {
+    ...attendance,
 
-        date:
-            attendance.date
-                ? getISTDateString(
-                    attendance.date
-                )
-                : null,
+    date:
+        attendance.date
+            ? getISTDateString(
+                attendance.date
+            )
+            : null,
 
-        checkInTime:
-            formatTimeValue(
-                attendance.checkInTime
-            ),
+    checkInTime:
+        formatTimeValue(
+            attendance.checkInTime
+        ),
 
-        checkOutTime:
-            formatTimeValue(
-                attendance.checkOutTime
-            ),
+    checkOutTime:
+        formatTimeValue(
+            attendance.checkOutTime
+        ),
 
-        totalHours:
-            attendance.totalHours !== null &&
-            attendance.totalHours !== undefined
-                ? Number(attendance.totalHours)
-                : null
-    };
+    totalHours:
+        attendance.totalHours !== null &&
+        attendance.totalHours !== undefined
+            ? Number(attendance.totalHours)
+            : null
 };
 
+};
 
 // ======================================================
 // PROCESS DEVICE ATTENDANCE PUNCH
 // ======================================================
 
 const processDevicePunch = async (data) => {
-    const {
-        device,
-        sensorSlot
-    } = data;
+const {
+device,
+sensorSlot
+} = data;
 
-    const DUPLICATE_WINDOW_SECONDS = 30;
+const DUPLICATE_WINDOW_SECONDS = 30;
 
 
-    // ==================================================
-    // VALIDATE DEVICE
-    // ==================================================
+// ==================================================
+// VALIDATE DEVICE
+// ==================================================
 
-    if (!device) {
-        const error = new Error(
-            "Authenticated device is required"
-        );
+if (!device) {
+    const error = new Error(
+        "Authenticated device is required"
+    );
 
-        error.statusCode = 401;
+    error.statusCode = 401;
 
-        throw error;
+    throw error;
+}
+
+
+// ==================================================
+// VALIDATE SENSOR SLOT
+// ==================================================
+
+if (
+    sensorSlot === undefined ||
+    sensorSlot === null
+) {
+    const error = new Error(
+        "Sensor slot is required"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+const slot =
+    Number(sensorSlot);
+
+if (
+    !Number.isInteger(slot) ||
+    slot < 1
+) {
+    const error = new Error(
+        "Sensor slot must be a positive integer"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+// ==================================================
+// UPDATE DEVICE LAST SEEN
+// ==================================================
+
+await prisma.iotDevice.update({
+    where: {
+        deviceId:
+            device.deviceId
+    },
+
+    data: {
+        lastSeenAt:
+            new Date()
     }
+});
 
 
-    // ==================================================
-    // VALIDATE SENSOR SLOT
-    // ==================================================
+// ==================================================
+// FIND FINGERPRINT
+// ==================================================
 
-    if (
-        sensorSlot === undefined ||
-        sensorSlot === null
-    ) {
-        const error = new Error(
-            "Sensor slot is required"
-        );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-    const slot =
-        Number(sensorSlot);
-
-    if (
-        !Number.isInteger(slot) ||
-        slot < 1
-    ) {
-        const error = new Error(
-            "Sensor slot must be a positive integer"
-        );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    // ==================================================
-    // UPDATE DEVICE LAST SEEN
-    // ==================================================
-
-    await prisma.iotDevice.update({
+const fingerprint =
+    await prisma.fingerprintTemplate.findUnique({
         where: {
-            deviceId:
-                device.deviceId
+            sensorSlot: slot
         },
 
-        data: {
-            lastSeenAt:
-                new Date()
+        include: {
+            employee: true
         }
     });
 
 
-    // ==================================================
-    // FIND FINGERPRINT
-    // ==================================================
+if (!fingerprint) {
+    const error = new Error(
+        "No fingerprint is registered for this sensor slot"
+    );
 
-    const fingerprint =
-        await prisma.fingerprintTemplate.findUnique({
-            where: {
-                sensorSlot: slot
-            },
+    error.statusCode = 404;
 
-            include: {
-                employee: true
+    throw error;
+}
+
+
+// ==================================================
+// CHECK FINGERPRINT STATUS
+// ==================================================
+
+if (
+    fingerprint.status !== "ACTIVE"
+) {
+    const error = new Error(
+        "Fingerprint template is inactive"
+    );
+
+    error.statusCode = 403;
+
+    throw error;
+}
+
+
+// ==================================================
+// EMPLOYEE
+// ==================================================
+
+const employee =
+    fingerprint.employee;
+
+
+if (
+    employee.status !== "ACTIVE"
+) {
+    const error = new Error(
+        "Employee is not active"
+    );
+
+    error.statusCode = 403;
+
+    throw error;
+}
+
+
+// ==================================================
+// CURRENT TIME
+// ==================================================
+
+const punchedAt =
+    new Date();
+
+
+// ==================================================
+// TODAY IN IST
+// ==================================================
+
+const startOfToday =
+    getStartOfDay(punchedAt);
+
+const endOfToday =
+    getEndOfDay(punchedAt);
+
+
+// ==================================================
+// ==================================================
+// PREVIOUS-DAY ATTENDANCE DOES NOT BLOCK TODAY
+// ==================================================
+//
+// An employee may continue working on a new calendar day
+// even when the previous day contains an unresolved final IN.
+// That previous day is kept as a historical settlement item
+// and can be resolved later by an administrator.
+//
+// Only today's raw punches determine whether this punch is
+// IN or OUT.
+// ==================================================
+
+const todayCalendarDate =
+    getISTCalendarDate(punchedAt);
+
+
+// ==================================================
+
+// GET TODAY'S PUNCHES
+// ==================================================
+
+const todayPunches =
+    await prisma.attendancePunch.findMany({
+        where: {
+            employeeId:
+                employee.employeeId,
+
+            punchedAt: {
+                gte:
+                    startOfToday,
+
+                lte:
+                    endOfToday
             }
-        });
+        },
+
+        orderBy: {
+            punchedAt: "desc"
+        }
+    });
 
 
-    if (!fingerprint) {
-        const error = new Error(
-            "No fingerprint is registered for this sensor slot"
-        );
+// ==================================================
+// DUPLICATE PROTECTION
+// ==================================================
 
-        error.statusCode = 404;
+if (
+    todayPunches.length > 0
+) {
+    const lastPunch =
+        todayPunches[0];
 
-        throw error;
-    }
-
-
-    // ==================================================
-    // CHECK FINGERPRINT STATUS
-    // ==================================================
+    const secondsSinceLastPunch =
+        (
+            punchedAt.getTime() -
+            new Date(
+                lastPunch.punchedAt
+            ).getTime()
+        ) / 1000;
 
     if (
-        fingerprint.status !== "ACTIVE"
+        secondsSinceLastPunch >= 0 &&
+        secondsSinceLastPunch <
+            DUPLICATE_WINDOW_SECONDS
     ) {
         const error = new Error(
-            "Fingerprint template is inactive"
-        );
-
-        error.statusCode = 403;
-
-        throw error;
-    }
-
-
-    // ==================================================
-    // EMPLOYEE
-    // ==================================================
-
-    const employee =
-        fingerprint.employee;
-
-
-    if (
-        employee.status !== "ACTIVE"
-    ) {
-        const error = new Error(
-            "Employee is not active"
-        );
-
-        error.statusCode = 403;
-
-        throw error;
-    }
-
-
-    // ==================================================
-    // CURRENT TIME
-    // ==================================================
-
-    const punchedAt =
-        new Date();
-
-
-    // ==================================================
-    // TODAY IN IST
-    // ==================================================
-
-    const startOfToday =
-        getStartOfDay(punchedAt);
-
-    const endOfToday =
-        getEndOfDay(punchedAt);
-
-
-    // ==================================================
-    // CHECK FOR PREVIOUS OPEN ATTENDANCE
-    // ==================================================
-    //
-    // A previous calendar day with an IN but no OUT must be
-    // resolved by an administrator before another fingerprint
-    // punch is accepted. This prevents consecutive open
-    // attendance records and avoids guessing a checkout time.
-    // ==================================================
-
-    const todayCalendarDate =
-        getISTCalendarDate(punchedAt);
-
-    const previousOpenAttendance =
-        await prisma.attendance.findFirst({
-            where: {
-                employeeId:
-                    employee.employeeId,
-
-                date: {
-                    lt:
-                        todayCalendarDate
-                },
-
-                checkInTime: {
-                    not: null
-                },
-
-                checkOutTime: null
-            },
-
-            orderBy: {
-                date: "desc"
-            }
-        });
-
-    if (previousOpenAttendance) {
-        const openDate =
-            getISTDateString(
-                previousOpenAttendance.date
-            );
-
-        const error = new Error(
-            `Previous attendance on ${openDate} has no checkout. Please ask an administrator to resolve the missing checkout before scanning again.`
+            `Duplicate punch detected. Please wait ${DUPLICATE_WINDOW_SECONDS} seconds before scanning again.`
         );
 
         error.statusCode = 409;
 
         throw error;
     }
+}
 
 
-    // ==================================================
-    // GET TODAY'S PUNCHES
-    // ==================================================
+// ==================================================
+// DETERMINE IN / OUT
+// ==================================================
 
-    const todayPunches =
-        await prisma.attendancePunch.findMany({
-            where: {
-                employeeId:
-                    employee.employeeId,
+let punchType = "IN";
 
-                punchedAt: {
-                    gte:
-                        startOfToday,
+if (
+    todayPunches.length > 0
+) {
+    const lastPunch =
+        todayPunches[0];
 
-                    lte:
-                        endOfToday
+    punchType =
+        lastPunch.punchType === "IN"
+            ? "OUT"
+            : "IN";
+}
+
+
+console.log(
+    "Attendance punch type:",
+    punchType
+);
+
+
+// ==================================================
+// TRANSACTION
+// ==================================================
+
+const result =
+    await prisma.$transaction(
+        async (tx) => {
+
+            // ======================================
+            // CREATE RAW PUNCH
+            // ======================================
+
+            const punch =
+                await tx.attendancePunch.create({
+                    data: {
+                        employeeId:
+                            employee.employeeId,
+
+                        deviceId:
+                            device.deviceId,
+
+                        sensorSlot:
+                            slot,
+
+                        punchType:
+                            punchType,
+
+                        punchedAt:
+                            punchedAt
+                    },
+
+                    include: {
+                        employee: {
+                            select: {
+                                employeeId: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true
+                            }
+                        },
+
+                        device: {
+                            select: {
+                                deviceId: true,
+                                deviceCode: true,
+                                deviceName: true,
+                                branchId: true
+                            }
+                        }
+                    }
+                });
+
+
+            // ======================================
+            // GET ALL TODAY'S PUNCHES
+            // ======================================
+
+            const allPunches =
+                await tx.attendancePunch.findMany({
+                    where: {
+                        employeeId:
+                            employee.employeeId,
+
+                        punchedAt: {
+                            gte:
+                                startOfToday,
+
+                            lte:
+                                endOfToday
+                        }
+                    },
+
+                    orderBy: {
+                        punchedAt: "asc"
+                    }
+                });
+
+
+            // ======================================
+            // CALCULATE TOTAL WORKING TIME
+            // ======================================
+
+            let totalMilliseconds = 0;
+            let openInTime = null;
+
+
+            for (
+                const currentPunch
+                of allPunches
+            ) {
+
+                if (
+                    currentPunch.punchType === "IN"
+                ) {
+                    if (
+                        openInTime === null
+                    ) {
+                        openInTime =
+                            new Date(
+                                currentPunch.punchedAt
+                            );
+                    }
                 }
-            },
 
-            orderBy: {
-                punchedAt: "desc"
+                else if (
+                    currentPunch.punchType === "OUT"
+                ) {
+
+                    if (
+                        openInTime !== null
+                    ) {
+
+                        const outTime =
+                            new Date(
+                                currentPunch.punchedAt
+                            );
+
+                        const duration =
+                            outTime.getTime() -
+                            openInTime.getTime();
+
+                        if (
+                            duration > 0
+                        ) {
+                            totalMilliseconds +=
+                                duration;
+                        }
+
+                        openInTime = null;
+                    }
+                }
             }
-        });
 
 
-    // ==================================================
-    // DUPLICATE PROTECTION
-    // ==================================================
-
-    if (
-        todayPunches.length > 0
-    ) {
-        const lastPunch =
-            todayPunches[0];
-
-        const secondsSinceLastPunch =
-            (
-                punchedAt.getTime() -
-                new Date(
-                    lastPunch.punchedAt
-                ).getTime()
-            ) / 1000;
-
-        if (
-            secondsSinceLastPunch >= 0 &&
-            secondsSinceLastPunch <
-                DUPLICATE_WINDOW_SECONDS
-        ) {
-            const error = new Error(
-                `Duplicate punch detected. Please wait ${DUPLICATE_WINDOW_SECONDS} seconds before scanning again.`
-            );
-
-            error.statusCode = 409;
-
-            throw error;
-        }
-    }
+            const totalHours =
+                totalMilliseconds /
+                (
+                    1000 *
+                    60 *
+                    60
+                );
 
 
-    // ==================================================
-    // DETERMINE IN / OUT
-    // ==================================================
-
-    let punchType = "IN";
-
-    if (
-        todayPunches.length > 0
-    ) {
-        const lastPunch =
-            todayPunches[0];
-
-        punchType =
-            lastPunch.punchType === "IN"
-                ? "OUT"
-                : "IN";
-    }
+            const totalHoursRounded =
+                totalHours > 0
+                    ? Number(
+                        totalHours.toFixed(2)
+                    )
+                    : null;
 
 
-    console.log(
-        "Attendance punch type:",
-        punchType
-    );
+            // ======================================
+            // FIND ATTENDANCE
+            // ======================================
+
+            // Attendance.date is a MySQL DATE field.
+            // Use the pure IST calendar date here so the lookup
+            // matches the same value used when creating the row.
+            let attendance =
+                await tx.attendance.findUnique({
+                    where: {
+                        employeeId_date: {
+                            employeeId:
+                                employee.employeeId,
+
+                            date:
+                                getISTCalendarDate(
+                                    punchedAt
+                                )
+                        }
+                    }
+                });
 
 
-    // ==================================================
-    // TRANSACTION
-    // ==================================================
+            // ======================================
+            // FIRST PUNCH / CREATE
+            // ======================================
 
-    const result =
-        await prisma.$transaction(
-            async (tx) => {
+            if (!attendance) {
 
-                // ======================================
-                // CREATE RAW PUNCH
-                // ======================================
-
-                const punch =
-                    await tx.attendancePunch.create({
+                attendance =
+                    await tx.attendance.create({
                         data: {
                             employeeId:
                                 employee.employeeId,
 
-                            deviceId:
-                                device.deviceId,
+                            date:
+                                getISTCalendarDate(punchedAt),
 
-                            sensorSlot:
-                                slot,
+                            checkInTime:
+                                punchType === "IN"
+                                    ? createMySQLTimeFromIST(
+                                        punchedAt
+                                    )
+                                    : null,
 
-                            punchType:
-                                punchType,
+                            checkOutTime:
+                                punchType === "OUT"
+                                    ? createMySQLTimeFromIST(
+                                        punchedAt
+                                    )
+                                    : null,
 
-                            punchedAt:
-                                punchedAt
-                        },
+                            totalHours:
+                                totalHoursRounded,
 
-                        include: {
-                            employee: {
-                                select: {
-                                    employeeId: true,
-                                    firstName: true,
-                                    lastName: true,
-                                    email: true
-                                }
-                            },
-
-                            device: {
-                                select: {
-                                    deviceId: true,
-                                    deviceCode: true,
-                                    deviceName: true,
-                                    branchId: true
-                                }
-                            }
+                            status:
+                                "PRESENT"
                         }
                     });
+            }
 
+            // ======================================
+            // UPDATE ATTENDANCE
+            // ======================================
 
-                // ======================================
-                // GET ALL TODAY'S PUNCHES
-                // ======================================
+            else {
 
-                const allPunches =
-                    await tx.attendancePunch.findMany({
-                        where: {
-                            employeeId:
-                                employee.employeeId,
-
-                            punchedAt: {
-                                gte:
-                                    startOfToday,
-
-                                lte:
-                                    endOfToday
-                            }
-                        },
-
-                        orderBy: {
-                            punchedAt: "asc"
-                        }
-                    });
-
-
-                // ======================================
-                // CALCULATE TOTAL WORKING TIME
-                // ======================================
-
-                let totalMilliseconds = 0;
-                let openInTime = null;
+                let firstInTime = null;
+                let lastOutTime = null;
 
 
                 for (
@@ -1019,11 +1212,12 @@ const processDevicePunch = async (data) => {
                     if (
                         currentPunch.punchType === "IN"
                     ) {
+
                         if (
-                            openInTime === null
+                            firstInTime === null
                         ) {
-                            openInTime =
-                                new Date(
+                            firstInTime =
+                                createMySQLTimeFromIST(
                                     currentPunch.punchedAt
                                 );
                         }
@@ -1033,554 +1227,84 @@ const processDevicePunch = async (data) => {
                         currentPunch.punchType === "OUT"
                     ) {
 
-                        if (
-                            openInTime !== null
-                        ) {
-
-                            const outTime =
-                                new Date(
-                                    currentPunch.punchedAt
-                                );
-
-                            const duration =
-                                outTime.getTime() -
-                                openInTime.getTime();
-
-                            if (
-                                duration > 0
-                            ) {
-                                totalMilliseconds +=
-                                    duration;
-                            }
-
-                            openInTime = null;
-                        }
+                        lastOutTime =
+                            createMySQLTimeFromIST(
+                                currentPunch.punchedAt
+                            );
                     }
                 }
 
 
-                const totalHours =
-                    totalMilliseconds /
-                    (
-                        1000 *
-                        60 *
-                        60
-                    );
-
-
-                const totalHoursRounded =
-                    totalHours > 0
-                        ? Number(
-                            totalHours.toFixed(2)
-                        )
-                        : null;
-
-
-                // ======================================
-                // FIND ATTENDANCE
-                // ======================================
-
-                // Attendance.date is a MySQL DATE field.
-                // Use the pure IST calendar date here so the lookup
-                // matches the same value used when creating the row.
-                let attendance =
-                    await tx.attendance.findUnique({
+                attendance =
+                    await tx.attendance.update({
                         where: {
-                            employeeId_date: {
-                                employeeId:
-                                    employee.employeeId,
+                            attendanceId:
+                                attendance.attendanceId
+                        },
 
-                                date:
-                                    getISTCalendarDate(
-                                        punchedAt
-                                    )
-                            }
+                        data: {
+                            checkInTime:
+                                firstInTime,
+
+                            checkOutTime:
+                                lastOutTime,
+
+                            totalHours:
+                                totalHoursRounded,
+
+                            status:
+                                "PRESENT"
                         }
                     });
-
-
-                // ======================================
-                // FIRST PUNCH / CREATE
-                // ======================================
-
-                if (!attendance) {
-
-                    attendance =
-                        await tx.attendance.create({
-                            data: {
-                                employeeId:
-                                    employee.employeeId,
-
-                                date:
-                                    getISTCalendarDate(punchedAt),
-
-                                checkInTime:
-                                    punchType === "IN"
-                                        ? createMySQLTimeFromIST(
-                                            punchedAt
-                                        )
-                                        : null,
-
-                                checkOutTime:
-                                    punchType === "OUT"
-                                        ? createMySQLTimeFromIST(
-                                            punchedAt
-                                        )
-                                        : null,
-
-                                totalHours:
-                                    totalHoursRounded,
-
-                                status:
-                                    "PRESENT"
-                            }
-                        });
-                }
-
-                // ======================================
-                // UPDATE ATTENDANCE
-                // ======================================
-
-                else {
-
-                    let firstInTime = null;
-                    let lastOutTime = null;
-
-
-                    for (
-                        const currentPunch
-                        of allPunches
-                    ) {
-
-                        if (
-                            currentPunch.punchType === "IN"
-                        ) {
-
-                            if (
-                                firstInTime === null
-                            ) {
-                                firstInTime =
-                                    createMySQLTimeFromIST(
-                                        currentPunch.punchedAt
-                                    );
-                            }
-                        }
-
-                        else if (
-                            currentPunch.punchType === "OUT"
-                        ) {
-
-                            lastOutTime =
-                                createMySQLTimeFromIST(
-                                    currentPunch.punchedAt
-                                );
-                        }
-                    }
-
-
-                    attendance =
-                        await tx.attendance.update({
-                            where: {
-                                attendanceId:
-                                    attendance.attendanceId
-                            },
-
-                            data: {
-                                checkInTime:
-                                    firstInTime,
-
-                                checkOutTime:
-                                    lastOutTime,
-
-                                totalHours:
-                                    totalHoursRounded,
-
-                                status:
-                                    "PRESENT"
-                            }
-                        });
-                }
-
-
-                return {
-                    punch,
-                    attendance,
-                    totalHours:
-                        totalHoursRounded || 0,
-
-                    totalHoursFormatted:
-                        formatDuration(
-                            totalHours
-                        )
-                };
             }
-        );
 
 
-    return result;
+            return {
+                punch,
+                attendance,
+                totalHours:
+                    totalHoursRounded || 0,
+
+                totalHoursFormatted:
+                    formatDuration(
+                        totalHours
+                    )
+            };
+        }
+    );
+
+
+return result;
+
 };
-
 
 // ======================================================
 // GET ALL ATTENDANCE
 // ======================================================
 
 const getAllAttendance = async (
-    filters = {}
+filters = {}
 ) => {
 
-    const {
-        date,
-        from,
-        to
-    } = filters;
+const {
+    date,
+    from,
+    to
+} = filters;
 
-    const where = {};
-
-
-    if (date) {
-
-        const selectedDate =
-            new Date(
-                `${date}T00:00:00`
-            );
-
-        if (
-            Number.isNaN(
-                selectedDate.getTime()
-            )
-        ) {
-            const error = new Error(
-                "Invalid date. Use YYYY-MM-DD"
-            );
-
-            error.statusCode = 400;
-
-            throw error;
-        }
-
-        where.date = {
-            gte:
-                getISTCalendarDate(
-                    selectedDate
-                ),
-
-            lt:
-                getNextISTCalendarDate(
-                    selectedDate
-                )
-        };
-    }
-
-    else if (
-        from ||
-        to
-    ) {
-
-        where.date = {};
-
-        if (from) {
-
-            const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    fromDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid from date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.gte =
-                getISTCalendarDate(
-                    fromDate
-                );
-        }
+const where = {};
 
 
-        if (to) {
+if (date) {
 
-            const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    toDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid to date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.lt =
-                getNextISTCalendarDate(
-                    toDate
-                );
-        }
-    }
-
-
-    const attendance =
-        await prisma.attendance.findMany({
-            where,
-
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                }
-            },
-
-            orderBy: [
-                {
-                    date: "desc"
-                },
-
-                {
-                    employeeId: "asc"
-                }
-            ]
-        });
-
-
-    return attendance.map(
-        serializeAttendance
-    );
-};
-
-
-// ======================================================
-// GET ATTENDANCE BY ID
-// ======================================================
-
-const getAttendanceById = async (
-    attendanceId
-) => {
-
-    const id =
-        Number(attendanceId);
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-        const error = new Error(
-            "Invalid attendance ID"
+    const selectedDate =
+        new Date(
+            `${date}T00:00:00`
         );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    const attendance =
-        await prisma.attendance.findUnique({
-            where: {
-                attendanceId: id
-            },
-
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                }
-            }
-        });
-
-
-    if (!attendance) {
-        const error = new Error(
-            "Attendance record not found"
-        );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
-
-    return serializeAttendance(
-        attendance
-    );
-};
-
-
-// ======================================================
-// GET EMPLOYEE ATTENDANCE
-// ======================================================
-
-const getEmployeeAttendance = async (
-    employeeId,
-    filters = {}
-) => {
-
-    const id =
-        Number(employeeId);
-
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-        const error = new Error(
-            "Invalid employee ID"
-        );
-
-        error.statusCode = 400;
-
-        throw error;
-    }
-
-
-    const {
-        from,
-        to
-    } = filters;
-
-
-    const where = {
-        employeeId: id
-    };
-
-
-    if (
-        from ||
-        to
-    ) {
-
-        where.date = {};
-
-
-        if (from) {
-
-            const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    fromDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid from date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.gte =
-                getISTCalendarDate(
-                    fromDate
-                );
-        }
-
-
-        if (to) {
-
-            const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    toDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid to date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.lt =
-                getNextISTCalendarDate(
-                    toDate
-                );
-        }
-    }
-
-
-    const attendance =
-        await prisma.attendance.findMany({
-            where,
-
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
-                }
-            },
-
-            orderBy: {
-                date: "desc"
-            }
-        });
-
-
-    return attendance.map(
-        serializeAttendance
-    );
-};
-
-
-// ======================================================
-// GET DAILY ATTENDANCE SUMMARY
-// ======================================================
-
-const getAttendanceSummary = async (
-    date
-) => {
-
-    const targetDate =
-        date
-            ? new Date(
-                `${date}T00:00:00`
-            )
-            : new Date();
-
 
     if (
         Number.isNaN(
-            targetDate.getTime()
+            selectedDate.getTime()
         )
     ) {
         const error = new Error(
@@ -1592,347 +1316,680 @@ const getAttendanceSummary = async (
         throw error;
     }
 
-
-    const calendarDateStart =
-        getISTCalendarDate(
-            targetDate
-        );
-
-    const calendarDateEnd =
-        getNextISTCalendarDate(
-            targetDate
-        );
-
-
-    const totalEmployees =
-        await prisma.employee.count({
-            where: {
-                status: "ACTIVE"
-            }
-        });
-
-
-    const attendance =
-        await prisma.attendance.findMany({
-            where: {
-                date: {
-                    gte: calendarDateStart,
-                    lt: calendarDateEnd
-                },
-
-                employee: {
-                    status: "ACTIVE"
-                }
-            },
-
-            select: {
-                employeeId: true,
-                checkInTime: true,
-                checkOutTime: true,
-                totalHours: true,
-                status: true
-            }
-        });
-
-
-    const present =
-        attendance.filter(
-            record =>
-                record.status === "PRESENT"
-        ).length;
-
-
-    const checkedIn =
-        attendance.filter(
-            record =>
-                record.checkInTime &&
-                !record.checkOutTime
-        ).length;
-
-
-    const checkedOut =
-        attendance.filter(
-            record =>
-                !!record.checkOutTime
-        ).length;
-
-
-    const absent =
-        Math.max(
-            totalEmployees - present,
-            0
-        );
-
-
-    const totalHours =
-        attendance.reduce(
-            (total, record) =>
-                total +
-                (
-                    record.totalHours
-                        ? Number(
-                            record.totalHours
-                        )
-                        : 0
-                ),
-            0
-        );
-
-
-    return {
-        date:
-            getISTDateString(
-                targetDate
+    where.date = {
+        gte:
+            getISTCalendarDate(
+                selectedDate
             ),
 
-        totalEmployees,
-
-        present,
-
-        absent,
-
-        checkedIn,
-
-        checkedOut,
-
-        totalHours:
-            Number(
-                totalHours.toFixed(2)
+        lt:
+            getNextISTCalendarDate(
+                selectedDate
             )
     };
+}
+
+else if (
+    from ||
+    to
+) {
+
+    where.date = {};
+
+    if (from) {
+
+        const fromDate =
+            new Date(
+                `${from}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                fromDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid from date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.gte =
+            getISTCalendarDate(
+                fromDate
+            );
+    }
+
+
+    if (to) {
+
+        const toDate =
+            new Date(
+                `${to}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                toDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid to date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.lt =
+            getNextISTCalendarDate(
+                toDate
+            );
+    }
+}
+
+
+const attendance =
+    await prisma.attendance.findMany({
+        where,
+
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                }
+            }
+        },
+
+        orderBy: [
+            {
+                date: "desc"
+            },
+
+            {
+                employeeId: "asc"
+            }
+        ]
+    });
+
+
+return attendance.map(
+    serializeAttendance
+);
+
 };
 
+// ======================================================
+// GET ATTENDANCE BY ID
+// ======================================================
+
+const getAttendanceById = async (
+attendanceId
+) => {
+
+const id =
+    Number(attendanceId);
+
+if (
+    !Number.isInteger(id) ||
+    id < 1
+) {
+    const error = new Error(
+        "Invalid attendance ID"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+const attendance =
+    await prisma.attendance.findUnique({
+        where: {
+            attendanceId: id
+        },
+
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                }
+            }
+        }
+    });
+
+
+if (!attendance) {
+    const error = new Error(
+        "Attendance record not found"
+    );
+
+    error.statusCode = 404;
+
+    throw error;
+}
+
+
+return serializeAttendance(
+    attendance
+);
+
+};
+
+// ======================================================
+// GET EMPLOYEE ATTENDANCE
+// ======================================================
+
+const getEmployeeAttendance = async (
+employeeId,
+filters = {}
+) => {
+
+const id =
+    Number(employeeId);
+
+if (
+    !Number.isInteger(id) ||
+    id < 1
+) {
+    const error = new Error(
+        "Invalid employee ID"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+const {
+    from,
+    to
+} = filters;
+
+
+const where = {
+    employeeId: id
+};
+
+
+if (
+    from ||
+    to
+) {
+
+    where.date = {};
+
+
+    if (from) {
+
+        const fromDate =
+            new Date(
+                `${from}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                fromDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid from date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.gte =
+            getISTCalendarDate(
+                fromDate
+            );
+    }
+
+
+    if (to) {
+
+        const toDate =
+            new Date(
+                `${to}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                toDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid to date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.lt =
+            getNextISTCalendarDate(
+                toDate
+            );
+    }
+}
+
+
+const attendance =
+    await prisma.attendance.findMany({
+        where,
+
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                }
+            }
+        },
+
+        orderBy: {
+            date: "desc"
+        }
+    });
+
+
+return attendance.map(
+    serializeAttendance
+);
+
+};
+
+// ======================================================
+// GET DAILY ATTENDANCE SUMMARY
+// ======================================================
+
+const getAttendanceSummary = async (
+date
+) => {
+
+const targetDate =
+    date
+        ? new Date(
+            `${date}T00:00:00`
+        )
+        : new Date();
+
+
+if (
+    Number.isNaN(
+        targetDate.getTime()
+    )
+) {
+    const error = new Error(
+        "Invalid date. Use YYYY-MM-DD"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+const calendarDateStart =
+    getISTCalendarDate(
+        targetDate
+    );
+
+const calendarDateEnd =
+    getNextISTCalendarDate(
+        targetDate
+    );
+
+
+const totalEmployees =
+    await prisma.employee.count({
+        where: {
+            status: "ACTIVE"
+        }
+    });
+
+
+const attendance =
+    await prisma.attendance.findMany({
+        where: {
+            date: {
+                gte: calendarDateStart,
+                lt: calendarDateEnd
+            },
+
+            employee: {
+                status: "ACTIVE"
+            }
+        },
+
+        select: {
+            employeeId: true,
+            checkInTime: true,
+            checkOutTime: true,
+            totalHours: true,
+            status: true
+        }
+    });
+
+
+const present =
+    attendance.filter(
+        record =>
+            record.status === "PRESENT"
+    ).length;
+
+
+const checkedIn =
+    attendance.filter(
+        record =>
+            record.checkInTime &&
+            !record.checkOutTime
+    ).length;
+
+
+const checkedOut =
+    attendance.filter(
+        record =>
+            !!record.checkOutTime
+    ).length;
+
+
+const absent =
+    Math.max(
+        totalEmployees - present,
+        0
+    );
+
+
+const totalHours =
+    attendance.reduce(
+        (total, record) =>
+            total +
+            (
+                record.totalHours
+                    ? Number(
+                        record.totalHours
+                    )
+                    : 0
+            ),
+        0
+    );
+
+
+return {
+    date:
+        getISTDateString(
+            targetDate
+        ),
+
+    totalEmployees,
+
+    present,
+
+    absent,
+
+    checkedIn,
+
+    checkedOut,
+
+    totalHours:
+        Number(
+            totalHours.toFixed(2)
+        )
+};
+
+};
 
 // ======================================================
 // GET EMPLOYEE ATTENDANCE SUMMARY
 // ======================================================
 
 const getEmployeeAttendanceSummary = async (
-    employeeId,
-    filters = {}
+employeeId,
+filters = {}
 ) => {
 
-    const id =
-        Number(employeeId);
+const id =
+    Number(employeeId);
 
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-        const error = new Error(
-            "Invalid employee ID"
-        );
+if (
+    !Number.isInteger(id) ||
+    id < 1
+) {
+    const error = new Error(
+        "Invalid employee ID"
+    );
 
-        error.statusCode = 400;
+    error.statusCode = 400;
 
-        throw error;
-    }
-
-
-    const employee =
-        await prisma.employee.findUnique({
-            where: {
-                employeeId: id
-            },
-
-            select: {
-                employeeId: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                status: true
-            }
-        });
+    throw error;
+}
 
 
-    if (!employee) {
-        const error = new Error(
-            "Employee not found"
-        );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
-
-    const {
-        from,
-        to
-    } = filters;
-
-
-    const where = {
-        employeeId: id
-    };
-
-
-    if (
-        from ||
-        to
-    ) {
-
-        where.date = {};
-
-
-        if (from) {
-
-            const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    fromDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid from date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.gte =
-                getISTCalendarDate(
-                    fromDate
-                );
-        }
-
-
-        if (to) {
-
-            const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    toDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid to date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            where.date.lt =
-                getNextISTCalendarDate(
-                    toDate
-                );
-        }
-    }
-
-
-    const attendance =
-        await prisma.attendance.findMany({
-            where,
-
-            orderBy: {
-                date: "asc"
-            }
-        });
-
-
-    const totalDays =
-        attendance.length;
-
-
-    const presentDays =
-        attendance.filter(
-            record =>
-                record.status === "PRESENT"
-        ).length;
-
-
-    const absentDays =
-        attendance.filter(
-            record =>
-                record.status === "ABSENT"
-        ).length;
-
-
-    const totalHours =
-        attendance.reduce(
-            (total, record) =>
-                total +
-                (
-                    record.totalHours
-                        ? Number(
-                            record.totalHours
-                        )
-                        : 0
-                ),
-            0
-        );
-
-
-    const averageHours =
-        presentDays > 0
-            ? totalHours / presentDays
-            : 0;
-
-
-    return {
-        employee: {
-            employeeId:
-                employee.employeeId,
-
-            firstName:
-                employee.firstName,
-
-            lastName:
-                employee.lastName,
-
-            email:
-                employee.email,
-
-            status:
-                employee.status
+const employee =
+    await prisma.employee.findUnique({
+        where: {
+            employeeId: id
         },
 
-        from:
-            from || null,
+        select: {
+            employeeId: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            status: true
+        }
+    });
 
-        to:
-            to || null,
 
-        totalDays,
+if (!employee) {
+    const error = new Error(
+        "Employee not found"
+    );
 
-        presentDays,
+    error.statusCode = 404;
 
-        absentDays,
+    throw error;
+}
 
-        totalHours:
-            Number(
-                totalHours.toFixed(2)
-            ),
 
-        totalHoursFormatted:
-            formatDuration(
-                totalHours
-            ),
+const {
+    from,
+    to
+} = filters;
 
-        averageHours:
-            Number(
-                averageHours.toFixed(2)
-            ),
 
-        averageHoursFormatted:
-            formatDuration(
-                averageHours
-            )
-    };
+const where = {
+    employeeId: id
 };
 
+
+if (
+    from ||
+    to
+) {
+
+    where.date = {};
+
+
+    if (from) {
+
+        const fromDate =
+            new Date(
+                `${from}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                fromDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid from date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.gte =
+            getISTCalendarDate(
+                fromDate
+            );
+    }
+
+
+    if (to) {
+
+        const toDate =
+            new Date(
+                `${to}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                toDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid to date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        where.date.lt =
+            getNextISTCalendarDate(
+                toDate
+            );
+    }
+}
+
+
+const attendance =
+    await prisma.attendance.findMany({
+        where,
+
+        orderBy: {
+            date: "asc"
+        }
+    });
+
+
+const totalDays =
+    attendance.length;
+
+
+const presentDays =
+    attendance.filter(
+        record =>
+            record.status === "PRESENT"
+    ).length;
+
+
+const absentDays =
+    attendance.filter(
+        record =>
+            record.status === "ABSENT"
+    ).length;
+
+
+const totalHours =
+    attendance.reduce(
+        (total, record) =>
+            total +
+            (
+                record.totalHours
+                    ? Number(
+                        record.totalHours
+                    )
+                    : 0
+            ),
+        0
+    );
+
+
+const averageHours =
+    presentDays > 0
+        ? totalHours / presentDays
+        : 0;
+
+
+return {
+    employee: {
+        employeeId:
+            employee.employeeId,
+
+        firstName:
+            employee.firstName,
+
+        lastName:
+            employee.lastName,
+
+        email:
+            employee.email,
+
+        status:
+            employee.status
+    },
+
+    from:
+        from || null,
+
+    to:
+        to || null,
+
+    totalDays,
+
+    presentDays,
+
+    absentDays,
+
+    totalHours:
+        Number(
+            totalHours.toFixed(2)
+        ),
+
+    totalHoursFormatted:
+        formatDuration(
+            totalHours
+        ),
+
+    averageHours:
+        Number(
+            averageHours.toFixed(2)
+        ),
+
+    averageHoursFormatted:
+        formatDuration(
+            averageHours
+        )
+};
+
+};
 
 // ======================================================
 // GET ATTENDANCE WITH FILTERS + PAGINATION
@@ -1952,705 +2009,315 @@ const getEmployeeAttendanceSummary = async (
 
 const LATE_AFTER_MINUTES = 9 * 60;
 
-
 // ======================================================
 // BUILD EFFECTIVE STATUS
 // ======================================================
 
 const getEffectiveAttendanceStatus = (
-    attendanceRecord,
-    leaveMap,
-    employeeId,
-    isDailyView = false
+attendanceRecord,
+leaveMap,
+employeeId,
+isDailyView = false
 ) => {
-    const checkInTime =
-        attendanceRecord?.checkInTime || null;
+const checkInTime =
+attendanceRecord?.checkInTime || null;
 
-    // Real attendance always takes precedence over leave.
-    if (checkInTime) {
-        const checkInMinutes =
-            timeValueToMinutes(checkInTime);
+// Real attendance always takes precedence over leave.
+if (checkInTime) {
+    const checkInMinutes =
+        timeValueToMinutes(checkInTime);
 
-        if (
-            checkInMinutes !== null &&
-            checkInMinutes > LATE_AFTER_MINUTES
-        ) {
-            return "LATE";
-        }
-
-        return "PRESENT";
-    }
-
-    // Preserve an explicitly corrected stored status when it exists.
     if (
-        attendanceRecord?.status === "ABSENT"
+        checkInMinutes !== null &&
+        checkInMinutes > LATE_AFTER_MINUTES
     ) {
-        return "ABSENT";
+        return "LATE";
     }
 
-    // Approved leave applies only when there is no attendance.
-    if (
-        leaveMap?.has(
-            Number(employeeId)
-        )
-    ) {
-        return "ON_LEAVE";
-    }
+    return "PRESENT";
+}
 
-    // Daily roster view needs a concrete state even when no
-    // Attendance row exists yet.
-    if (isDailyView) {
-        return "ABSENT";
-    }
+// Preserve an explicitly corrected stored status when it exists.
+if (
+    attendanceRecord?.status === "ABSENT"
+) {
+    return "ABSENT";
+}
 
-    return attendanceRecord?.status || "ABSENT";
+// Approved leave applies only when there is no attendance.
+if (
+    leaveMap?.has(
+        Number(employeeId)
+    )
+) {
+    return "ON_LEAVE";
+}
+
+// Daily roster view needs a concrete state even when no
+// Attendance row exists yet.
+if (isDailyView) {
+    return "ABSENT";
+}
+
+return attendanceRecord?.status || "ABSENT";
+
 };
-
 
 // ======================================================
 // GET ATTENDANCE WITH FILTERS + PAGINATION
 // ======================================================
 
 const getAttendancePaginated = async (
-    filters = {}
+filters = {}
 ) => {
 
-    const {
-        date,
-        from,
-        to,
-        employeeId,
-        companyId,
-        status,
-        page = 1,
-        limit = 20
-    } = filters;
+const {
+    date,
+    from,
+    to,
+    employeeId,
+    companyId,
+    status,
+    page = 1,
+    limit = 20
+} = filters;
 
 
-    const parsedPage =
-        Number(page);
+const parsedPage =
+    Number(page);
 
-    const parsedLimit =
-        Number(limit);
+const parsedLimit =
+    Number(limit);
 
 
-    // ==============================================
-    // VALIDATE PAGE
-    // ==============================================
+// ==============================================
+// VALIDATE PAGE
+// ==============================================
+
+if (
+    !Number.isInteger(parsedPage) ||
+    parsedPage < 1
+) {
+    const error = new Error(
+        "Page must be a positive integer"
+    );
+
+    error.statusCode = 400;
+    throw error;
+}
+
+
+// ==============================================
+// VALIDATE LIMIT
+// ==============================================
+
+if (
+    !Number.isInteger(parsedLimit) ||
+    parsedLimit < 1 ||
+    parsedLimit > 100
+) {
+    const error = new Error(
+        "Limit must be between 1 and 100"
+    );
+
+    error.statusCode = 400;
+    throw error;
+}
+
+
+// ==============================================
+// VALIDATE STATUS
+// ==============================================
+
+const allowedStatusFilters = [
+    "PRESENT",
+    "ABSENT",
+    "LATE",
+    "ON_LEAVE"
+];
+
+if (
+    status !== undefined &&
+    status !== "" &&
+    !allowedStatusFilters.includes(status)
+) {
+    const error = new Error(
+        "Invalid attendance status filter"
+    );
+
+    error.statusCode = 400;
+    throw error;
+}
+
+
+// ==============================================
+// OPTIONAL COMPANY SCOPE
+// ==============================================
+
+const parsedCompanyId =
+    companyId !== undefined &&
+    companyId !== null &&
+    companyId !== ""
+        ? Number(companyId)
+        : null;
+
+if (
+    parsedCompanyId !== null &&
+    (
+        !Number.isInteger(parsedCompanyId) ||
+        parsedCompanyId < 1
+    )
+) {
+    const error = new Error(
+        "Invalid company ID"
+    );
+
+    error.statusCode = 400;
+    throw error;
+}
+
+
+// ==============================================
+// OPTIONAL EMPLOYEE FILTER
+// ==============================================
+
+let parsedEmployeeId = null;
+
+if (
+    employeeId !== undefined &&
+    employeeId !== ""
+) {
+    parsedEmployeeId =
+        Number(employeeId);
 
     if (
-        !Number.isInteger(parsedPage) ||
-        parsedPage < 1
+        !Number.isInteger(parsedEmployeeId) ||
+        parsedEmployeeId < 1
     ) {
         const error = new Error(
-            "Page must be a positive integer"
+            "Invalid employee ID"
         );
 
         error.statusCode = 400;
         throw error;
     }
+}
 
 
-    // ==============================================
-    // VALIDATE LIMIT
-    // ==============================================
+// ==============================================
+// DAILY STATUS VIEW
+// ==============================================
+//
+// This mode is used whenever a specific date is selected,
+// or whenever a status filter is selected without a date.
+//
+// It creates one row per active employee for that day, so:
+//
+// - PRESENT -> has attendance
+// - LATE -> check-in is after the configured cutoff
+// - ON_LEAVE -> approved leave and no attendance
+// - ABSENT -> no attendance and no approved leave
+//
+// This is the part that makes every status filter actually
+// usable instead of depending on an Attendance row already
+// existing in the database.
+// ==============================================
 
-    if (
-        !Number.isInteger(parsedLimit) ||
-        parsedLimit < 1 ||
-        parsedLimit > 100
-    ) {
-        const error = new Error(
-            "Limit must be between 1 and 100"
-        );
+const dailyViewRequested =
+    Boolean(date) ||
+    Boolean(status);
 
-        error.statusCode = 400;
-        throw error;
-    }
+let dailyDate = null;
 
-
-    // ==============================================
-    // VALIDATE STATUS
-    // ==============================================
-
-    const allowedStatusFilters = [
-        "PRESENT",
-        "ABSENT",
-        "LATE",
-        "ON_LEAVE"
-    ];
-
-    if (
-        status !== undefined &&
-        status !== "" &&
-        !allowedStatusFilters.includes(status)
-    ) {
-        const error = new Error(
-            "Invalid attendance status filter"
-        );
-
-        error.statusCode = 400;
-        throw error;
-    }
-
-
-    // ==============================================
-    // OPTIONAL COMPANY SCOPE
-    // ==============================================
-
-    const parsedCompanyId =
-        companyId !== undefined &&
-        companyId !== null &&
-        companyId !== ""
-            ? Number(companyId)
-            : null;
+if (dailyViewRequested) {
+    dailyDate = date
+        ? new Date(
+            `${date}T00:00:00`
+        )
+        : new Date();
 
     if (
-        parsedCompanyId !== null &&
-        (
-            !Number.isInteger(parsedCompanyId) ||
-            parsedCompanyId < 1
+        Number.isNaN(
+            dailyDate.getTime()
         )
     ) {
         const error = new Error(
-            "Invalid company ID"
+            "Invalid date. Use YYYY-MM-DD"
         );
 
         error.statusCode = 400;
         throw error;
     }
 
-
-    // ==============================================
-    // OPTIONAL EMPLOYEE FILTER
-    // ==============================================
-
-    let parsedEmployeeId = null;
-
-    if (
-        employeeId !== undefined &&
-        employeeId !== ""
-    ) {
-        parsedEmployeeId =
-            Number(employeeId);
-
-        if (
-            !Number.isInteger(parsedEmployeeId) ||
-            parsedEmployeeId < 1
-        ) {
-            const error = new Error(
-                "Invalid employee ID"
-            );
-
-            error.statusCode = 400;
-            throw error;
-        }
-    }
-
-
-    // ==============================================
-    // DAILY STATUS VIEW
-    // ==============================================
-    //
-    // This mode is used whenever a specific date is selected,
-    // or whenever a status filter is selected without a date.
-    //
-    // It creates one row per active employee for that day, so:
-    //
-    // - PRESENT -> has attendance
-    // - LATE -> check-in is after the configured cutoff
-    // - ON_LEAVE -> approved leave and no attendance
-    // - ABSENT -> no attendance and no approved leave
-    //
-    // This is the part that makes every status filter actually
-    // usable instead of depending on an Attendance row already
-    // existing in the database.
-    // ==============================================
-
-    const dailyViewRequested =
-        Boolean(date) ||
-        Boolean(status);
-
-    let dailyDate = null;
-
-    if (dailyViewRequested) {
-        dailyDate = date
-            ? new Date(
-                `${date}T00:00:00`
-            )
-            : new Date();
-
-        if (
-            Number.isNaN(
-                dailyDate.getTime()
-            )
-        ) {
-            const error = new Error(
-                "Invalid date. Use YYYY-MM-DD"
-            );
-
-            error.statusCode = 400;
-            throw error;
-        }
-
-        const dailyDateStart =
-            getISTCalendarDate(
-                dailyDate
-            );
-
-        const dailyDateEnd =
-            getNextISTCalendarDate(
-                dailyDate
-            );
-
-
-        // ----------------------------------------------
-        // Active employees for the selected company
-        // ----------------------------------------------
-
-        const employeeWhere = {
-            status: "ACTIVE"
-        };
-
-        if (
-            parsedCompanyId !== null
-        ) {
-            employeeWhere.companyId =
-                parsedCompanyId;
-        }
-
-        if (
-            parsedEmployeeId !== null
-        ) {
-            employeeWhere.employeeId =
-                parsedEmployeeId;
-        }
-
-
-        const employees =
-            await prisma.employee.findMany({
-                where: employeeWhere,
-
-                select: {
-                    employeeId: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    status: true
-                },
-
-                orderBy: {
-                    employeeId: "asc"
-                }
-            });
-
-
-        const employeeIds =
-            employees.map(
-                employee =>
-                    employee.employeeId
-            );
-
-
-        if (
-            employeeIds.length === 0
-        ) {
-            return {
-                data: [],
-                pagination: {
-                    page: 1,
-                    limit: parsedLimit,
-                    total: 0,
-                    totalPages: 0,
-                    hasNextPage: false,
-                    hasPreviousPage: false
-                }
-            };
-        }
-
-
-        // ----------------------------------------------
-        // Stored attendance for selected day
-        // ----------------------------------------------
-
-        const storedAttendance =
-            await prisma.attendance.findMany({
-                where: {
-                    employeeId: {
-                        in: employeeIds
-                    },
-
-                    date: {
-                        gte:
-                            dailyDateStart,
-
-                        lt:
-                            dailyDateEnd
-                    }
-                },
-
-                include: {
-                    employee: {
-                        select: {
-                            employeeId: true,
-                            firstName: true,
-                            lastName: true,
-                            email: true,
-                            status: true
-                        }
-                    }
-                }
-            });
-
-
-        const attendanceMap =
-            new Map();
-
-        for (
-            const record
-            of storedAttendance
-        ) {
-            attendanceMap.set(
-                Number(record.employeeId),
-                record
-            );
-        }
-
-
-        // ----------------------------------------------
-        // Today's raw punches
-        // ----------------------------------------------
-        //
-        // Raw punches are needed only when the selected day
-        // is the current IST day. They keep the admin page
-        // live while the Attendance summary row is being built.
-        // ----------------------------------------------
-
-        const now =
-            new Date();
-
-        const isToday =
-            getISTDateString(
-                dailyDate
-            ) ===
-            getISTDateString(
-                now
-            );
-
-        let todayViews = [];
-
-        if (isToday) {
-            const todayStart =
-                getStartOfDay(now);
-
-            const todayEnd =
-                getEndOfDay(now);
-
-
-            const todayPunches =
-                await prisma.attendancePunch.findMany({
-                    where: {
-                        punchedAt: {
-                            gte:
-                                todayStart,
-
-                            lte:
-                                todayEnd
-                        },
-
-                        employeeId: {
-                            in: employeeIds
-                        }
-                    },
-
-                    include: {
-                        employee: {
-                            select: {
-                                employeeId: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                status: true
-                            }
-                        }
-                    },
-
-                    orderBy: {
-                        punchedAt: "asc"
-                    }
-                });
-
-
-            todayViews =
-                buildTodayAttendanceFromPunches(
-                    todayPunches,
-                    now
-                );
-        }
-
-
-        const todayViewMap =
-            new Map();
-
-        for (
-            const todayView
-            of todayViews
-        ) {
-            todayViewMap.set(
-                Number(todayView.employeeId),
-                todayView
-            );
-        }
-
-
-        // ----------------------------------------------
-        // Approved leaves overlapping selected date
-        // ----------------------------------------------
-
-        const approvedLeaves =
-            await prisma.leaveRequest.findMany({
-                where: {
-                    employeeId: {
-                        in: employeeIds
-                    },
-
-                    status: "APPROVED"
-                },
-
-                select: {
-                    employeeId: true,
-                    startDate: true,
-                    endDate: true,
-                    approvedStartDate: true,
-                    approvedEndDate: true
-                }
-            });
-
-
-        const selectedDateKey =
-            getISTDateString(
-                dailyDate
-            );
-
-
-        const leaveMap =
-            new Map();
-
-
-        for (
-            const leave
-            of approvedLeaves
-        ) {
-            const effectiveStart =
-                leave.approvedStartDate ||
-                leave.startDate;
-
-            const effectiveEnd =
-                leave.approvedEndDate ||
-                leave.endDate;
-
-            if (
-                !effectiveStart ||
-                !effectiveEnd
-            ) {
-                continue;
-            }
-
-
-            const startKey =
-                getISTDateString(
-                    effectiveStart
-                );
-
-            const endKey =
-                getISTDateString(
-                    effectiveEnd
-                );
-
-
-            if (
-                selectedDateKey >= startKey &&
-                selectedDateKey <= endKey
-            ) {
-                leaveMap.set(
-                    Number(leave.employeeId),
-                    true
-                );
-            }
-        }
-
-
-        // ----------------------------------------------
-        // Build one daily row per employee
-        // ----------------------------------------------
-
-        const dailyRows = [];
-
-
-        for (
-            const employee
-            of employees
-        ) {
-            const id =
-                Number(
-                    employee.employeeId
-                );
-
-
-            const storedRecord =
-                attendanceMap.get(id) ||
-                null;
-
-
-            const liveRecord =
-                todayViewMap.get(id) ||
-                null;
-
-
-            const baseRecord =
-                liveRecord
-                    ? {
-                        ...(storedRecord || {}),
-                        ...liveRecord,
-                        employee:
-                            storedRecord?.employee ||
-                            liveRecord?.employee ||
-                            employee
-                    }
-                    : (
-                        storedRecord
-                            ? storedRecord
-                            : {
-                                attendanceId:
-                                    null,
-
-                                employeeId:
-                                    employee.employeeId,
-
-                                date:
-                                    dailyDate,
-
-                                checkInTime:
-                                    null,
-
-                                checkOutTime:
-                                    null,
-
-                                totalHours:
-                                    null,
-
-                                status:
-                                    null,
-
-                                createdAt:
-                                    null,
-
-                                updatedAt:
-                                    null,
-
-                                employee:
-                                    employee
-                            }
-                    );
-
-
-            const effectiveStatus =
-                getEffectiveAttendanceStatus(
-                    baseRecord,
-                    leaveMap,
-                    id,
-                    true
-                );
-
-
-            // ------------------------------------------
-            // Status filter
-            // ------------------------------------------
-
-            if (
-                status &&
-                effectiveStatus !== status
-            ) {
-                continue;
-            }
-
-
-            dailyRows.push({
-                ...baseRecord,
-
-                employee:
-                    baseRecord.employee ||
-                    employee,
-
-                employeeId:
-                    employee.employeeId,
-
-                date:
-                    baseRecord.date ||
-                    dailyDate,
-
-                status:
-                    effectiveStatus,
-
-                attendanceStatus:
-                    baseRecord.status ||
-                    null,
-
-                onLeave:
-                    effectiveStatus ===
-                    "ON_LEAVE",
-
-                late:
-                    effectiveStatus ===
-                    "LATE"
-            });
-        }
-
-
-        // ----------------------------------------------
-        // Search/order/pagination
-        // ----------------------------------------------
-
-        dailyRows.sort(
-            (a, b) =>
-                Number(a.employeeId) -
-                Number(b.employeeId)
+    const dailyDateStart =
+        getISTCalendarDate(
+            dailyDate
+        );
+
+    const dailyDateEnd =
+        getNextISTCalendarDate(
+            dailyDate
         );
 
 
-        const total =
-            dailyRows.length;
+    // ----------------------------------------------
+    // Active employees for the selected company
+    // ----------------------------------------------
+
+    const employeeWhere = {
+        status: "ACTIVE"
+    };
+
+    if (
+        parsedCompanyId !== null
+    ) {
+        employeeWhere.companyId =
+            parsedCompanyId;
+    }
+
+    if (
+        parsedEmployeeId !== null
+    ) {
+        employeeWhere.employeeId =
+            parsedEmployeeId;
+    }
 
 
-        // Daily roster intentionally returns the complete
-        // employee set because AdminAttendance has no
-        // pagination controls of its own.
-        const pagedDailyRows =
-            dailyRows;
+    const employees =
+        await prisma.employee.findMany({
+            where: employeeWhere,
+
+            select: {
+                employeeId: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                status: true
+            },
+
+            orderBy: {
+                employeeId: "asc"
+            }
+        });
 
 
-        const serializedDailyRows =
-            pagedDailyRows.map(
-                serializeAttendance
-            );
+    const employeeIds =
+        employees.map(
+            employee =>
+                employee.employeeId
+        );
 
 
+    if (
+        employeeIds.length === 0
+    ) {
         return {
-            data:
-                serializedDailyRows,
-
+            data: [],
             pagination: {
                 page: 1,
-                limit:
-                    Math.max(
-                        total,
-                        parsedLimit
-                    ),
-                total,
-                totalPages:
-                    total > 0
-                        ? 1
-                        : 0,
+                limit: parsedLimit,
+                total: 0,
+                totalPages: 0,
                 hasNextPage: false,
                 hasPreviousPage: false
             }
@@ -2658,137 +2325,25 @@ const getAttendancePaginated = async (
     }
 
 
-    // ==============================================
-    // ORIGINAL HISTORY / DATE-RANGE VIEW
-    // ==============================================
-    //
-    // Preserve the existing historical behavior when no
-    // daily status view is requested.
-    // ==============================================
+    // ----------------------------------------------
+    // Stored attendance for selected day
+    // ----------------------------------------------
 
-    const where = {};
-
-
-    if (
-        parsedCompanyId !== null
-    ) {
-        where.employee = {
-            companyId:
-                parsedCompanyId
-        };
-    }
-
-
-    if (
-        parsedEmployeeId !== null
-    ) {
-        where.employeeId =
-            parsedEmployeeId;
-    }
-
-
-    // ==============================================
-    // DATE FILTER
-    // ==============================================
-
-    if (date) {
-        const selectedDate =
-            new Date(
-                `${date}T00:00:00`
-            );
-
-        if (
-            Number.isNaN(
-                selectedDate.getTime()
-            )
-        ) {
-            const error = new Error(
-                "Invalid date. Use YYYY-MM-DD"
-            );
-
-            error.statusCode = 400;
-            throw error;
-        }
-
-        where.date = {
-            gte:
-                getISTCalendarDate(
-                    selectedDate
-                ),
-            lt:
-                getNextISTCalendarDate(
-                    selectedDate
-                )
-        };
-    }
-    else if (from || to) {
-        where.date = {};
-
-        if (from) {
-            const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    fromDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid from date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-                throw error;
-            }
-
-            where.date.gte =
-                getISTCalendarDate(
-                    fromDate
-                );
-        }
-
-
-        if (to) {
-            const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
-            if (
-                Number.isNaN(
-                    toDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid to date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-                throw error;
-            }
-
-            where.date.lt =
-                getNextISTCalendarDate(
-                    toDate
-                );
-        }
-    }
-
-
-    const skip =
-        (parsedPage - 1) *
-        parsedLimit;
-
-
-    // ==============================================
-    // LOAD STORED ATTENDANCE
-    // ==============================================
-
-    const attendance =
+    const storedAttendance =
         await prisma.attendance.findMany({
-            where,
+            where: {
+                employeeId: {
+                    in: employeeIds
+                },
+
+                date: {
+                    gte:
+                        dailyDateStart,
+
+                    lt:
+                        dailyDateEnd
+                }
+            },
 
             include: {
                 employee: {
@@ -2804,33 +2359,52 @@ const getAttendancePaginated = async (
         });
 
 
-    // ==============================================
-    // LOAD TODAY'S RAW PUNCHES
-    // ==============================================
+    const attendanceMap =
+        new Map();
+
+    for (
+        const record
+        of storedAttendance
+    ) {
+        attendanceMap.set(
+            Number(record.employeeId),
+            record
+        );
+    }
+
+
+    // ----------------------------------------------
+    // Today's raw punches
+    // ----------------------------------------------
     //
-    // Preserve the existing behavior: when no historical
-    // date filter is selected, today's raw punches are merged
-    // into the historical attendance list.
-    // ==============================================
+    // Raw punches are needed only when the selected day
+    // is the current IST day. They keep the admin page
+    // live while the Attendance summary row is being built.
+    // ----------------------------------------------
 
     const now =
         new Date();
 
-    const todayStart =
-        getStartOfDay(now);
+    const isToday =
+        getISTDateString(
+            dailyDate
+        ) ===
+        getISTDateString(
+            now
+        );
 
-    const todayEnd =
-        getEndOfDay(now);
+    let todayViews = [];
 
-    const includeToday =
-        !date &&
-        !from &&
-        !to;
+    if (isToday) {
+        const todayStart =
+            getStartOfDay(now);
+
+        const todayEnd =
+            getEndOfDay(now);
 
 
-    const todayPunches =
-        includeToday
-            ? await prisma.attendancePunch.findMany({
+        const todayPunches =
+            await prisma.attendancePunch.findMany({
                 where: {
                     punchedAt: {
                         gte:
@@ -2840,21 +2414,9 @@ const getAttendancePaginated = async (
                             todayEnd
                     },
 
-                    ...(parsedEmployeeId !== null
-                        ? {
-                            employeeId:
-                                parsedEmployeeId
-                        }
-                        : {}),
-
-                    ...(parsedCompanyId !== null
-                        ? {
-                            employee: {
-                                companyId:
-                                    parsedCompanyId
-                            }
-                        }
-                        : {})
+                    employeeId: {
+                        in: employeeIds
+                    }
                 },
 
                 include: {
@@ -2872,134 +2434,813 @@ const getAttendancePaginated = async (
                 orderBy: {
                     punchedAt: "asc"
                 }
-            })
-            : [];
+            });
 
 
-    const todayViews =
-        buildTodayAttendanceFromPunches(
-            todayPunches,
-            now
-        );
-
-
-    // ==============================================
-    // MERGE TODAY'S RAW DATA INTO ATTENDANCE DATA
-    // ==============================================
-
-    const merged =
-        new Map();
-
-
-    for (
-        const record
-        of attendance
-    ) {
-        const key =
-            `${record.employeeId}|${getISTDateString(
-                record.date
-            )}`;
-
-        merged.set(
-            key,
-            record
-        );
+        todayViews =
+            buildTodayAttendanceFromPunches(
+                todayPunches,
+                now
+            );
     }
 
+
+    const todayViewMap =
+        new Map();
 
     for (
         const todayView
         of todayViews
     ) {
-        const key =
-            `${todayView.employeeId}|${getISTDateString(
-                todayView.date
-            )}`;
-
-        const existing =
-            merged.get(key);
+        todayViewMap.set(
+            Number(todayView.employeeId),
+            todayView
+        );
+    }
 
 
-        if (existing) {
-            merged.set(
-                key,
-                {
-                    ...existing,
+    // ----------------------------------------------
+    // Approved leaves overlapping selected date
+    // ----------------------------------------------
 
-                    checkInTime:
-                        todayView.checkInTime,
+    const approvedLeaves =
+        await prisma.leaveRequest.findMany({
+            where: {
+                employeeId: {
+                    in: employeeIds
+                },
 
-                    checkOutTime:
-                        todayView.checkOutTime,
+                status: "APPROVED"
+            },
 
-                    totalHours:
-                        todayView.totalHours,
+            select: {
+                employeeId: true,
+                startDate: true,
+                endDate: true,
+                approvedStartDate: true,
+                approvedEndDate: true
+            }
+        });
 
-                    status:
-                        "PRESENT",
 
-                    employee:
-                        existing.employee ||
-                        todayView.employee
-                }
-            );
+    const selectedDateKey =
+        getISTDateString(
+            dailyDate
+        );
+
+
+    const leaveMap =
+        new Map();
+
+
+    for (
+        const leave
+        of approvedLeaves
+    ) {
+        const effectiveStart =
+            leave.approvedStartDate ||
+            leave.startDate;
+
+        const effectiveEnd =
+            leave.approvedEndDate ||
+            leave.endDate;
+
+        if (
+            !effectiveStart ||
+            !effectiveEnd
+        ) {
+            continue;
         }
-        else {
-            // Defensive fallback: a raw IN punch must be visible
-            // even when its summary Attendance row has not been created.
-            merged.set(
-                key,
-                {
-                    attendanceId:
-                        null,
 
-                    employeeId:
-                        todayView.employeeId,
 
-                    date:
-                        todayView.date,
+        const startKey =
+            getISTDateString(
+                effectiveStart
+            );
 
-                    checkInTime:
-                        todayView.checkInTime,
+        const endKey =
+            getISTDateString(
+                effectiveEnd
+            );
 
-                    checkOutTime:
-                        todayView.checkOutTime,
 
-                    totalHours:
-                        todayView.totalHours,
-
-                    status:
-                        "PRESENT",
-
-                    createdAt:
-                        now,
-
-                    updatedAt:
-                        now,
-
-                    employee:
-                        todayView.employee
-                }
+        if (
+            selectedDateKey >= startKey &&
+            selectedDateKey <= endKey
+        ) {
+            leaveMap.set(
+                Number(leave.employeeId),
+                true
             );
         }
     }
 
 
-    // ==============================================
-    // CALCULATE LATE STATUS FOR EXISTING RECORDS
-    // ==============================================
-    //
-    // Historical rows do not get synthesized absent/leave
-    // rows here. They retain their existing list behavior.
-    // LATE is still derived from check-in time.
-    // ==============================================
+    // ----------------------------------------------
+    // Build one daily row per employee
+    // ----------------------------------------------
 
-    const historicalAttendance =
+    const dailyRows = [];
+
+
+    for (
+        const employee
+        of employees
+    ) {
+        const id =
+            Number(
+                employee.employeeId
+            );
+
+
+        const storedRecord =
+            attendanceMap.get(id) ||
+            null;
+
+
+        const liveRecord =
+            todayViewMap.get(id) ||
+            null;
+
+
+        const baseRecord =
+            liveRecord
+                ? {
+                    ...(storedRecord || {}),
+                    ...liveRecord,
+                    employee:
+                        storedRecord?.employee ||
+                        liveRecord?.employee ||
+                        employee
+                }
+                : (
+                    storedRecord
+                        ? storedRecord
+                        : {
+                            attendanceId:
+                                null,
+
+                            employeeId:
+                                employee.employeeId,
+
+                            date:
+                                dailyDate,
+
+                            checkInTime:
+                                null,
+
+                            checkOutTime:
+                                null,
+
+                            totalHours:
+                                null,
+
+                            status:
+                                null,
+
+                            createdAt:
+                                null,
+
+                            updatedAt:
+                                null,
+
+                            employee:
+                                employee
+                        }
+                );
+
+
+        const effectiveStatus =
+            getEffectiveAttendanceStatus(
+                baseRecord,
+                leaveMap,
+                id,
+                true
+            );
+
+
+        // ------------------------------------------
+        // Status filter
+        // ------------------------------------------
+
+        if (
+            status &&
+            effectiveStatus !== status
+        ) {
+            continue;
+        }
+
+
+        dailyRows.push({
+            ...baseRecord,
+
+            employee:
+                baseRecord.employee ||
+                employee,
+
+            employeeId:
+                employee.employeeId,
+
+            date:
+                baseRecord.date ||
+                dailyDate,
+
+            status:
+                effectiveStatus,
+
+            attendanceStatus:
+                baseRecord.status ||
+                null,
+
+            onLeave:
+                effectiveStatus ===
+                "ON_LEAVE",
+
+            late:
+                effectiveStatus ===
+                "LATE"
+        });
+    }
+
+
+    // ----------------------------------------------
+    // Search/order/pagination
+    // ----------------------------------------------
+
+    dailyRows.sort(
+        (a, b) =>
+            Number(a.employeeId) -
+            Number(b.employeeId)
+    );
+
+
+    const total =
+        dailyRows.length;
+
+
+    // Daily roster intentionally returns the complete
+    // employee set because AdminAttendance has no
+    // pagination controls of its own.
+    const pagedDailyRows =
+        dailyRows;
+
+
+    const serializedDailyRows =
+        pagedDailyRows.map(
+            serializeAttendance
+        );
+
+
+    return {
+        data:
+            serializedDailyRows,
+
+        pagination: {
+            page: 1,
+            limit:
+                Math.max(
+                    total,
+                    parsedLimit
+                ),
+            total,
+            totalPages:
+                total > 0
+                    ? 1
+                    : 0,
+            hasNextPage: false,
+            hasPreviousPage: false
+        }
+    };
+}
+
+
+// ==============================================
+// ORIGINAL HISTORY / DATE-RANGE VIEW
+// ==============================================
+//
+// Preserve the existing historical behavior when no
+// daily status view is requested.
+// ==============================================
+
+const where = {};
+
+
+if (
+    parsedCompanyId !== null
+) {
+    where.employee = {
+        companyId:
+            parsedCompanyId
+    };
+}
+
+
+if (
+    parsedEmployeeId !== null
+) {
+    where.employeeId =
+        parsedEmployeeId;
+}
+
+
+// ==============================================
+// DATE FILTER
+// ==============================================
+
+if (date) {
+    const selectedDate =
+        new Date(
+            `${date}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            selectedDate.getTime()
+        )
+    ) {
+        const error = new Error(
+            "Invalid date. Use YYYY-MM-DD"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+
+    where.date = {
+        gte:
+            getISTCalendarDate(
+                selectedDate
+            ),
+        lt:
+            getNextISTCalendarDate(
+                selectedDate
+            )
+    };
+}
+else if (from || to) {
+    where.date = {};
+
+    if (from) {
+        const fromDate =
+            new Date(
+                `${from}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                fromDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid from date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
+        where.date.gte =
+            getISTCalendarDate(
+                fromDate
+            );
+    }
+
+
+    if (to) {
+        const toDate =
+            new Date(
+                `${to}T00:00:00`
+            );
+
+        if (
+            Number.isNaN(
+                toDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid to date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
+        where.date.lt =
+            getNextISTCalendarDate(
+                toDate
+            );
+    }
+}
+
+
+const skip =
+    (parsedPage - 1) *
+    parsedLimit;
+
+
+// ==============================================
+// LOAD STORED ATTENDANCE
+// ==============================================
+
+const attendance =
+    await prisma.attendance.findMany({
+        where,
+
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                }
+            }
+        }
+    });
+
+
+// ==============================================
+// LOAD TODAY'S RAW PUNCHES
+// ==============================================
+//
+// Preserve the existing behavior: when no historical
+// date filter is selected, today's raw punches are merged
+// into the historical attendance list.
+// ==============================================
+
+const now =
+    new Date();
+
+const todayStart =
+    getStartOfDay(now);
+
+const todayEnd =
+    getEndOfDay(now);
+
+const includeToday =
+    !date &&
+    !from &&
+    !to;
+
+
+const todayPunches =
+    includeToday
+        ? await prisma.attendancePunch.findMany({
+            where: {
+                punchedAt: {
+                    gte:
+                        todayStart,
+
+                    lte:
+                        todayEnd
+                },
+
+                ...(parsedEmployeeId !== null
+                    ? {
+                        employeeId:
+                            parsedEmployeeId
+                    }
+                    : {}),
+
+                ...(parsedCompanyId !== null
+                    ? {
+                        employee: {
+                            companyId:
+                                parsedCompanyId
+                        }
+                    }
+                    : {})
+            },
+
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
+                }
+            },
+
+            orderBy: {
+                punchedAt: "asc"
+            }
+        })
+        : [];
+
+
+const todayViews =
+    buildTodayAttendanceFromPunches(
+        todayPunches,
+        now
+    );
+
+
+// ==============================================
+// MERGE TODAY'S RAW DATA INTO ATTENDANCE DATA
+// ==============================================
+
+const merged =
+    new Map();
+
+
+for (
+    const record
+    of attendance
+) {
+    const key =
+        `${record.employeeId}|${getISTDateString(
+            record.date
+        )}`;
+
+    merged.set(
+        key,
+        record
+    );
+}
+
+
+for (
+    const todayView
+    of todayViews
+) {
+    const key =
+        `${todayView.employeeId}|${getISTDateString(
+            todayView.date
+        )}`;
+
+    const existing =
+        merged.get(key);
+
+
+    if (existing) {
+        merged.set(
+            key,
+            {
+                ...existing,
+
+                checkInTime:
+                    todayView.checkInTime,
+
+                checkOutTime:
+                    todayView.checkOutTime,
+
+                totalHours:
+                    todayView.totalHours,
+
+                status:
+                    "PRESENT",
+
+                employee:
+                    existing.employee ||
+                    todayView.employee
+            }
+        );
+    }
+    else {
+        // Defensive fallback: a raw IN punch must be visible
+        // even when its summary Attendance row has not been created.
+        merged.set(
+            key,
+            {
+                attendanceId:
+                    null,
+
+                employeeId:
+                    todayView.employeeId,
+
+                date:
+                    todayView.date,
+
+                checkInTime:
+                    todayView.checkInTime,
+
+                checkOutTime:
+                    todayView.checkOutTime,
+
+                totalHours:
+                    todayView.totalHours,
+
+                status:
+                    "PRESENT",
+
+                createdAt:
+                    now,
+
+                updatedAt:
+                    now,
+
+                employee:
+                    todayView.employee
+            }
+        );
+    }
+}
+
+
+// ==============================================
+// ======================================================
+// DETECT HISTORICAL OPEN SESSIONS FROM RAW PUNCHES
+// ======================================================
+//
+// IMPORTANT:
+// Checking only Attendance.checkOutTime is insufficient.
+// Example:
+//
+//   01:34 IN
+//   17:46 OUT
+//   18:10 IN
+//
+// The stored Attendance row still has checkOutTime=17:46,
+// but the final raw punch is IN, so the historical day still
+// needs administrator settlement.
+//
+// After settlement, Attendance.checkOutTime is replaced with
+// the administrator-provided settlement time. If that time is
+// different from the last real OUT punch, the historical session
+// is considered settled.
+// ======================================================
+
+const mergedRecords =
+    Array.from(merged.values());
+
+const historicalRecordsForPunchCheck =
+    mergedRecords.filter((record) => {
+        if (!record?.date) {
+            return false;
+        }
+
+        return (
+            getISTDateString(record.date) <
+            getISTDateString(now)
+        );
+    });
+
+const punchStateMap = new Map();
+
+if (
+    historicalRecordsForPunchCheck.length > 0
+) {
+    const historicalEmployeeIds =
         Array.from(
-            merged.values()
-        ).map(
-            (record) => ({
+            new Set(
+                historicalRecordsForPunchCheck.map(
+                    (record) =>
+                        Number(record.employeeId)
+                )
+            )
+        ).filter(
+            (employeeId) =>
+                Number.isInteger(employeeId) &&
+                employeeId > 0
+        );
+
+    const sortedHistoricalDates =
+        historicalRecordsForPunchCheck
+            .map((record) =>
+                record.date instanceof Date
+                    ? record.date
+                    : new Date(record.date)
+            )
+            .filter(
+                (dateValue) =>
+                    !Number.isNaN(
+                        dateValue.getTime()
+                    )
+            )
+            .sort(
+                (a, b) =>
+                    a.getTime() -
+                    b.getTime()
+            );
+
+    if (
+        historicalEmployeeIds.length > 0 &&
+        sortedHistoricalDates.length > 0
+    ) {
+        const punchStart =
+            getStartOfDay(
+                sortedHistoricalDates[0]
+            );
+
+        const punchEnd =
+            getEndOfDay(
+                sortedHistoricalDates[
+                    sortedHistoricalDates.length - 1
+                ]
+            );
+
+        const historicalPunches =
+            await prisma.attendancePunch.findMany({
+                where: {
+                    employeeId: {
+                        in: historicalEmployeeIds
+                    },
+
+                    punchedAt: {
+                        gte: punchStart,
+                        lte: punchEnd
+                    }
+                },
+
+                orderBy: {
+                    punchedAt: "asc"
+                }
+            });
+
+        const groupedPunches = new Map();
+
+        for (const punch of historicalPunches) {
+            const key =
+                `${punch.employeeId}|${getISTDateString(
+                    punch.punchedAt
+                )}`;
+
+            if (!groupedPunches.has(key)) {
+                groupedPunches.set(key, []);
+            }
+
+            groupedPunches.get(key).push(punch);
+        }
+
+        for (const [key, punches] of groupedPunches.entries()) {
+            punchStateMap.set(
+                key,
+                calculatePunchSessionState(punches)
+            );
+        }
+    }
+}
+
+// CALCULATE LATE STATUS FOR EXISTING RECORDS
+// ==============================================
+//
+// Historical rows do not get synthesized absent/leave
+// rows here. They retain their existing list behavior.
+// LATE is still derived from check-in time.
+// ==============================================
+
+const historicalAttendance =
+    mergedRecords.map(
+        (record) => {
+            const key =
+                `${record.employeeId}|${getISTDateString(
+                    record.date
+                )}`;
+
+            const punchState =
+                punchStateMap.get(key);
+
+            const rawOpenSession =
+                punchState?.hasOpenSession === true;
+
+            const storedCheckout =
+                formatTimeValue(
+                    record.checkOutTime
+                );
+
+            const lastRawOut =
+                punchState?.lastOut
+                    ? formatTimeValue(
+                        createMySQLTimeFromIST(
+                            punchState.lastOut
+                        )
+                    )
+                    : null;
+
+            // A historical day is pending settlement only when the
+            // raw punches still end with IN and the Attendance row has
+            // not already been replaced with an administrator settlement.
+            //
+            // Cases:
+            //   IN -> OUT -> IN, stored checkout = last real OUT
+            //       => still pending
+            //
+            //   IN -> OUT -> IN, stored checkout = admin settlement
+            //       => already settled
+            //
+            //   IN only, stored checkout = null
+            //       => still pending
+            //
+            //   IN only, stored checkout = admin settlement
+            //       => already settled
+            const hasOpenSession =
+                rawOpenSession &&
+                (
+                    storedCheckout === null ||
+                    (
+                        lastRawOut !== null &&
+                        storedCheckout === lastRawOut
+                    )
+                );
+
+            return {
                 ...record,
+
+                hasOpenSession,
 
                 status:
                     record.checkInTime &&
@@ -3012,127 +3253,190 @@ const getAttendancePaginated = async (
                             record.status ||
                             "ABSENT"
                         )
-            })
-        );
-
-
-    // ==============================================
-    // SORT ALL RECORDS
-    // ==============================================
-
-    historicalAttendance.sort(
-        (a, b) => {
-
-            const aTime =
-                new Date(
-                    a.date
-                ).getTime();
-
-            const bTime =
-                new Date(
-                    b.date
-                ).getTime();
-
-
-            if (
-                aTime !== bTime
-            ) {
-                return (
-                    bTime -
-                    aTime
-                );
-            }
-
-
-            return (
-                Number(
-                    a.employeeId
-                ) -
-                Number(
-                    b.employeeId
-                )
-            );
+            };
         }
     );
 
 
-    const total =
-        historicalAttendance.length;
+// ==============================================
+// SORT ALL RECORDS
+// ==============================================
+
+historicalAttendance.sort(
+    (a, b) => {
+
+        const aTime =
+            new Date(
+                a.date
+            ).getTime();
+
+        const bTime =
+            new Date(
+                b.date
+            ).getTime();
 
 
-    // ==============================================
-    // PAGINATION
-    // ==============================================
+        if (
+            aTime !== bTime
+        ) {
+            return (
+                bTime -
+                aTime
+            );
+        }
 
-    const pagedAttendance =
-        historicalAttendance.slice(
-            skip,
-            skip + parsedLimit
+
+        return (
+            Number(
+                a.employeeId
+            ) -
+            Number(
+                b.employeeId
+            )
         );
+    }
+);
 
 
-    // ==============================================
-    // SERIALIZE
-    // ==============================================
-
-    const serializedAttendance =
-        pagedAttendance.map(
-            serializeAttendance
-        );
+const total =
+    historicalAttendance.length;
 
 
-    const totalPages =
-        Math.ceil(
-            total /
-            parsedLimit
-        );
+// ==============================================
+// PAGINATION
+// ==============================================
+
+const pagedAttendance =
+    historicalAttendance.slice(
+        skip,
+        skip + parsedLimit
+    );
 
 
-    return {
-        data:
-            serializedAttendance,
+// ==============================================
+// SERIALIZE
+// ==============================================
 
-        pagination: {
-            page:
-                parsedPage,
+const serializedAttendance =
+    pagedAttendance.map(
+        serializeAttendance
+    );
 
-            limit:
-                parsedLimit,
 
-            total,
+const totalPages =
+    Math.ceil(
+        total /
+        parsedLimit
+    );
 
+
+return {
+    data:
+        serializedAttendance,
+
+    pagination: {
+        page:
+            parsedPage,
+
+        limit:
+            parsedLimit,
+
+        total,
+
+        totalPages,
+
+        hasNextPage:
+            parsedPage <
             totalPages,
 
-            hasNextPage:
-                parsedPage <
-                totalPages,
-
-            hasPreviousPage:
-                parsedPage >
-                1
-        }
-    };
+        hasPreviousPage:
+            parsedPage >
+            1
+    }
 };
 
+};
 
 // ======================================================
 // GET ATTENDANCE PUNCH HISTORY
 // ======================================================
 
 const getAttendancePunchHistory = async (
-    employeeId,
-    filters = {}
+employeeId,
+filters = {}
 ) => {
 
-    const id =
-        Number(employeeId);
+const id =
+    Number(employeeId);
+
+if (
+    !Number.isInteger(id) ||
+    id < 1
+) {
+    const error = new Error(
+        "Invalid employee ID"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+const employee =
+    await prisma.employee.findUnique({
+        where: {
+            employeeId: id
+        },
+
+        select: {
+            employeeId: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            status: true
+        }
+    });
+
+
+if (!employee) {
+    const error = new Error(
+        "Employee not found"
+    );
+
+    error.statusCode = 404;
+
+    throw error;
+}
+
+
+const {
+    date,
+    from,
+    to
+} = filters;
+
+
+const where = {
+    employeeId: id
+};
+
+
+if (date) {
+
+    const selectedDate =
+        new Date(
+            `${date}T00:00:00`
+        );
+
 
     if (
-        !Number.isInteger(id) ||
-        id < 1
+        Number.isNaN(
+            selectedDate.getTime()
+        )
     ) {
         const error = new Error(
-            "Invalid employee ID"
+            "Invalid date. Use YYYY-MM-DD"
         );
 
         error.statusCode = 400;
@@ -3141,60 +3445,42 @@ const getAttendancePunchHistory = async (
     }
 
 
-    const employee =
-        await prisma.employee.findUnique({
-            where: {
-                employeeId: id
-            },
+    where.punchedAt = {
+        gte:
+            getStartOfDay(
+                selectedDate
+            ),
 
-            select: {
-                employeeId: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                status: true
-            }
-        });
-
-
-    if (!employee) {
-        const error = new Error(
-            "Employee not found"
-        );
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
-
-    const {
-        date,
-        from,
-        to
-    } = filters;
-
-
-    const where = {
-        employeeId: id
+        lt:
+            getEndOfDay(
+                selectedDate
+            )
     };
+}
+
+else if (
+    from ||
+    to
+) {
+
+    where.punchedAt = {};
 
 
-    if (date) {
+    if (from) {
 
-        const selectedDate =
+        const fromDate =
             new Date(
-                `${date}T00:00:00`
+                `${from}T00:00:00`
             );
 
 
         if (
             Number.isNaN(
-                selectedDate.getTime()
+                fromDate.getTime()
             )
         ) {
             const error = new Error(
-                "Invalid date. Use YYYY-MM-DD"
+                "Invalid from date. Use YYYY-MM-DD"
             );
 
             error.statusCode = 400;
@@ -3203,411 +3489,604 @@ const getAttendancePunchHistory = async (
         }
 
 
-        where.punchedAt = {
-            gte:
-                getStartOfDay(
-                    selectedDate
-                ),
-
-            lt:
-                getEndOfDay(
-                    selectedDate
-                )
-        };
-    }
-
-    else if (
-        from ||
-        to
-    ) {
-
-        where.punchedAt = {};
-
-
-        if (from) {
-
-            const fromDate =
-                new Date(
-                    `${from}T00:00:00`
-                );
-
-
-            if (
-                Number.isNaN(
-                    fromDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid from date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-
-            where.punchedAt.gte =
-                getStartOfDay(
-                    fromDate
-                );
-        }
-
-
-        if (to) {
-
-            const toDate =
-                new Date(
-                    `${to}T00:00:00`
-                );
-
-
-            if (
-                Number.isNaN(
-                    toDate.getTime()
-                )
-            ) {
-                const error = new Error(
-                    "Invalid to date. Use YYYY-MM-DD"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-
-            where.punchedAt.lt =
-                getEndOfDay(
-                    toDate
-                );
-        }
+        where.punchedAt.gte =
+            getStartOfDay(
+                fromDate
+            );
     }
 
 
-    const punches =
-        await prisma.attendancePunch.findMany({
-            where,
+    if (to) {
 
-            include: {
-                device: {
-                    select: {
-                        deviceId: true,
-                        deviceCode: true,
-                        deviceName: true,
-                        branchId: true
-                    }
+        const toDate =
+            new Date(
+                `${to}T00:00:00`
+            );
+
+
+        if (
+            Number.isNaN(
+                toDate.getTime()
+            )
+        ) {
+            const error = new Error(
+                "Invalid to date. Use YYYY-MM-DD"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+
+        where.punchedAt.lt =
+            getEndOfDay(
+                toDate
+            );
+    }
+}
+
+
+const punches =
+    await prisma.attendancePunch.findMany({
+        where,
+
+        include: {
+            device: {
+                select: {
+                    deviceId: true,
+                    deviceCode: true,
+                    deviceName: true,
+                    branchId: true
                 }
-            },
-
-            orderBy: {
-                punchedAt: "asc"
             }
-        });
-
-
-    return {
-        employee,
-
-        filters: {
-            date:
-                date || null,
-
-            from:
-                from || null,
-
-            to:
-                to || null
         },
 
-        totalPunches:
-            punches.length,
+        orderBy: {
+            punchedAt: "asc"
+        }
+    });
 
-        punches:
-            punches.map(
-                punch => ({
-                    ...punch,
 
-                    punchId:
-                        punch.punchId.toString()
-                })
-            )
-    };
+return {
+    employee,
+
+    filters: {
+        date:
+            date || null,
+
+        from:
+            from || null,
+
+        to:
+            to || null
+    },
+
+    totalPunches:
+        punches.length,
+
+    punches:
+        punches.map(
+            punch => ({
+                ...punch,
+
+                punchId:
+                    punch.punchId.toString()
+            })
+        )
 };
 
+};
 
 // ======================================================
 // ADMIN ATTENDANCE CORRECTION
 // ======================================================
 
 const updateAttendance = async (
-    attendanceId,
-    data,
-    adminUser = null
+attendanceId,
+data,
+adminUser = null
 ) => {
 
-    const id =
-        Number(attendanceId);
+const id =
+    Number(attendanceId);
 
 
-    if (
-        !Number.isInteger(id) ||
-        id < 1
-    ) {
-        const error = new Error(
-            "Invalid attendance ID"
-        );
+if (
+    !Number.isInteger(id) ||
+    id < 1
+) {
+    const error = new Error(
+        "Invalid attendance ID"
+    );
 
-        error.statusCode = 400;
+    error.statusCode = 400;
 
-        throw error;
-    }
+    throw error;
+}
 
 
-    const existingAttendance =
-        await prisma.attendance.findUnique({
-            where: {
-                attendanceId: id
-            },
+const existingAttendance =
+    await prisma.attendance.findUnique({
+        where: {
+            attendanceId: id
+        },
 
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
                 }
             }
-        });
+        }
+    });
 
 
-    if (!existingAttendance) {
-        const error = new Error(
-            "Attendance record not found"
+if (!existingAttendance) {
+    const error = new Error(
+        "Attendance record not found"
+    );
+
+    error.statusCode = 404;
+
+    throw error;
+}
+
+
+const {
+    checkInTime,
+    checkOutTime,
+    status
+} = data;
+
+
+if (
+    checkInTime === undefined &&
+    checkOutTime === undefined &&
+    status === undefined
+) {
+    const error = new Error(
+        "At least one attendance field is required"
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+}
+
+
+// ======================================================
+// HISTORICAL MISSING-CHECKOUT SETTLEMENT
+// ======================================================
+//
+// An administrator may settle a previous day's final open IN.
+// We never overwrite or delete raw fingerprint punches.
+// Instead, we recalculate the whole day from those punches:
+//
+//   IN -> OUT -> IN -> admin settlement OUT
+//
+// Completed sessions remain intact and only the final unmatched
+// IN is closed using the administrator's supplied checkout time.
+//
+// Today's unresolved IN is intentionally NOT settled through this
+// path. The employee still has the current day available to punch OUT.
+// ======================================================
+
+if (
+    checkOutTime !== undefined
+) {
+    const attendanceDate =
+        existingAttendance.date;
+
+    const attendanceDateString =
+        getISTDateString(
+            attendanceDate
         );
 
-        error.statusCode = 404;
-
-        throw error;
-    }
-
-
-    const {
-        checkInTime,
-        checkOutTime,
-        status
-    } = data;
-
-
-    if (
-        checkInTime === undefined &&
-        checkOutTime === undefined &&
-        status === undefined
-    ) {
-        const error = new Error(
-            "At least one attendance field is required"
+    const todayDateString =
+        getISTDateString(
+            new Date()
         );
 
-        error.statusCode = 400;
+    const isHistoricalDate =
+        attendanceDateString <
+        todayDateString;
 
-        throw error;
-    }
-
-
-    const newCheckInTime =
-        checkInTime !== undefined
-            ? parseTime(
-                checkInTime,
-                "checkInTime"
-            )
-            : existingAttendance.checkInTime;
-
-
-    const newCheckOutTime =
-        checkOutTime !== undefined
-            ? parseTime(
+    if (isHistoricalDate) {
+        const settlementTime =
+            parseTime(
                 checkOutTime,
                 "checkOutTime"
-            )
-            : existingAttendance.checkOutTime;
-
-
-    let totalHours = null;
-    let totalHoursFormatted =
-        "0 minutes";
-
-
-    if (
-        newCheckInTime &&
-        newCheckOutTime
-    ) {
-
-        const checkInMinutes =
-            timeValueToMinutes(
-                newCheckInTime
             );
 
-
-        const checkOutMinutes =
-            timeValueToMinutes(
-                newCheckOutTime
+        const dayStart =
+            getStartOfDay(
+                attendanceDate
             );
 
+        const dayEnd =
+            getEndOfDay(
+                attendanceDate
+            );
 
-        let durationMinutes =
-            checkOutMinutes -
-            checkInMinutes;
+        const rawPunches =
+            await prisma.attendancePunch.findMany({
+                where: {
+                    employeeId:
+                        existingAttendance.employeeId,
 
+                    punchedAt: {
+                        gte: dayStart,
+                        lte: dayEnd
+                    }
+                },
 
-        if (
-            durationMinutes < 0
-        ) {
-            durationMinutes +=
-                24 * 60;
-        }
+                orderBy: {
+                    punchedAt: "asc"
+                }
+            });
 
+        const punchState =
+            calculatePunchSessionState(
+                rawPunches
+            );
 
-        if (
-            durationMinutes > 0
-        ) {
+        if (punchState.hasOpenSession) {
+            const storedCheckout =
+                formatTimeValue(
+                    existingAttendance.checkOutTime
+                );
 
-            totalHours =
+            const lastRawOut =
+                punchState.lastOut
+                    ? formatTimeValue(
+                        createMySQLTimeFromIST(
+                            punchState.lastOut
+                        )
+                    )
+                    : null;
+
+            // If the raw punches still end with IN but the stored checkout
+            // is already different from the last real OUT, the day has
+            // already been settled by an administrator. Do not settle it
+            // a second time.
+            const alreadySettled =
+                storedCheckout !== null &&
+                (
+                    lastRawOut === null ||
+                    storedCheckout !== lastRawOut
+                );
+
+            if (alreadySettled) {
+                const error = new Error(
+                    "This historical attendance has already been settled."
+                );
+
+                error.statusCode = 409;
+
+                throw error;
+            }
+
+            const settlementInstant =
+                combineAttendanceDateAndTime(
+                    attendanceDate,
+                    settlementTime
+                );
+
+            if (
+                !settlementInstant
+            ) {
+                const error = new Error(
+                    "Invalid settlement checkout time"
+                );
+
+                error.statusCode = 400;
+
+                throw error;
+            }
+
+            // Historical settlement closes the final unmatched IN on the
+            // SAME attendance date. Never add 24 hours implicitly here.
+            // The admin must enter a checkout time later than that final IN.
+            if (
+                settlementInstant.getTime() <=
+                punchState.openIn.getTime()
+            ) {
+                const error = new Error(
+                    "Settlement checkout time must be later than the final unmatched IN time on the same attendance date."
+                );
+
+                error.statusCode = 400;
+
+                throw error;
+            }
+
+            const finalSessionMilliseconds =
+                settlementInstant.getTime() -
+                punchState.openIn.getTime();
+
+            if (
+                finalSessionMilliseconds <= 0
+            ) {
+                const error = new Error(
+                    "Settlement checkout time must be after the final unmatched IN time"
+                );
+
+                error.statusCode = 400;
+
+                throw error;
+            }
+
+            const finalSessionHours =
+                finalSessionMilliseconds /
+                (1000 * 60 * 60);
+
+            const totalHours =
                 Number(
                     (
-                        durationMinutes / 60
+                        punchState.completedHours +
+                        finalSessionHours
                     ).toFixed(2)
                 );
 
-
-            totalHoursFormatted =
+            const totalHoursFormatted =
                 formatDuration(
                     totalHours
                 );
+
+            const updatedAttendance =
+                await prisma.attendance.update({
+                    where: {
+                        attendanceId: id
+                    },
+
+                    data: {
+                        checkOutTime:
+                            settlementTime,
+
+                        totalHours,
+
+                        status:
+                            status !== undefined
+                                ? status
+                                : "PRESENT"
+                    },
+
+                    include: {
+                        employee: {
+                            select: {
+                                employeeId: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                                status: true
+                            }
+                        }
+                    }
+                });
+
+            return {
+                attendance:
+                    serializeAttendance(
+                        updatedAttendance
+                    ),
+
+                totalHours,
+
+                totalHoursFormatted,
+
+                correctedBy:
+                    adminUser?.userId ||
+                    adminUser?.id ||
+                    null
+            };
         }
+
+        // Historical checkout correction is only valid as a settlement
+        // when the raw punches currently have an unmatched final IN.
+        // Do not let the generic correction path overwrite a settled
+        // historical record a second time.
+        const error = new Error(
+            "This historical attendance does not have an unresolved final IN session to settle."
+        );
+
+        error.statusCode = 409;
+
+        throw error;
     }
+}
 
 
-    const updateData = {};
+// ======================================================
+// NORMAL ATTENDANCE CORRECTION
+// ======================================================
 
+const newCheckInTime =
+    checkInTime !== undefined
+        ? parseTime(
+            checkInTime,
+            "checkInTime"
+        )
+        : existingAttendance.checkInTime;
+
+
+const newCheckOutTime =
+    checkOutTime !== undefined
+        ? parseTime(
+            checkOutTime,
+            "checkOutTime"
+        )
+        : existingAttendance.checkOutTime;
+
+
+let totalHours = null;
+let totalHoursFormatted =
+    "0 minutes";
+
+
+if (
+    newCheckInTime &&
+    newCheckOutTime
+) {
+    const checkInMinutes =
+        timeValueToMinutes(
+            newCheckInTime
+        );
+
+    const checkOutMinutes =
+        timeValueToMinutes(
+            newCheckOutTime
+        );
+
+    let durationMinutes =
+        checkOutMinutes -
+        checkInMinutes;
 
     if (
-        checkInTime !== undefined
+        durationMinutes < 0
     ) {
-        updateData.checkInTime =
-            newCheckInTime;
+        durationMinutes +=
+            24 * 60;
     }
 
-
     if (
-        checkOutTime !== undefined
+        durationMinutes > 0
     ) {
-        updateData.checkOutTime =
-            newCheckOutTime;
-    }
-
-
-    if (
-        checkInTime !== undefined ||
-        checkOutTime !== undefined
-    ) {
-        updateData.totalHours =
-            totalHours;
-    }
-
-
-    if (
-        status !== undefined
-    ) {
-
-        const allowedStatuses = [
-            "PRESENT",
-            "ABSENT"
-        ];
-
-
-        if (
-            !allowedStatuses.includes(
-                status
-            )
-        ) {
-            const error = new Error(
-                "Invalid attendance status"
+        totalHours =
+            Number(
+                (
+                    durationMinutes / 60
+                ).toFixed(2)
             );
 
-            error.statusCode = 400;
+        totalHoursFormatted =
+            formatDuration(
+                totalHours
+            );
+    }
+}
 
-            throw error;
-        }
+
+const updateData = {};
 
 
-        updateData.status =
-            status;
+if (
+    checkInTime !== undefined
+) {
+    updateData.checkInTime =
+        newCheckInTime;
+}
+
+
+if (
+    checkOutTime !== undefined
+) {
+    updateData.checkOutTime =
+        newCheckOutTime;
+}
+
+
+if (
+    checkInTime !== undefined ||
+    checkOutTime !== undefined
+) {
+    updateData.totalHours =
+        totalHours;
+}
+
+
+if (
+    status !== undefined
+) {
+    const allowedStatuses = [
+        "PRESENT",
+        "ABSENT"
+    ];
+
+    if (
+        !allowedStatuses.includes(
+            status
+        )
+    ) {
+        const error = new Error(
+            "Invalid attendance status"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
     }
 
+    updateData.status =
+        status;
+}
 
-    const updatedAttendance =
-        await prisma.attendance.update({
-            where: {
-                attendanceId: id
-            },
 
-            data: updateData,
+const updatedAttendance =
+    await prisma.attendance.update({
+        where: {
+            attendanceId: id
+        },
 
-            include: {
-                employee: {
-                    select: {
-                        employeeId: true,
-                        firstName: true,
-                        lastName: true,
-                        email: true,
-                        status: true
-                    }
+        data: updateData,
+
+        include: {
+            employee: {
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
                 }
             }
-        });
+        }
+    });
 
 
-    return {
-        attendance:
-            serializeAttendance(
-                updatedAttendance
-            ),
+return {
+    attendance:
+        serializeAttendance(
+            updatedAttendance
+        ),
 
-        totalHours,
+    totalHours,
 
-        totalHoursFormatted,
+    totalHoursFormatted,
 
-        correctedBy:
-            adminUser?.userId ||
-            adminUser?.id ||
-            null
-    };
+    correctedBy:
+        adminUser?.userId ||
+        adminUser?.id ||
+        null
 };
 
+};
 
 // ======================================================
 // EXPORT
 // ======================================================
 
 module.exports = {
-    processDevicePunch,
+processDevicePunch,
 
-    getAllAttendance,
+getAllAttendance,
 
-    getAttendancePaginated,
+getAttendancePaginated,
 
-    getAttendancePunchHistory,
+getAttendancePunchHistory,
 
-    getAttendanceById,
+getAttendanceById,
 
-    getEmployeeAttendance,
+getEmployeeAttendance,
 
-    getAttendanceSummary,
+getAttendanceSummary,
 
-    getEmployeeAttendanceSummary,
+getEmployeeAttendanceSummary,
 
-    updateAttendance
+updateAttendance
+
 };
