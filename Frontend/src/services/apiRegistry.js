@@ -224,6 +224,14 @@ const API = {
         create:
             "/api/fingerprints",
 
+        // GET /api/fingerprints/enrollment/:id/status
+        enrollmentStatus: (enrollmentId) =>
+            `/api/fingerprints/enrollment/${enrollmentId}/status`,
+
+        // POST /api/fingerprints/enrollment/:id/cancel
+        cancelEnrollment: (enrollmentId) =>
+            `/api/fingerprints/enrollment/${enrollmentId}/cancel`,
+
         // PUT /api/fingerprints/:id
         update: (id) =>
             `/api/fingerprints/${id}`,
@@ -275,8 +283,25 @@ const API = {
     device: {
 
         // POST /api/device/fingerprint-enroll
+        // Legacy direct device enrollment endpoint.
         fingerprintEnroll:
             "/api/device/fingerprint-enroll",
+
+        // GET /api/device/fingerprint-enroll/pending
+        fingerprintEnrollPending:
+            "/api/device/fingerprint-enroll/pending",
+
+        // GET /api/device/fingerprint-enroll/:id/status
+        fingerprintEnrollStatus: (enrollmentId) =>
+            `/api/device/fingerprint-enroll/${enrollmentId}/status`,
+
+        // POST /api/device/fingerprint-enroll/log
+        fingerprintEnrollLog:
+            "/api/device/fingerprint-enroll/log",
+
+        // POST /api/device/fingerprint-enroll/result
+        fingerprintEnrollResult:
+            "/api/device/fingerprint-enroll/result",
 
     },
 

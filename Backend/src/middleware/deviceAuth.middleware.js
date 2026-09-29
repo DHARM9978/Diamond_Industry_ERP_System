@@ -1,13 +1,37 @@
 const bcrypt = require("bcrypt");
 
-const prisma = require("../config/database");
+const prisma =
+    require("../config/database");
 
 
 // ======================================================
 // DEVICE AUTHENTICATION MIDDLEWARE
 // ======================================================
+//
+// Authenticates fingerprint / IoT devices before allowing
+// them to access device-protected API endpoints.
+//
+// Expected request headers:
+//
+//     x-device-code
+//     x-device-secret
+//
+// On successful authentication:
+//
+//     req.device = authenticated IotDevice record
+//
+// This middleware is used by:
+//
+//     POST /api/attendance/punch
+//     POST /api/attendance/batch
+//
+// ======================================================
 
-const authenticateDevice = async (req, res, next) => {
+const authenticateDevice = async (
+    req,
+    res,
+    next
+) => {
 
     try {
 
@@ -26,7 +50,10 @@ const authenticateDevice = async (req, res, next) => {
         // Validate credentials exist
         // ==============================================
 
-        if (!deviceCode || !deviceSecret) {
+        if (
+            !deviceCode ||
+            !deviceSecret
+        ) {
 
             return res.status(401).json({
 
@@ -39,7 +66,7 @@ const authenticateDevice = async (req, res, next) => {
 
 
         // ==============================================
-        // Find device
+        // Find device by unique device code
         // ==============================================
 
         const device =
@@ -50,6 +77,10 @@ const authenticateDevice = async (req, res, next) => {
                 }
             });
 
+
+        // ==============================================
+        // Reject unknown device
+        // ==============================================
 
         if (!device) {
 
@@ -67,7 +98,9 @@ const authenticateDevice = async (req, res, next) => {
         // Check device status
         // ==============================================
 
-        if (device.status !== "ACTIVE") {
+        if (
+            device.status !== "ACTIVE"
+        ) {
 
             return res.status(403).json({
 
@@ -83,7 +116,9 @@ const authenticateDevice = async (req, res, next) => {
         // Check secret hash exists
         // ==============================================
 
-        if (!device.deviceSecretHash) {
+        if (
+            !device.deviceSecretHash
+        ) {
 
             return res.status(401).json({
 
@@ -96,7 +131,7 @@ const authenticateDevice = async (req, res, next) => {
 
 
         // ==============================================
-        // Compare secret
+        // Compare supplied secret with stored hash
         // ==============================================
 
         const validSecret =
@@ -105,6 +140,10 @@ const authenticateDevice = async (req, res, next) => {
                 device.deviceSecretHash
             );
 
+
+        // ==============================================
+        // Reject invalid secret
+        // ==============================================
 
         if (!validSecret) {
 
@@ -119,14 +158,20 @@ const authenticateDevice = async (req, res, next) => {
 
 
         // ==============================================
-        // Attach device to request
+        // Attach authenticated device to request
+        // ==============================================
+        //
+        // Controllers/services use req.device to identify
+        // the authenticated device and its company/branch.
+        //
         // ==============================================
 
-        req.device = device;
+        req.device =
+            device;
 
 
         // ==============================================
-        // Update last seen
+        // Update device last-seen timestamp
         // ==============================================
 
         await prisma.iotDevice.update({
@@ -144,7 +189,7 @@ const authenticateDevice = async (req, res, next) => {
 
 
         // ==============================================
-        // Continue
+        // Continue to the protected endpoint
         // ==============================================
 
         next();
@@ -156,4 +201,9 @@ const authenticateDevice = async (req, res, next) => {
 };
 
 
-module.exports = authenticateDevice;
+// ======================================================
+// EXPORT
+// ======================================================
+
+module.exports =
+    authenticateDevice;

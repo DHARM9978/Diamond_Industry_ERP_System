@@ -2547,10 +2547,12 @@ export namespace Prisma {
 
   export type AdminCountOutputType = {
     approvedAdvances: number
+    attendanceOverrides: number
   }
 
   export type AdminCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     approvedAdvances?: boolean | AdminCountOutputTypeCountApprovedAdvancesArgs
+    attendanceOverrides?: boolean | AdminCountOutputTypeCountAttendanceOverridesArgs
   }
 
   // Custom InputTypes
@@ -2569,6 +2571,13 @@ export namespace Prisma {
    */
   export type AdminCountOutputTypeCountApprovedAdvancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AdvancePaymentWhereInput
+  }
+
+  /**
+   * AdminCountOutputType without action
+   */
+  export type AdminCountOutputTypeCountAttendanceOverridesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceWhereInput
   }
 
 
@@ -3277,6 +3286,7 @@ export namespace Prisma {
     updatedAt?: boolean
     company?: boolean | companiesDefaultArgs<ExtArgs>
     approvedAdvances?: boolean | Admin$approvedAdvancesArgs<ExtArgs>
+    attendanceOverrides?: boolean | Admin$attendanceOverridesArgs<ExtArgs>
     _count?: boolean | AdminCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["admin"]>
 
@@ -3297,6 +3307,7 @@ export namespace Prisma {
   export type AdminInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     approvedAdvances?: boolean | Admin$approvedAdvancesArgs<ExtArgs>
+    attendanceOverrides?: boolean | Admin$attendanceOverridesArgs<ExtArgs>
     _count?: boolean | AdminCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3305,6 +3316,7 @@ export namespace Prisma {
     objects: {
       company: Prisma.$companiesPayload<ExtArgs>
       approvedAdvances: Prisma.$AdvancePaymentPayload<ExtArgs>[]
+      attendanceOverrides: Prisma.$AttendancePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       adminId: number
@@ -3657,6 +3669,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     approvedAdvances<T extends Admin$approvedAdvancesArgs<ExtArgs> = {}>(args?: Subset<T, Admin$approvedAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdvancePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    attendanceOverrides<T extends Admin$attendanceOverridesArgs<ExtArgs> = {}>(args?: Subset<T, Admin$attendanceOverridesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4063,6 +4076,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AdvancePaymentScalarFieldEnum | AdvancePaymentScalarFieldEnum[]
+  }
+
+  /**
+   * Admin.attendanceOverrides
+   */
+  export type Admin$attendanceOverridesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Attendance
+     */
+    select?: AttendanceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Attendance
+     */
+    omit?: AttendanceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceInclude<ExtArgs> | null
+    where?: AttendanceWhereInput
+    orderBy?: AttendanceOrderByWithRelationInput | AttendanceOrderByWithRelationInput[]
+    cursor?: AttendanceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
   }
 
   /**
@@ -9952,6 +9989,7 @@ export namespace Prisma {
     sensorSlot: number | null
     punchType: string | null
     punchedAt: Date | null
+    eventId: string | null
     createdAt: Date | null
   }
 
@@ -9962,6 +10000,7 @@ export namespace Prisma {
     sensorSlot: number | null
     punchType: string | null
     punchedAt: Date | null
+    eventId: string | null
     createdAt: Date | null
   }
 
@@ -9972,6 +10011,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: number
     punchedAt: number
+    eventId: number
     createdAt: number
     _all: number
   }
@@ -9998,6 +10038,7 @@ export namespace Prisma {
     sensorSlot?: true
     punchType?: true
     punchedAt?: true
+    eventId?: true
     createdAt?: true
   }
 
@@ -10008,6 +10049,7 @@ export namespace Prisma {
     sensorSlot?: true
     punchType?: true
     punchedAt?: true
+    eventId?: true
     createdAt?: true
   }
 
@@ -10018,6 +10060,7 @@ export namespace Prisma {
     sensorSlot?: true
     punchType?: true
     punchedAt?: true
+    eventId?: true
     createdAt?: true
     _all?: true
   }
@@ -10115,6 +10158,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date
+    eventId: string | null
     createdAt: Date
     _count: AttendancePunchCountAggregateOutputType | null
     _avg: AttendancePunchAvgAggregateOutputType | null
@@ -10144,6 +10188,7 @@ export namespace Prisma {
     sensorSlot?: boolean
     punchType?: boolean
     punchedAt?: boolean
+    eventId?: boolean
     createdAt?: boolean
     device?: boolean | IotDeviceDefaultArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
@@ -10158,10 +10203,11 @@ export namespace Prisma {
     sensorSlot?: boolean
     punchType?: boolean
     punchedAt?: boolean
+    eventId?: boolean
     createdAt?: boolean
   }
 
-  export type AttendancePunchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"punchId" | "employeeId" | "deviceId" | "sensorSlot" | "punchType" | "punchedAt" | "createdAt", ExtArgs["result"]["attendancePunch"]>
+  export type AttendancePunchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"punchId" | "employeeId" | "deviceId" | "sensorSlot" | "punchType" | "punchedAt" | "eventId" | "createdAt", ExtArgs["result"]["attendancePunch"]>
   export type AttendancePunchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     device?: boolean | IotDeviceDefaultArgs<ExtArgs>
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
@@ -10180,6 +10226,7 @@ export namespace Prisma {
       sensorSlot: number
       punchType: string
       punchedAt: Date
+      eventId: string | null
       createdAt: Date
     }, ExtArgs["result"]["attendancePunch"]>
     composites: {}
@@ -10558,6 +10605,7 @@ export namespace Prisma {
     readonly sensorSlot: FieldRef<"AttendancePunch", 'Int'>
     readonly punchType: FieldRef<"AttendancePunch", 'String'>
     readonly punchedAt: FieldRef<"AttendancePunch", 'DateTime'>
+    readonly eventId: FieldRef<"AttendancePunch", 'String'>
     readonly createdAt: FieldRef<"AttendancePunch", 'DateTime'>
   }
     
@@ -10941,12 +10989,14 @@ export namespace Prisma {
     attendanceId: number | null
     employeeId: number | null
     totalHours: Decimal | null
+    manualOverrideBy: number | null
   }
 
   export type AttendanceSumAggregateOutputType = {
     attendanceId: number | null
     employeeId: number | null
     totalHours: Decimal | null
+    manualOverrideBy: number | null
   }
 
   export type AttendanceMinAggregateOutputType = {
@@ -10957,6 +11007,10 @@ export namespace Prisma {
     checkOutTime: Date | null
     totalHours: Decimal | null
     status: string | null
+    resolutionSource: string | null
+    manualOverride: boolean | null
+    manualOverrideAt: Date | null
+    manualOverrideBy: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10969,6 +11023,10 @@ export namespace Prisma {
     checkOutTime: Date | null
     totalHours: Decimal | null
     status: string | null
+    resolutionSource: string | null
+    manualOverride: boolean | null
+    manualOverrideAt: Date | null
+    manualOverrideBy: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -10981,6 +11039,10 @@ export namespace Prisma {
     checkOutTime: number
     totalHours: number
     status: number
+    resolutionSource: number
+    manualOverride: number
+    manualOverrideAt: number
+    manualOverrideBy: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -10991,12 +11053,14 @@ export namespace Prisma {
     attendanceId?: true
     employeeId?: true
     totalHours?: true
+    manualOverrideBy?: true
   }
 
   export type AttendanceSumAggregateInputType = {
     attendanceId?: true
     employeeId?: true
     totalHours?: true
+    manualOverrideBy?: true
   }
 
   export type AttendanceMinAggregateInputType = {
@@ -11007,6 +11071,10 @@ export namespace Prisma {
     checkOutTime?: true
     totalHours?: true
     status?: true
+    resolutionSource?: true
+    manualOverride?: true
+    manualOverrideAt?: true
+    manualOverrideBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11019,6 +11087,10 @@ export namespace Prisma {
     checkOutTime?: true
     totalHours?: true
     status?: true
+    resolutionSource?: true
+    manualOverride?: true
+    manualOverrideAt?: true
+    manualOverrideBy?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -11031,6 +11103,10 @@ export namespace Prisma {
     checkOutTime?: true
     totalHours?: true
     status?: true
+    resolutionSource?: true
+    manualOverride?: true
+    manualOverrideAt?: true
+    manualOverrideBy?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -11130,6 +11206,10 @@ export namespace Prisma {
     checkOutTime: Date | null
     totalHours: Decimal | null
     status: string
+    resolutionSource: string | null
+    manualOverride: boolean
+    manualOverrideAt: Date | null
+    manualOverrideBy: number | null
     createdAt: Date
     updatedAt: Date
     _count: AttendanceCountAggregateOutputType | null
@@ -11161,9 +11241,14 @@ export namespace Prisma {
     checkOutTime?: boolean
     totalHours?: boolean
     status?: boolean
+    resolutionSource?: boolean
+    manualOverride?: boolean
+    manualOverrideAt?: boolean
+    manualOverrideBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    manualOverrideAdmin?: boolean | Attendance$manualOverrideAdminArgs<ExtArgs>
   }, ExtArgs["result"]["attendance"]>
 
 
@@ -11176,19 +11261,25 @@ export namespace Prisma {
     checkOutTime?: boolean
     totalHours?: boolean
     status?: boolean
+    resolutionSource?: boolean
+    manualOverride?: boolean
+    manualOverrideAt?: boolean
+    manualOverrideBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"attendanceId" | "employeeId" | "date" | "checkInTime" | "checkOutTime" | "totalHours" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
+  export type AttendanceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"attendanceId" | "employeeId" | "date" | "checkInTime" | "checkOutTime" | "totalHours" | "status" | "resolutionSource" | "manualOverride" | "manualOverrideAt" | "manualOverrideBy" | "createdAt" | "updatedAt", ExtArgs["result"]["attendance"]>
   export type AttendanceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     employee?: boolean | EmployeeDefaultArgs<ExtArgs>
+    manualOverrideAdmin?: boolean | Attendance$manualOverrideAdminArgs<ExtArgs>
   }
 
   export type $AttendancePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Attendance"
     objects: {
       employee: Prisma.$EmployeePayload<ExtArgs>
+      manualOverrideAdmin: Prisma.$AdminPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       attendanceId: number
@@ -11198,6 +11289,10 @@ export namespace Prisma {
       checkOutTime: Date | null
       totalHours: Prisma.Decimal | null
       status: string
+      resolutionSource: string | null
+      manualOverride: boolean
+      manualOverrideAt: Date | null
+      manualOverrideBy: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["attendance"]>
@@ -11541,6 +11636,7 @@ export namespace Prisma {
   export interface Prisma__AttendanceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     employee<T extends EmployeeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmployeeDefaultArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    manualOverrideAdmin<T extends Attendance$manualOverrideAdminArgs<ExtArgs> = {}>(args?: Subset<T, Attendance$manualOverrideAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11577,6 +11673,10 @@ export namespace Prisma {
     readonly checkOutTime: FieldRef<"Attendance", 'DateTime'>
     readonly totalHours: FieldRef<"Attendance", 'Decimal'>
     readonly status: FieldRef<"Attendance", 'String'>
+    readonly resolutionSource: FieldRef<"Attendance", 'String'>
+    readonly manualOverride: FieldRef<"Attendance", 'Boolean'>
+    readonly manualOverrideAt: FieldRef<"Attendance", 'DateTime'>
+    readonly manualOverrideBy: FieldRef<"Attendance", 'Int'>
     readonly createdAt: FieldRef<"Attendance", 'DateTime'>
     readonly updatedAt: FieldRef<"Attendance", 'DateTime'>
   }
@@ -11924,6 +12024,25 @@ export namespace Prisma {
      * Limit how many Attendances to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Attendance.manualOverrideAdmin
+   */
+  export type Attendance$manualOverrideAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Admin
+     */
+    select?: AdminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Admin
+     */
+    omit?: AdminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminInclude<ExtArgs> | null
+    where?: AdminWhereInput
   }
 
   /**
@@ -26100,6 +26219,7 @@ export namespace Prisma {
     sensorSlot: 'sensorSlot',
     punchType: 'punchType',
     punchedAt: 'punchedAt',
+    eventId: 'eventId',
     createdAt: 'createdAt'
   };
 
@@ -26114,6 +26234,10 @@ export namespace Prisma {
     checkOutTime: 'checkOutTime',
     totalHours: 'totalHours',
     status: 'status',
+    resolutionSource: 'resolutionSource',
+    manualOverride: 'manualOverride',
+    manualOverrideAt: 'manualOverrideAt',
+    manualOverrideBy: 'manualOverrideBy',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -26406,14 +26530,16 @@ export namespace Prisma {
 
 
   export const AttendancePunchOrderByRelevanceFieldEnum: {
-    punchType: 'punchType'
+    punchType: 'punchType',
+    eventId: 'eventId'
   };
 
   export type AttendancePunchOrderByRelevanceFieldEnum = (typeof AttendancePunchOrderByRelevanceFieldEnum)[keyof typeof AttendancePunchOrderByRelevanceFieldEnum]
 
 
   export const AttendanceOrderByRelevanceFieldEnum: {
-    status: 'status'
+    status: 'status',
+    resolutionSource: 'resolutionSource'
   };
 
   export type AttendanceOrderByRelevanceFieldEnum = (typeof AttendanceOrderByRelevanceFieldEnum)[keyof typeof AttendanceOrderByRelevanceFieldEnum]
@@ -26581,6 +26707,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Admin"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     approvedAdvances?: AdvancePaymentListRelationFilter
+    attendanceOverrides?: AttendanceListRelationFilter
   }
 
   export type AdminOrderByWithRelationInput = {
@@ -26594,6 +26721,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     company?: companiesOrderByWithRelationInput
     approvedAdvances?: AdvancePaymentOrderByRelationAggregateInput
+    attendanceOverrides?: AttendanceOrderByRelationAggregateInput
     _relevance?: AdminOrderByRelevanceInput
   }
 
@@ -26611,6 +26739,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Admin"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     approvedAdvances?: AdvancePaymentListRelationFilter
+    attendanceOverrides?: AttendanceListRelationFilter
   }, "adminId" | "email">
 
   export type AdminOrderByWithAggregationInput = {
@@ -27151,6 +27280,7 @@ export namespace Prisma {
     sensorSlot?: IntFilter<"AttendancePunch"> | number
     punchType?: StringFilter<"AttendancePunch"> | string
     punchedAt?: DateTimeFilter<"AttendancePunch"> | Date | string
+    eventId?: StringNullableFilter<"AttendancePunch"> | string | null
     createdAt?: DateTimeFilter<"AttendancePunch"> | Date | string
     device?: XOR<IotDeviceScalarRelationFilter, IotDeviceWhereInput>
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
@@ -27163,6 +27293,7 @@ export namespace Prisma {
     sensorSlot?: SortOrder
     punchType?: SortOrder
     punchedAt?: SortOrder
+    eventId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     device?: IotDeviceOrderByWithRelationInput
     employee?: EmployeeOrderByWithRelationInput
@@ -27171,6 +27302,7 @@ export namespace Prisma {
 
   export type AttendancePunchWhereUniqueInput = Prisma.AtLeast<{
     punchId?: bigint | number
+    deviceId_eventId?: AttendancePunchDeviceIdEventIdCompoundUniqueInput
     AND?: AttendancePunchWhereInput | AttendancePunchWhereInput[]
     OR?: AttendancePunchWhereInput[]
     NOT?: AttendancePunchWhereInput | AttendancePunchWhereInput[]
@@ -27179,10 +27311,11 @@ export namespace Prisma {
     sensorSlot?: IntFilter<"AttendancePunch"> | number
     punchType?: StringFilter<"AttendancePunch"> | string
     punchedAt?: DateTimeFilter<"AttendancePunch"> | Date | string
+    eventId?: StringNullableFilter<"AttendancePunch"> | string | null
     createdAt?: DateTimeFilter<"AttendancePunch"> | Date | string
     device?: XOR<IotDeviceScalarRelationFilter, IotDeviceWhereInput>
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
-  }, "punchId">
+  }, "punchId" | "deviceId_eventId">
 
   export type AttendancePunchOrderByWithAggregationInput = {
     punchId?: SortOrder
@@ -27191,6 +27324,7 @@ export namespace Prisma {
     sensorSlot?: SortOrder
     punchType?: SortOrder
     punchedAt?: SortOrder
+    eventId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: AttendancePunchCountOrderByAggregateInput
     _avg?: AttendancePunchAvgOrderByAggregateInput
@@ -27209,6 +27343,7 @@ export namespace Prisma {
     sensorSlot?: IntWithAggregatesFilter<"AttendancePunch"> | number
     punchType?: StringWithAggregatesFilter<"AttendancePunch"> | string
     punchedAt?: DateTimeWithAggregatesFilter<"AttendancePunch"> | Date | string
+    eventId?: StringNullableWithAggregatesFilter<"AttendancePunch"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"AttendancePunch"> | Date | string
   }
 
@@ -27223,9 +27358,14 @@ export namespace Prisma {
     checkOutTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     totalHours?: DecimalNullableFilter<"Attendance"> | Decimal | DecimalJsLike | number | string | null
     status?: StringFilter<"Attendance"> | string
+    resolutionSource?: StringNullableFilter<"Attendance"> | string | null
+    manualOverride?: BoolFilter<"Attendance"> | boolean
+    manualOverrideAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
+    manualOverrideBy?: IntNullableFilter<"Attendance"> | number | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    manualOverrideAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
   }
 
   export type AttendanceOrderByWithRelationInput = {
@@ -27236,9 +27376,14 @@ export namespace Prisma {
     checkOutTime?: SortOrderInput | SortOrder
     totalHours?: SortOrderInput | SortOrder
     status?: SortOrder
+    resolutionSource?: SortOrderInput | SortOrder
+    manualOverride?: SortOrder
+    manualOverrideAt?: SortOrderInput | SortOrder
+    manualOverrideBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     employee?: EmployeeOrderByWithRelationInput
+    manualOverrideAdmin?: AdminOrderByWithRelationInput
     _relevance?: AttendanceOrderByRelevanceInput
   }
 
@@ -27254,9 +27399,14 @@ export namespace Prisma {
     checkOutTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
     totalHours?: DecimalNullableFilter<"Attendance"> | Decimal | DecimalJsLike | number | string | null
     status?: StringFilter<"Attendance"> | string
+    resolutionSource?: StringNullableFilter<"Attendance"> | string | null
+    manualOverride?: BoolFilter<"Attendance"> | boolean
+    manualOverrideAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
+    manualOverrideBy?: IntNullableFilter<"Attendance"> | number | null
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     employee?: XOR<EmployeeScalarRelationFilter, EmployeeWhereInput>
+    manualOverrideAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
   }, "attendanceId" | "employeeId_date">
 
   export type AttendanceOrderByWithAggregationInput = {
@@ -27267,6 +27417,10 @@ export namespace Prisma {
     checkOutTime?: SortOrderInput | SortOrder
     totalHours?: SortOrderInput | SortOrder
     status?: SortOrder
+    resolutionSource?: SortOrderInput | SortOrder
+    manualOverride?: SortOrder
+    manualOverrideAt?: SortOrderInput | SortOrder
+    manualOverrideBy?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: AttendanceCountOrderByAggregateInput
@@ -27287,6 +27441,10 @@ export namespace Prisma {
     checkOutTime?: DateTimeNullableWithAggregatesFilter<"Attendance"> | Date | string | null
     totalHours?: DecimalNullableWithAggregatesFilter<"Attendance"> | Decimal | DecimalJsLike | number | string | null
     status?: StringWithAggregatesFilter<"Attendance"> | string
+    resolutionSource?: StringNullableWithAggregatesFilter<"Attendance"> | string | null
+    manualOverride?: BoolWithAggregatesFilter<"Attendance"> | boolean
+    manualOverrideAt?: DateTimeNullableWithAggregatesFilter<"Attendance"> | Date | string | null
+    manualOverrideBy?: IntNullableWithAggregatesFilter<"Attendance"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
   }
@@ -28455,6 +28613,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutAdminsInput
     approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminUncheckedCreateInput = {
@@ -28467,6 +28626,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminUpdateInput = {
@@ -28478,6 +28638,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
     approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type AdminUncheckedUpdateInput = {
@@ -28490,6 +28651,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type AdminCreateManyInput = {
@@ -29044,6 +29206,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
     device: IotDeviceCreateNestedOneWithoutAttendancePunchesInput
     employee: EmployeeCreateNestedOneWithoutAttendancePunchesInput
@@ -29056,6 +29219,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -29064,6 +29228,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     device?: IotDeviceUpdateOneRequiredWithoutAttendancePunchesNestedInput
     employee?: EmployeeUpdateOneRequiredWithoutAttendancePunchesNestedInput
@@ -29076,6 +29241,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -29086,6 +29252,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -29094,6 +29261,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -29104,6 +29272,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -29113,9 +29282,13 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutAttendanceInput
+    manualOverrideAdmin?: AdminCreateNestedOneWithoutAttendanceOverridesInput
   }
 
   export type AttendanceUncheckedCreateInput = {
@@ -29126,6 +29299,10 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    manualOverrideBy?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29136,9 +29313,13 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutAttendanceNestedInput
+    manualOverrideAdmin?: AdminUpdateOneWithoutAttendanceOverridesNestedInput
   }
 
   export type AttendanceUncheckedUpdateInput = {
@@ -29149,6 +29330,10 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    manualOverrideBy?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29161,6 +29346,10 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    manualOverrideBy?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -29171,6 +29360,9 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29183,6 +29375,10 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    manualOverrideBy?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30450,12 +30646,22 @@ export namespace Prisma {
     none?: AdvancePaymentWhereInput
   }
 
+  export type AttendanceListRelationFilter = {
+    every?: AttendanceWhereInput
+    some?: AttendanceWhereInput
+    none?: AttendanceWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type AdvancePaymentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AttendanceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -30772,12 +30978,6 @@ export namespace Prisma {
     none?: ActivityLogWhereInput
   }
 
-  export type AttendanceListRelationFilter = {
-    every?: AttendanceWhereInput
-    some?: AttendanceWhereInput
-    none?: AttendanceWhereInput
-  }
-
   export type AttendancePunchListRelationFilter = {
     every?: AttendancePunchWhereInput
     some?: AttendancePunchWhereInput
@@ -30832,10 +31032,6 @@ export namespace Prisma {
   }
 
   export type ActivityLogOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type AttendanceOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31143,6 +31339,11 @@ export namespace Prisma {
     search: string
   }
 
+  export type AttendancePunchDeviceIdEventIdCompoundUniqueInput = {
+    deviceId: number
+    eventId: string
+  }
+
   export type AttendancePunchCountOrderByAggregateInput = {
     punchId?: SortOrder
     employeeId?: SortOrder
@@ -31150,6 +31351,7 @@ export namespace Prisma {
     sensorSlot?: SortOrder
     punchType?: SortOrder
     punchedAt?: SortOrder
+    eventId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -31167,6 +31369,7 @@ export namespace Prisma {
     sensorSlot?: SortOrder
     punchType?: SortOrder
     punchedAt?: SortOrder
+    eventId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -31177,6 +31380,7 @@ export namespace Prisma {
     sensorSlot?: SortOrder
     punchType?: SortOrder
     punchedAt?: SortOrder
+    eventId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -31203,6 +31407,16 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type AdminNullableScalarRelationFilter = {
+    is?: AdminWhereInput | null
+    isNot?: AdminWhereInput | null
+  }
+
   export type AttendanceOrderByRelevanceInput = {
     fields: AttendanceOrderByRelevanceFieldEnum | AttendanceOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -31222,6 +31436,10 @@ export namespace Prisma {
     checkOutTime?: SortOrder
     totalHours?: SortOrder
     status?: SortOrder
+    resolutionSource?: SortOrder
+    manualOverride?: SortOrder
+    manualOverrideAt?: SortOrder
+    manualOverrideBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31230,6 +31448,7 @@ export namespace Prisma {
     attendanceId?: SortOrder
     employeeId?: SortOrder
     totalHours?: SortOrder
+    manualOverrideBy?: SortOrder
   }
 
   export type AttendanceMaxOrderByAggregateInput = {
@@ -31240,6 +31459,10 @@ export namespace Prisma {
     checkOutTime?: SortOrder
     totalHours?: SortOrder
     status?: SortOrder
+    resolutionSource?: SortOrder
+    manualOverride?: SortOrder
+    manualOverrideAt?: SortOrder
+    manualOverrideBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31252,6 +31475,10 @@ export namespace Prisma {
     checkOutTime?: SortOrder
     totalHours?: SortOrder
     status?: SortOrder
+    resolutionSource?: SortOrder
+    manualOverride?: SortOrder
+    manualOverrideAt?: SortOrder
+    manualOverrideBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -31260,6 +31487,15 @@ export namespace Prisma {
     attendanceId?: SortOrder
     employeeId?: SortOrder
     totalHours?: SortOrder
+    manualOverrideBy?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type DeviceLogOrderByRelevanceInput = {
@@ -31311,11 +31547,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type AdminNullableScalarRelationFilter = {
-    is?: AdminWhereInput | null
-    isNot?: AdminWhereInput | null
   }
 
   export type PayrollNullableScalarRelationFilter = {
@@ -31649,11 +31880,6 @@ export namespace Prisma {
     incentiveAmount?: SortOrder
   }
 
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type PublicHolidayOrderByRelevanceInput = {
     fields: PublicHolidayOrderByRelevanceFieldEnum | PublicHolidayOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -31713,14 +31939,6 @@ export namespace Prisma {
     companyId?: SortOrder
     branchId?: SortOrder
     dailyWorkingHours?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type ActivityLogOrderByRelevanceInput = {
@@ -32194,11 +32412,25 @@ export namespace Prisma {
     connect?: AdvancePaymentWhereUniqueInput | AdvancePaymentWhereUniqueInput[]
   }
 
+  export type AttendanceCreateNestedManyWithoutManualOverrideAdminInput = {
+    create?: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput> | AttendanceCreateWithoutManualOverrideAdminInput[] | AttendanceUncheckedCreateWithoutManualOverrideAdminInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutManualOverrideAdminInput | AttendanceCreateOrConnectWithoutManualOverrideAdminInput[]
+    createMany?: AttendanceCreateManyManualOverrideAdminInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
   export type AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput = {
     create?: XOR<AdvancePaymentCreateWithoutApproverInput, AdvancePaymentUncheckedCreateWithoutApproverInput> | AdvancePaymentCreateWithoutApproverInput[] | AdvancePaymentUncheckedCreateWithoutApproverInput[]
     connectOrCreate?: AdvancePaymentCreateOrConnectWithoutApproverInput | AdvancePaymentCreateOrConnectWithoutApproverInput[]
     createMany?: AdvancePaymentCreateManyApproverInputEnvelope
     connect?: AdvancePaymentWhereUniqueInput | AdvancePaymentWhereUniqueInput[]
+  }
+
+  export type AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput = {
+    create?: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput> | AttendanceCreateWithoutManualOverrideAdminInput[] | AttendanceUncheckedCreateWithoutManualOverrideAdminInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutManualOverrideAdminInput | AttendanceCreateOrConnectWithoutManualOverrideAdminInput[]
+    createMany?: AttendanceCreateManyManualOverrideAdminInputEnvelope
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -32235,6 +32467,20 @@ export namespace Prisma {
     deleteMany?: AdvancePaymentScalarWhereInput | AdvancePaymentScalarWhereInput[]
   }
 
+  export type AttendanceUpdateManyWithoutManualOverrideAdminNestedInput = {
+    create?: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput> | AttendanceCreateWithoutManualOverrideAdminInput[] | AttendanceUncheckedCreateWithoutManualOverrideAdminInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutManualOverrideAdminInput | AttendanceCreateOrConnectWithoutManualOverrideAdminInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutManualOverrideAdminInput | AttendanceUpsertWithWhereUniqueWithoutManualOverrideAdminInput[]
+    createMany?: AttendanceCreateManyManualOverrideAdminInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutManualOverrideAdminInput | AttendanceUpdateWithWhereUniqueWithoutManualOverrideAdminInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutManualOverrideAdminInput | AttendanceUpdateManyWithWhereWithoutManualOverrideAdminInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -32255,6 +32501,20 @@ export namespace Prisma {
     update?: AdvancePaymentUpdateWithWhereUniqueWithoutApproverInput | AdvancePaymentUpdateWithWhereUniqueWithoutApproverInput[]
     updateMany?: AdvancePaymentUpdateManyWithWhereWithoutApproverInput | AdvancePaymentUpdateManyWithWhereWithoutApproverInput[]
     deleteMany?: AdvancePaymentScalarWhereInput | AdvancePaymentScalarWhereInput[]
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput = {
+    create?: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput> | AttendanceCreateWithoutManualOverrideAdminInput[] | AttendanceUncheckedCreateWithoutManualOverrideAdminInput[]
+    connectOrCreate?: AttendanceCreateOrConnectWithoutManualOverrideAdminInput | AttendanceCreateOrConnectWithoutManualOverrideAdminInput[]
+    upsert?: AttendanceUpsertWithWhereUniqueWithoutManualOverrideAdminInput | AttendanceUpsertWithWhereUniqueWithoutManualOverrideAdminInput[]
+    createMany?: AttendanceCreateManyManualOverrideAdminInputEnvelope
+    set?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    disconnect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    delete?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+    update?: AttendanceUpdateWithWhereUniqueWithoutManualOverrideAdminInput | AttendanceUpdateWithWhereUniqueWithoutManualOverrideAdminInput[]
+    updateMany?: AttendanceUpdateManyWithWhereWithoutManualOverrideAdminInput | AttendanceUpdateManyWithWhereWithoutManualOverrideAdminInput[]
+    deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
   export type companiesCreateNestedOneWithoutBranchesInput = {
@@ -33319,12 +33579,32 @@ export namespace Prisma {
     connect?: EmployeeWhereUniqueInput
   }
 
+  export type AdminCreateNestedOneWithoutAttendanceOverridesInput = {
+    create?: XOR<AdminCreateWithoutAttendanceOverridesInput, AdminUncheckedCreateWithoutAttendanceOverridesInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutAttendanceOverridesInput
+    connect?: AdminWhereUniqueInput
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type EmployeeUpdateOneRequiredWithoutAttendanceNestedInput = {
     create?: XOR<EmployeeCreateWithoutAttendanceInput, EmployeeUncheckedCreateWithoutAttendanceInput>
     connectOrCreate?: EmployeeCreateOrConnectWithoutAttendanceInput
     upsert?: EmployeeUpsertWithoutAttendanceInput
     connect?: EmployeeWhereUniqueInput
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutAttendanceInput, EmployeeUpdateWithoutAttendanceInput>, EmployeeUncheckedUpdateWithoutAttendanceInput>
+  }
+
+  export type AdminUpdateOneWithoutAttendanceOverridesNestedInput = {
+    create?: XOR<AdminCreateWithoutAttendanceOverridesInput, AdminUncheckedCreateWithoutAttendanceOverridesInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutAttendanceOverridesInput
+    upsert?: AdminUpsertWithoutAttendanceOverridesInput
+    disconnect?: AdminWhereInput | boolean
+    delete?: AdminWhereInput | boolean
+    connect?: AdminWhereUniqueInput
+    update?: XOR<XOR<AdminUpdateToOneWithWhereWithoutAttendanceOverridesInput, AdminUpdateWithoutAttendanceOverridesInput>, AdminUncheckedUpdateWithoutAttendanceOverridesInput>
   }
 
   export type IotDeviceCreateNestedOneWithoutDeviceLogsInput = {
@@ -33651,10 +33931,6 @@ export namespace Prisma {
     create?: XOR<BranchCreateWithoutPublicHolidaysInput, BranchUncheckedCreateWithoutPublicHolidaysInput>
     connectOrCreate?: BranchCreateOrConnectWithoutPublicHolidaysInput
     connect?: BranchWhereUniqueInput
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type companiesUpdateOneRequiredWithoutPublicHolidaysNestedInput = {
@@ -34453,6 +34729,19 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -34478,19 +34767,6 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type companiesCreateWithoutAdminsInput = {
@@ -34567,6 +34843,45 @@ export namespace Prisma {
 
   export type AdvancePaymentCreateManyApproverInputEnvelope = {
     data: AdvancePaymentCreateManyApproverInput | AdvancePaymentCreateManyApproverInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AttendanceCreateWithoutManualOverrideAdminInput = {
+    date: Date | string
+    checkInTime?: Date | string | null
+    checkOutTime?: Date | string | null
+    totalHours?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    employee: EmployeeCreateNestedOneWithoutAttendanceInput
+  }
+
+  export type AttendanceUncheckedCreateWithoutManualOverrideAdminInput = {
+    attendanceId?: number
+    employeeId: number
+    date: Date | string
+    checkInTime?: Date | string | null
+    checkOutTime?: Date | string | null
+    totalHours?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateOrConnectWithoutManualOverrideAdminInput = {
+    where: AttendanceWhereUniqueInput
+    create: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput>
+  }
+
+  export type AttendanceCreateManyManualOverrideAdminInputEnvelope = {
+    data: AttendanceCreateManyManualOverrideAdminInput | AttendanceCreateManyManualOverrideAdminInput[]
     skipDuplicates?: boolean
   }
 
@@ -34647,6 +34962,41 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AdvancePayment"> | Date | string
     deductedAt?: DateTimeNullableFilter<"AdvancePayment"> | Date | string | null
     deductedInPayrollId?: IntNullableFilter<"AdvancePayment"> | number | null
+  }
+
+  export type AttendanceUpsertWithWhereUniqueWithoutManualOverrideAdminInput = {
+    where: AttendanceWhereUniqueInput
+    update: XOR<AttendanceUpdateWithoutManualOverrideAdminInput, AttendanceUncheckedUpdateWithoutManualOverrideAdminInput>
+    create: XOR<AttendanceCreateWithoutManualOverrideAdminInput, AttendanceUncheckedCreateWithoutManualOverrideAdminInput>
+  }
+
+  export type AttendanceUpdateWithWhereUniqueWithoutManualOverrideAdminInput = {
+    where: AttendanceWhereUniqueInput
+    data: XOR<AttendanceUpdateWithoutManualOverrideAdminInput, AttendanceUncheckedUpdateWithoutManualOverrideAdminInput>
+  }
+
+  export type AttendanceUpdateManyWithWhereWithoutManualOverrideAdminInput = {
+    where: AttendanceScalarWhereInput
+    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutManualOverrideAdminInput>
+  }
+
+  export type AttendanceScalarWhereInput = {
+    AND?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+    OR?: AttendanceScalarWhereInput[]
+    NOT?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+    attendanceId?: IntFilter<"Attendance"> | number
+    employeeId?: IntFilter<"Attendance"> | number
+    date?: DateTimeFilter<"Attendance"> | Date | string
+    checkInTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
+    checkOutTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
+    totalHours?: DecimalNullableFilter<"Attendance"> | Decimal | DecimalJsLike | number | string | null
+    status?: StringFilter<"Attendance"> | string
+    resolutionSource?: StringNullableFilter<"Attendance"> | string | null
+    manualOverride?: BoolFilter<"Attendance"> | boolean
+    manualOverrideAt?: DateTimeNullableFilter<"Attendance"> | Date | string | null
+    manualOverrideBy?: IntNullableFilter<"Attendance"> | number | null
+    createdAt?: DateTimeFilter<"Attendance"> | Date | string
+    updatedAt?: DateTimeFilter<"Attendance"> | Date | string
   }
 
   export type companiesCreateWithoutBranchesInput = {
@@ -35497,8 +35847,12 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    manualOverrideAdmin?: AdminCreateNestedOneWithoutAttendanceOverridesInput
   }
 
   export type AttendanceUncheckedCreateWithoutEmployeeInput = {
@@ -35508,6 +35862,10 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    manualOverrideBy?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -35527,6 +35885,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
     device: IotDeviceCreateNestedOneWithoutAttendancePunchesInput
   }
@@ -35537,6 +35896,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -36138,21 +36498,6 @@ export namespace Prisma {
     data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutEmployeeInput>
   }
 
-  export type AttendanceScalarWhereInput = {
-    AND?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
-    OR?: AttendanceScalarWhereInput[]
-    NOT?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
-    attendanceId?: IntFilter<"Attendance"> | number
-    employeeId?: IntFilter<"Attendance"> | number
-    date?: DateTimeFilter<"Attendance"> | Date | string
-    checkInTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
-    checkOutTime?: DateTimeNullableFilter<"Attendance"> | Date | string | null
-    totalHours?: DecimalNullableFilter<"Attendance"> | Decimal | DecimalJsLike | number | string | null
-    status?: StringFilter<"Attendance"> | string
-    createdAt?: DateTimeFilter<"Attendance"> | Date | string
-    updatedAt?: DateTimeFilter<"Attendance"> | Date | string
-  }
-
   export type AttendancePunchUpsertWithWhereUniqueWithoutEmployeeInput = {
     where: AttendancePunchWhereUniqueInput
     update: XOR<AttendancePunchUpdateWithoutEmployeeInput, AttendancePunchUncheckedUpdateWithoutEmployeeInput>
@@ -36179,6 +36524,7 @@ export namespace Prisma {
     sensorSlot?: IntFilter<"AttendancePunch"> | number
     punchType?: StringFilter<"AttendancePunch"> | string
     punchedAt?: DateTimeFilter<"AttendancePunch"> | Date | string
+    eventId?: StringNullableFilter<"AttendancePunch"> | string | null
     createdAt?: DateTimeFilter<"AttendancePunch"> | Date | string
   }
 
@@ -36640,6 +36986,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
     employee: EmployeeCreateNestedOneWithoutAttendancePunchesInput
   }
@@ -36650,6 +36997,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -37320,6 +37668,34 @@ export namespace Prisma {
     create: XOR<EmployeeCreateWithoutAttendanceInput, EmployeeUncheckedCreateWithoutAttendanceInput>
   }
 
+  export type AdminCreateWithoutAttendanceOverridesInput = {
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutAdminsInput
+    approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+  }
+
+  export type AdminUncheckedCreateWithoutAttendanceOverridesInput = {
+    adminId?: number
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+  }
+
+  export type AdminCreateOrConnectWithoutAttendanceOverridesInput = {
+    where: AdminWhereUniqueInput
+    create: XOR<AdminCreateWithoutAttendanceOverridesInput, AdminUncheckedCreateWithoutAttendanceOverridesInput>
+  }
+
   export type EmployeeUpsertWithoutAttendanceInput = {
     update: XOR<EmployeeUpdateWithoutAttendanceInput, EmployeeUncheckedUpdateWithoutAttendanceInput>
     create: XOR<EmployeeCreateWithoutAttendanceInput, EmployeeUncheckedCreateWithoutAttendanceInput>
@@ -37396,6 +37772,40 @@ export namespace Prisma {
     extraWorkRecords?: ExtraWorkUncheckedUpdateManyWithoutEmployeeNestedInput
     extraWorkSettlements?: ExtraWorkSettlementUncheckedUpdateManyWithoutEmployeeNestedInput
     subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
+  }
+
+  export type AdminUpsertWithoutAttendanceOverridesInput = {
+    update: XOR<AdminUpdateWithoutAttendanceOverridesInput, AdminUncheckedUpdateWithoutAttendanceOverridesInput>
+    create: XOR<AdminCreateWithoutAttendanceOverridesInput, AdminUncheckedCreateWithoutAttendanceOverridesInput>
+    where?: AdminWhereInput
+  }
+
+  export type AdminUpdateToOneWithWhereWithoutAttendanceOverridesInput = {
+    where?: AdminWhereInput
+    data: XOR<AdminUpdateWithoutAttendanceOverridesInput, AdminUncheckedUpdateWithoutAttendanceOverridesInput>
+  }
+
+  export type AdminUpdateWithoutAttendanceOverridesInput = {
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+  }
+
+  export type AdminUncheckedUpdateWithoutAttendanceOverridesInput = {
+    adminId?: IntFieldUpdateOperationsInput | number
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
   }
 
   export type IotDeviceCreateWithoutDeviceLogsInput = {
@@ -37480,6 +37890,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutAdminsInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminUncheckedCreateWithoutApprovedAdvancesInput = {
@@ -37491,6 +37902,7 @@ export namespace Prisma {
     companyId: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminCreateOrConnectWithoutApprovedAdvancesInput = {
@@ -37647,6 +38059,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type AdminUncheckedUpdateWithoutApprovedAdvancesInput = {
@@ -37658,6 +38071,7 @@ export namespace Prisma {
     companyId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type PayrollUpsertWithoutAdvanceDeductionRecordInput = {
@@ -39149,6 +39563,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminUncheckedCreateWithoutCompanyInput = {
@@ -39160,6 +39575,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
   }
 
   export type AdminCreateOrConnectWithoutCompanyInput = {
@@ -40464,6 +40880,21 @@ export namespace Prisma {
     deductedInPayrollId?: number | null
   }
 
+  export type AttendanceCreateManyManualOverrideAdminInput = {
+    attendanceId?: number
+    employeeId: number
+    date: Date | string
+    checkInTime?: Date | string | null
+    checkOutTime?: Date | string | null
+    totalHours?: Decimal | DecimalJsLike | number | string | null
+    status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AdvancePaymentUpdateWithoutApproverInput = {
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     approvedAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -40506,6 +40937,50 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deductedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deductedInPayrollId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type AttendanceUpdateWithoutManualOverrideAdminInput = {
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkInTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    employee?: EmployeeUpdateOneRequiredWithoutAttendanceNestedInput
+  }
+
+  export type AttendanceUncheckedUpdateWithoutManualOverrideAdminInput = {
+    attendanceId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkInTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutManualOverrideAdminInput = {
+    attendanceId?: IntFieldUpdateOperationsInput | number
+    employeeId?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    checkInTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DepartmentCreateManyBranchInput = {
@@ -40890,6 +41365,10 @@ export namespace Prisma {
     checkOutTime?: Date | string | null
     totalHours?: Decimal | DecimalJsLike | number | string | null
     status: string
+    resolutionSource?: string | null
+    manualOverride?: boolean
+    manualOverrideAt?: Date | string | null
+    manualOverrideBy?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40900,6 +41379,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -41099,8 +41579,12 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    manualOverrideAdmin?: AdminUpdateOneWithoutAttendanceOverridesNestedInput
   }
 
   export type AttendanceUncheckedUpdateWithoutEmployeeInput = {
@@ -41110,6 +41594,10 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    manualOverrideBy?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41121,6 +41609,10 @@ export namespace Prisma {
     checkOutTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totalHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: StringFieldUpdateOperationsInput | string
+    resolutionSource?: NullableStringFieldUpdateOperationsInput | string | null
+    manualOverride?: BoolFieldUpdateOperationsInput | boolean
+    manualOverrideAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    manualOverrideBy?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41130,6 +41622,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     device?: IotDeviceUpdateOneRequiredWithoutAttendancePunchesNestedInput
   }
@@ -41140,6 +41633,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -41149,6 +41643,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -41560,6 +42055,7 @@ export namespace Prisma {
     sensorSlot: number
     punchType: string
     punchedAt: Date | string
+    eventId?: string | null
     createdAt?: Date | string
   }
 
@@ -41575,6 +42071,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     employee?: EmployeeUpdateOneRequiredWithoutAttendancePunchesNestedInput
   }
@@ -41585,6 +42082,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -41594,6 +42092,7 @@ export namespace Prisma {
     sensorSlot?: IntFieldUpdateOperationsInput | number
     punchType?: StringFieldUpdateOperationsInput | string
     punchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -41841,6 +42340,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type AdminUncheckedUpdateWithoutCompanyInput = {
@@ -41852,6 +42352,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
   }
 
   export type AdminUncheckedUpdateManyWithoutCompanyInput = {

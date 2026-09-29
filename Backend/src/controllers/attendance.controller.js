@@ -2,6 +2,81 @@ const prisma = require("../config/database");
 const attendanceService =
     require("../services/attendance.service");
 
+const attendanceSettingsService =
+    require("../services/attendanceSettings.service");
+
+// Process a device memory-card/batch upload.
+//
+// The device authentication middleware populates req.device.
+// The service owns validation, idempotent raw-punch insertion,
+// actual-event-time ordering and attendance resolution.
+const processAttendanceBatch = async (req, res) => {
+    const result =
+        await attendanceService.processAttendanceBatch({
+            device:
+                req.device,
+
+            events:
+                req.body?.events,
+
+            officeCloseTime:
+                req.body?.officeCloseTime
+        });
+
+    return res.status(201).json({
+        success: true,
+
+        message:
+            "Attendance batch processed successfully",
+
+        data: result
+    });
+};
+
+// Get the company-specific attendance office closing time.
+const getOfficeCloseTime = async (req, res) => {
+    const companyId =
+        Number(req.user?.companyId);
+
+    const result =
+        await attendanceSettingsService.getOfficeCloseTime(
+            companyId
+        );
+
+    return res.status(200).json({
+        success: true,
+
+        message:
+            "Attendance office closing time fetched successfully",
+
+        data:
+            result
+    });
+};
+
+
+// Save the company-specific attendance office closing time.
+const updateOfficeCloseTime = async (req, res) => {
+    const companyId =
+        Number(req.user?.companyId);
+
+    const result =
+        await attendanceSettingsService.saveOfficeCloseTime(
+            companyId,
+            req.body?.value
+        );
+
+    return res.status(200).json({
+        success: true,
+
+        message:
+            "Attendance office closing time saved successfully",
+
+        data:
+            result
+    });
+};
+
 // Get all raw attendance punches.
 const getPunches = async (req, res) => {
     const punches =
@@ -753,6 +828,9 @@ const getEmployeeAttendanceSummary =
     };
 
 module.exports = {
+    processAttendanceBatch,
+    getOfficeCloseTime,
+    updateOfficeCloseTime,
     getPunches,
     getLiveAttendance,
     getPunchById,

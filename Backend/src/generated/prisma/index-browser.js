@@ -204,6 +204,7 @@ exports.Prisma.AttendancePunchScalarFieldEnum = {
   sensorSlot: 'sensorSlot',
   punchType: 'punchType',
   punchedAt: 'punchedAt',
+  eventId: 'eventId',
   createdAt: 'createdAt'
 };
 
@@ -215,6 +216,10 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   checkOutTime: 'checkOutTime',
   totalHours: 'totalHours',
   status: 'status',
+  resolutionSource: 'resolutionSource',
+  manualOverride: 'manualOverride',
+  manualOverrideAt: 'manualOverrideAt',
+  manualOverrideBy: 'manualOverrideBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -441,11 +446,13 @@ exports.Prisma.FingerprintTemplateOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.AttendancePunchOrderByRelevanceFieldEnum = {
-  punchType: 'punchType'
+  punchType: 'punchType',
+  eventId: 'eventId'
 };
 
 exports.Prisma.AttendanceOrderByRelevanceFieldEnum = {
-  status: 'status'
+  status: 'status',
+  resolutionSource: 'resolutionSource'
 };
 
 exports.Prisma.DeviceLogOrderByRelevanceFieldEnum = {

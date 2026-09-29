@@ -5,6 +5,18 @@ const attendanceService =
 // ==========================================
 // Process Attendance Punch
 // ==========================================
+//
+// This controller intentionally stays thin.
+// The attendance service owns fingerprint validation,
+// IN/OUT determination, raw punch creation and attendance
+// resolution. The controller only passes the authenticated
+// device context and request payload to the service.
+//
+// eventId is optional for the existing single-punch/test API,
+// but when supplied by a device/client it enables idempotent
+// retries through the AttendancePunch(deviceId, eventId)
+// unique constraint.
+// ==========================================
 
 const processPunch = async (req, res) => {
 
@@ -15,8 +27,15 @@ const processPunch = async (req, res) => {
                 req.device,
 
             sensorSlot:
-                req.body.sensorSlot
+                req.body.sensorSlot,
+
+            eventId:
+                req.body.eventId
         });
+
+
+    const isDuplicate =
+        result.duplicate === true;
 
 
     return res.status(201).json({
@@ -24,11 +43,16 @@ const processPunch = async (req, res) => {
         success: true,
 
         message:
-            result.punch.punchType === "IN"
-                ? "Check-in recorded successfully"
-                : "Check-out recorded successfully",
+            isDuplicate
+                ? "Attendance punch was already processed"
+                : result.punch.punchType === "IN"
+                    ? "Check-in recorded successfully"
+                    : "Check-out recorded successfully",
 
         data: {
+
+            duplicate:
+                isDuplicate,
 
             punch: {
 
@@ -40,6 +64,9 @@ const processPunch = async (req, res) => {
 
                 punchedAt:
                     result.punch.punchedAt,
+
+                eventId:
+                    result.punch.eventId || null,
 
                 employee:
                     result.punch.employee,

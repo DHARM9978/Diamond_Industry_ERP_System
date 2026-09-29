@@ -627,7 +627,9 @@ export const fingerprintService = {
 
         const response =
             await apiClient.get(
-                `/api/fingerprints/enrollment/${enrollmentId}/status`
+                API.fingerprints.enrollmentStatus(
+                    enrollmentId
+                )
             );
 
         return unwrap(response);
@@ -644,7 +646,9 @@ export const fingerprintService = {
 
         const response =
             await apiClient.post(
-                `/api/fingerprints/enrollment/${enrollmentId}/cancel`
+                API.fingerprints.cancelEnrollment(
+                    enrollmentId
+                )
             );
 
         return unwrap(response);
@@ -2161,6 +2165,40 @@ export const leaveService = {
 
 };
 
+// ============================================================
+// ATTENDANCE SETTINGS SERVICE
+// ============================================================
+
+export const attendanceSettingsService = {
+
+    getOfficeCloseTime: async () => {
+
+        const response =
+            await apiClient.get(
+                "/api/attendance/settings/office-close-time"
+            );
+
+        return unwrap(response);
+    },
+
+
+    saveOfficeCloseTime: async (
+        value
+    ) => {
+
+        const response =
+            await apiClient.put(
+                "/api/attendance/settings/office-close-time",
+                {
+                    value,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+};
+
 
 // ============================================================
 // DEFAULT EXPORT
@@ -2173,6 +2211,7 @@ export default {
     branchService,
     departmentService,
     attendanceService,
+    attendanceSettingsService,
     fingerprintService,
     deviceService,
     deviceEnrollmentService,

@@ -8,6 +8,7 @@ import {
   MapPin,
   Calendar,
   RefreshCw,
+  Clock3,
 } from 'lucide-react';
 
 import {
@@ -23,9 +24,8 @@ import {
   companyService,
   branchService,
   employeeService,
+  attendanceSettingsService,
 } from '@/services/apiServices';
-
-import { formatISTDate } from '@/utils/dateTime';
 
 
 // ======================================================
@@ -44,6 +44,12 @@ export function AdminCompany() {
 
   const [employeeCount, setEmployeeCount] =
     useState(0);
+
+  const [officeCloseTime, setOfficeCloseTime] =
+    useState('22:00');
+
+  const [officeCloseConfigured, setOfficeCloseConfigured] =
+    useState(false);
 
   const [loading, setLoading] =
     useState(true);
@@ -66,7 +72,8 @@ export function AdminCompany() {
       setLoading(true);
 
       /*
-       * Load all three APIs together.
+       * Load company, branch, employee, and
+       * attendance closing-time data together.
        *
        * Company:
        * GET /api/companies
@@ -82,10 +89,12 @@ export function AdminCompany() {
         companyResponse,
         branchResponse,
         employeeResponse,
+        officeCloseResponse,
       ] = await Promise.all([
         companyService.list(),
         branchService.list(),
         employeeService.list(),
+        attendanceSettingsService.getOfficeCloseTime(),
       ]);
 
 
@@ -201,6 +210,23 @@ export function AdminCompany() {
         employees.length
       );
 
+
+      // ================================================
+      // OFFICE CLOSING TIME
+      // ================================================
+
+      const configuredOfficeCloseTime =
+        officeCloseResponse?.value ||
+        '22:00';
+
+      setOfficeCloseTime(
+        configuredOfficeCloseTime
+      );
+
+      setOfficeCloseConfigured(
+        officeCloseResponse?.configured === true
+      );
+
     } catch (error) {
 
       console.error(
@@ -236,6 +262,36 @@ export function AdminCompany() {
 
 
   // ====================================================
+  // FORMAT TIME FOR DISPLAY
+  // ====================================================
+
+  const formatTimeForDisplay = (time) => {
+
+    if (
+      typeof time !== 'string' ||
+      !/^\d{2}:\d{2}$/.test(time)
+    ) {
+      return '10 PM';
+    }
+
+    const [rawHour, rawMinute] =
+      time.split(':').map(Number);
+
+    const period =
+      rawHour >= 12 ? 'PM' : 'AM';
+
+    const hour =
+      rawHour % 12 || 12;
+
+    if (rawMinute === 0) {
+      return `${hour} ${period}`;
+    }
+
+    return `${hour}:${String(rawMinute).padStart(2, '0')} ${period}`;
+  };
+
+
+  // ====================================================
   // FORMAT DATE
   // ====================================================
 
@@ -245,11 +301,25 @@ export function AdminCompany() {
       return '—';
     }
 
-    return formatISTDate(date, {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    const parsedDate =
+      new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return '—';
+    }
+
+    return parsedDate.toLocaleDateString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }
+    );
   };
 
 
@@ -318,6 +388,23 @@ export function AdminCompany() {
         'Company update response:',
         response
       );
+
+
+      // Save the automatic attendance closing time
+      // as part of the same Edit Company action.
+      const savedOfficeCloseTime =
+        await attendanceSettingsService.saveOfficeCloseTime(
+          formData.officeCloseTime ||
+          '22:00'
+        );
+
+      setOfficeCloseTime(
+        savedOfficeCloseTime?.value ||
+        formData.officeCloseTime ||
+        '22:00'
+      );
+
+      setOfficeCloseConfigured(true);
 
 
       /*
@@ -678,6 +765,36 @@ export function AdminCompany() {
 
             </div>
 
+
+            {/* Office Closing Time */}
+
+            <div className="flex items-start gap-3">
+
+              <Clock3
+                size={19}
+                className="text-navy-400 mt-0.5"
+              />
+
+              <div>
+
+                <p className="text-xs font-medium text-navy-400 uppercase">
+                  Office Closing Time
+                </p>
+
+                <p className="text-sm text-navy-800 mt-1 font-semibold">
+                  {formatTimeForDisplay(officeCloseTime)}
+                </p>
+
+                <p className="text-xs text-navy-400 mt-1">
+                  {officeCloseConfigured
+                    ? 'Configured for automatic attendance closing'
+                    : 'Default system time'}
+                </p>
+
+              </div>
+
+            </div>
+
           </div>
 
 
@@ -788,6 +905,7 @@ export function AdminCompany() {
 
         <CompanyForm
           company={company}
+          officeCloseTime={officeCloseTime}
           saving={saving}
           onCancel={() => {
 
@@ -812,6 +930,7 @@ export function AdminCompany() {
 
 function CompanyForm({
   company,
+  officeCloseTime,
   saving,
   onCancel,
   onSave,
@@ -831,7 +950,25 @@ function CompanyForm({
     address:
       company?.address || '',
 
+    officeCloseTime:
+      officeCloseTime ||
+      '22:00',
+
   });
+
+
+  // Keep the edit form synchronized with the current
+  // company-level office closing time loaded by the page.
+  useEffect(() => {
+
+    setForm((previous) => ({
+      ...previous,
+      officeCloseTime:
+        officeCloseTime ||
+        '22:00',
+    }));
+
+  }, [officeCloseTime]);
 
 
   // ====================================================
@@ -979,6 +1116,44 @@ function CompanyForm({
           placeholder="Enter company address"
           disabled={saving}
         />
+
+      </div>
+
+
+      {/* Office Closing Time */}
+
+      <div className="flex flex-col gap-1.5">
+
+        <label className="text-sm font-medium text-navy-700">
+          Office Closing Time
+        </label>
+
+        <div className="flex items-center gap-3">
+
+          <Clock3
+            size={18}
+            className="text-navy-400"
+          />
+
+          <input
+            type="time"
+            className="input-field max-w-xs"
+            value={form.officeCloseTime}
+            onChange={(event) =>
+              handleChange(
+                'officeCloseTime',
+                event.target.value
+              )
+            }
+            disabled={saving}
+            required
+          />
+
+        </div>
+
+        <p className="text-xs text-navy-400">
+          Unmatched final attendance sessions are automatically closed at this time. Time zone: IST.
+        </p>
 
       </div>
 

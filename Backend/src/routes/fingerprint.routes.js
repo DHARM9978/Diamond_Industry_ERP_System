@@ -120,6 +120,12 @@ router.delete(
 // Adding new fingerprint
 // POST /api/device/fingerprint-enroll
 // ==========================================
+//
+// Kept for legacy compatibility.
+// Note: This route is mounted under
+// /api/fingerprints in app.js.
+//
+// ==========================================
 
 router.post(
     "/fingerprint-enroll",

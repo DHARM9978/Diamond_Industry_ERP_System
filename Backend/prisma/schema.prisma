@@ -21,8 +21,9 @@ model Admin {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  company          companies        @relation(fields: [companyId], references: [company_id])
-  approvedAdvances AdvancePayment[] @relation("ApprovedAdvances")
+  company             companies        @relation(fields: [companyId], references: [company_id])
+  approvedAdvances    AdvancePayment[] @relation("ApprovedAdvances")
+  attendanceOverrides Attendance[]     @relation("AttendanceManualOverride")
 
   @@index([companyId])
   @@map("admin")
@@ -194,11 +195,17 @@ model AttendancePunch {
   sensorSlot Int      @map("sensor_slot")
   punchType  String   @map("punch_type") @db.VarChar(10)
   punchedAt  DateTime @map("punched_at")
-  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Unique event identifier supplied by the biometric device.
+  // Nullable so existing single-punch records remain valid.
+  eventId String? @map("event_id") @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   device   IotDevice @relation(fields: [deviceId], references: [deviceId])
   employee Employee  @relation(fields: [employeeId], references: [employeeId])
 
+  @@unique([deviceId, eventId])
   @@index([employeeId])
   @@index([deviceId])
   @@index([sensorSlot])
@@ -218,14 +225,28 @@ model Attendance {
   checkOutTime DateTime? @map("check_out_time") @db.Time(0)
   totalHours   Decimal?  @map("total_hours") @db.Decimal(5, 2)
   status       String    @db.VarChar(20)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
+  // How the ERP attendance result was resolved.
+  // DEVICE     = real device OUT exists
+  // AUTO_CLOSE = final open session resolved using office close time
+  // ADMIN      = explicit administrator correction
+  resolutionSource String? @map("resolution_source") @db.VarChar(20)
+
+  // Protect an explicit administrator correction from automatic recalculation.
+  manualOverride   Boolean   @default(false) @map("manual_override")
+  manualOverrideAt DateTime? @map("manual_override_at")
+  manualOverrideBy Int?      @map("manual_override_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  employee            Employee @relation(fields: [employeeId], references: [employeeId])
+  manualOverrideAdmin Admin?   @relation("AttendanceManualOverride", fields: [manualOverrideBy], references: [adminId])
 
   @@unique([employeeId, date])
   @@index([employeeId])
   @@index([date])
+  @@index([manualOverrideBy])
   @@map("attendance")
 }
 

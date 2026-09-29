@@ -25,12 +25,60 @@ const router =
 // ======================================================
 // DEVICE ATTENDANCE PUNCH
 // ======================================================
+//
+// POST /api/attendance/punch
+//
+// This endpoint is used by the fingerprint device/client.
+//
+// Device authentication happens before the controller.
+//
+// The controller forwards:
+// - sensorSlot
+// - optional eventId
+//
+// to attendance.service.js.
+//
+// eventId is supported for idempotent device retries.
+// ======================================================
 
 router.post(
     "/punch",
     authenticateDevice,
     asyncHandler(
         attendancePunchController.processPunch
+    )
+);
+
+
+// ======================================================
+// DEVICE ATTENDANCE BATCH
+// ======================================================
+//
+// POST /api/attendance/batch
+//
+// This endpoint is used by the fingerprint device/client
+// to upload multiple attendance events in one request.
+//
+// Device authentication happens before the controller.
+//
+// The controller forwards:
+// - events
+// - optional officeCloseTime
+//
+// to attendance.service.js.
+//
+// Batch processing supports:
+// - multiple employee events
+// - delayed device uploads
+// - eventId-based duplicate protection
+// - attendance resolution
+// ======================================================
+
+router.post(
+    "/batch",
+    authenticateDevice,
+    asyncHandler(
+        attendanceController.processAttendanceBatch
     )
 );
 
@@ -48,8 +96,12 @@ router.use(
 // ======================================================
 // LIVE ATTENDANCE
 // ======================================================
-
+//
 // GET /api/attendance/live
+//
+// Existing live-attendance endpoint.
+// ======================================================
+
 router.get(
     "/live",
     asyncHandler(
@@ -59,10 +111,40 @@ router.get(
 
 
 // ======================================================
-// RAW ATTENDANCE PUNCHES
+// ATTENDANCE SETTINGS
+// ======================================================
+//
+// GET /api/attendance/settings/office-close-time
+//
+// PUT /api/attendance/settings/office-close-time
+//
+// These endpoints are ADMIN-protected and use the authenticated
+// administrator's companyId to read/write the company setting.
 // ======================================================
 
+router.get(
+    "/settings/office-close-time",
+    asyncHandler(
+        attendanceController.getOfficeCloseTime
+    )
+);
+
+
+router.put(
+    "/settings/office-close-time",
+    asyncHandler(
+        attendanceController.updateOfficeCloseTime
+    )
+);
+
+
+// ======================================================
+// RAW ATTENDANCE PUNCHES
+// ======================================================
+//
 // GET /api/attendance/punches
+// ======================================================
+
 router.get(
     "/punches",
     asyncHandler(
@@ -71,7 +153,13 @@ router.get(
 );
 
 
+// ======================================================
+// GET RAW ATTENDANCE PUNCH BY ID
+// ======================================================
+//
 // GET /api/attendance/punches/:id
+// ======================================================
+
 router.get(
     "/punches/:id",
     asyncHandler(
@@ -83,8 +171,10 @@ router.get(
 // ======================================================
 // EMPLOYEE RAW PUNCH HISTORY
 // ======================================================
-
+//
 // GET /api/attendance/employee/:employeeId/punches
+// ======================================================
+
 router.get(
     "/employee/:employeeId/punches",
     asyncHandler(
@@ -96,8 +186,10 @@ router.get(
 // ======================================================
 // EMPLOYEE ATTENDANCE SUMMARY
 // ======================================================
-
+//
 // GET /api/attendance/employee/:employeeId/summary
+// ======================================================
+
 router.get(
     "/employee/:employeeId/summary",
     asyncHandler(
@@ -109,8 +201,10 @@ router.get(
 // ======================================================
 // EMPLOYEE ATTENDANCE
 // ======================================================
-
+//
 // GET /api/attendance/employee/:employeeId
+// ======================================================
+
 router.get(
     "/employee/:employeeId",
     asyncHandler(
@@ -122,8 +216,10 @@ router.get(
 // ======================================================
 // DAILY ATTENDANCE SUMMARY
 // ======================================================
-
+//
 // GET /api/attendance/summary
+// ======================================================
+
 router.get(
     "/summary",
     asyncHandler(
@@ -135,8 +231,10 @@ router.get(
 // ======================================================
 // DAILY ATTENDANCE
 // ======================================================
-
+//
 // GET /api/attendance
+// ======================================================
+
 router.get(
     "/",
     asyncHandler(
@@ -148,8 +246,13 @@ router.get(
 // ======================================================
 // ADMIN ATTENDANCE CORRECTION
 // ======================================================
-
+//
 // PUT /api/attendance/:id
+//
+// Used by ADMIN to manually correct attendance.
+//
+// ======================================================
+
 router.put(
     "/:id",
     asyncHandler(
@@ -158,7 +261,13 @@ router.put(
 );
 
 
+// ======================================================
+// GET ATTENDANCE BY ID
+// ======================================================
+//
 // GET /api/attendance/:id
+// ======================================================
+
 router.get(
     "/:id",
     asyncHandler(
@@ -166,5 +275,9 @@ router.get(
     )
 );
 
+
+// ======================================================
+// EXPORT
+// ======================================================
 
 module.exports = router;

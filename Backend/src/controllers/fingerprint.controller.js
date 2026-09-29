@@ -1,6 +1,7 @@
 const fingerprintService =
     require("../services/fingerprint.service");
 
+
 // ==========================================
 // Get Fingerprint
 // ==========================================
@@ -19,6 +20,7 @@ const getFingerprint = async (req, res) => {
     });
 };
 
+
 // ==========================================
 // Get All Fingerprints
 // ==========================================
@@ -36,6 +38,7 @@ const getFingerprints = async (req, res) => {
     });
 };
 
+
 // ==========================================
 // Start Fingerprint Enrollment
 // Admin -> creates pending device job
@@ -50,10 +53,12 @@ const enrollFingerprint = async (req, res) => {
 
     return res.status(201).json({
         success: true,
-        message: "Fingerprint enrollment request created successfully",
+        message:
+            "Fingerprint enrollment request created successfully",
         data: enrollment
     });
 };
+
 
 // ==========================================
 // Update Fingerprint
@@ -74,6 +79,7 @@ const updateFingerprint = async (req, res) => {
     });
 };
 
+
 // ==========================================
 // Delete Fingerprint
 // ==========================================
@@ -90,6 +96,7 @@ const deleteFingerprint = async (req, res) => {
     });
 };
 
+
 // ==========================================
 // Get Enrollment Status
 // GET /api/fingerprints/enrollment/:id/status
@@ -104,7 +111,8 @@ const getEnrollmentStatus = async (req, res) => {
 
     return res.status(200).json({
         success: true,
-        message: "Fingerprint enrollment status fetched successfully",
+        message:
+            "Fingerprint enrollment status fetched successfully",
         data: enrollment
     });
 };
@@ -124,7 +132,8 @@ const cancelEnrollment = async (req, res) => {
 
     return res.status(200).json({
         success: true,
-        message: "Fingerprint enrollment cancelled successfully",
+        message:
+            "Fingerprint enrollment cancelled successfully",
         data: enrollment
     });
 };
@@ -144,7 +153,8 @@ const getDeviceEnrollmentStatus = async (req, res) => {
 
     return res.status(200).json({
         success: true,
-        message: "Device fingerprint enrollment status fetched successfully",
+        message:
+            "Device fingerprint enrollment status fetched successfully",
         data: enrollment
     });
 };
@@ -163,7 +173,8 @@ const reportEnrollmentLog = async (req, res) => {
 
     return res.status(200).json({
         success: true,
-        message: "Fingerprint enrollment log received successfully",
+        message:
+            "Fingerprint enrollment log received successfully",
         data: result
     });
 };
@@ -188,6 +199,7 @@ const getPendingEnrollment = async (req, res) => {
     });
 };
 
+
 // ==========================================
 // DEVICE: Report enrollment result
 // ==========================================
@@ -201,10 +213,12 @@ const reportEnrollmentResult = async (req, res) => {
 
     return res.status(200).json({
         success: true,
-        message: "Fingerprint enrollment result processed successfully",
+        message:
+            "Fingerprint enrollment result processed successfully",
         data: enrollment
     });
 };
+
 
 // ==========================================
 // DEVICE: Legacy direct enrollment
@@ -222,22 +236,28 @@ const enrollFingerprintFromDevice = async (req, res) => {
 
     return res.status(201).json({
         success: true,
-        message: "Fingerprint enrolled successfully from device",
+        message:
+            "Fingerprint enrolled successfully from device",
         data: fingerprint
     });
 };
+
+
+// ==========================================
+// EXPORTS
+// ==========================================
 
 module.exports = {
     getFingerprint,
     getFingerprints,
     enrollFingerprint,
     getEnrollmentStatus,
+    cancelEnrollment,
     updateFingerprint,
     deleteFingerprint,
     getPendingEnrollment,
     reportEnrollmentResult,
     reportEnrollmentLog,
     getDeviceEnrollmentStatus,
-    cancelEnrollment,
     enrollFingerprintFromDevice
 };

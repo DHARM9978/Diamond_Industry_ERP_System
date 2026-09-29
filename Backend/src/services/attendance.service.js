@@ -7,6 +7,34 @@ const prisma = require("../config/database");
 const IST_OFFSET_MS =
 5.5 * 60 * 60 * 1000;
 
+const DEFAULT_OFFICE_CLOSE_TIME =
+"22:00";
+
+const DUPLICATE_WINDOW_SECONDS =
+30;
+
+const OFFICE_CLOSE_SETTING_KEYS = [
+"attendance.office_close_time",
+"office_close_time",
+"ATTENDANCE_OFFICE_CLOSE_TIME"
+];
+
+// ======================================================
+// COMMON ERROR HELPER
+// ======================================================
+
+const createError = (
+message,
+statusCode = 400
+) => {
+const error = new Error(message);
+
+error.statusCode =
+statusCode;
+
+return error;
+};
+
 // ======================================================
 // DATE / TIME HELPERS
 // ======================================================
@@ -250,183 +278,355 @@ return new Date(
 // Checkout stays null until an OUT punch is recorded.
 // ======================================================
 
-const buildTodayAttendanceFromPunches = (punches, now) => {
-const groups = new Map();
-
-for (const punch of punches) {
-    const key =
-        `${punch.employeeId}|${getISTDateString(punch.punchedAt)}`;
-
-    if (!groups.has(key)) {
-        groups.set(key, {
-            employeeId: punch.employeeId,
-            employee: punch.employee || null,
-            date: getStartOfDay(punch.punchedAt),
-            punches: []
-        });
-    }
-
-    groups.get(key).punches.push(punch);
-}
-
-const result = [];
-
-for (const group of groups.values()) {
-    let firstIn = null;
-    let lastOut = null;
-    let openIn = null;
-    let totalMilliseconds = 0;
-
-    for (const punch of group.punches) {
-        if (punch.punchType === "IN") {
-            if (firstIn === null) {
-                firstIn = new Date(punch.punchedAt);
-            }
-
-            if (openIn === null) {
-                openIn = new Date(punch.punchedAt);
-            }
-        }
-        else if (punch.punchType === "OUT") {
-            lastOut = new Date(punch.punchedAt);
-
-            if (openIn !== null) {
-                const duration =
-                    lastOut.getTime() - openIn.getTime();
-
-                if (duration > 0) {
-                    totalMilliseconds += duration;
-                }
-
-                openIn = null;
-            }
-        }
-    }
-
-    // Still checked in: count time from the unmatched IN until now.
-    if (openIn !== null) {
-        const ongoingDuration =
-            now.getTime() - openIn.getTime();
-
-        if (ongoingDuration > 0) {
-            totalMilliseconds += ongoingDuration;
-        }
-    }
-
-    const totalHours =
-        totalMilliseconds /
-        (1000 * 60 * 60);
-
-    result.push({
-        employeeId: group.employeeId,
-        date: group.date,
-        checkInTime: firstIn
-            ? createMySQLTimeFromIST(firstIn)
-            : null,
-        checkOutTime: lastOut
-            ? createMySQLTimeFromIST(lastOut)
-            : null,
-        totalHours: totalHours > 0
-            ? Number(totalHours.toFixed(2))
-            : null,
-        status: "PRESENT",
-        employee: group.employee
-    });
-}
-
-return result;
-
-};
 
 // ======================================================
 // CALCULATE RAW PUNCH SESSION STATE
 // ======================================================
 //
-// AttendancePunch is the source of truth for whether the final
-// session of a day is still open.
+// AttendancePunch is the source of truth for the raw IN/OUT
+// session state.
 //
-// Examples:
+// One central calculator is used by:
+// - live daily attendance
+// - single device punch processing
+// - batch imports
+// - historical inspection
+// - AUTO_CLOSE resolution
 //
-//   IN -> OUT
-//       hasOpenSession = false
+// Multiple sessions are handled independently:
 //
-//   IN -> OUT -> IN
-//       hasOpenSession = true
+// 08:00 IN
+// 14:00 OUT
+// 16:00 IN
+// 21:00 OUT
 //
-// The helper also calculates the completed-session hours without
-// counting the final unmatched IN.
+// = 6 + 5 = 11 hours
+//
+// The final unmatched IN is represented by openIn and is NOT
+// included in completedHours.
 // ======================================================
 
 const calculatePunchSessionState = (
 punches = []
 ) => {
+
 const sortedPunches =
 [...punches].sort(
 (a, b) =>
-new Date(a.punchedAt).getTime() -
-new Date(b.punchedAt).getTime()
+new Date(
+a.punchedAt
+).getTime() -
+new Date(
+b.punchedAt
+).getTime()
 );
 
-let firstIn = null;
-let lastOut = null;
-let openIn = null;
-let completedMilliseconds = 0;
+let firstIn =
+null;
 
-for (const punch of sortedPunches) {
-    if (punch.punchType === "IN") {
-        if (firstIn === null) {
-            firstIn = new Date(punch.punchedAt);
-        }
+let lastOut =
+null;
 
-        if (openIn === null) {
-            openIn = new Date(punch.punchedAt);
-        }
-    }
-    else if (punch.punchType === "OUT") {
-        const outTime =
-            new Date(punch.punchedAt);
+let openIn =
+null;
 
-        lastOut = outTime;
+let completedMilliseconds =
+0;
 
-        if (openIn !== null) {
-            const duration =
-                outTime.getTime() -
-                openIn.getTime();
+const sessions =
+[];
 
-            if (duration > 0) {
-                completedMilliseconds +=
-                    duration;
-            }
+for (
+const punch
+of sortedPunches
+) {
 
-            openIn = null;
-        }
-    }
+const punchedAt =
+new Date(
+punch.punchedAt
+);
+
+if (
+Number.isNaN(
+punchedAt.getTime()
+)
+) {
+continue;
+}
+
+if (
+punch.punchType ===
+"IN"
+) {
+
+if (
+firstIn === null
+) {
+firstIn =
+new Date(
+punchedAt
+);
+}
+
+// Ignore a repeated IN state when calculating sessions.
+// The raw event itself remains stored.
+if (
+openIn === null
+) {
+openIn =
+new Date(
+punchedAt
+);
+}
+}
+
+else if (
+punch.punchType ===
+"OUT"
+) {
+
+const outTime =
+new Date(
+punchedAt
+);
+
+lastOut =
+outTime;
+
+if (
+openIn !== null
+) {
+
+const duration =
+outTime.getTime() -
+openIn.getTime();
+
+if (
+duration > 0
+) {
+
+completedMilliseconds +=
+duration;
+
+sessions.push({
+in:
+new Date(
+openIn
+),
+
+out:
+new Date(
+outTime
+),
+
+hours:
+Number(
+(
+duration /
+(1000 * 60 * 60)
+).toFixed(2)
+)
+});
+}
+
+openIn =
+null;
+}
+}
 }
 
 return {
-    punches: sortedPunches,
+punches:
+sortedPunches,
 
-    firstIn,
+firstIn,
 
-    lastOut,
+lastOut,
 
-    openIn,
+openIn,
 
-    hasOpenSession:
-        openIn !== null,
+hasOpenSession:
+openIn !== null,
 
-    completedHours:
-        Number(
-            (
-                completedMilliseconds /
-                (1000 * 60 * 60)
-            ).toFixed(2)
-        )
+completedMilliseconds,
+
+completedHours:
+Number(
+(
+completedMilliseconds /
+(1000 * 60 * 60)
+).toFixed(2)
+),
+
+sessions
 };
 
 };
 
 
+// ======================================================
+// BUILD TODAY'S ATTENDANCE VIEW FROM RAW PUNCHES
+// ======================================================
+//
+// This is a display projection only.
+//
+// If the current day ends with an unmatched IN, the UI may show
+// elapsed working time up to "now", but this value is not written
+// into Attendance as a checkout.
+//
+// AUTO_CLOSE is handled separately by batch resolution.
+// ======================================================
+
+const buildTodayAttendanceFromPunches = (
+punches,
+now
+) => {
+
+const groups =
+new Map();
+
+for (
+const punch
+of punches
+) {
+
+const key =
+`${punch.employeeId}|${getISTDateString(
+punch.punchedAt
+)}`;
+
+if (
+!groups.has(
+key
+)
+) {
+
+groups.set(
+key,
+{
+employeeId:
+punch.employeeId,
+
+employee:
+punch.employee ||
+null,
+
+date:
+getISTCalendarDate(
+punch.punchedAt
+),
+
+punches:
+[]
+}
+);
+}
+
+groups
+.get(key)
+.punches
+.push(
+punch
+);
+}
+
+const result =
+[];
+
+for (
+const group
+of groups.values()
+) {
+
+const state =
+calculatePunchSessionState(
+group.punches
+);
+
+if (
+!state.firstIn
+) {
+continue;
+}
+
+let totalMilliseconds =
+state.completedMilliseconds;
+
+if (
+state.openIn
+) {
+
+const ongoingMilliseconds =
+new Date(now).getTime() -
+state.openIn.getTime();
+
+if (
+ongoingMilliseconds > 0
+) {
+totalMilliseconds +=
+ongoingMilliseconds;
+}
+}
+
+const totalHours =
+totalMilliseconds /
+(1000 * 60 * 60);
+
+result.push({
+
+employeeId:
+group.employeeId,
+
+date:
+group.date,
+
+checkInTime:
+createMySQLTimeFromIST(
+state.firstIn
+),
+
+checkOutTime:
+state.hasOpenSession
+? null
+: (
+state.lastOut
+? createMySQLTimeFromIST(
+state.lastOut
+)
+: null
+),
+
+totalHours:
+totalHours > 0
+? Number(
+totalHours.toFixed(2)
+)
+: null,
+
+status:
+"PRESENT",
+
+resolutionSource:
+state.hasOpenSession
+? null
+: "DEVICE",
+
+manualOverride:
+false,
+
+manualOverrideAt:
+null,
+
+manualOverrideBy:
+null,
+
+employee:
+group.employee
+});
+}
+
+return result;
+};
 
 const parseTime = (
 value,
@@ -716,566 +916,1856 @@ return {
 
 };
 
+
+// ======================================================
+// SERIALIZE RAW PUNCH
+// ======================================================
+//
+// AttendancePunch.punchId is a BigInt. Convert it to a string for
+// JSON consumers while preserving all other raw audit information.
+// ======================================================
+
+const serializePunch = (
+punch
+) => {
+
+if (!punch) {
+return null;
+}
+
+return {
+...punch,
+
+punchId:
+typeof punch.punchId ===
+"bigint"
+? punch.punchId.toString()
+: punch.punchId
+};
+};
+
+
+// ======================================================
+// OFFICE CLOSE SETTINGS
+// ======================================================
+//
+// Existing Setting is company-scoped key/value storage.
+// No additional settings table is introduced.
+//
+// Supported keys are intentionally backward-compatible.
+// The default is 22:00 when no valid company setting exists.
+// ======================================================
+
+const getOfficeCloseTime = async (
+companyId,
+db = prisma
+) => {
+
+const numericCompanyId =
+Number(companyId);
+
+if (
+!Number.isInteger(
+numericCompanyId
+) ||
+numericCompanyId < 1
+) {
+return DEFAULT_OFFICE_CLOSE_TIME;
+}
+
+for (
+const key
+of OFFICE_CLOSE_SETTING_KEYS
+) {
+
+const setting =
+await db.setting.findUnique({
+where: {
+companyId_key: {
+companyId:
+numericCompanyId,
+
+key
+}
+},
+
+select: {
+value:
+true
+}
+});
+
+if (
+setting?.value
+) {
+
+try {
+
+const parsed =
+parseTime(
+setting.value,
+"office close time"
+);
+
+return formatTimeValue(
+parsed
+).slice(
+0,
+5
+);
+
+}
+catch {
+// Ignore malformed setting and try the next supported key.
+}
+}
+}
+
+return DEFAULT_OFFICE_CLOSE_TIME;
+};
+
+
+// ======================================================
+// OFFICE CLOSE REACHED
+// ======================================================
+
+const isOfficeCloseReached = (
+attendanceDate,
+officeCloseTime,
+now = new Date()
+) => {
+
+const closeTime =
+parseTime(
+officeCloseTime,
+"officeCloseTime"
+);
+
+const closeInstant =
+combineAttendanceDateAndTime(
+attendanceDate,
+closeTime
+);
+
+return Boolean(
+closeInstant &&
+new Date(now).getTime() >=
+closeInstant.getTime()
+);
+};
+
+
+// ======================================================
+// ADMIN ID NORMALIZATION
+// ======================================================
+
+const getAdminIdFromUser = (
+adminUser
+) => {
+
+if (!adminUser) {
+return null;
+}
+
+const rawId =
+adminUser.adminId ??
+adminUser.userId ??
+adminUser.id;
+
+if (
+rawId === undefined ||
+rawId === null ||
+rawId === ""
+) {
+return null;
+}
+
+const numericId =
+Number(rawId);
+
+return Number.isInteger(
+numericId
+) &&
+numericId > 0
+? numericId
+: null;
+};
+
+
+// ======================================================
+// RESOLVE ATTENDANCE FOR ONE EMPLOYEE / ONE DATE
+// ======================================================
+//
+// RAW:
+// AttendancePunch
+//
+// RESOLVED:
+// Attendance
+//
+// Precedence:
+//
+// ADMIN override
+//      ↓
+// DEVICE real OUT
+//      ↓
+// AUTO_CLOSE at office close
+//
+// AUTO_CLOSE changes only the Attendance resolution. It never
+// creates an AttendancePunch.
+// ======================================================
+
+const resolveAttendanceForDateWithClient = async (
+db,
+employeeId,
+attendanceDateValue,
+options = {}
+) => {
+
+const attendanceDate =
+getISTCalendarDate(
+attendanceDateValue
+);
+
+if (
+!attendanceDate
+) {
+throw createError(
+"Invalid attendance date"
+);
+}
+
+const dayStart =
+getStartOfDay(
+attendanceDate
+);
+
+const dayEnd =
+getEndOfDay(
+attendanceDate
+);
+
+const existing =
+await db.attendance.findUnique({
+where: {
+employeeId_date: {
+employeeId:
+Number(employeeId),
+
+date:
+attendanceDate
+}
+}
+});
+
+// ------------------------------------------------------
+// ADMIN OVERRIDE PROTECTION
+// ------------------------------------------------------
+//
+// Once an administrator explicitly corrects Attendance,
+// automatic calculation must never silently replace it.
+// ------------------------------------------------------
+
+if (
+existing?.manualOverride ===
+true
+) {
+return existing;
+}
+
+const punches =
+await db.attendancePunch.findMany({
+where: {
+employeeId:
+Number(employeeId),
+
+punchedAt: {
+gte:
+dayStart,
+
+lte:
+dayEnd
+}
+},
+
+orderBy: {
+punchedAt:
+"asc"
+}
+});
+
+if (
+punches.length ===
+0
+) {
+return existing ||
+null;
+}
+
+const state =
+calculatePunchSessionState(
+punches
+);
+
+if (
+!state.firstIn
+) {
+return existing ||
+null;
+}
+
+const officeCloseTime =
+options.officeCloseTime ||
+await getOfficeCloseTime(
+options.companyId,
+db
+);
+
+const now =
+options.now instanceof Date
+? options.now
+: new Date();
+
+let checkOutInstant =
+null;
+
+let resolutionSource =
+null;
+
+let totalHours =
+state.completedHours;
+
+// ------------------------------------------------------
+// REAL DEVICE OUT
+// ------------------------------------------------------
+
+if (
+!state.hasOpenSession &&
+state.lastOut
+) {
+
+checkOutInstant =
+state.lastOut;
+
+resolutionSource =
+"DEVICE";
+}
+
+// ------------------------------------------------------
+// FINAL OPEN SESSION
+// ------------------------------------------------------
+
+if (
+state.hasOpenSession
+) {
+
+const shouldAutoClose =
+options.autoClose ===
+true &&
+isOfficeCloseReached(
+attendanceDate,
+officeCloseTime,
+now
+);
+
+if (
+shouldAutoClose
+) {
+
+const closeTime =
+parseTime(
+officeCloseTime,
+"officeCloseTime"
+);
+
+const closeInstant =
+combineAttendanceDateAndTime(
+attendanceDate,
+closeTime
+);
+
+if (
+closeInstant &&
+closeInstant.getTime() >
+state.openIn.getTime()
+) {
+
+checkOutInstant =
+closeInstant;
+
+resolutionSource =
+"AUTO_CLOSE";
+
+const openMilliseconds =
+closeInstant.getTime() -
+state.openIn.getTime();
+
+totalHours =
+Number(
+(
+state.completedHours +
+openMilliseconds /
+(1000 * 60 * 60)
+).toFixed(2)
+);
+}
+}
+}
+
+// ------------------------------------------------------
+// STILL OPEN
+// ------------------------------------------------------
+
+if (
+!checkOutInstant
+) {
+
+totalHours =
+state.completedHours >
+0
+? state.completedHours
+: null;
+
+resolutionSource =
+null;
+}
+
+// ------------------------------------------------------
+// WRITE RESOLVED ATTENDANCE
+// ------------------------------------------------------
+
+const attendanceData = {
+
+employeeId:
+Number(employeeId),
+
+date:
+attendanceDate,
+
+checkInTime:
+createMySQLTimeFromIST(
+state.firstIn
+),
+
+checkOutTime:
+checkOutInstant
+? createMySQLTimeFromIST(
+checkOutInstant
+)
+: null,
+
+totalHours,
+
+status:
+"PRESENT",
+
+resolutionSource,
+
+manualOverride:
+false,
+
+manualOverrideAt:
+null,
+
+manualOverrideBy:
+null
+};
+
+if (
+existing
+) {
+
+return db.attendance.update({
+where: {
+attendanceId:
+existing.attendanceId
+},
+
+data:
+attendanceData
+});
+}
+
+return db.attendance.create({
+data:
+attendanceData
+});
+};
+
+
+// ======================================================
+// PUBLIC ATTENDANCE RESOLVER
+// ======================================================
+
+const resolveAttendanceForDate = async (
+employeeId,
+attendanceDate,
+options = {}
+) => {
+
+return resolveAttendanceForDateWithClient(
+prisma,
+employeeId,
+attendanceDate,
+options
+);
+};
+
+
+// ======================================================
+// NORMALIZE BATCH EVENT TYPE
+// ======================================================
+//
+// Machine payloads may call this field eventType, punchType,
+// type, checkIn, checkOut, entry, or exit. Normalize only the
+// supported semantic values.
+// ======================================================
+
+const normalizeEventType = (
+value
+) => {
+
+if (
+value === undefined ||
+value === null ||
+value === ""
+) {
+return null;
+}
+
+const normalized =
+String(value)
+.trim()
+.toUpperCase();
+
+if (
+[
+"IN",
+"CHECK_IN",
+"CHECKIN",
+"ENTRY"
+].includes(
+normalized
+)
+) {
+return "IN";
+}
+
+if (
+[
+"OUT",
+"CHECK_OUT",
+"CHECKOUT",
+"EXIT"
+].includes(
+normalized
+)
+) {
+return "OUT";
+}
+
+return null;
+};
+
+
 // ======================================================
 // PROCESS DEVICE ATTENDANCE PUNCH
 // ======================================================
 
-const processDevicePunch = async (data) => {
+// ======================================================
+// PROCESS DEVICE ATTENDANCE PUNCH
+// ======================================================
+//
+// This remains the current single-punch/test API.
+//
+// The important architectural change is that this function
+// creates only the RAW AttendancePunch and then asks the central
+// resolver to calculate the ERP Attendance row.
+//
+// Therefore:
+// - no duplicate calculation implementation
+// - no fake AUTO_CLOSE punch
+// - ADMIN overrides remain protected
+// - DEVICE OUT can replace a previous AUTO_CLOSE
+// ======================================================
+
+const processDevicePunch = async (
+data
+) => {
+
 const {
 device,
-sensorSlot
-} = data;
-
-const DUPLICATE_WINDOW_SECONDS = 30;
-
+sensorSlot,
+eventId
+} = data || {};
 
 // ==================================================
 // VALIDATE DEVICE
 // ==================================================
 
-if (!device) {
-    const error = new Error(
-        "Authenticated device is required"
-    );
-
-    error.statusCode = 401;
-
-    throw error;
+if (
+!device
+) {
+throw createError(
+"Authenticated device is required",
+401
+);
 }
-
 
 // ==================================================
 // VALIDATE SENSOR SLOT
 // ==================================================
 
-if (
-    sensorSlot === undefined ||
-    sensorSlot === null
-) {
-    const error = new Error(
-        "Sensor slot is required"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
-}
-
 const slot =
-    Number(sensorSlot);
+Number(sensorSlot);
 
 if (
-    !Number.isInteger(slot) ||
-    slot < 1
+!Number.isInteger(slot) ||
+slot < 1
 ) {
-    const error = new Error(
-        "Sensor slot must be a positive integer"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
+throw createError(
+"Sensor slot must be a positive integer"
+);
 }
 
+// ==================================================
+// VALIDATE EVENT ID WHEN PROVIDED
+// ==================================================
+
+let normalizedEventId =
+null;
+
+if (
+eventId !== undefined &&
+eventId !== null &&
+eventId !== ""
+) {
+
+normalizedEventId =
+String(eventId)
+.trim();
+
+if (
+!normalizedEventId
+) {
+throw createError(
+"eventId cannot be empty"
+);
+}
+
+if (
+normalizedEventId.length >
+100
+) {
+throw createError(
+"eventId cannot exceed 100 characters"
+);
+}
+}
 
 // ==================================================
 // UPDATE DEVICE LAST SEEN
 // ==================================================
 
 await prisma.iotDevice.update({
-    where: {
-        deviceId:
-            device.deviceId
-    },
+where: {
+deviceId:
+device.deviceId
+},
 
-    data: {
-        lastSeenAt:
-            new Date()
-    }
+data: {
+lastSeenAt:
+new Date()
+}
 });
-
 
 // ==================================================
 // FIND FINGERPRINT
 // ==================================================
 
 const fingerprint =
-    await prisma.fingerprintTemplate.findUnique({
-        where: {
-            sensorSlot: slot
-        },
+await prisma.fingerprintTemplate.findUnique({
+where: {
+sensorSlot:
+slot
+},
 
-        include: {
-            employee: true
-        }
-    });
-
-
-if (!fingerprint) {
-    const error = new Error(
-        "No fingerprint is registered for this sensor slot"
-    );
-
-    error.statusCode = 404;
-
-    throw error;
+include: {
+employee:
+true
 }
+});
 
+if (
+!fingerprint
+) {
+throw createError(
+"No fingerprint is registered for this sensor slot",
+404
+);
+}
 
 // ==================================================
 // CHECK FINGERPRINT STATUS
 // ==================================================
 
 if (
-    fingerprint.status !== "ACTIVE"
+fingerprint.status !==
+"ACTIVE"
 ) {
-    const error = new Error(
-        "Fingerprint template is inactive"
-    );
-
-    error.statusCode = 403;
-
-    throw error;
+throw createError(
+"Fingerprint template is inactive",
+403
+);
 }
-
 
 // ==================================================
 // EMPLOYEE
 // ==================================================
 
 const employee =
-    fingerprint.employee;
-
+fingerprint.employee;
 
 if (
-    employee.status !== "ACTIVE"
+employee.status !==
+"ACTIVE"
 ) {
-    const error = new Error(
-        "Employee is not active"
-    );
-
-    error.statusCode = 403;
-
-    throw error;
+throw createError(
+"Employee is not active",
+403
+);
 }
 
-
 // ==================================================
-// CURRENT TIME
+// CURRENT EVENT TIME
 // ==================================================
 
 const punchedAt =
-    new Date();
-
-
-// ==================================================
-// TODAY IN IST
-// ==================================================
-
-const startOfToday =
-    getStartOfDay(punchedAt);
-
-const endOfToday =
-    getEndOfDay(punchedAt);
-
-
-// ==================================================
-// ==================================================
-// PREVIOUS-DAY ATTENDANCE DOES NOT BLOCK TODAY
-// ==================================================
-//
-// An employee may continue working on a new calendar day
-// even when the previous day contains an unresolved final IN.
-// That previous day is kept as a historical settlement item
-// and can be resolved later by an administrator.
-//
-// Only today's raw punches determine whether this punch is
-// IN or OUT.
-// ==================================================
-
-const todayCalendarDate =
-    getISTCalendarDate(punchedAt);
-
-
-// ==================================================
-
-// GET TODAY'S PUNCHES
-// ==================================================
-
-const todayPunches =
-    await prisma.attendancePunch.findMany({
-        where: {
-            employeeId:
-                employee.employeeId,
-
-            punchedAt: {
-                gte:
-                    startOfToday,
-
-                lte:
-                    endOfToday
-            }
-        },
-
-        orderBy: {
-            punchedAt: "desc"
-        }
-    });
-
-
-// ==================================================
-// DUPLICATE PROTECTION
-// ==================================================
-
-if (
-    todayPunches.length > 0
-) {
-    const lastPunch =
-        todayPunches[0];
-
-    const secondsSinceLastPunch =
-        (
-            punchedAt.getTime() -
-            new Date(
-                lastPunch.punchedAt
-            ).getTime()
-        ) / 1000;
-
-    if (
-        secondsSinceLastPunch >= 0 &&
-        secondsSinceLastPunch <
-            DUPLICATE_WINDOW_SECONDS
-    ) {
-        const error = new Error(
-            `Duplicate punch detected. Please wait ${DUPLICATE_WINDOW_SECONDS} seconds before scanning again.`
-        );
-
-        error.statusCode = 409;
-
-        throw error;
-    }
-}
-
-
-// ==================================================
-// DETERMINE IN / OUT
-// ==================================================
-
-let punchType = "IN";
-
-if (
-    todayPunches.length > 0
-) {
-    const lastPunch =
-        todayPunches[0];
-
-    punchType =
-        lastPunch.punchType === "IN"
-            ? "OUT"
-            : "IN";
-}
-
-
-console.log(
-    "Attendance punch type:",
-    punchType
-);
-
+new Date();
 
 // ==================================================
 // TRANSACTION
 // ==================================================
 
 const result =
-    await prisma.$transaction(
-        async (tx) => {
+await prisma.$transaction(
+async (
+tx
+) => {
 
-            // ======================================
-            // CREATE RAW PUNCH
-            // ======================================
+// --------------------------------------------------
+// IDEMPOTENT EVENT CHECK
+// --------------------------------------------------
+//
+// If a client/device retries the same event, do not
+// create another raw punch.
+//
+if (
+normalizedEventId
+) {
 
-            const punch =
-                await tx.attendancePunch.create({
-                    data: {
-                        employeeId:
-                            employee.employeeId,
+const existingEvent =
+await tx.attendancePunch.findUnique({
+where: {
+deviceId_eventId: {
+deviceId:
+device.deviceId,
 
-                        deviceId:
-                            device.deviceId,
+eventId:
+normalizedEventId
+}
+},
 
-                        sensorSlot:
-                            slot,
+include: {
+employee: {
+select: {
+employeeId: true,
+firstName: true,
+lastName: true,
+email: true
+}
+},
 
-                        punchType:
-                            punchType,
+device: {
+select: {
+deviceId: true,
+deviceCode: true,
+deviceName: true,
+branchId: true
+}
+}
+}
+});
 
-                        punchedAt:
-                            punchedAt
-                    },
+if (
+existingEvent
+) {
 
-                    include: {
-                        employee: {
-                            select: {
-                                employeeId: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true
-                            }
-                        },
+const existingAttendance =
+await tx.attendance.findUnique({
+where: {
+employeeId_date: {
+employeeId:
+employee.employeeId,
 
-                        device: {
-                            select: {
-                                deviceId: true,
-                                deviceCode: true,
-                                deviceName: true,
-                                branchId: true
-                            }
-                        }
-                    }
-                });
+date:
+getISTCalendarDate(
+existingEvent.punchedAt
+)
+}
+}
+});
 
+return {
+punch:
+existingEvent,
 
-            // ======================================
-            // GET ALL TODAY'S PUNCHES
-            // ======================================
+attendance:
+existingAttendance,
 
-            const allPunches =
-                await tx.attendancePunch.findMany({
-                    where: {
-                        employeeId:
-                            employee.employeeId,
+totalHours:
+existingAttendance?.totalHours
+? Number(
+existingAttendance.totalHours
+)
+: 0,
 
-                        punchedAt: {
-                            gte:
-                                startOfToday,
+totalHoursFormatted:
+formatDuration(
+existingAttendance?.totalHours
+),
 
-                            lte:
-                                endOfToday
-                        }
-                    },
+duplicate:
+true
+};
+}
+}
 
-                    orderBy: {
-                        punchedAt: "asc"
-                    }
-                });
+// --------------------------------------------------
+// TODAY'S RAW PUNCHES
+// --------------------------------------------------
+//
+// Previous-day open sessions never block today's punch.
+// The current calendar date is independently calculated.
+//
+const startOfToday =
+getStartOfDay(
+punchedAt
+);
 
+const endOfToday =
+getEndOfDay(
+punchedAt
+);
 
-            // ======================================
-            // CALCULATE TOTAL WORKING TIME
-            // ======================================
+const todayPunches =
+await tx.attendancePunch.findMany({
+where: {
+employeeId:
+employee.employeeId,
 
-            let totalMilliseconds = 0;
-            let openInTime = null;
+punchedAt: {
+gte:
+startOfToday,
 
+lte:
+endOfToday
+}
+},
 
-            for (
-                const currentPunch
-                of allPunches
-            ) {
+orderBy: {
+punchedAt:
+"desc"
+}
+});
 
-                if (
-                    currentPunch.punchType === "IN"
-                ) {
-                    if (
-                        openInTime === null
-                    ) {
-                        openInTime =
-                            new Date(
-                                currentPunch.punchedAt
-                            );
-                    }
-                }
+// --------------------------------------------------
+// DUPLICATE WINDOW FOR LEGACY/SINGLE-PUNCH CLIENTS
+// --------------------------------------------------
 
-                else if (
-                    currentPunch.punchType === "OUT"
-                ) {
+if (
+todayPunches.length > 0
+) {
 
-                    if (
-                        openInTime !== null
-                    ) {
+const lastPunch =
+todayPunches[0];
 
-                        const outTime =
-                            new Date(
-                                currentPunch.punchedAt
-                            );
+const secondsSinceLastPunch =
+(
+punchedAt.getTime() -
+new Date(
+lastPunch.punchedAt
+).getTime()
+) / 1000;
 
-                        const duration =
-                            outTime.getTime() -
-                            openInTime.getTime();
+if (
+secondsSinceLastPunch >=
+0 &&
+secondsSinceLastPunch <
+DUPLICATE_WINDOW_SECONDS
+) {
 
-                        if (
-                            duration > 0
-                        ) {
-                            totalMilliseconds +=
-                                duration;
-                        }
+throw createError(
+`Duplicate punch detected. Please wait ${DUPLICATE_WINDOW_SECONDS} seconds before scanning again.`,
+409
+);
+}
+}
 
-                        openInTime = null;
-                    }
-                }
-            }
+// --------------------------------------------------
+// DETERMINE IN / OUT
+// --------------------------------------------------
 
+let punchType =
+"IN";
 
-            const totalHours =
-                totalMilliseconds /
-                (
-                    1000 *
-                    60 *
-                    60
-                );
+if (
+todayPunches.length > 0
+) {
 
+const lastPunch =
+todayPunches[0];
 
-            const totalHoursRounded =
-                totalHours > 0
-                    ? Number(
-                        totalHours.toFixed(2)
-                    )
-                    : null;
+punchType =
+lastPunch.punchType ===
+"IN"
+? "OUT"
+: "IN";
+}
 
+console.log(
+"Attendance punch type:",
+punchType
+);
 
-            // ======================================
-            // FIND ATTENDANCE
-            // ======================================
+// --------------------------------------------------
+// CREATE RAW PUNCH
+// --------------------------------------------------
 
-            // Attendance.date is a MySQL DATE field.
-            // Use the pure IST calendar date here so the lookup
-            // matches the same value used when creating the row.
-            let attendance =
-                await tx.attendance.findUnique({
-                    where: {
-                        employeeId_date: {
-                            employeeId:
-                                employee.employeeId,
+const punch =
+await tx.attendancePunch.create({
+data: {
+employeeId:
+employee.employeeId,
 
-                            date:
-                                getISTCalendarDate(
-                                    punchedAt
-                                )
-                        }
-                    }
-                });
+deviceId:
+device.deviceId,
 
+sensorSlot:
+slot,
 
-            // ======================================
-            // FIRST PUNCH / CREATE
-            // ======================================
+punchType:
+punchType,
 
-            if (!attendance) {
+punchedAt:
+punchedAt,
 
-                attendance =
-                    await tx.attendance.create({
-                        data: {
-                            employeeId:
-                                employee.employeeId,
+eventId:
+normalizedEventId
+},
 
-                            date:
-                                getISTCalendarDate(punchedAt),
+include: {
+employee: {
+select: {
+employeeId: true,
+firstName: true,
+lastName: true,
+email: true
+}
+},
 
-                            checkInTime:
-                                punchType === "IN"
-                                    ? createMySQLTimeFromIST(
-                                        punchedAt
-                                    )
-                                    : null,
+device: {
+select: {
+deviceId: true,
+deviceCode: true,
+deviceName: true,
+branchId: true
+}
+}
+}
+});
 
-                            checkOutTime:
-                                punchType === "OUT"
-                                    ? createMySQLTimeFromIST(
-                                        punchedAt
-                                    )
-                                    : null,
+// --------------------------------------------------
+// CENTRAL ATTENDANCE RESOLUTION
+// --------------------------------------------------
+//
+// autoClose=false here because a normal single punch is
+// not the batch settlement mechanism.
+//
+const attendance =
+await resolveAttendanceForDateWithClient(
+tx,
+employee.employeeId,
+punchedAt,
+{
+autoClose:
+false,
 
-                            totalHours:
-                                totalHoursRounded,
+companyId:
+employee.companyId
+}
+);
 
-                            status:
-                                "PRESENT"
-                        }
-                    });
-            }
+return {
+punch,
 
-            // ======================================
-            // UPDATE ATTENDANCE
-            // ======================================
+attendance,
 
-            else {
+totalHours:
+attendance?.totalHours
+? Number(
+attendance.totalHours
+)
+: 0,
 
-                let firstInTime = null;
-                let lastOutTime = null;
+totalHoursFormatted:
+formatDuration(
+attendance?.totalHours
+),
 
-
-                for (
-                    const currentPunch
-                    of allPunches
-                ) {
-
-                    if (
-                        currentPunch.punchType === "IN"
-                    ) {
-
-                        if (
-                            firstInTime === null
-                        ) {
-                            firstInTime =
-                                createMySQLTimeFromIST(
-                                    currentPunch.punchedAt
-                                );
-                        }
-                    }
-
-                    else if (
-                        currentPunch.punchType === "OUT"
-                    ) {
-
-                        lastOutTime =
-                            createMySQLTimeFromIST(
-                                currentPunch.punchedAt
-                            );
-                    }
-                }
-
-
-                attendance =
-                    await tx.attendance.update({
-                        where: {
-                            attendanceId:
-                                attendance.attendanceId
-                        },
-
-                        data: {
-                            checkInTime:
-                                firstInTime,
-
-                            checkOutTime:
-                                lastOutTime,
-
-                            totalHours:
-                                totalHoursRounded,
-
-                            status:
-                                "PRESENT"
-                        }
-                    });
-            }
-
-
-            return {
-                punch,
-                attendance,
-                totalHours:
-                    totalHoursRounded || 0,
-
-                totalHoursFormatted:
-                    formatDuration(
-                        totalHours
-                    )
-            };
-        }
-    );
-
+duplicate:
+false
+};
+}
+);
 
 return result;
+};
 
+
+// ======================================================
+// PROCESS ATTENDANCE BATCH
+// ======================================================
+//
+// Future biometric-machine flow:
+//
+// Device memory card
+//       ↓
+// Batch upload
+//       ↓
+// RAW AttendancePunch
+//       ↓
+// Central session calculation
+//       ↓
+// Attendance resolution
+//
+// This function is intentionally idempotent.
+// Re-uploading the same eventId for the same device does not
+// create another AttendancePunch.
+//
+// Expected concepts per event:
+//
+// {
+//     eventId,
+//     employeeId,
+//     eventDateTime,
+//     eventType,
+//     sensorSlot
+// }
+//
+// eventType may be omitted only when the server must derive
+// IN / OUT from the previous raw state.
+// ======================================================
+
+const processAttendanceBatch = async (
+data
+) => {
+
+const {
+device,
+events,
+officeCloseTime:
+suppliedOfficeCloseTime
+} = data || {};
+
+if (
+!device
+) {
+throw createError(
+"Authenticated device is required",
+401
+);
+}
+
+if (
+!Array.isArray(events)
+) {
+throw createError(
+"events must be an array"
+);
+}
+
+if (
+events.length === 0
+) {
+return {
+deviceId:
+device.deviceId,
+
+receivedCount:
+0,
+
+insertedCount:
+0,
+
+duplicateCount:
+0,
+
+insertedPunches:
+[],
+
+duplicatePunches:
+[],
+
+attendance:
+[]
+};
+}
+
+if (
+events.length > 5000
+) {
+throw createError(
+"A maximum of 5000 attendance events can be uploaded in one batch"
+);
+}
+
+const companyId =
+Number(
+device.companyId
+);
+
+const normalizedEvents = [];
+
+for (
+let index = 0;
+index < events.length;
+index++
+) {
+
+const event =
+events[index] || {};
+
+const eventId =
+String(
+event.eventId ??
+""
+).trim();
+
+if (
+!eventId
+) {
+throw createError(
+`Batch event at index ${index} is missing eventId`
+);
+}
+
+if (
+eventId.length > 100
+) {
+throw createError(
+`Batch event at index ${index} has an eventId longer than 100 characters`
+);
+}
+
+if (
+event.deviceId !== undefined &&
+event.deviceId !== null &&
+String(event.deviceId) !==
+String(device.deviceId)
+) {
+throw createError(
+`Batch event ${eventId} belongs to another device`
+);
+}
+
+const employeeId =
+Number(
+event.employeeId
+);
+
+if (
+!Number.isInteger(
+employeeId
+) ||
+employeeId < 1
+) {
+throw createError(
+`Batch event ${eventId} has an invalid employeeId`
+);
+}
+
+const timestampValue =
+event.eventDateTime ??
+event.punchedAt ??
+event.timestamp ??
+null;
+
+const punchedAt =
+new Date(
+timestampValue
+);
+
+if (
+!timestampValue ||
+Number.isNaN(
+punchedAt.getTime()
+)
+) {
+throw createError(
+`Batch event ${eventId} has an invalid eventDateTime`
+);
+}
+
+const normalizedType =
+normalizeEventType(
+event.eventType ??
+event.punchType ??
+event.type
+);
+
+let sensorSlot =
+Number(
+event.sensorSlot ?? 0
+);
+
+if (
+!Number.isInteger(
+sensorSlot
+) ||
+sensorSlot < 0
+) {
+throw createError(
+`Batch event ${eventId} has an invalid sensorSlot`
+);
+}
+
+normalizedEvents.push({
+eventId,
+employeeId,
+punchedAt,
+punchType:
+normalizedType,
+sensorSlot,
+originalIndex:
+index
+});
+}
+
+// ------------------------------------------------------
+// VALIDATE EMPLOYEES IN ONE QUERY
+// ------------------------------------------------------
+
+const employeeIds =
+Array.from(
+new Set(
+normalizedEvents.map(
+event =>
+event.employeeId
+)
+)
+);
+
+const employees =
+await prisma.employee.findMany({
+where: {
+employeeId: {
+in:
+employeeIds
+},
+...(Number.isInteger(
+companyId
+) && companyId > 0
+? {
+companyId
+}
+: {})
+},
+
+select: {
+employeeId: true,
+companyId: true,
+status: true
+}
+});
+
+const employeeMap =
+new Map(
+employees.map(
+employee => [
+employee.employeeId,
+employee
+]
+)
+);
+
+for (
+const employeeId
+of employeeIds
+) {
+
+const employee =
+employeeMap.get(
+employeeId
+);
+
+if (
+!employee
+) {
+throw createError(
+`Employee ${employeeId} was not found for this device`
+);
+}
+
+if (
+employee.status !==
+"ACTIVE"
+) {
+throw createError(
+`Employee ${employeeId} is not active`,
+403
+);
+}
+
+if (
+Number.isInteger(
+companyId
+) &&
+companyId > 0 &&
+Number(employee.companyId) !==
+companyId
+) {
+throw createError(
+`Employee ${employeeId} does not belong to the authenticated device company`,
+403
+);
+}
+}
+
+// ------------------------------------------------------
+// SORT BY ACTUAL EVENT TIME
+// ------------------------------------------------------
+//
+// Upload order is not attendance order.
+// Always calculate session state using punch timestamp.
+//
+const sortedEvents =
+[...normalizedEvents].sort(
+(a, b) => {
+
+const timeDifference =
+a.punchedAt.getTime() -
+b.punchedAt.getTime();
+
+if (
+timeDifference !== 0
+) {
+return timeDifference;
+}
+
+return (
+a.originalIndex -
+b.originalIndex
+);
+}
+);
+
+// ------------------------------------------------------
+// LOAD EXISTING EVENT IDs
+// ------------------------------------------------------
+
+const eventIds =
+sortedEvents.map(
+event =>
+event.eventId
+);
+
+const existingEvents =
+await prisma.attendancePunch.findMany({
+where: {
+deviceId:
+device.deviceId,
+
+eventId: {
+in:
+eventIds
+}
+},
+
+include: {
+employee: {
+select: employeeSelect
+},
+
+device: {
+select: {
+deviceId: true,
+deviceCode: true,
+deviceName: true,
+branchId: true
+}
+}
+}
+});
+
+const existingEventMap =
+new Map(
+existingEvents.map(
+punch => [
+String(punch.eventId),
+punch
+]
+)
+);
+
+// ------------------------------------------------------
+// LOAD EXISTING RAW PUNCHES FOR EVENT-TYPE INFERENCE
+// ------------------------------------------------------
+//
+// The eventType coming from the machine should normally be
+// explicit. If it is absent, derive it from the actual prior
+// raw state for that employee and attendance date.
+//
+const uniqueEmployeeIds =
+employeeIds;
+
+const earliestEvent =
+sortedEvents[0].punchedAt;
+
+const latestEvent =
+sortedEvents[
+sortedEvents.length - 1
+].punchedAt;
+
+const existingRangePunches =
+await prisma.attendancePunch.findMany({
+where: {
+employeeId: {
+in:
+uniqueEmployeeIds
+},
+
+punchedAt: {
+gte:
+getStartOfDay(
+earliestEvent
+),
+
+lte:
+getEndOfDay(
+latestEvent
+)
+}
+},
+
+orderBy: {
+punchedAt:
+"asc"
+}
+});
+
+const stateByEmployeeDate =
+new Map();
+
+for (
+const punch
+of existingRangePunches
+) {
+
+const key =
+`${punch.employeeId}|${getISTDateString(
+punch.punchedAt
+)}`;
+
+stateByEmployeeDate.set(
+key,
+punch.punchType
+);
+}
+
+const insertedPunches =
+[];
+
+const duplicatePunches =
+[];
+
+const affectedAttendanceKeys =
+new Map();
+
+const seenBatchEventIds =
+new Set();
+
+await prisma.$transaction(
+async (
+tx
+) => {
+
+// --------------------------------------------------
+// OFFICE CLOSE RESOLUTION SETTING
+// --------------------------------------------------
+
+const officeCloseTime =
+suppliedOfficeCloseTime
+? formatTimeValue(
+parseTime(
+suppliedOfficeCloseTime,
+"officeCloseTime"
+)
+).slice(
+0,
+5
+)
+: await getOfficeCloseTime(
+companyId,
+tx
+);
+
+// --------------------------------------------------
+// PROCESS EACH EVENT
+// --------------------------------------------------
+
+for (
+const event
+of sortedEvents
+) {
+
+if (
+seenBatchEventIds.has(
+event.eventId
+)
+) {
+
+const duplicate =
+existingEventMap.get(
+event.eventId
+);
+
+duplicatePunches.push(
+duplicate || {
+eventId:
+event.eventId,
+
+duplicate:
+true
+}
+);
+
+continue;
+}
+
+seenBatchEventIds.add(
+event.eventId
+);
+
+// -----------------------------------------------
+// IDEMPOTENCY CHECK
+// -----------------------------------------------
+
+const existingEvent =
+existingEventMap.get(
+event.eventId
+);
+
+if (
+existingEvent
+) {
+
+duplicatePunches.push(
+existingEvent
+);
+
+affectedAttendanceKeys.set(
+`${event.employeeId}|${getISTDateString(
+event.punchedAt
+)}`,
+{
+employeeId:
+event.employeeId,
+
+attendanceDate:
+getISTCalendarDate(
+event.punchedAt
+)
+}
+);
+
+continue;
+}
+
+// -----------------------------------------------
+// DETERMINE PUNCH TYPE
+// -----------------------------------------------
+
+const attendanceKey =
+`${event.employeeId}|${getISTDateString(
+event.punchedAt
+)}`;
+
+let punchType =
+event.punchType;
+
+if (
+!punchType
+) {
+
+const previousPunchType =
+stateByEmployeeDate.get(
+attendanceKey
+);
+
+punchType =
+previousPunchType ===
+"IN"
+? "OUT"
+: "IN";
+}
+
+// -----------------------------------------------
+// INSERT RAW PUNCH
+// -----------------------------------------------
+
+let punch;
+
+try {
+
+punch =
+await tx.attendancePunch.create({
+data: {
+employeeId:
+event.employeeId,
+
+deviceId:
+device.deviceId,
+
+sensorSlot:
+event.sensorSlot,
+
+punchType,
+
+punchedAt:
+event.punchedAt,
+
+eventId:
+event.eventId
+},
+
+include: {
+employee: {
+select:
+employeeSelect
+},
+
+device: {
+select: {
+deviceId: true,
+deviceCode: true,
+deviceName: true,
+branchId: true
+}
+}
+}
+});
+
+}
+catch (
+error
+) {
+
+if (
+error?.code ===
+"P2002"
+) {
+
+const duplicate =
+await tx.attendancePunch.findUnique({
+where: {
+deviceId_eventId: {
+deviceId:
+device.deviceId,
+
+eventId:
+event.eventId
+}
+},
+
+include: {
+employee: {
+select:
+employeeSelect
+},
+
+device: {
+select: {
+deviceId: true,
+deviceCode: true,
+deviceName: true,
+branchId: true
+}
+}
+}
+});
+
+duplicatePunches.push(
+duplicate || {
+eventId:
+event.eventId,
+
+duplicate:
+true
+}
+);
+
+continue;
+}
+
+throw error;
+}
+
+insertedPunches.push(
+punch
+);
+
+// -----------------------------------------------
+// KEEP DERIVED STATE IN SYNC
+// -----------------------------------------------
+
+stateByEmployeeDate.set(
+attendanceKey,
+punchType
+);
+
+affectedAttendanceKeys.set(
+attendanceKey,
+{
+employeeId:
+event.employeeId,
+
+attendanceDate:
+getISTCalendarDate(
+event.punchedAt
+)
+}
+);
+}
+
+// --------------------------------------------------
+// CENTRAL ATTENDANCE RESOLUTION
+// --------------------------------------------------
+//
+// Run once for every affected employee/date.
+//
+// Because autoClose=true, a late batch upload can settle a
+// historical open session using that historical day's office
+// close time. No fake raw punch is created.
+//
+for (
+const affected
+of affectedAttendanceKeys.values()
+) {
+
+await resolveAttendanceForDateWithClient(
+tx,
+affected.employeeId,
+affected.attendanceDate,
+{
+autoClose:
+true,
+
+companyId:
+companyId,
+
+officeCloseTime:
+officeCloseTime,
+
+now:
+new Date()
+}
+);
+}
+}
+);
+
+// ------------------------------------------------------
+// LOAD RESOLVED ATTENDANCE FOR RESPONSE
+// ------------------------------------------------------
+
+const resolvedAttendance =
+[];
+
+for (
+const affected
+of affectedAttendanceKeys.values()
+) {
+
+const attendance =
+await prisma.attendance.findUnique({
+where: {
+employeeId_date: {
+employeeId:
+affected.employeeId,
+
+date:
+affected.attendanceDate
+}
+},
+
+include: {
+employee: {
+select:
+employeeSelect
+},
+
+manualOverrideAdmin: {
+select: {
+adminId:
+true,
+
+adminName:
+true,
+
+email:
+true
+}
+}
+}
+});
+
+if (
+attendance
+) {
+resolvedAttendance.push(
+serializeAttendance(
+attendance
+)
+);
+}
+}
+
+return {
+deviceId:
+device.deviceId,
+
+receivedCount:
+normalizedEvents.length,
+
+insertedCount:
+insertedPunches.length,
+
+duplicateCount:
+duplicatePunches.length,
+
+insertedPunches:
+insertedPunches.map(
+serializePunch
+),
+
+duplicatePunches:
+duplicatePunches.map(
+serializePunch
+),
+
+attendance:
+resolvedAttendance
+};
 };
 
 // ======================================================
@@ -1466,6 +2956,14 @@ const attendance =
                     lastName: true,
                     email: true,
                     status: true
+                }
+            },
+
+            manualOverrideAdmin: {
+                select: {
+                    adminId: true,
+                    adminName: true,
+                    email: true
                 }
             }
         }
@@ -1687,7 +3185,9 @@ const attendance =
             checkInTime: true,
             checkOutTime: true,
             totalHours: true,
-            status: true
+            status: true,
+            resolutionSource: true,
+            manualOverride: true
         }
     });
 
@@ -2977,28 +4477,57 @@ for (
 
 
     if (existing) {
-        merged.set(
-            key,
-            {
-                ...existing,
 
-                checkInTime:
-                    todayView.checkInTime,
+        if (
+            existing.manualOverride === true
+        ) {
+            merged.set(
+                key,
+                {
+                    ...existing,
 
-                checkOutTime:
-                    todayView.checkOutTime,
+                    employee:
+                        existing.employee ||
+                        todayView.employee
+                }
+            );
+        }
+        else {
+            merged.set(
+                key,
+                {
+                    ...existing,
 
-                totalHours:
-                    todayView.totalHours,
+                    checkInTime:
+                        todayView.checkInTime,
 
-                status:
-                    "PRESENT",
+                    checkOutTime:
+                        todayView.checkOutTime,
 
-                employee:
-                    existing.employee ||
-                    todayView.employee
-            }
-        );
+                    totalHours:
+                        todayView.totalHours,
+
+                    status:
+                        "PRESENT",
+
+                    resolutionSource:
+                        todayView.resolutionSource,
+
+                    manualOverride:
+                        false,
+
+                    manualOverrideAt:
+                        null,
+
+                    manualOverrideBy:
+                        null,
+
+                    employee:
+                        existing.employee ||
+                        todayView.employee
+                }
+            );
+        }
     }
     else {
         // Defensive fallback: a raw IN punch must be visible
@@ -3026,6 +4555,18 @@ for (
 
                 status:
                     "PRESENT",
+
+                resolutionSource:
+                    todayView.resolutionSource,
+
+                manualOverride:
+                    false,
+
+                manualOverrideAt:
+                    null,
+
+                manualOverrideBy:
+                    null,
 
                 createdAt:
                     now,
@@ -3853,7 +5394,21 @@ if (
                         status:
                             status !== undefined
                                 ? status
-                                : "PRESENT"
+                                : "PRESENT",
+
+                        resolutionSource:
+                            "ADMIN",
+
+                        manualOverride:
+                            true,
+
+                        manualOverrideAt:
+                            new Date(),
+
+                        manualOverrideBy:
+                            getAdminIdFromUser(
+                                adminUser
+                            )
                     },
 
                     include: {
@@ -4026,6 +5581,31 @@ if (
 }
 
 
+
+// ======================================================
+// PROTECT EXPLICIT ADMIN CORRECTION
+// ======================================================
+//
+// Any successful manual attendance edit becomes the authoritative
+// ERP resolution for that date. Raw biometric punches remain
+// unchanged for auditability.
+// ======================================================
+
+updateData.resolutionSource =
+"ADMIN";
+
+updateData.manualOverride =
+true;
+
+updateData.manualOverrideAt =
+new Date();
+
+updateData.manualOverrideBy =
+getAdminIdFromUser(
+adminUser
+);
+
+
 const updatedAttendance =
     await prisma.attendance.update({
         where: {
@@ -4072,6 +5652,10 @@ return {
 
 module.exports = {
 processDevicePunch,
+
+processAttendanceBatch,
+
+resolveAttendanceForDate,
 
 getAllAttendance,
 

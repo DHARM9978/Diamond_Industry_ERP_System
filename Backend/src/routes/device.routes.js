@@ -12,37 +12,35 @@ const authenticate =
 const authorizeRoles =
     require("../middleware/authorization.middleware");
 
-const router = express.Router();
+const router =
+    express.Router();
 
 
 // ==========================================
-// ADMIN DEVICE MANAGEMENT
+// DEVICE AUTHENTICATION
 // ==========================================
 
 router.use(
-    authenticate,
-    authorizeRoles("ADMIN")
+    authenticate
 );
 
 
 // ==========================================
-// Create Device
-// ==========================================
-
-router.post(
-    "/",
-    asyncHandler(
-        deviceController.createDevice
-    )
-);
-
-
-// ==========================================
-// Get All Devices
+// GET DEVICES
+//
+// CLIENT ADMIN:
+// - Can view devices
+//
+// SUPERADMIN:
+// - Can view devices
 // ==========================================
 
 router.get(
     "/",
+    authorizeRoles(
+        "ADMIN",
+        "SUPERADMIN"
+    ),
     asyncHandler(
         deviceController.getDevices
     )
@@ -50,11 +48,21 @@ router.get(
 
 
 // ==========================================
-// Get Device
+// GET SINGLE DEVICE
+//
+// CLIENT ADMIN:
+// - Can view device details
+//
+// SUPERADMIN:
+// - Can view device details
 // ==========================================
 
 router.get(
     "/:id",
+    authorizeRoles(
+        "ADMIN",
+        "SUPERADMIN"
+    ),
     asyncHandler(
         deviceController.getDevice
     )
@@ -62,11 +70,42 @@ router.get(
 
 
 // ==========================================
-// Update Device
+// CREATE DEVICE
+//
+// SUPERADMIN ONLY
+//
+// The client admin must NOT be able to
+// register a new fingerprint device.
+// ==========================================
+
+router.post(
+    "/",
+    authorizeRoles(
+        "SUPERADMIN"
+    ),
+    asyncHandler(
+        deviceController.createDevice
+    )
+);
+
+
+// ==========================================
+// UPDATE DEVICE
+//
+// SUPERADMIN ONLY
+//
+// Includes changes such as:
+// - device name
+// - branch
+// - location
+// - status
 // ==========================================
 
 router.put(
     "/:id",
+    authorizeRoles(
+        "SUPERADMIN"
+    ),
     asyncHandler(
         deviceController.updateDevice
     )
@@ -74,15 +113,24 @@ router.put(
 
 
 // ==========================================
-// Delete Device
+// DELETE DEVICE
+//
+// SUPERADMIN ONLY
 // ==========================================
 
 router.delete(
     "/:id",
+    authorizeRoles(
+        "SUPERADMIN"
+    ),
     asyncHandler(
         deviceController.deleteDevice
     )
 );
 
+
+// ==========================================
+// EXPORT
+// ==========================================
 
 module.exports = router;

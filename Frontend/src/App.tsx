@@ -22,6 +22,7 @@ import { AdminReports } from '@/pages/admin/AdminReports';
 import { BonusPayments } from '@/pages/admin/BonusPayments';
 import { AdminPublicHolidays } from '@/pages/admin/AdminPublicHolidays';
 
+
 import { EmployeeDashboard } from '@/pages/employee/EmployeeDashboard';
 import { EmployeeAttendance } from '@/pages/employee/EmployeeAttendance';
 import { EmployeeLeaves } from '@/pages/employee/EmployeeLeaves';
@@ -121,6 +122,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
 
 
             <Route

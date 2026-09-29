@@ -1,4 +1,51 @@
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 const prisma = require("../config/database");
+
+
+// ==========================================
+// DEVICE RESPONSE HELPERS
+// ==========================================
+
+// Never expose the stored device-secret hash to the admin UI.
+const sanitizeDevice = (device) => {
+
+    if (!device) {
+        return device;
+    }
+
+    const {
+        deviceSecretHash,
+        ...safeDevice
+    } = device;
+
+    return safeDevice;
+};
+
+
+// Generate a strong random secret for a new ESP32 device.
+// The plain secret is returned only once to the caller.
+const generateDeviceSecret = () => {
+
+    return crypto.randomBytes(32).toString("hex");
+};
+
+
+const validateDeviceStatus = (status) => {
+
+    if (status === undefined) {
+        return;
+    }
+
+    if (!["ACTIVE", "INACTIVE"].includes(status)) {
+        const error = new Error(
+            "Device status must be ACTIVE or INACTIVE"
+        );
+
+        error.statusCode = 400;
+        throw error;
+    }
+};
 
 
 // ==========================================
@@ -23,7 +70,7 @@ const getDeviceById = async (deviceId, companyId) => {
         throw error;
     }
 
-    return device;
+    return sanitizeDevice(device);
 };
 
 
@@ -33,7 +80,7 @@ const getDeviceById = async (deviceId, companyId) => {
 
 const getAllDevices = async (companyId) => {
 
-    return await prisma.iotDevice.findMany({
+    const devices = await prisma.iotDevice.findMany({
         where: {
             companyId: Number(companyId)
         },
@@ -44,6 +91,8 @@ const getAllDevices = async (companyId) => {
             deviceId: "asc"
         }
     });
+
+    return devices.map(sanitizeDevice);
 };
 
 
@@ -57,21 +106,33 @@ const createDevice = async (data, companyId) => {
         deviceCode,
         deviceName,
         location,
-        branchId
+        branchId,
+        status
     } = data;
+
+    const normalizedDeviceCode =
+        String(deviceCode || "").trim();
+
+    const normalizedDeviceName =
+        String(deviceName || "").trim();
+
+    const normalizedLocation =
+        location === undefined || location === null
+            ? null
+            : String(location).trim() || null;
 
 
     // ======================================
     // Required fields
     // ======================================
 
-    if (!deviceCode) {
+    if (!normalizedDeviceCode) {
         const error = new Error("Device code is required");
         error.statusCode = 400;
         throw error;
     }
 
-    if (!deviceName) {
+    if (!normalizedDeviceName) {
         const error = new Error("Device name is required");
         error.statusCode = 400;
         throw error;
@@ -82,6 +143,8 @@ const createDevice = async (data, companyId) => {
         error.statusCode = 400;
         throw error;
     }
+
+    validateDeviceStatus(status);
 
 
     // ======================================
@@ -112,7 +175,7 @@ const createDevice = async (data, companyId) => {
     const existingDevice =
         await prisma.iotDevice.findFirst({
             where: {
-                deviceCode
+                deviceCode: normalizedDeviceCode
             }
         });
 
@@ -127,24 +190,42 @@ const createDevice = async (data, companyId) => {
 
 
     // ======================================
+    // Generate device credentials
+    // ======================================
+
+    const deviceSecret =
+        generateDeviceSecret();
+
+    const deviceSecretHash =
+        await bcrypt.hash(
+            deviceSecret,
+            12
+        );
+
+
+    // ======================================
     // Create device
     // ======================================
 
     const device = await prisma.iotDevice.create({
         data: {
-            deviceCode,
-            deviceName,
-            location: location || null,
+            deviceCode: normalizedDeviceCode,
+            deviceName: normalizedDeviceName,
+            location: normalizedLocation,
             companyId: Number(companyId),
             branchId: Number(branchId),
-            status: "ACTIVE"
+            status: status || "ACTIVE",
+            deviceSecretHash
         },
         include: {
             branch: true
         }
     });
 
-    return device;
+    return {
+        device: sanitizeDevice(device),
+        deviceSecret
+    };
 };
 
 
@@ -160,6 +241,12 @@ const updateDevice = async (
 
     const id = Number(deviceId);
     const company = Number(companyId);
+
+    if (!Number.isInteger(id) || id < 1) {
+        const error = new Error("Invalid device ID");
+        error.statusCode = 400;
+        throw error;
+    }
 
 
     // ======================================
@@ -188,6 +275,8 @@ const updateDevice = async (
         status
     } = data;
 
+    validateDeviceStatus(status);
+
 
     // ======================================
     // Verify new branch
@@ -195,9 +284,23 @@ const updateDevice = async (
 
     if (branchId !== undefined) {
 
+        const numericBranchId = Number(branchId);
+
+        if (
+            !Number.isInteger(numericBranchId) ||
+            numericBranchId < 1
+        ) {
+            const error = new Error(
+                "A valid branch is required"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+
         const branch = await prisma.branch.findFirst({
             where: {
-                branchId: Number(branchId),
+                branchId: numericBranchId,
                 companyId: company
             }
         });
@@ -214,6 +317,30 @@ const updateDevice = async (
 
 
     // ======================================
+    // Validate text fields
+    // ======================================
+
+    const normalizedDeviceName =
+        deviceName === undefined
+            ? undefined
+            : String(deviceName).trim();
+
+    const normalizedLocation =
+        location === undefined
+            ? undefined
+            : String(location).trim() || null;
+
+    if (
+        normalizedDeviceName !== undefined &&
+        !normalizedDeviceName
+    ) {
+        const error = new Error("Device name is required");
+        error.statusCode = 400;
+        throw error;
+    }
+
+
+    // ======================================
     // Update device
     // ======================================
 
@@ -224,12 +351,12 @@ const updateDevice = async (
 
         data: {
 
-            ...(deviceName !== undefined && {
-                deviceName
+            ...(normalizedDeviceName !== undefined && {
+                deviceName: normalizedDeviceName
             }),
 
-            ...(location !== undefined && {
-                location
+            ...(normalizedLocation !== undefined && {
+                location: normalizedLocation
             }),
 
             ...(branchId !== undefined && {
@@ -246,7 +373,7 @@ const updateDevice = async (
         }
     });
 
-    return device;
+    return sanitizeDevice(device);
 };
 
 

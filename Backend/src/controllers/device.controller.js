@@ -1,4 +1,5 @@
-const deviceService = require("../services/device.service");
+const deviceService =
+    require("../services/device.service");
 
 
 // ==========================================
@@ -41,18 +42,27 @@ const getDevices = async (req, res) => {
 // ==========================================
 // Create Device
 // ==========================================
+//
+// The device service generates a random device secret,
+// stores only its bcrypt hash, and returns the plain secret
+// once as part of the creation response.
+//
+// The administrator must store the returned deviceSecret
+// securely and configure the fingerprint device with it.
+// ==========================================
 
 const createDevice = async (req, res) => {
 
-    const device = await deviceService.createDevice(
+    const result = await deviceService.createDevice(
         req.body,
         req.user.companyId
     );
 
     return res.status(201).json({
         success: true,
-        message: "Device created successfully",
-        data: device
+        message:
+            "Device created successfully. Store the device secret securely because it is returned only once.",
+        data: result
     });
 };
 
@@ -94,6 +104,10 @@ const deleteDevice = async (req, res) => {
     });
 };
 
+
+// ==========================================
+// EXPORT
+// ==========================================
 
 module.exports = {
     getDevice,
