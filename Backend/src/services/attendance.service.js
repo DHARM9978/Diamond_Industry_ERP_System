@@ -3118,145 +3118,1130 @@ return attendance.map(
 };
 
 // ======================================================
-// GET DAILY ATTENDANCE SUMMARY
+// GET ATTENDANCE SUMMARY
+// ======================================================
+//
+// Supports both the existing daily summary and range summaries.
+//
+// Daily:
+//   getAttendanceSummary(date, { companyId })
+//
+// Range:
+//   getAttendanceSummary(null, {
+//       from,
+//       to,
+//       companyId
+//   })
+//
+// Range summaries are used by the ADMIN ATTENDANCE page for:
+// - Last 7 Days
+// - Monthly
+//
+// The response contains:
+// - overall period totals
+// - employee-level totals
+// - total hours
+//
+// AttendancePunch remains the source of truth for the current IST
+// day, so a still-open punch can continue contributing live hours.
 // ======================================================
 
 const getAttendanceSummary = async (
-date
+    date,
+    filters = {}
 ) => {
 
-const targetDate =
-    date
-        ? new Date(
-            `${date}T00:00:00`
+    const {
+        from = null,
+        to = null,
+        companyId = null
+    } = filters;
+
+
+    // ==================================================
+    // OPTIONAL COMPANY SCOPE
+    // ==================================================
+
+    const parsedCompanyId =
+        companyId !== undefined &&
+        companyId !== null &&
+        companyId !== ""
+            ? Number(companyId)
+            : null;
+
+
+    if (
+        parsedCompanyId !== null &&
+        (
+            !Number.isInteger(parsedCompanyId) ||
+            parsedCompanyId < 1
         )
-        : new Date();
+    ) {
+        throw createError(
+            "Invalid company ID"
+        );
+    }
 
 
-if (
-    Number.isNaN(
-        targetDate.getTime()
-    )
-) {
-    const error = new Error(
-        "Invalid date. Use YYYY-MM-DD"
-    );
+    // ==================================================
+    // DAILY SUMMARY
+    // ==================================================
+    //
+    // Keep the existing daily response shape so the current
+    // admin/dashboard consumers remain compatible.
+    // ==================================================
 
-    error.statusCode = 400;
+    if (!from && !to) {
 
-    throw error;
-}
-
-
-const calendarDateStart =
-    getISTCalendarDate(
-        targetDate
-    );
-
-const calendarDateEnd =
-    getNextISTCalendarDate(
-        targetDate
-    );
+        const targetDate =
+            date
+                ? new Date(
+                    `${date}T00:00:00`
+                )
+                : new Date();
 
 
-const totalEmployees =
-    await prisma.employee.count({
-        where: {
-            status: "ACTIVE"
+        if (
+            Number.isNaN(
+                targetDate.getTime()
+            )
+        ) {
+            throw createError(
+                "Invalid date. Use YYYY-MM-DD"
+            );
         }
-    });
 
 
-const attendance =
-    await prisma.attendance.findMany({
-        where: {
-            date: {
-                gte: calendarDateStart,
-                lt: calendarDateEnd
+        const calendarDateStart =
+            getISTCalendarDate(
+                targetDate
+            );
+
+        const calendarDateEnd =
+            getNextISTCalendarDate(
+                targetDate
+            );
+
+
+        const employeeWhere = {
+            status: "ACTIVE"
+        };
+
+
+        if (
+            parsedCompanyId !== null
+        ) {
+            employeeWhere.companyId =
+                parsedCompanyId;
+        }
+
+
+        const employees =
+            await prisma.employee.findMany({
+                where: employeeWhere,
+
+                select: {
+                    employeeId: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    status: true
+                },
+
+                orderBy: {
+                    employeeId: "asc"
+                }
+            });
+
+
+        const employeeIds =
+            employees.map(
+                employee =>
+                    Number(employee.employeeId)
+            );
+
+
+        const storedAttendance =
+            employeeIds.length > 0
+                ? await prisma.attendance.findMany({
+                    where: {
+                        employeeId: {
+                            in: employeeIds
+                        },
+
+                        date: {
+                            gte:
+                                calendarDateStart,
+
+                            lt:
+                                calendarDateEnd
+                        }
+                    },
+
+                    select: {
+                        attendanceId: true,
+                        employeeId: true,
+                        date: true,
+                        checkInTime: true,
+                        checkOutTime: true,
+                        totalHours: true,
+                        status: true,
+                        resolutionSource: true,
+                        manualOverride: true
+                    }
+                })
+                : [];
+
+
+        // --------------------------------------------------
+        // Live current-day projection
+        // --------------------------------------------------
+
+        const now = new Date();
+
+        const isToday =
+            getISTDateString(
+                targetDate
+            ) ===
+            getISTDateString(
+                now
+            );
+
+
+        let liveTodayRows = [];
+
+        if (
+            isToday &&
+            employeeIds.length > 0
+        ) {
+            const todayStart =
+                getStartOfDay(now);
+
+            const todayEnd =
+                getEndOfDay(now);
+
+            const todayPunches =
+                await prisma.attendancePunch.findMany({
+                    where: {
+                        punchedAt: {
+                            gte:
+                                todayStart,
+                            lte:
+                                todayEnd
+                        },
+
+                        employeeId: {
+                            in: employeeIds
+                        }
+                    },
+
+                    include: {
+                        employee: {
+                            select: {
+                                employeeId: true,
+                                firstName: true,
+                                lastName: true,
+                                email: true,
+                                status: true
+                            }
+                        }
+                    },
+
+                    orderBy: {
+                        punchedAt: "asc"
+                    }
+                });
+
+
+            liveTodayRows =
+                buildTodayAttendanceFromPunches(
+                    todayPunches,
+                    now
+                );
+        }
+
+
+        const storedMap =
+            new Map();
+
+        for (
+            const record of storedAttendance
+        ) {
+            storedMap.set(
+                Number(record.employeeId),
+                record
+            );
+        }
+
+
+        const liveMap =
+            new Map();
+
+        for (
+            const record of liveTodayRows
+        ) {
+            liveMap.set(
+                Number(record.employeeId),
+                record
+            );
+        }
+
+
+        // --------------------------------------------------
+        // Approved leave for selected date
+        // --------------------------------------------------
+
+        let leaveMap = new Map();
+
+        if (
+            employeeIds.length > 0
+        ) {
+            const approvedLeaves =
+                await prisma.leaveRequest.findMany({
+                    where: {
+                        employeeId: {
+                            in: employeeIds
+                        },
+
+                        status: "APPROVED"
+                    },
+
+                    select: {
+                        employeeId: true,
+                        startDate: true,
+                        endDate: true,
+                        approvedStartDate: true,
+                        approvedEndDate: true
+                    }
+                });
+
+
+            const selectedDateKey =
+                getISTDateString(
+                    targetDate
+                );
+
+
+            leaveMap =
+                new Map();
+
+
+            for (
+                const leave of approvedLeaves
+            ) {
+                const effectiveStart =
+                    leave.approvedStartDate ||
+                    leave.startDate;
+
+                const effectiveEnd =
+                    leave.approvedEndDate ||
+                    leave.endDate;
+
+                if (
+                    !effectiveStart ||
+                    !effectiveEnd
+                ) {
+                    continue;
+                }
+
+
+                const startKey =
+                    getISTDateString(
+                        effectiveStart
+                    );
+
+                const endKey =
+                    getISTDateString(
+                        effectiveEnd
+                    );
+
+
+                if (
+                    selectedDateKey >= startKey &&
+                    selectedDateKey <= endKey
+                ) {
+                    leaveMap.set(
+                        Number(leave.employeeId),
+                        true
+                    );
+                }
+            }
+        }
+
+
+        let present = 0;
+        let absent = 0;
+        let late = 0;
+        let onLeave = 0;
+        let checkedIn = 0;
+        let checkedOut = 0;
+        let totalHours = 0;
+
+        const employeeSummaries = [];
+
+
+        for (
+            const employee of employees
+        ) {
+            const employeeId =
+                Number(employee.employeeId);
+
+            const storedRecord =
+                storedMap.get(employeeId) ||
+                null;
+
+            const liveRecord =
+                liveMap.get(employeeId) ||
+                null;
+
+            const record =
+                liveRecord
+                    ? {
+                        ...(storedRecord || {}),
+                        ...liveRecord,
+                        employee
+                    }
+                    : storedRecord;
+
+            let effectiveStatus =
+                "ABSENT";
+
+            if (
+                record?.checkInTime
+            ) {
+                const checkInMinutes =
+                    timeValueToMinutes(
+                        record.checkInTime
+                    );
+
+                effectiveStatus =
+                    checkInMinutes !== null &&
+                    checkInMinutes >
+                        LATE_AFTER_MINUTES
+                        ? "LATE"
+                        : "PRESENT";
+            } else if (
+                leaveMap.has(employeeId)
+            ) {
+                effectiveStatus =
+                    "ON_LEAVE";
+            }
+
+
+            if (
+                record?.checkInTime
+            ) {
+                present += 1;
+                checkedIn += 1;
+            }
+
+            if (
+                effectiveStatus === "LATE"
+            ) {
+                late += 1;
+            }
+
+            if (
+                effectiveStatus === "ON_LEAVE"
+            ) {
+                onLeave += 1;
+            }
+
+            if (
+                effectiveStatus === "ABSENT"
+            ) {
+                absent += 1;
+            }
+
+            if (
+                record?.checkOutTime
+            ) {
+                checkedOut += 1;
+            }
+
+            const employeeHours =
+                record?.totalHours !== null &&
+                record?.totalHours !== undefined
+                    ? Number(record.totalHours)
+                    : 0;
+
+            if (
+                Number.isFinite(
+                    employeeHours
+                ) &&
+                employeeHours > 0
+            ) {
+                totalHours +=
+                    employeeHours;
+            }
+
+
+            employeeSummaries.push({
+                employeeId,
+                firstName:
+                    employee.firstName,
+                lastName:
+                    employee.lastName,
+                email:
+                    employee.email,
+                attendanceDays:
+                    record?.checkInTime ? 1 : 0,
+                presentDays:
+                    record?.checkInTime ? 1 : 0,
+                lateDays:
+                    effectiveStatus === "LATE"
+                        ? 1
+                        : 0,
+                absentDays:
+                    effectiveStatus === "ABSENT"
+                        ? 1
+                        : 0,
+                onLeaveDays:
+                    effectiveStatus === "ON_LEAVE"
+                        ? 1
+                        : 0,
+                checkedInDays:
+                    record?.checkInTime ? 1 : 0,
+                checkedOutDays:
+                    record?.checkOutTime ? 1 : 0,
+                totalHours:
+                    Number(
+                        employeeHours.toFixed(2)
+                    ),
+                totalHoursFormatted:
+                    formatDuration(
+                        employeeHours
+                    )
+            });
+        }
+
+
+        return {
+            period: "DAILY",
+            date:
+                getISTDateString(
+                    targetDate
+                ),
+            from:
+                getISTDateString(
+                    targetDate
+                ),
+            to:
+                getISTDateString(
+                    targetDate
+                ),
+            totalEmployees:
+                employees.length,
+            present,
+            absent,
+            late,
+            onLeave,
+            checkedIn,
+            checkedOut,
+            totalHours:
+                Number(
+                    totalHours.toFixed(2)
+                ),
+            employeeSummaries
+        };
+    }
+
+
+    // ==================================================
+    // RANGE SUMMARY
+    // ==================================================
+
+    const rangeFrom =
+        from ||
+        to;
+
+    const rangeTo =
+        to ||
+        from;
+
+
+    const fromDate =
+        new Date(
+            `${rangeFrom}T00:00:00`
+        );
+
+    const toDate =
+        new Date(
+            `${rangeTo}T00:00:00`
+        );
+
+
+    if (
+        Number.isNaN(
+            fromDate.getTime()
+        ) ||
+        Number.isNaN(
+            toDate.getTime()
+        )
+    ) {
+        throw createError(
+            "Invalid date range. Use YYYY-MM-DD"
+        );
+    }
+
+
+    const fromCalendarDate =
+        getISTCalendarDate(
+            fromDate
+        );
+
+    const toCalendarDate =
+        getISTCalendarDate(
+            toDate
+        );
+
+
+    if (
+        fromCalendarDate.getTime() >
+        toCalendarDate.getTime()
+    ) {
+        throw createError(
+            "The from date cannot be after the to date"
+        );
+    }
+
+
+    const rangeEndExclusive =
+        getNextISTCalendarDate(
+            toDate
+        );
+
+
+    const employeeWhere = {
+        status: "ACTIVE"
+    };
+
+
+    if (
+        parsedCompanyId !== null
+    ) {
+        employeeWhere.companyId =
+            parsedCompanyId;
+    }
+
+
+    const employees =
+        await prisma.employee.findMany({
+            where: employeeWhere,
+
+            select: {
+                employeeId: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                status: true
             },
 
-            employee: {
-                status: "ACTIVE"
+            orderBy: {
+                employeeId: "asc"
             }
-        },
-
-        select: {
-            employeeId: true,
-            checkInTime: true,
-            checkOutTime: true,
-            totalHours: true,
-            status: true,
-            resolutionSource: true,
-            manualOverride: true
-        }
-    });
+        });
 
 
-const present =
-    attendance.filter(
-        record =>
-            record.status === "PRESENT"
-    ).length;
+    const employeeIds =
+        employees.map(
+            employee =>
+                Number(employee.employeeId)
+        );
 
 
-const checkedIn =
-    attendance.filter(
-        record =>
-            record.checkInTime &&
-            !record.checkOutTime
-    ).length;
+    const attendanceRecords =
+        employeeIds.length > 0
+            ? await prisma.attendance.findMany({
+                where: {
+                    employeeId: {
+                        in: employeeIds
+                    },
+
+                    date: {
+                        gte:
+                            fromCalendarDate,
+
+                        lt:
+                            rangeEndExclusive
+                    }
+                },
+
+                select: {
+                    attendanceId: true,
+                    employeeId: true,
+                    date: true,
+                    checkInTime: true,
+                    checkOutTime: true,
+                    totalHours: true,
+                    status: true,
+                    resolutionSource: true,
+                    manualOverride: true
+                },
+
+                orderBy: [
+                    {
+                        date: "asc"
+                    },
+                    {
+                        employeeId: "asc"
+                    }
+                ]
+            })
+            : [];
 
 
-const checkedOut =
-    attendance.filter(
-        record =>
-            !!record.checkOutTime
-    ).length;
+    // --------------------------------------------------
+    // Current-day live attendance overlay
+    // --------------------------------------------------
 
+    const now = new Date();
+    const todayKey =
+        getISTDateString(now);
 
-const absent =
-    Math.max(
-        totalEmployees - present,
-        0
-    );
-
-
-const totalHours =
-    attendance.reduce(
-        (total, record) =>
-            total +
-            (
-                record.totalHours
-                    ? Number(
-                        record.totalHours
-                    )
-                    : 0
-            ),
-        0
-    );
-
-
-return {
-    date:
+    const rangeStartKey =
         getISTDateString(
-            targetDate
-        ),
+            fromCalendarDate
+        );
 
-    totalEmployees,
+    const rangeEndKey =
+        getISTDateString(
+            toCalendarDate
+        );
 
-    present,
+    let liveTodayRows = [];
 
-    absent,
+    if (
+        employeeIds.length > 0 &&
+        todayKey >= rangeStartKey &&
+        todayKey <= rangeEndKey
+    ) {
+        const todayStart =
+            getStartOfDay(now);
 
-    checkedIn,
+        const todayEnd =
+            getEndOfDay(now);
 
-    checkedOut,
+        const todayPunches =
+            await prisma.attendancePunch.findMany({
+                where: {
+                    punchedAt: {
+                        gte:
+                            todayStart,
+                        lte:
+                            todayEnd
+                    },
 
-    totalHours:
-        Number(
-            totalHours.toFixed(2)
-        )
-};
+                    employeeId: {
+                        in: employeeIds
+                    }
+                },
+
+                include: {
+                    employee: {
+                        select: {
+                            employeeId: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            status: true
+                        }
+                    }
+                },
+
+                orderBy: {
+                    punchedAt: "asc"
+                }
+            });
+
+        liveTodayRows =
+            buildTodayAttendanceFromPunches(
+                todayPunches,
+                now
+            );
+    }
+
+
+    // --------------------------------------------------
+    // Build a single attendance map by employee/date.
+    // --------------------------------------------------
+
+    const attendanceMap =
+        new Map();
+
+    for (
+        const record of attendanceRecords
+    ) {
+        attendanceMap.set(
+            `${Number(record.employeeId)}|${getISTDateString(record.date)}`,
+            record
+        );
+    }
+
+    for (
+        const liveRecord of liveTodayRows
+    ) {
+        attendanceMap.set(
+            `${Number(liveRecord.employeeId)}|${getISTDateString(liveRecord.date)}`,
+            liveRecord
+        );
+    }
+
+
+    // --------------------------------------------------
+    // Approved leaves in the selected range.
+    // --------------------------------------------------
+
+    const leaveMap =
+        new Map();
+
+    if (
+        employeeIds.length > 0
+    ) {
+        const approvedLeaves =
+            await prisma.leaveRequest.findMany({
+                where: {
+                    employeeId: {
+                        in: employeeIds
+                    },
+
+                    status: "APPROVED"
+                },
+
+                select: {
+                    employeeId: true,
+                    startDate: true,
+                    endDate: true,
+                    approvedStartDate: true,
+                    approvedEndDate: true
+                }
+            });
+
+
+        for (
+            const leave of approvedLeaves
+        ) {
+            const effectiveStart =
+                leave.approvedStartDate ||
+                leave.startDate;
+
+            const effectiveEnd =
+                leave.approvedEndDate ||
+                leave.endDate;
+
+            if (
+                !effectiveStart ||
+                !effectiveEnd
+            ) {
+                continue;
+            }
+
+
+            const leaveStart =
+                getISTCalendarDate(
+                    effectiveStart
+                );
+
+            const leaveEnd =
+                getISTCalendarDate(
+                    effectiveEnd
+                );
+
+            const clippedStart =
+                leaveStart.getTime() <
+                fromCalendarDate.getTime()
+                    ? fromCalendarDate
+                    : leaveStart;
+
+            const clippedEnd =
+                leaveEnd.getTime() >
+                toCalendarDate.getTime()
+                    ? toCalendarDate
+                    : leaveEnd;
+
+            if (
+                clippedStart.getTime() >
+                clippedEnd.getTime()
+            ) {
+                continue;
+            }
+
+
+            let cursor =
+                new Date(
+                    clippedStart
+                );
+
+            while (
+                cursor.getTime() <=
+                clippedEnd.getTime()
+            ) {
+                const key =
+                    `${Number(leave.employeeId)}|${getISTDateString(cursor)}`;
+
+                leaveMap.set(
+                    key,
+                    true
+                );
+
+                cursor =
+                    new Date(
+                        cursor.getTime() +
+                        (24 * 60 * 60 * 1000)
+                    );
+            }
+        }
+    }
+
+
+    // --------------------------------------------------
+    // Iterate every active employee over every calendar day.
+    // This produces a consistent employee-day summary for the UI.
+    // --------------------------------------------------
+
+    const calendarDays =
+        Math.floor(
+            (
+                toCalendarDate.getTime() -
+                fromCalendarDate.getTime()
+            ) /
+            (24 * 60 * 60 * 1000)
+        ) + 1;
+
+
+    const totalEmployeeDays =
+        employees.length *
+        calendarDays;
+
+    let present = 0;
+    let absent = 0;
+    let late = 0;
+    let onLeave = 0;
+    let checkedIn = 0;
+    let checkedOut = 0;
+    let totalHours = 0;
+
+
+    const employeeSummaries =
+        employees.map(
+            employee => ({
+                employeeId:
+                    Number(employee.employeeId),
+                firstName:
+                    employee.firstName,
+                lastName:
+                    employee.lastName,
+                email:
+                    employee.email,
+                attendanceDays: 0,
+                presentDays: 0,
+                lateDays: 0,
+                absentDays: 0,
+                onLeaveDays: 0,
+                checkedInDays: 0,
+                checkedOutDays: 0,
+                totalHours: 0,
+                totalHoursFormatted:
+                    formatDuration(0),
+                averageHours: 0,
+                averageHoursFormatted:
+                    formatDuration(0)
+            })
+        );
+
+
+    const employeeSummaryMap =
+        new Map(
+            employeeSummaries.map(
+                summary => [
+                    Number(summary.employeeId),
+                    summary
+                ]
+            )
+        );
+
+
+    let cursor =
+        new Date(
+            fromCalendarDate
+        );
+
+    while (
+        cursor.getTime() <=
+        toCalendarDate.getTime()
+    ) {
+        const dateKey =
+            getISTDateString(cursor);
+
+        for (
+            const employee of employees
+        ) {
+            const employeeId =
+                Number(employee.employeeId);
+
+            const summary =
+                employeeSummaryMap.get(
+                    employeeId
+                );
+
+            const record =
+                attendanceMap.get(
+                    `${employeeId}|${dateKey}`
+                ) ||
+                null;
+
+            let effectiveStatus =
+                "ABSENT";
+
+            if (
+                record?.checkInTime
+            ) {
+                const checkInMinutes =
+                    timeValueToMinutes(
+                        record.checkInTime
+                    );
+
+                effectiveStatus =
+                    checkInMinutes !== null &&
+                    checkInMinutes >
+                        LATE_AFTER_MINUTES
+                        ? "LATE"
+                        : "PRESENT";
+            } else if (
+                leaveMap.has(
+                    `${employeeId}|${dateKey}`
+                )
+            ) {
+                effectiveStatus =
+                    "ON_LEAVE";
+            }
+
+
+            if (
+                record?.checkInTime
+            ) {
+                present += 1;
+                checkedIn += 1;
+                summary.attendanceDays += 1;
+                summary.presentDays += 1;
+                summary.checkedInDays += 1;
+            }
+
+            if (
+                record?.checkOutTime
+            ) {
+                checkedOut += 1;
+                summary.checkedOutDays += 1;
+            }
+
+            const recordHours =
+                record?.totalHours !== null &&
+                record?.totalHours !== undefined
+                    ? Number(record.totalHours)
+                    : 0;
+
+            if (
+                Number.isFinite(recordHours) &&
+                recordHours > 0
+            ) {
+                totalHours +=
+                    recordHours;
+                summary.totalHours +=
+                    recordHours;
+            }
+
+
+            if (
+                effectiveStatus === "LATE"
+            ) {
+                late += 1;
+                summary.lateDays += 1;
+            }
+
+            if (
+                effectiveStatus === "ON_LEAVE"
+            ) {
+                onLeave += 1;
+                summary.onLeaveDays += 1;
+            }
+
+            if (
+                effectiveStatus === "ABSENT"
+            ) {
+                absent += 1;
+                summary.absentDays += 1;
+            }
+        }
+
+        cursor =
+            new Date(
+                cursor.getTime() +
+                (24 * 60 * 60 * 1000)
+            );
+    }
+
+
+    for (
+        const summary of employeeSummaries
+    ) {
+        const averageHours =
+            summary.presentDays > 0
+                ? summary.totalHours /
+                    summary.presentDays
+                : 0;
+
+        summary.totalHours =
+            Number(
+                summary.totalHours.toFixed(2)
+            );
+
+        summary.totalHoursFormatted =
+            formatDuration(
+                summary.totalHours
+            );
+
+        summary.averageHours =
+            Number(
+                averageHours.toFixed(2)
+            );
+
+        summary.averageHoursFormatted =
+            formatDuration(
+                averageHours
+            );
+    }
+
+
+    return {
+        period: "RANGE",
+        from:
+            getISTDateString(
+                fromCalendarDate
+            ),
+        to:
+            getISTDateString(
+                toCalendarDate
+            ),
+        calendarDays,
+        totalEmployees:
+            employees.length,
+        totalEmployeeDays,
+        present,
+        absent,
+        late,
+        onLeave,
+        checkedIn,
+        checkedOut,
+        totalHours:
+            Number(
+                totalHours.toFixed(2)
+            ),
+        totalHoursFormatted:
+            formatDuration(
+                totalHours
+            ),
+        employeeSummaries
+    };
 
 };
 

@@ -772,12 +772,47 @@ const getEmployeeAttendance =
         });
     };
 
-// Get attendance summary.
+// Get attendance summary for the selected date or date range.
+//
+// Supported requests:
+// - Daily:       ?date=YYYY-MM-DD
+// - Last 7 Days:  ?from=YYYY-MM-DD&to=YYYY-MM-DD
+// - Monthly:      ?from=YYYY-MM-DD&to=YYYY-MM-DD
+//
+// The authenticated administrator's companyId is passed to the
+// service so the summary never mixes attendance across companies.
 const getAttendanceSummary =
     async (req, res) => {
+        const {
+            date,
+            from,
+            to
+        } = req.query;
+
+        const companyId =
+            Number(
+                req.user?.companyId
+            );
+
+        if (
+            !Number.isInteger(companyId) ||
+            companyId < 1
+        ) {
+            return res.status(403).json({
+                success: false,
+                message:
+                    "Admin company information is missing"
+            });
+        }
+
         const summary =
             await attendanceService.getAttendanceSummary(
-                req.query.date
+                date,
+                {
+                    from,
+                    to,
+                    companyId
+                }
             );
 
         return res.status(200).json({
@@ -785,6 +820,17 @@ const getAttendanceSummary =
 
             message:
                 "Attendance summary fetched successfully",
+
+            filters: {
+                date:
+                    date || null,
+
+                from:
+                    from || null,
+
+                to:
+                    to || null
+            },
 
             data:
                 summary
