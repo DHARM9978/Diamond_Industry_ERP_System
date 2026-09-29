@@ -21,12 +21,23 @@ import {
   selfService,
 } from '@/services/apiServices';
 
-import { formatISTDate } from '@/utils/dateTime';
-
 
 // ============================================================
 // EMPLOYEE ADVANCES
 // ============================================================
+
+const getISTTodayString = () => {
+  return new Intl.DateTimeFormat(
+    'en-CA',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }
+  ).format(new Date());
+};
+
 
 export function EmployeeAdvances() {
 
@@ -331,16 +342,25 @@ export function EmployeeAdvances() {
       return '-';
     }
 
-    const formatted =
-      formatISTDate(date, {
+    const parsedDate =
+      new Date(date);
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+      return '-';
+    }
+
+    return parsedDate.toLocaleDateString(
+      'en-IN',
+      {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-      });
-
-    return formatted === '—'
-      ? '-'
-      : formatted;
+      }
+    );
   };
 
 
@@ -840,6 +860,13 @@ function AdvanceForm({
       return;
     }
 
+    if (form.paymentDate < getISTTodayString()) {
+      setValidationError(
+        'Payment date must be today or a future date.'
+      );
+      return;
+    }
+
 
     onSave({
       amount,
@@ -977,6 +1004,9 @@ function AdvanceForm({
         <input
           id="advance-payment-date"
           type="date"
+          min={
+            getISTTodayString()
+          }
           className="input-field"
           value={
             form.paymentDate

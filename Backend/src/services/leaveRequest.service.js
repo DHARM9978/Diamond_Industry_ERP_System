@@ -90,6 +90,18 @@ function calculateInclusiveDays(startDate, endDate) {
     ) + 1;
 }
 
+function getISTTodayDateKey() {
+    return new Intl.DateTimeFormat(
+        'en-CA',
+        {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }
+    ).format(new Date());
+}
+
 function formatDateOnly(date) {
     const normalized = normalizeDate(date);
     const year = normalized.getFullYear();
@@ -337,6 +349,14 @@ async function createLeaveRequest(companyId, employeeId, data) {
         throw createError(
             "endDate cannot be before startDate",
             400
+        );
+    }
+
+    if (formatDateOnly(startDate) < getISTTodayDateKey()) {
+        throw createError(
+            "Leave requests can only start today or on a future date",
+            400,
+            "PAST_LEAVE_DATE"
         );
     }
 

@@ -12,7 +12,22 @@ import {
 } from 'lucide-react';
 
 import apiClient from '@/services/apiClient';
+
+import { formatISTDate } from '@/utils/dateTime';
 import { branchService } from '@/services/apiServices';
+
+const getISTTodayString = () => {
+  return new Intl.DateTimeFormat(
+    'en-CA',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }
+  ).format(new Date());
+};
+
 
 const getResponseData = (response) => {
   return response?.data?.data ?? response?.data ?? response;
@@ -64,17 +79,15 @@ const formatDate = (value) => {
 
   if (!key) return '-';
 
-  const [year, month, day] = key.split('-');
-
-  return new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  ).toLocaleDateString('en-IN', {
+  const formatted = formatISTDate(key, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
+
+  return formatted === '—'
+    ? '-'
+    : formatted;
 };
 
 const getDateRange = (start, end) => {
@@ -453,6 +466,10 @@ export function AdminPublicHolidays() {
 
     if (!endDate) {
       return 'Please select the end date.';
+    }
+
+    if (!editingHoliday && startDate < getISTTodayString()) {
+      return 'New public holidays can only be created for today or a future date.';
     }
 
     if (endDate < startDate) {
@@ -1244,6 +1261,11 @@ export function AdminPublicHolidays() {
                     <input
                       type="date"
                       value={startDate}
+                      min={
+                        editingHoliday
+                          ? undefined
+                          : getISTTodayString()
+                      }
                       onChange={(event) =>
                         setStartDate(
                           event.target.value
@@ -1264,7 +1286,14 @@ export function AdminPublicHolidays() {
                       type="date"
                       value={endDate}
                       min={
-                        startDate || undefined
+                        editingHoliday
+                          ? (startDate || undefined)
+                          : (
+                              startDate &&
+                              startDate > getISTTodayString()
+                                ? startDate
+                                : getISTTodayString()
+                            )
                       }
                       onChange={(event) =>
                         setEndDate(

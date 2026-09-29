@@ -156,6 +156,78 @@ const parseDateOnly = (
 
 
 // ------------------------------------------------------------
+// Get Current IST Calendar Date
+// ------------------------------------------------------------
+//
+// Public-holiday business rules are based on the ERP's
+// calendar date in India Standard Time, not the server's
+// local timezone.
+//
+// This returns YYYY-MM-DD for the current IST calendar day.
+// ------------------------------------------------------------
+
+const IST_OFFSET_MS =
+    5.5 * 60 * 60 * 1000;
+
+const getCurrentISTDateOnly = () => {
+    const now = new Date();
+
+    const istNow =
+        new Date(
+            now.getTime() +
+            IST_OFFSET_MS
+        );
+
+    return istNow
+        .toISOString()
+        .slice(0, 10);
+};
+
+
+// ------------------------------------------------------------
+// Validate Holiday Date For Creation / Date Change
+// ------------------------------------------------------------
+//
+// New public holidays may be created only for today or a
+// future date. Historical public-holiday records remain valid
+// and can still be viewed.
+//
+// When editing an existing holiday:
+// - leaving its historical date unchanged is allowed
+// - changing it to a past date is rejected
+// ------------------------------------------------------------
+
+const validateHolidayDateNotPast = (
+    value,
+    fieldName = "Holiday date"
+) => {
+    const parsedDate =
+        parseDateOnly(
+            value,
+            fieldName
+        );
+
+    const todayDate =
+        parseDateOnly(
+            getCurrentISTDateOnly(),
+            "Current date"
+        );
+
+    if (
+        parsedDate.getTime() <
+        todayDate.getTime()
+    ) {
+        throw createServiceError(
+            `${fieldName} cannot be in the past. Select today or a future date.`
+        );
+    }
+
+    return parsedDate;
+};
+
+
+
+// ------------------------------------------------------------
 // Date To YYYY-MM-DD
 // ------------------------------------------------------------
 
@@ -560,7 +632,7 @@ const createPublicHoliday = async (
 
 
     const parsedDate =
-        parseDateOnly(
+        validateHolidayDateNotPast(
             holidayDate,
             "Holiday date"
         );
@@ -1187,12 +1259,35 @@ const updatePublicHoliday = async (
         data.holidayDate !== ""
     ) {
 
-        targetDate =
+        const requestedTargetDate =
             parseDateOnly(
                 data.holidayDate,
                 "Holiday date"
             );
 
+        const existingDateString =
+            formatDateOnly(
+                existingHoliday.holidayDate
+            );
+
+        const requestedDateString =
+            formatDateOnly(
+                requestedTargetDate
+            );
+
+        if (
+            requestedDateString !==
+            existingDateString
+        ) {
+            targetDate =
+                validateHolidayDateNotPast(
+                    requestedDateString,
+                    "Holiday date"
+                );
+        } else {
+            targetDate =
+                existingHoliday.holidayDate;
+        }
 
         updateData.holidayDate =
             targetDate;

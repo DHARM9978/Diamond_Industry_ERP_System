@@ -112,6 +112,38 @@ const formatDate = (value) => {
 };
 
 
+/*
+|--------------------------------------------------------------------------
+| Current IST date for date-input validation
+|--------------------------------------------------------------------------
+|
+| New leave requests may start today or later.
+| Attendance/history screens are different; this rule is specific to
+| the employee's new leave-request form.
+*/
+
+const getISTTodayInputValue = () => {
+  const parts = new Intl.DateTimeFormat(
+    'en-CA',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }
+  ).formatToParts(new Date());
+
+  const values = {};
+
+  parts.forEach((part) => {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  });
+
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
 const getRequestId = (request) => {
   return (
     request?.leaveRequestId ??
@@ -1962,10 +1994,28 @@ function LeaveForm({
     } = event.target;
 
 
+    const today =
+      getISTTodayInputValue();
+
+    if (
+      (name === 'startDate' || name === 'endDate') &&
+      value < today
+    ) {
+      setError(
+        'Leave dates cannot be in the past. Please select today or a future date.'
+      );
+      return;
+    }
+
     setForm(
       (previous) => ({
         ...previous,
         [name]: value,
+        ...(name === 'startDate' &&
+        previous.endDate &&
+        previous.endDate < value
+          ? { endDate: '' }
+          : {}),
       })
     );
 
@@ -2025,6 +2075,21 @@ function LeaveForm({
       ) {
         setError(
           'Please select an end date.'
+        );
+
+        return;
+      }
+
+
+      const today =
+        getISTTodayInputValue();
+
+      if (
+        form.startDate < today ||
+        form.endDate < today
+      ) {
+        setError(
+          'Leave dates cannot be in the past. Please select today or a future date.'
         );
 
         return;
@@ -2254,6 +2319,9 @@ function LeaveForm({
             value={
               form.startDate
             }
+            min={
+              getISTTodayInputValue()
+            }
             onChange={
               handleChange
             }
@@ -2300,7 +2368,7 @@ function LeaveForm({
             }
             min={
               form.startDate ||
-              undefined
+              getISTTodayInputValue()
             }
             onChange={
               handleChange
