@@ -1,0 +1,3 @@
+-- Historical reconciliation migration.
+-- The required schema changes were already present in the development database.
+-- This migration intentionally performs no additional schema change.

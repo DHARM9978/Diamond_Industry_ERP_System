@@ -153,6 +153,22 @@ model IotDevice {
   updatedAt        DateTime  @updatedAt @map("updated_at")
   deviceSecretHash String?   @map("device_secret_hash") @db.VarChar(255)
 
+  // ------------------------------------------------------
+  // Remote Wi-Fi configuration state
+  // ------------------------------------------------------
+  // The encrypted payload contains the configured
+  // Primary and Secondary Wi-Fi credentials.
+  //
+  // Plaintext Wi-Fi passwords are never returned
+  // through the device/admin API.
+  wifiConfigEncrypted      String?   @map("wifi_config_encrypted") @db.Text
+  wifiConfigVersion        Int       @default(0) @map("wifi_config_version")
+  wifiConfigStatus         String    @default("NOT_CONFIGURED") @map("wifi_config_status") @db.VarChar(30)
+  wifiConfigUpdatedAt      DateTime? @map("wifi_config_updated_at")
+  wifiConfigAcknowledgedAt DateTime? @map("wifi_config_acknowledged_at")
+  wifiActiveNetwork        String?   @map("wifi_active_network") @db.VarChar(20)
+  wifiLastError            String?   @map("wifi_last_error") @db.Text
+
   attendancePunches AttendancePunch[]
   deviceLogs        DeviceLog[]
 

@@ -183,7 +183,14 @@ exports.Prisma.IotDeviceScalarFieldEnum = {
   lastSeenAt: 'lastSeenAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  deviceSecretHash: 'deviceSecretHash'
+  deviceSecretHash: 'deviceSecretHash',
+  wifiConfigEncrypted: 'wifiConfigEncrypted',
+  wifiConfigVersion: 'wifiConfigVersion',
+  wifiConfigStatus: 'wifiConfigStatus',
+  wifiConfigUpdatedAt: 'wifiConfigUpdatedAt',
+  wifiConfigAcknowledgedAt: 'wifiConfigAcknowledgedAt',
+  wifiActiveNetwork: 'wifiActiveNetwork',
+  wifiLastError: 'wifiLastError'
 };
 
 exports.Prisma.FingerprintTemplateScalarFieldEnum = {
@@ -437,7 +444,11 @@ exports.Prisma.IotDeviceOrderByRelevanceFieldEnum = {
   deviceName: 'deviceName',
   location: 'location',
   status: 'status',
-  deviceSecretHash: 'deviceSecretHash'
+  deviceSecretHash: 'deviceSecretHash',
+  wifiConfigEncrypted: 'wifiConfigEncrypted',
+  wifiConfigStatus: 'wifiConfigStatus',
+  wifiActiveNetwork: 'wifiActiveNetwork',
+  wifiLastError: 'wifiLastError'
 };
 
 exports.Prisma.FingerprintTemplateOrderByRelevanceFieldEnum = {

@@ -1,0 +1,4 @@
+-- Historical reconciliation migration.
+-- salary_rate_per_hour is already created by
+-- 20260928152800_reconcile_existing_schema_drift.
+-- This migration intentionally performs no additional schema change.

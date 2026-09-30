@@ -273,6 +273,14 @@ const API = {
         delete: (id) =>
             `/api/devices/${id}`,
 
+        // GET /api/devices/:id/wifi
+        getWifi: (id) =>
+            `/api/devices/${id}/wifi`,
+
+        // PUT /api/devices/:id/wifi
+        setWifi: (id) =>
+            `/api/devices/${id}/wifi`,
+
     },
 
 
@@ -302,6 +310,31 @@ const API = {
         // POST /api/device/fingerprint-enroll/result
         fingerprintEnrollResult:
             "/api/device/fingerprint-enroll/result",
+
+
+        // ====================================================
+        // ESP32 WIFI CONFIGURATION
+        // ====================================================
+
+        // GET /api/device/wifi-config
+        //
+        // ESP32 fetches its assigned Wi-Fi configuration.
+        wifiConfig:
+            "/api/device/wifi-config",
+
+        // POST /api/device/wifi-config/ack
+        //
+        // ESP32 acknowledges successful or failed
+        // application of a Wi-Fi configuration.
+        wifiConfigAck:
+            "/api/device/wifi-config/ack",
+
+        // POST /api/device/wifi-config/runtime
+        //
+        // ESP32 reports its current active network and
+        // Wi-Fi runtime state.
+        wifiConfigRuntime:
+            "/api/device/wifi-config/runtime",
 
     },
 
@@ -572,7 +605,6 @@ const API = {
             "/api/bonuses/pay",
 
     },
-
 
 
     // ========================================================

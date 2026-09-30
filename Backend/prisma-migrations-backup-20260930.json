@@ -1,0 +1,143 @@
+{
+  "createdAt": "2026-09-30T06:03:02.453Z",
+  "targetMigration": "20260928152800_reconcile_existing_schema_drift",
+  "targetMigrationRecord": [
+    {
+      "id": "277b0913-d82e-42e5-8041-33bec8fc546c",
+      "migration_name": "20260928152800_reconcile_existing_schema_drift",
+      "checksum": "f2b222ed480e31a0a555840be1b43aef34f5294053155e9f72afd6ee01b01d57",
+      "finished_at": "2026-09-28T13:58:51.133Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "0",
+      "logs": ""
+    }
+  ],
+  "allMigrationRecords": [
+    {
+      "id": "ea95b43a-1546-4dbe-9205-b89f4dadfcc6",
+      "migration_name": "20260821180219_init",
+      "checksum": "6587e945bd285146636aeafc602dbfd348d9a28cc98e23f81cceb82eb7f6e143",
+      "finished_at": "2026-08-21T18:02:20.689Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "48226c44-2986-46c6-90a7-1eca8b0e14f8",
+      "migration_name": "20260905110000_add_fingerprint_enrollment_queue",
+      "checksum": "4613dfd847e85776fd2e3cd935a43deb6c7df58ab5bb82cc1bbe777a886b7ff6",
+      "finished_at": "2026-09-05T11:49:08.263Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "3b7e1e67-a0cf-4d31-aa4b-4d2bd4bf2525",
+      "migration_name": "20260914120000_add_extra_work_and_incentive",
+      "checksum": "5f34e26c6041df053e2a89dee2b748945089261e142b200390a5ff9e0fe05f66",
+      "finished_at": null,
+      "rolled_back_at": "2026-09-14T13:19:51.398Z",
+      "applied_steps_count": "0",
+      "logs": "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: 20260914120000_add_extra_work_and_incentive\n\nDatabase error code: 1067\n\nDatabase error:\nInvalid default value for 'settlement_date'\n\nPlease check the query number 3 from the migration file.\n\n   0: sql_schema_connector::apply_migration::apply_script\n           with migration_name=\"20260914120000_add_extra_work_and_incentive\"\n             at schema-engine\\connectors\\sql-schema-connector\\src\\apply_migration.rs:113\n   1: schema_commands::commands::apply_migrations::Applying migration\n           with migration_name=\"20260914120000_add_extra_work_and_incentive\"\n             at schema-engine\\commands\\src\\commands\\apply_migrations.rs:95\n   2: schema_core::state::ApplyMigrations\n             at schema-engine\\core\\src\\state.rs:255"
+    },
+    {
+      "id": "c11cef4b-f030-4a79-94a4-ad5fc4357edd",
+      "migration_name": "20260914140000_add_extra_work_and_incentive",
+      "checksum": "40b5f4594bfdbfc62b3c773fdc68bd7508b6d825531a04ef22a4cde9ff169d6c",
+      "finished_at": null,
+      "rolled_back_at": "2026-09-14T13:27:22.700Z",
+      "applied_steps_count": "0",
+      "logs": "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: 20260914140000_add_extra_work_and_incentive\n\nDatabase error code: 1064\n\nDatabase error:\nYou have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '��-' at line 1\n\nPlease check the query number 1 from the migration file.\n\n   0: sql_schema_connector::apply_migration::apply_script\n           with migration_name=\"20260914140000_add_extra_work_and_incentive\"\n             at schema-engine\\connectors\\sql-schema-connector\\src\\apply_migration.rs:113\n   1: schema_commands::commands::apply_migrations::Applying migration\n           with migration_name=\"20260914140000_add_extra_work_and_incentive\"\n             at schema-engine\\commands\\src\\commands\\apply_migrations.rs:95\n   2: schema_core::state::ApplyMigrations\n             at schema-engine\\core\\src\\state.rs:255"
+    },
+    {
+      "id": "bd35ad50-7494-4aee-bdd8-edb837f5e183",
+      "migration_name": "20260914140000_add_extra_work_and_incentive",
+      "checksum": "21c6048923c8b123136ad0f5b35ca72d95ed576e7e1a632313ad4fff44235826",
+      "finished_at": null,
+      "rolled_back_at": "2026-09-14T13:31:10.550Z",
+      "applied_steps_count": "0",
+      "logs": "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: 20260914140000_add_extra_work_and_incentive\n\nDatabase error code: 1064\n\nDatabase error:\nYou have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '﻿-- AlterTable\nALTER TABLE `payroll`\n    ADD COLUMN `extra_hours` DECIMAL(8, 2' at line 1\n\nPlease check the query number 1 from the migration file.\n\n   0: sql_schema_connector::apply_migration::apply_script\n           with migration_name=\"20260914140000_add_extra_work_and_incentive\"\n             at schema-engine\\connectors\\sql-schema-connector\\src\\apply_migration.rs:113\n   1: schema_commands::commands::apply_migrations::Applying migration\n           with migration_name=\"20260914140000_add_extra_work_and_incentive\"\n             at schema-engine\\commands\\src\\commands\\apply_migrations.rs:95\n   2: schema_core::state::ApplyMigrations\n             at schema-engine\\core\\src\\state.rs:255"
+    },
+    {
+      "id": "dd58a3b6-e310-47fe-8ebf-01a93e7c2f80",
+      "migration_name": "20260914140000_add_extra_work_and_incentive",
+      "checksum": "96814fb8e346ecad81dbc1f66f619bbe6caa4f499c0a5c524838aaa1803c178b",
+      "finished_at": "2026-09-14T13:31:16.635Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "9906bf83-0c0a-4957-a033-b19ed02b845b",
+      "migration_name": "20260917140000_decouple_variable_payments",
+      "checksum": "9ac5c3f73a94bf7636d4bb864c99460a0eeb3c13fb33101ff873cde54bcc07fc",
+      "finished_at": null,
+      "rolled_back_at": "2026-09-17T10:04:54.100Z",
+      "applied_steps_count": "0",
+      "logs": "A migration failed to apply. New migrations cannot be applied before the error is recovered from. Read more about how to resolve migration issues in a production database: https://pris.ly/d/migrate-resolve\n\nMigration name: 20260917140000_decouple_variable_payments\n\nDatabase error code: 1553\n\nDatabase error:\nCannot drop index 'extra_work_payroll_id_key': needed in a foreign key constraint\n\nPlease check the query number 1 from the migration file.\n\n   0: sql_schema_connector::apply_migration::apply_script\n           with migration_name=\"20260917140000_decouple_variable_payments\"\n             at schema-engine\\connectors\\sql-schema-connector\\src\\apply_migration.rs:113\n   1: schema_commands::commands::apply_migrations::Applying migration\n           with migration_name=\"20260917140000_decouple_variable_payments\"\n             at schema-engine\\commands\\src\\commands\\apply_migrations.rs:95\n   2: schema_core::state::ApplyMigrations\n             at schema-engine\\core\\src\\state.rs:255"
+    },
+    {
+      "id": "798917fe-5334-48cf-a7fc-9ac8353a3537",
+      "migration_name": "20260917140000_decouple_variable_payments",
+      "checksum": "a7761d163fcfda4a69be18b0f28533b668671a51ca5f44b80a0020ae2dff599e",
+      "finished_at": "2026-09-17T10:05:19.710Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "1d671d7b-b4e1-45c7-b355-289b9b1cf5a9",
+      "migration_name": "20260921220000_add_public_holidays",
+      "checksum": "1625a6b36ceb514b0a757a7bd17b4b4875657efa801ccfd51c9366eac512093e",
+      "finished_at": "2026-09-21T21:14:46.250Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "1ba84796-d209-47bf-b2d6-5fc0b1c78e7f",
+      "migration_name": "20260924213000_add_system_default_leave_type",
+      "checksum": "bf1880eded31476ce09288f848398caad1c1510f13a68f9645e8518861ee80fe",
+      "finished_at": "2026-09-24T18:36:59.477Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "dfb9b922-f4ea-499a-9dc6-a0bab8e3d686",
+      "migration_name": "20260924212900_add_leave_tables",
+      "checksum": "ce92ecf9e63f3df2189bc83cbba76c29f4bf707d5743f60495567d9046c666ab",
+      "finished_at": "2026-09-28T13:31:22.973Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "0",
+      "logs": ""
+    },
+    {
+      "id": "277b0913-d82e-42e5-8041-33bec8fc546c",
+      "migration_name": "20260928152800_reconcile_existing_schema_drift",
+      "checksum": "f2b222ed480e31a0a555840be1b43aef34f5294053155e9f72afd6ee01b01d57",
+      "finished_at": "2026-09-28T13:58:51.133Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "0",
+      "logs": ""
+    },
+    {
+      "id": "9c589520-cff1-4030-8705-a9f9d58c6878",
+      "migration_name": "20260928152900_add_attendance_resolution_and_batch_event_id",
+      "checksum": "d99b8b68fbb365055da2bac9725fb14cc7fcb9399d76de099d80d6299e6f4526",
+      "finished_at": "2026-09-28T13:58:59.558Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "1",
+      "logs": null
+    },
+    {
+      "id": "d19b8b84-c8e9-4daf-8352-84ae90c0553b",
+      "migration_name": "20260928153000_reconcile_salary_rate",
+      "checksum": "fd08385407795b870c335c4fb4c7072cd9008c361539674b569141c0de948248",
+      "finished_at": "2026-09-28T14:03:07.451Z",
+      "rolled_back_at": null,
+      "applied_steps_count": "0",
+      "logs": ""
+    }
+  ]
+}

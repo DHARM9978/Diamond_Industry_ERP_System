@@ -7859,12 +7859,14 @@ export namespace Prisma {
     deviceId: number | null
     branchId: number | null
     companyId: number | null
+    wifiConfigVersion: number | null
   }
 
   export type IotDeviceSumAggregateOutputType = {
     deviceId: number | null
     branchId: number | null
     companyId: number | null
+    wifiConfigVersion: number | null
   }
 
   export type IotDeviceMinAggregateOutputType = {
@@ -7879,6 +7881,13 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deviceSecretHash: string | null
+    wifiConfigEncrypted: string | null
+    wifiConfigVersion: number | null
+    wifiConfigStatus: string | null
+    wifiConfigUpdatedAt: Date | null
+    wifiConfigAcknowledgedAt: Date | null
+    wifiActiveNetwork: string | null
+    wifiLastError: string | null
   }
 
   export type IotDeviceMaxAggregateOutputType = {
@@ -7893,6 +7902,13 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deviceSecretHash: string | null
+    wifiConfigEncrypted: string | null
+    wifiConfigVersion: number | null
+    wifiConfigStatus: string | null
+    wifiConfigUpdatedAt: Date | null
+    wifiConfigAcknowledgedAt: Date | null
+    wifiActiveNetwork: string | null
+    wifiLastError: string | null
   }
 
   export type IotDeviceCountAggregateOutputType = {
@@ -7907,6 +7923,13 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     deviceSecretHash: number
+    wifiConfigEncrypted: number
+    wifiConfigVersion: number
+    wifiConfigStatus: number
+    wifiConfigUpdatedAt: number
+    wifiConfigAcknowledgedAt: number
+    wifiActiveNetwork: number
+    wifiLastError: number
     _all: number
   }
 
@@ -7915,12 +7938,14 @@ export namespace Prisma {
     deviceId?: true
     branchId?: true
     companyId?: true
+    wifiConfigVersion?: true
   }
 
   export type IotDeviceSumAggregateInputType = {
     deviceId?: true
     branchId?: true
     companyId?: true
+    wifiConfigVersion?: true
   }
 
   export type IotDeviceMinAggregateInputType = {
@@ -7935,6 +7960,13 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deviceSecretHash?: true
+    wifiConfigEncrypted?: true
+    wifiConfigVersion?: true
+    wifiConfigStatus?: true
+    wifiConfigUpdatedAt?: true
+    wifiConfigAcknowledgedAt?: true
+    wifiActiveNetwork?: true
+    wifiLastError?: true
   }
 
   export type IotDeviceMaxAggregateInputType = {
@@ -7949,6 +7981,13 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deviceSecretHash?: true
+    wifiConfigEncrypted?: true
+    wifiConfigVersion?: true
+    wifiConfigStatus?: true
+    wifiConfigUpdatedAt?: true
+    wifiConfigAcknowledgedAt?: true
+    wifiActiveNetwork?: true
+    wifiLastError?: true
   }
 
   export type IotDeviceCountAggregateInputType = {
@@ -7963,6 +8002,13 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deviceSecretHash?: true
+    wifiConfigEncrypted?: true
+    wifiConfigVersion?: true
+    wifiConfigStatus?: true
+    wifiConfigUpdatedAt?: true
+    wifiConfigAcknowledgedAt?: true
+    wifiActiveNetwork?: true
+    wifiLastError?: true
     _all?: true
   }
 
@@ -8064,6 +8110,13 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     deviceSecretHash: string | null
+    wifiConfigEncrypted: string | null
+    wifiConfigVersion: number
+    wifiConfigStatus: string
+    wifiConfigUpdatedAt: Date | null
+    wifiConfigAcknowledgedAt: Date | null
+    wifiActiveNetwork: string | null
+    wifiLastError: string | null
     _count: IotDeviceCountAggregateOutputType | null
     _avg: IotDeviceAvgAggregateOutputType | null
     _sum: IotDeviceSumAggregateOutputType | null
@@ -8097,6 +8150,13 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deviceSecretHash?: boolean
+    wifiConfigEncrypted?: boolean
+    wifiConfigVersion?: boolean
+    wifiConfigStatus?: boolean
+    wifiConfigUpdatedAt?: boolean
+    wifiConfigAcknowledgedAt?: boolean
+    wifiActiveNetwork?: boolean
+    wifiLastError?: boolean
     attendancePunches?: boolean | IotDevice$attendancePunchesArgs<ExtArgs>
     deviceLogs?: boolean | IotDevice$deviceLogsArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
@@ -8118,9 +8178,16 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deviceSecretHash?: boolean
+    wifiConfigEncrypted?: boolean
+    wifiConfigVersion?: boolean
+    wifiConfigStatus?: boolean
+    wifiConfigUpdatedAt?: boolean
+    wifiConfigAcknowledgedAt?: boolean
+    wifiActiveNetwork?: boolean
+    wifiLastError?: boolean
   }
 
-  export type IotDeviceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"deviceId" | "deviceCode" | "deviceName" | "branchId" | "companyId" | "location" | "status" | "lastSeenAt" | "createdAt" | "updatedAt" | "deviceSecretHash", ExtArgs["result"]["iotDevice"]>
+  export type IotDeviceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"deviceId" | "deviceCode" | "deviceName" | "branchId" | "companyId" | "location" | "status" | "lastSeenAt" | "createdAt" | "updatedAt" | "deviceSecretHash" | "wifiConfigEncrypted" | "wifiConfigVersion" | "wifiConfigStatus" | "wifiConfigUpdatedAt" | "wifiConfigAcknowledgedAt" | "wifiActiveNetwork" | "wifiLastError", ExtArgs["result"]["iotDevice"]>
   export type IotDeviceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     attendancePunches?: boolean | IotDevice$attendancePunchesArgs<ExtArgs>
     deviceLogs?: boolean | IotDevice$deviceLogsArgs<ExtArgs>
@@ -8149,6 +8216,13 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       deviceSecretHash: string | null
+      wifiConfigEncrypted: string | null
+      wifiConfigVersion: number
+      wifiConfigStatus: string
+      wifiConfigUpdatedAt: Date | null
+      wifiConfigAcknowledgedAt: Date | null
+      wifiActiveNetwork: string | null
+      wifiLastError: string | null
     }, ExtArgs["result"]["iotDevice"]>
     composites: {}
   }
@@ -8533,6 +8607,13 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"IotDevice", 'DateTime'>
     readonly updatedAt: FieldRef<"IotDevice", 'DateTime'>
     readonly deviceSecretHash: FieldRef<"IotDevice", 'String'>
+    readonly wifiConfigEncrypted: FieldRef<"IotDevice", 'String'>
+    readonly wifiConfigVersion: FieldRef<"IotDevice", 'Int'>
+    readonly wifiConfigStatus: FieldRef<"IotDevice", 'String'>
+    readonly wifiConfigUpdatedAt: FieldRef<"IotDevice", 'DateTime'>
+    readonly wifiConfigAcknowledgedAt: FieldRef<"IotDevice", 'DateTime'>
+    readonly wifiActiveNetwork: FieldRef<"IotDevice", 'String'>
+    readonly wifiLastError: FieldRef<"IotDevice", 'String'>
   }
     
 
@@ -26192,7 +26273,14 @@ export namespace Prisma {
     lastSeenAt: 'lastSeenAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    deviceSecretHash: 'deviceSecretHash'
+    deviceSecretHash: 'deviceSecretHash',
+    wifiConfigEncrypted: 'wifiConfigEncrypted',
+    wifiConfigVersion: 'wifiConfigVersion',
+    wifiConfigStatus: 'wifiConfigStatus',
+    wifiConfigUpdatedAt: 'wifiConfigUpdatedAt',
+    wifiConfigAcknowledgedAt: 'wifiConfigAcknowledgedAt',
+    wifiActiveNetwork: 'wifiActiveNetwork',
+    wifiLastError: 'wifiLastError'
   };
 
   export type IotDeviceScalarFieldEnum = (typeof IotDeviceScalarFieldEnum)[keyof typeof IotDeviceScalarFieldEnum]
@@ -26515,7 +26603,11 @@ export namespace Prisma {
     deviceName: 'deviceName',
     location: 'location',
     status: 'status',
-    deviceSecretHash: 'deviceSecretHash'
+    deviceSecretHash: 'deviceSecretHash',
+    wifiConfigEncrypted: 'wifiConfigEncrypted',
+    wifiConfigStatus: 'wifiConfigStatus',
+    wifiActiveNetwork: 'wifiActiveNetwork',
+    wifiLastError: 'wifiLastError'
   };
 
   export type IotDeviceOrderByRelevanceFieldEnum = (typeof IotDeviceOrderByRelevanceFieldEnum)[keyof typeof IotDeviceOrderByRelevanceFieldEnum]
@@ -27115,6 +27207,13 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"IotDevice"> | Date | string
     updatedAt?: DateTimeFilter<"IotDevice"> | Date | string
     deviceSecretHash?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigEncrypted?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigVersion?: IntFilter<"IotDevice"> | number
+    wifiConfigStatus?: StringFilter<"IotDevice"> | string
+    wifiConfigUpdatedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiConfigAcknowledgedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiActiveNetwork?: StringNullableFilter<"IotDevice"> | string | null
+    wifiLastError?: StringNullableFilter<"IotDevice"> | string | null
     attendancePunches?: AttendancePunchListRelationFilter
     deviceLogs?: DeviceLogListRelationFilter
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
@@ -27133,6 +27232,13 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deviceSecretHash?: SortOrderInput | SortOrder
+    wifiConfigEncrypted?: SortOrderInput | SortOrder
+    wifiConfigVersion?: SortOrder
+    wifiConfigStatus?: SortOrder
+    wifiConfigUpdatedAt?: SortOrderInput | SortOrder
+    wifiConfigAcknowledgedAt?: SortOrderInput | SortOrder
+    wifiActiveNetwork?: SortOrderInput | SortOrder
+    wifiLastError?: SortOrderInput | SortOrder
     attendancePunches?: AttendancePunchOrderByRelationAggregateInput
     deviceLogs?: DeviceLogOrderByRelationAggregateInput
     branch?: BranchOrderByWithRelationInput
@@ -27155,6 +27261,13 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"IotDevice"> | Date | string
     updatedAt?: DateTimeFilter<"IotDevice"> | Date | string
     deviceSecretHash?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigEncrypted?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigVersion?: IntFilter<"IotDevice"> | number
+    wifiConfigStatus?: StringFilter<"IotDevice"> | string
+    wifiConfigUpdatedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiConfigAcknowledgedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiActiveNetwork?: StringNullableFilter<"IotDevice"> | string | null
+    wifiLastError?: StringNullableFilter<"IotDevice"> | string | null
     attendancePunches?: AttendancePunchListRelationFilter
     deviceLogs?: DeviceLogListRelationFilter
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
@@ -27173,6 +27286,13 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deviceSecretHash?: SortOrderInput | SortOrder
+    wifiConfigEncrypted?: SortOrderInput | SortOrder
+    wifiConfigVersion?: SortOrder
+    wifiConfigStatus?: SortOrder
+    wifiConfigUpdatedAt?: SortOrderInput | SortOrder
+    wifiConfigAcknowledgedAt?: SortOrderInput | SortOrder
+    wifiActiveNetwork?: SortOrderInput | SortOrder
+    wifiLastError?: SortOrderInput | SortOrder
     _count?: IotDeviceCountOrderByAggregateInput
     _avg?: IotDeviceAvgOrderByAggregateInput
     _max?: IotDeviceMaxOrderByAggregateInput
@@ -27195,6 +27315,13 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"IotDevice"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"IotDevice"> | Date | string
     deviceSecretHash?: StringNullableWithAggregatesFilter<"IotDevice"> | string | null
+    wifiConfigEncrypted?: StringNullableWithAggregatesFilter<"IotDevice"> | string | null
+    wifiConfigVersion?: IntWithAggregatesFilter<"IotDevice"> | number
+    wifiConfigStatus?: StringWithAggregatesFilter<"IotDevice"> | string
+    wifiConfigUpdatedAt?: DateTimeNullableWithAggregatesFilter<"IotDevice"> | Date | string | null
+    wifiConfigAcknowledgedAt?: DateTimeNullableWithAggregatesFilter<"IotDevice"> | Date | string | null
+    wifiActiveNetwork?: StringNullableWithAggregatesFilter<"IotDevice"> | string | null
+    wifiLastError?: StringNullableWithAggregatesFilter<"IotDevice"> | string | null
   }
 
   export type FingerprintTemplateWhereInput = {
@@ -29036,6 +29163,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogCreateNestedManyWithoutDeviceInput
     branch: BranchCreateNestedOneWithoutDevicesInput
@@ -29054,6 +29188,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogUncheckedCreateNestedManyWithoutDeviceInput
   }
@@ -29067,6 +29208,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUpdateManyWithoutDeviceNestedInput
     branch?: BranchUpdateOneRequiredWithoutDevicesNestedInput
@@ -29085,6 +29233,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUncheckedUpdateManyWithoutDeviceNestedInput
   }
@@ -29101,6 +29256,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
   }
 
   export type IotDeviceUpdateManyMutationInput = {
@@ -29112,6 +29274,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type IotDeviceUncheckedUpdateManyInput = {
@@ -29126,6 +29295,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type FingerprintTemplateCreateInput = {
@@ -31219,12 +31395,20 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deviceSecretHash?: SortOrder
+    wifiConfigEncrypted?: SortOrder
+    wifiConfigVersion?: SortOrder
+    wifiConfigStatus?: SortOrder
+    wifiConfigUpdatedAt?: SortOrder
+    wifiConfigAcknowledgedAt?: SortOrder
+    wifiActiveNetwork?: SortOrder
+    wifiLastError?: SortOrder
   }
 
   export type IotDeviceAvgOrderByAggregateInput = {
     deviceId?: SortOrder
     branchId?: SortOrder
     companyId?: SortOrder
+    wifiConfigVersion?: SortOrder
   }
 
   export type IotDeviceMaxOrderByAggregateInput = {
@@ -31239,6 +31423,13 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deviceSecretHash?: SortOrder
+    wifiConfigEncrypted?: SortOrder
+    wifiConfigVersion?: SortOrder
+    wifiConfigStatus?: SortOrder
+    wifiConfigUpdatedAt?: SortOrder
+    wifiConfigAcknowledgedAt?: SortOrder
+    wifiActiveNetwork?: SortOrder
+    wifiLastError?: SortOrder
   }
 
   export type IotDeviceMinOrderByAggregateInput = {
@@ -31253,12 +31444,20 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deviceSecretHash?: SortOrder
+    wifiConfigEncrypted?: SortOrder
+    wifiConfigVersion?: SortOrder
+    wifiConfigStatus?: SortOrder
+    wifiConfigUpdatedAt?: SortOrder
+    wifiConfigAcknowledgedAt?: SortOrder
+    wifiActiveNetwork?: SortOrder
+    wifiLastError?: SortOrder
   }
 
   export type IotDeviceSumOrderByAggregateInput = {
     deviceId?: SortOrder
     branchId?: SortOrder
     companyId?: SortOrder
+    wifiConfigVersion?: SortOrder
   }
 
   export type EmployeeScalarRelationFilter = {
@@ -35152,6 +35351,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogCreateNestedManyWithoutDeviceInput
     company: companiesCreateNestedOneWithoutDevicesInput
@@ -35168,6 +35374,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogUncheckedCreateNestedManyWithoutDeviceInput
   }
@@ -35358,6 +35571,13 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"IotDevice"> | Date | string
     updatedAt?: DateTimeFilter<"IotDevice"> | Date | string
     deviceSecretHash?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigEncrypted?: StringNullableFilter<"IotDevice"> | string | null
+    wifiConfigVersion?: IntFilter<"IotDevice"> | number
+    wifiConfigStatus?: StringFilter<"IotDevice"> | string
+    wifiConfigUpdatedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiConfigAcknowledgedAt?: DateTimeNullableFilter<"IotDevice"> | Date | string | null
+    wifiActiveNetwork?: StringNullableFilter<"IotDevice"> | string | null
+    wifiLastError?: StringNullableFilter<"IotDevice"> | string | null
   }
 
   export type PublicHolidayUpsertWithWhereUniqueWithoutBranchInput = {
@@ -37381,6 +37601,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     deviceLogs?: DeviceLogCreateNestedManyWithoutDeviceInput
     branch: BranchCreateNestedOneWithoutDevicesInput
     company: companiesCreateNestedOneWithoutDevicesInput
@@ -37398,6 +37625,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     deviceLogs?: DeviceLogUncheckedCreateNestedManyWithoutDeviceInput
   }
 
@@ -37498,6 +37732,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     deviceLogs?: DeviceLogUpdateManyWithoutDeviceNestedInput
     branch?: BranchUpdateOneRequiredWithoutDevicesNestedInput
     company?: companiesUpdateOneRequiredWithoutDevicesNestedInput
@@ -37515,6 +37756,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     deviceLogs?: DeviceLogUncheckedUpdateManyWithoutDeviceNestedInput
   }
 
@@ -37817,6 +38065,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchCreateNestedManyWithoutDeviceInput
     branch: BranchCreateNestedOneWithoutDevicesInput
     company: companiesCreateNestedOneWithoutDevicesInput
@@ -37834,6 +38089,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutDeviceInput
   }
 
@@ -37862,6 +38124,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUpdateManyWithoutDeviceNestedInput
     branch?: BranchUpdateOneRequiredWithoutDevicesNestedInput
     company?: companiesUpdateOneRequiredWithoutDevicesNestedInput
@@ -37879,6 +38148,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutDeviceNestedInput
   }
 
@@ -39736,6 +40012,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogCreateNestedManyWithoutDeviceInput
     branch: BranchCreateNestedOneWithoutDevicesInput
@@ -39752,6 +40035,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
     attendancePunches?: AttendancePunchUncheckedCreateNestedManyWithoutDeviceInput
     deviceLogs?: DeviceLogUncheckedCreateNestedManyWithoutDeviceInput
   }
@@ -41024,6 +41314,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
   }
 
   export type PublicHolidayCreateManyBranchInput = {
@@ -41162,6 +41459,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUpdateManyWithoutDeviceNestedInput
     company?: companiesUpdateOneRequiredWithoutDevicesNestedInput
@@ -41178,6 +41482,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUncheckedUpdateManyWithoutDeviceNestedInput
   }
@@ -41193,6 +41504,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PublicHolidayUpdateWithoutBranchInput = {
@@ -42295,6 +42613,13 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deviceSecretHash?: string | null
+    wifiConfigEncrypted?: string | null
+    wifiConfigVersion?: number
+    wifiConfigStatus?: string
+    wifiConfigUpdatedAt?: Date | string | null
+    wifiConfigAcknowledgedAt?: Date | string | null
+    wifiActiveNetwork?: string | null
+    wifiLastError?: string | null
   }
 
   export type LeaveTypeCreateManyCompanyInput = {
@@ -42521,6 +42846,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUpdateManyWithoutDeviceNestedInput
     branch?: BranchUpdateOneRequiredWithoutDevicesNestedInput
@@ -42537,6 +42869,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
     attendancePunches?: AttendancePunchUncheckedUpdateManyWithoutDeviceNestedInput
     deviceLogs?: DeviceLogUncheckedUpdateManyWithoutDeviceNestedInput
   }
@@ -42552,6 +42891,13 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deviceSecretHash?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigEncrypted?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiConfigVersion?: IntFieldUpdateOperationsInput | number
+    wifiConfigStatus?: StringFieldUpdateOperationsInput | string
+    wifiConfigUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiConfigAcknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    wifiActiveNetwork?: NullableStringFieldUpdateOperationsInput | string | null
+    wifiLastError?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type LeaveTypeUpdateWithoutCompanyInput = {

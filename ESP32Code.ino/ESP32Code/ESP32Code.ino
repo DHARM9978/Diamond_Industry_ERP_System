@@ -3,7 +3,7 @@
     ESP32 FINGERPRINT ERP ATTENDANCE MACHINE - HARDENED VERSION
   ============================================================================
 
-  Existing functions preserved:
+  Existing functions preserved from the original 2,847-line sketch:
     - Fingerprint attendance
     - Frontend-controlled enrollment through backend polling
     - OLED status screens
@@ -11,6 +11,18 @@
     - Serial diagnostic commands
     - Physical sensor slot check/delete
     - Device-authenticated HTTP API
+
+  ADDITIONAL WIFI/RECOVERY FEATURES:
+    - Primary + secondary Wi-Fi credentials stored in ESP32 NVS.
+    - Automatic primary -> secondary failover.
+    - Automatic return to primary when it becomes available.
+    - ERP-controlled remote Wi-Fi configuration.
+    - Transactional Wi-Fi changes: test Wi-Fi + ERP before committing.
+    - ESP32 device-authenticated Wi-Fi configuration polling/ACK/runtime reporting.
+    - Physical CONFIG-button recovery mode.
+    - Setup AP/captive portal recovery.
+    - BLE Wi-Fi provisioning/recovery.
+    - Wi-Fi-only factory reset without deleting fingerprint templates or device identity.
 
   Main reliability improvements:
     1. OLED heartbeat + I2C presence check + automatic OLED re-initialization.
@@ -100,6 +112,12 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
+#include <DNSServer.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
 #include <Wire.h>
 #include <ArduinoJson.h>
 #include <Preferences.h>
@@ -112,13 +130,83 @@
 // ============================================================================
 // WIFI CONFIGURATION
 // ============================================================================
+//
+// Wi-Fi credentials are stored in ESP32 NVS (Preferences).
+// The compile-time values below are only a migration fallback for the
+// currently installed device. After the first successful boot they are copied
+// into NVS. Change/rotate these credentials from the ERP or provisioning flow.
+//
+// IMPORTANT:
+// - Do not display stored passwords in the ERP.
+// - Remote configuration is applied transactionally.
+// - A configuration is committed only after at least one candidate network
+//   connects and the ERP backend is reachable.
+// ============================================================================
 
-const char* WIFI_SSID = "Dharm's S24";
-const char* WIFI_PASSWORD = "Bhadani@99";
+const char* DEFAULT_PRIMARY_WIFI_SSID = "Dharm's S24";
+const char* DEFAULT_PRIMARY_WIFI_PASSWORD = "Bhadani@99";
+
+const char* DEFAULT_SECONDARY_WIFI_SSID = "Demo";
+const char* DEFAULT_SECONDARY_WIFI_PASSWORD = "Demo@1234";
+
+// Physical CONFIG button. Change this pin if your hardware uses another GPIO.
+#define CONFIG_BUTTON_PIN 27
+
+// Holding CONFIG_BUTTON_HOLD_MS at boot enters provisioning/recovery mode.
+const unsigned long CONFIG_BUTTON_HOLD_MS = 3000;
+
+// Setup AP / captive portal.
+const char* SETUP_AP_PASSWORD = "ERPSetup123";
+const unsigned long PROVISIONING_IDLE_TIMEOUT = 15UL * 60UL * 1000UL;
+
+// Remote Wi-Fi configuration polling.
+const unsigned long WIFI_CONFIG_POLL_INTERVAL = 30000;
+const unsigned long WIFI_RUNTIME_REPORT_INTERVAL = 30000;
+const unsigned long PRIMARY_RETURN_CHECK_INTERVAL = 60000;
+
+// Wi-Fi configuration version/status stored in NVS.
+Preferences wifiPrefs;
+
+struct WiFiCredentials {
+  String ssid;
+  String password;
+};
+
+struct WiFiConfiguration {
+  WiFiCredentials primary;
+  WiFiCredentials secondary;
+  uint32_t version;
+};
+
+WiFiConfiguration wifiConfig = {
+  {"", ""},
+  {"", ""},
+  0
+};
+
+enum ActiveWiFiNetwork {
+  WIFI_NETWORK_NONE,
+  WIFI_NETWORK_PRIMARY,
+  WIFI_NETWORK_SECONDARY
+};
+
+ActiveWiFiNetwork activeWiFiNetwork = WIFI_NETWORK_NONE;
+
+unsigned long lastWiFiConfigPoll = 0;
+unsigned long lastWiFiRuntimeReport = 0;
+unsigned long lastPrimaryReturnCheck = 0;
+unsigned long provisioningStartedAt = 0;
+
+bool provisioningMode = false;
+bool wifiConfigRequestInProgress = false;
+bool wifiRuntimeReportInProgress = false;
+bool primaryReturnCheckInProgress = false;
+bool configButtonHandled = false;
+unsigned long configButtonPressedAt = 0;
 
 // ============================================================================
 // ERP BACKEND CONFIGURATION
-// ============================================================================
+// ===========================================================================
 
 const char* BACKEND_BASE_URL = "http://10.72.179.69:5000";
 const char* DEVICE_CODE = "ESP32-001";
@@ -129,6 +217,11 @@ const char* ENROLLMENT_PENDING_ENDPOINT = "/api/device/fingerprint-enroll/pendin
 const char* ENROLLMENT_RESULT_ENDPOINT = "/api/device/fingerprint-enroll/result";
 const char* ENROLLMENT_LOG_ENDPOINT = "/api/device/fingerprint-enroll/log";
 const char* ENROLLMENT_STATUS_ENDPOINT = "/api/device/fingerprint-enroll";
+
+// Remote Wi-Fi management endpoints.
+const char* WIFI_CONFIG_ENDPOINT = "/api/device/wifi-config";
+const char* WIFI_CONFIG_ACK_ENDPOINT = "/api/device/wifi-config/ack";
+const char* WIFI_CONFIG_RUNTIME_ENDPOINT = "/api/device/wifi-config/runtime";
 
 // ============================================================================
 // TIMING
@@ -153,6 +246,8 @@ const unsigned long FINGER_REMOVAL_TIMEOUT = 15000;
 // Wi-Fi retry control.
 const unsigned long WIFI_CONNECT_TIMEOUT = 8000;
 const unsigned long WIFI_RETRY_INTERVAL = 10000;
+const unsigned long WIFI_FAILOVER_RETRY_INTERVAL = 5000;
+const uint8_t WIFI_NETWORK_CONNECT_ATTEMPTS = 2;
 
 // Attendance false-trigger filtering.
 const unsigned long FINGER_CONFIRM_DELAY_MS = 90;
@@ -216,6 +311,26 @@ String oledLine4 = "";
 
 unsigned long lastOLEDRefresh = 0;
 unsigned long lastOLEDRecovery = 0;
+
+// ============================================================================
+// LOCAL PROVISIONING / RECOVERY SERVICES
+// ============================================================================
+
+WebServer provisioningServer(80);
+DNSServer provisioningDnsServer;
+
+const byte DNS_PORT = 53;
+
+bool provisioningServerStarted = false;
+bool bleProvisioningStarted = false;
+
+BLEServer* bleServer = nullptr;
+BLECharacteristic* bleConfigCharacteristic = nullptr;
+BLECharacteristic* bleStatusCharacteristic = nullptr;
+
+const char* BLE_SERVICE_UUID = "6d2a0001-4f70-4d9f-a3a8-esp32erp001";
+const char* BLE_CONFIG_UUID  = "6d2a0002-4f70-4d9f-a3a8-esp32erp001";
+const char* BLE_STATUS_UUID  = "6d2a0003-4f70-4d9f-a3a8-esp32erp001";
 
 // ============================================================================
 // FINGERPRINT SENSOR
@@ -498,33 +613,140 @@ void errorSignal() {
 // WIFI
 // ============================================================================
 
-bool connectWiFi(bool force = false) {
-  unsigned long now = millis();
-
-  if (!force && now - lastWiFiAttempt < WIFI_RETRY_INTERVAL) {
-    return WiFi.status() == WL_CONNECTED;
+String activeWiFiNetworkName() {
+  if (activeWiFiNetwork == WIFI_NETWORK_PRIMARY) {
+    return "PRIMARY";
   }
 
-  lastWiFiAttempt = now;
+  if (activeWiFiNetwork == WIFI_NETWORK_SECONDARY) {
+    return "SECONDARY";
+  }
+
+  return "NONE";
+}
+
+void loadWiFiConfiguration() {
+  wifiPrefs.begin("wifi_cfg", true);
+
+  wifiConfig.primary.ssid =
+    wifiPrefs.getString("p_ssid", DEFAULT_PRIMARY_WIFI_SSID);
+
+  wifiConfig.primary.password =
+    wifiPrefs.getString("p_pass", DEFAULT_PRIMARY_WIFI_PASSWORD);
+
+  wifiConfig.secondary.ssid =
+    wifiPrefs.getString("s_ssid", DEFAULT_SECONDARY_WIFI_SSID);
+
+  wifiConfig.secondary.password =
+    wifiPrefs.getString("s_pass", DEFAULT_SECONDARY_WIFI_PASSWORD);
+
+  wifiConfig.version =
+    wifiPrefs.getUInt("version", 0);
+
+  wifiPrefs.end();
 
   Serial.println();
   Serial.println("====================================");
-  Serial.println("Connecting to Wi-Fi...");
+  Serial.println(" LOADED WIFI CONFIGURATION");
   Serial.println("====================================");
+  Serial.print("Primary SSID: ");
+  Serial.println(
+    wifiConfig.primary.ssid.length() > 0
+      ? wifiConfig.primary.ssid
+      : "(not configured)"
+  );
+  Serial.print("Secondary SSID: ");
+  Serial.println(
+    wifiConfig.secondary.ssid.length() > 0
+      ? wifiConfig.secondary.ssid
+      : "(not configured)"
+  );
+  Serial.print("Config version: ");
+  Serial.println(wifiConfig.version);
+  Serial.println("Passwords are not printed.");
+}
 
-  if (WiFi.status() == WL_CONNECTED) {
-    return true;
+void saveWiFiConfiguration(
+  const WiFiConfiguration& config
+) {
+  wifiPrefs.begin("wifi_cfg", false);
+
+  wifiPrefs.putString(
+    "p_ssid",
+    config.primary.ssid
+  );
+
+  wifiPrefs.putString(
+    "p_pass",
+    config.primary.password
+  );
+
+  wifiPrefs.putString(
+    "s_ssid",
+    config.secondary.ssid
+  );
+
+  wifiPrefs.putString(
+    "s_pass",
+    config.secondary.password
+  );
+
+  wifiPrefs.putUInt(
+    "version",
+    config.version
+  );
+
+  wifiPrefs.end();
+
+  wifiConfig = config;
+}
+
+bool hasPrimaryWiFi() {
+  return wifiConfig.primary.ssid.length() > 0 &&
+         wifiConfig.primary.password.length() >= 8;
+}
+
+bool hasSecondaryWiFi() {
+  return wifiConfig.secondary.ssid.length() > 0 &&
+         wifiConfig.secondary.password.length() >= 8;
+}
+
+bool connectToNetwork(
+  const WiFiCredentials& credentials,
+  ActiveWiFiNetwork network,
+  unsigned long timeoutMs = WIFI_CONNECT_TIMEOUT
+) {
+  if (credentials.ssid.length() == 0) {
+    return false;
   }
+
+  Serial.println();
+  Serial.println("====================================");
+  Serial.print("Connecting to ");
+  Serial.println(
+    network == WIFI_NETWORK_PRIMARY
+      ? "PRIMARY Wi-Fi"
+      : "SECONDARY Wi-Fi"
+  );
+  Serial.println("====================================");
+  Serial.print("SSID: ");
+  Serial.println(credentials.ssid);
+
+  WiFi.disconnect(true, true);
+  delay(150);
 
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(
+    credentials.ssid.c_str(),
+    credentials.password.c_str()
+  );
 
   unsigned long startTime = millis();
 
   while (
     WiFi.status() != WL_CONNECTED &&
-    millis() - startTime < WIFI_CONNECT_TIMEOUT
+    millis() - startTime < timeoutMs
   ) {
     serviceOLED();
     delay(250);
@@ -534,25 +756,124 @@ bool connectWiFi(bool force = false) {
   Serial.println();
 
   if (WiFi.status() == WL_CONNECTED) {
+    activeWiFiNetwork = network;
+
     Serial.println("Wi-Fi connected.");
+    Serial.print("SSID: ");
+    Serial.println(WiFi.SSID());
     Serial.print("ESP32 IP: ");
     Serial.println(WiFi.localIP());
 
-    showOLED(
-      "WiFi Connected",
-      WiFi.localIP().toString(),
-      "Starting machine..."
-    );
-    delay(800);
     return true;
   }
 
   Serial.println("Wi-Fi connection failed.");
+  return false;
+}
+
+bool checkBackendConnectivityForCurrentWiFi() {
+  if (WiFi.status() != WL_CONNECTED) {
+    return false;
+  }
+
+  if (!backendConfigured()) {
+    return false;
+  }
+
+  HTTPClient http;
+  String url = makeUrl(WIFI_CONFIG_ENDPOINT);
+
+  http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
+  http.setTimeout(HTTP_TIMEOUT);
+
+  if (!http.begin(url)) {
+    return false;
+  }
+
+  addDeviceHeaders(http);
+
+  int httpCode = http.GET();
+  http.end();
+
+  return httpCode >= 200 && httpCode < 300;
+}
+
+bool connectWiFi(bool force = false) {
+  unsigned long now = millis();
+
+  if (
+    !force &&
+    WiFi.status() == WL_CONNECTED
+  ) {
+    return true;
+  }
+
+  if (
+    !force &&
+    now - lastWiFiAttempt < WIFI_RETRY_INTERVAL
+  ) {
+    return false;
+  }
+
+  lastWiFiAttempt = now;
+
+  // Primary is always attempted first.
+  if (hasPrimaryWiFi()) {
+    for (
+      uint8_t attempt = 0;
+      attempt < WIFI_NETWORK_CONNECT_ATTEMPTS;
+      attempt++
+    ) {
+      if (
+        connectToNetwork(
+          wifiConfig.primary,
+          WIFI_NETWORK_PRIMARY
+        )
+      ) {
+        showOLED(
+          "WiFi Connected",
+          "Primary Network",
+          WiFi.localIP().toString(),
+          "ERP Ready"
+        );
+        return true;
+      }
+    }
+  }
+
+  // If primary fails, automatically use secondary.
+  if (hasSecondaryWiFi()) {
+    for (
+      uint8_t attempt = 0;
+      attempt < WIFI_NETWORK_CONNECT_ATTEMPTS;
+      attempt++
+    ) {
+      if (
+        connectToNetwork(
+          wifiConfig.secondary,
+          WIFI_NETWORK_SECONDARY
+        )
+      ) {
+        showOLED(
+          "WiFi Connected",
+          "Secondary Network",
+          WiFi.localIP().toString(),
+          "ERP Ready"
+        );
+        return true;
+      }
+    }
+  }
+
+  activeWiFiNetwork = WIFI_NETWORK_NONE;
+
+  Serial.println("Both configured Wi-Fi networks failed.");
 
   showOLED(
     "WiFi Failed",
-    "Retry Scheduled",
-    "Attendance may be Offline"
+    "Primary + Secondary",
+    "Recovery Available",
+    "Check Network"
   );
 
   return false;
@@ -564,6 +885,61 @@ bool ensureWiFi() {
   }
 
   return connectWiFi(false);
+}
+
+bool tryReturnToPrimary() {
+  if (
+    activeWiFiNetwork != WIFI_NETWORK_SECONDARY ||
+    !hasPrimaryWiFi()
+  ) {
+    return false;
+  }
+
+  unsigned long now = millis();
+
+  if (
+    now - lastPrimaryReturnCheck <
+    PRIMARY_RETURN_CHECK_INTERVAL
+  ) {
+    return false;
+  }
+
+  lastPrimaryReturnCheck = now;
+
+  Serial.println("Checking whether PRIMARY Wi-Fi has returned...");
+
+  ActiveWiFiNetwork previousNetwork =
+    activeWiFiNetwork;
+
+  if (
+    connectToNetwork(
+      wifiConfig.primary,
+      WIFI_NETWORK_PRIMARY,
+      4000
+    )
+  ) {
+    if (checkBackendConnectivityForCurrentWiFi()) {
+      Serial.println("Primary Wi-Fi restored and ERP is reachable.");
+      return true;
+    }
+
+    Serial.println(
+      "Primary Wi-Fi connected but ERP is unreachable. "
+      "Returning to secondary."
+    );
+  }
+
+  if (
+    previousNetwork == WIFI_NETWORK_SECONDARY &&
+    hasSecondaryWiFi()
+  ) {
+    connectToNetwork(
+      wifiConfig.secondary,
+      WIFI_NETWORK_SECONDARY
+    );
+  }
+
+  return false;
 }
 
 // ============================================================================
@@ -668,6 +1044,1121 @@ bool checkBackendConnectivity() {
 
   Serial.println("Backend connection: FAILED");
   return false;
+}
+
+// ============================================================================
+// REMOTE WIFI CONFIGURATION
+// ============================================================================
+
+bool parseWiFiConfigurationDocument(
+  JsonDocument& doc,
+  WiFiConfiguration& candidate
+) {
+  JsonVariant data = doc["data"];
+
+  if (data.isNull()) {
+    return false;
+  }
+
+  // Current backend contract:
+  // data.configuration.primarySsid
+  // data.configuration.primaryPassword
+  // data.configuration.secondarySsid
+  // data.configuration.secondaryPassword
+  JsonVariant configuration = data["configuration"];
+
+  if (configuration.isNull()) {
+    return false;
+  }
+
+  String primarySsid =
+    configuration["primarySsid"] | "";
+
+  String primaryPassword =
+    configuration["primaryPassword"] | "";
+
+  String secondarySsid =
+    configuration["secondarySsid"] | "";
+
+  String secondaryPassword =
+    configuration["secondaryPassword"] | "";
+
+  if (
+    primarySsid.length() == 0 ||
+    primaryPassword.length() < 8 ||
+    primaryPassword.length() > 63
+  ) {
+    return false;
+  }
+
+  if (
+    secondarySsid.length() > 0 &&
+    (
+      secondaryPassword.length() < 8 ||
+      secondaryPassword.length() > 63
+    )
+  ) {
+    return false;
+  }
+
+  candidate.primary.ssid = primarySsid;
+  candidate.primary.password = primaryPassword;
+
+  candidate.secondary.ssid = secondarySsid;
+  candidate.secondary.password =
+    secondarySsid.length() > 0
+      ? secondaryPassword
+      : "";
+
+  candidate.version =
+    data["configVersion"] | 0;
+
+  return true;
+}
+
+bool acknowledgeWiFiConfiguration(
+  uint32_t version,
+  bool applied,
+  const String& errorMessage
+) {
+  if (!ensureWiFi()) {
+    return false;
+  }
+
+  HTTPClient http;
+  String url = makeUrl(WIFI_CONFIG_ACK_ENDPOINT);
+
+  http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
+  http.setTimeout(HTTP_TIMEOUT);
+
+  if (!http.begin(url)) {
+    return false;
+  }
+
+  addDeviceHeaders(http);
+
+  JsonDocument doc;
+  doc["configVersion"] = version;
+  doc["success"] = applied;
+  doc["activeNetwork"] = activeWiFiNetworkName();
+
+  if (errorMessage.length() > 0) {
+    doc["error"] = errorMessage;
+  } else {
+    doc["error"] = nullptr;
+  }
+
+  String body;
+  serializeJson(doc, body);
+
+  int httpCode = http.POST(body);
+  String response = http.getString();
+
+  Serial.print("Wi-Fi config ACK HTTP code: ");
+  Serial.println(httpCode);
+
+  if (response.length() > 0) {
+    Serial.println(response);
+  }
+
+  http.end();
+
+  return httpCode >= 200 && httpCode < 300;
+}
+
+bool reportWiFiRuntimeState(
+  const String& activeNetwork,
+  const String& errorMessage = ""
+) {
+  if (WiFi.status() != WL_CONNECTED) {
+    return false;
+  }
+
+  if (!backendConfigured()) {
+    return false;
+  }
+
+  HTTPClient http;
+  String url = makeUrl(WIFI_CONFIG_RUNTIME_ENDPOINT);
+
+  http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
+  http.setTimeout(HTTP_TIMEOUT);
+
+  if (!http.begin(url)) {
+    return false;
+  }
+
+  addDeviceHeaders(http);
+
+  JsonDocument doc;
+
+  if (activeNetwork.length() > 0) {
+    doc["activeNetwork"] = activeNetwork;
+  }
+
+  if (errorMessage.length() > 0) {
+    doc["lastError"] = errorMessage;
+  } else {
+    doc["lastError"] = nullptr;
+  }
+
+  String body;
+  serializeJson(doc, body);
+
+  int httpCode = http.POST(body);
+
+  Serial.print("Wi-Fi runtime HTTP code: ");
+  Serial.println(httpCode);
+
+  http.end();
+
+  return httpCode >= 200 && httpCode < 300;
+}
+
+bool applyRemoteWiFiConfiguration(
+  const WiFiConfiguration& candidate
+) {
+  if (candidate.version == 0) {
+    return false;
+  }
+
+  WiFiConfiguration previous =
+    wifiConfig;
+
+  ActiveWiFiNetwork previousNetwork =
+    activeWiFiNetwork;
+
+  Serial.println();
+  Serial.println("====================================");
+  Serial.println(" APPLYING REMOTE WIFI CONFIGURATION");
+  Serial.println("====================================");
+  Serial.print("Candidate version: ");
+  Serial.println(candidate.version);
+
+  bool connected = false;
+
+  // Test PRIMARY first.
+  if (
+    candidate.primary.ssid.length() > 0 &&
+    candidate.primary.password.length() >= 8
+  ) {
+    connected =
+      connectToNetwork(
+        candidate.primary,
+        WIFI_NETWORK_PRIMARY
+      );
+
+    if (
+      connected &&
+      !checkBackendConnectivityForCurrentWiFi()
+    ) {
+      Serial.println(
+        "Candidate primary connected, but ERP test failed."
+      );
+      connected = false;
+    }
+  }
+
+  // Test SECONDARY if primary failed.
+  if (
+    !connected &&
+    candidate.secondary.ssid.length() > 0 &&
+    candidate.secondary.password.length() >= 8
+  ) {
+    connected =
+      connectToNetwork(
+        candidate.secondary,
+        WIFI_NETWORK_SECONDARY
+      );
+
+    if (
+      connected &&
+      !checkBackendConnectivityForCurrentWiFi()
+    ) {
+      Serial.println(
+        "Candidate secondary connected, but ERP test failed."
+      );
+      connected = false;
+    }
+  }
+
+  if (!connected) {
+    Serial.println(
+      "Remote Wi-Fi configuration rejected. "
+      "Restoring previous configuration."
+    );
+
+    wifiConfig = previous;
+
+    bool restored = false;
+
+    if (
+      previousNetwork == WIFI_NETWORK_PRIMARY &&
+      hasPrimaryWiFi()
+    ) {
+      restored =
+        connectToNetwork(
+          previous.primary,
+          WIFI_NETWORK_PRIMARY
+        );
+    }
+
+    if (
+      !restored &&
+      previousNetwork == WIFI_NETWORK_SECONDARY &&
+      hasSecondaryWiFi()
+    ) {
+      restored =
+        connectToNetwork(
+          previous.secondary,
+          WIFI_NETWORK_SECONDARY
+        );
+    }
+
+    if (!restored) {
+      restored = connectWiFi(true);
+    }
+
+    return false;
+  }
+
+  // Only after connection + ERP validation succeeds do we commit to NVS.
+  saveWiFiConfiguration(candidate);
+
+  Serial.println(
+    "Remote Wi-Fi configuration committed to NVS."
+  );
+
+  return true;
+}
+
+void pollRemoteWiFiConfiguration(bool force = false) {
+  if (wifiConfigRequestInProgress) {
+    return;
+  }
+
+  unsigned long now = millis();
+
+  if (
+    !force &&
+    now - lastWiFiConfigPoll <
+    WIFI_CONFIG_POLL_INTERVAL
+  ) {
+    return;
+  }
+
+  lastWiFiConfigPoll = now;
+
+  if (!ensureWiFi()) {
+    return;
+  }
+
+  wifiConfigRequestInProgress = true;
+
+  HTTPClient http;
+  String url = makeUrl(WIFI_CONFIG_ENDPOINT);
+
+  http.setConnectTimeout(HTTP_CONNECT_TIMEOUT);
+  http.setTimeout(HTTP_TIMEOUT);
+
+  if (!http.begin(url)) {
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  addDeviceHeaders(http);
+
+  int httpCode = http.GET();
+
+  if (httpCode <= 0) {
+    Serial.print("Wi-Fi configuration poll failed: ");
+    Serial.println(http.errorToString(httpCode));
+    http.end();
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  String response = http.getString();
+
+  Serial.print("Wi-Fi configuration HTTP code: ");
+  Serial.println(httpCode);
+
+  if (httpCode < 200 || httpCode >= 300) {
+    http.end();
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  JsonDocument doc;
+  DeserializationError error =
+    deserializeJson(doc, response);
+
+  http.end();
+
+  if (error) {
+    Serial.print(
+      "Could not parse Wi-Fi configuration: "
+    );
+    Serial.println(error.c_str());
+
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  bool success =
+    doc["success"] | false;
+
+  if (!success) {
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  JsonVariant data = doc["data"];
+
+  if (data.isNull()) {
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  uint32_t remoteVersion =
+    data["configVersion"] | 0;
+
+  if (
+    remoteVersion == 0 ||
+    remoteVersion <= wifiConfig.version
+  ) {
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  WiFiConfiguration candidate;
+  candidate.version = remoteVersion;
+
+  if (
+    !parseWiFiConfigurationDocument(
+      doc,
+      candidate
+    )
+  ) {
+    Serial.println(
+      "Remote Wi-Fi configuration failed validation."
+    );
+
+    acknowledgeWiFiConfiguration(
+      remoteVersion,
+      false,
+      "Invalid Wi-Fi configuration received by device."
+    );
+
+    wifiConfigRequestInProgress = false;
+    return;
+  }
+
+  bool applied =
+    applyRemoteWiFiConfiguration(candidate);
+
+  if (applied) {
+    Serial.println(
+      "Remote Wi-Fi configuration applied successfully."
+    );
+
+    acknowledgeWiFiConfiguration(
+      candidate.version,
+      true,
+      ""
+    );
+
+    showOLED(
+      "WiFi Updated",
+      "Config Applied",
+      activeWiFiNetworkName(),
+      "ERP Connected"
+    );
+
+    delay(800);
+    showAttendanceReady();
+
+  } else {
+    Serial.println(
+      "Remote Wi-Fi configuration could not be applied."
+    );
+
+    acknowledgeWiFiConfiguration(
+      candidate.version,
+      false,
+      "Could not connect to a configured network and ERP backend."
+    );
+  }
+
+  wifiConfigRequestInProgress = false;
+}
+
+void serviceConfigButton() {
+  bool pressed =
+    digitalRead(CONFIG_BUTTON_PIN) == LOW;
+
+  if (pressed) {
+    if (configButtonPressedAt == 0) {
+      configButtonPressedAt = millis();
+      Serial.println("CONFIG button pressed.");
+    }
+
+    if (
+      !configButtonHandled &&
+      millis() - configButtonPressedAt >=
+        CONFIG_BUTTON_HOLD_MS
+    ) {
+      configButtonHandled = true;
+      startRecoveryMode();
+    }
+  } else {
+    configButtonPressedAt = 0;
+    configButtonHandled = false;
+  }
+}
+
+void serviceWiFiManagement() {
+  if (provisioningMode) {
+    return;
+  }
+
+  pollRemoteWiFiConfiguration(false);
+
+  if (WiFi.status() == WL_CONNECTED) {
+    tryReturnToPrimary();
+
+    unsigned long now = millis();
+
+    if (
+      !wifiRuntimeReportInProgress &&
+      (
+        lastWiFiRuntimeReport == 0 ||
+        now - lastWiFiRuntimeReport >=
+          WIFI_RUNTIME_REPORT_INTERVAL
+      )
+    ) {
+      wifiRuntimeReportInProgress = true;
+
+      if (
+        reportWiFiRuntimeState(
+          activeWiFiNetworkName(),
+          ""
+        )
+      ) {
+        lastWiFiRuntimeReport = now;
+      }
+
+      wifiRuntimeReportInProgress = false;
+    }
+
+  } else {
+    activeWiFiNetwork = WIFI_NETWORK_NONE;
+  }
+}
+
+// ============================================================================
+// PROVISIONING / RECOVERY
+// ============================================================================
+
+String provisioningApName() {
+  return String("ERP-ESP32-") + String(DEVICE_CODE);
+}
+
+String htmlEscape(const String& value) {
+  String result = value;
+  result.replace("&", "&amp;");
+  result.replace("<", "&lt;");
+  result.replace(">", "&gt;");
+  result.replace("\"", "&quot;");
+  return result;
+}
+
+String provisioningPage(
+  const String& message = ""
+) {
+  String html;
+
+  html += "<!doctype html><html><head>";
+  html += "<meta name='viewport' content='width=device-width,initial-scale=1'>";
+  html += "<title>ESP32 ERP Wi-Fi Setup</title>";
+  html += "<style>";
+  html += "body{font-family:Arial,sans-serif;max-width:560px;margin:30px auto;padding:20px}";
+  html += "input{width:100%;padding:10px;margin:6px 0 14px;box-sizing:border-box}";
+  html += "button{padding:11px 18px;margin-right:8px}";
+  html += ".box{border:1px solid #ddd;border-radius:8px;padding:16px;margin-bottom:16px}";
+  html += "</style></head><body>";
+
+  html += "<h2>Fingerprint ERP - Wi-Fi Setup</h2>";
+
+  html += "<div class='box'>";
+  html += "<p><b>Device:</b> ";
+  html += htmlEscape(String(DEVICE_CODE));
+  html += "</p>";
+  html += "<p><b>Active Network:</b> ";
+  html += htmlEscape(activeWiFiNetworkName());
+  html += "</p>";
+  html += "<p><b>Config Version:</b> ";
+  html += String(wifiConfig.version);
+  html += "</p>";
+  html += "</div>";
+
+  if (message.length() > 0) {
+    html += "<div class='box'><b>";
+    html += htmlEscape(message);
+    html += "</b></div>";
+  }
+
+  html += "<form method='POST' action='/save'>";
+
+  html += "<div class='box'><h3>Primary Wi-Fi</h3>";
+  html += "<label>SSID</label>";
+  html += "<input name='primarySsid' required>";
+  html += "<label>Password</label>";
+  html += "<input name='primaryPassword' type='password' required>";
+  html += "</div>";
+
+  html += "<div class='box'><h3>Secondary Wi-Fi</h3>";
+  html += "<label>SSID</label>";
+  html += "<input name='secondarySsid'>";
+  html += "<label>Password</label>";
+  html += "<input name='secondaryPassword' type='password'>";
+  html += "</div>";
+
+  html += "<button type='submit'>Test & Save</button>";
+  html += "</form>";
+
+  html += "<p>Existing passwords are never displayed.</p>";
+
+  html += "</body></html>";
+
+  return html;
+}
+
+bool applyProvisioningCredentials(
+  const String& primarySsid,
+  const String& primaryPassword,
+  const String& secondarySsid,
+  const String& secondaryPassword
+) {
+  WiFiConfiguration candidate = wifiConfig;
+
+  candidate.primary.ssid = primarySsid;
+  candidate.primary.password = primaryPassword;
+
+  candidate.secondary.ssid = secondarySsid;
+  candidate.secondary.password =
+    secondarySsid.length() > 0
+      ? secondaryPassword
+      : "";
+
+  // Local provisioning is a new configuration. Keep the current version
+  // until the test succeeds, then advance it locally.
+  candidate.version =
+    wifiConfig.version + 1;
+
+  if (
+    candidate.primary.ssid.length() == 0 ||
+    candidate.primary.password.length() < 8 ||
+    candidate.primary.password.length() > 63
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.secondary.ssid.length() > 0 &&
+    (
+      candidate.secondary.password.length() < 8 ||
+      candidate.secondary.password.length() > 63
+    )
+  ) {
+    return false;
+  }
+
+  return applyRemoteWiFiConfiguration(
+    candidate
+  );
+}
+
+void handleProvisioningRoot() {
+  provisioningServer.send(
+    200,
+    "text/html",
+    provisioningPage()
+  );
+}
+
+void handleProvisioningSave() {
+  String primarySsid =
+    provisioningServer.arg("primarySsid");
+
+  String primaryPassword =
+    provisioningServer.arg("primaryPassword");
+
+  String secondarySsid =
+    provisioningServer.arg("secondarySsid");
+
+  String secondaryPassword =
+    provisioningServer.arg("secondaryPassword");
+
+  primarySsid.trim();
+  secondarySsid.trim();
+
+  if (
+    primarySsid.length() == 0 ||
+    primaryPassword.length() < 8 ||
+    primaryPassword.length() > 63
+  ) {
+    provisioningServer.send(
+      400,
+      "text/html",
+      provisioningPage(
+        "Invalid primary Wi-Fi credentials."
+      )
+    );
+    return;
+  }
+
+  if (
+    secondarySsid.length() > 0 &&
+    (
+      secondaryPassword.length() < 8 ||
+      secondaryPassword.length() > 63
+    )
+  ) {
+    provisioningServer.send(
+      400,
+      "text/html",
+      provisioningPage(
+        "Invalid secondary Wi-Fi credentials."
+      )
+    );
+    return;
+  }
+
+  bool applied =
+    applyProvisioningCredentials(
+      primarySsid,
+      primaryPassword,
+      secondarySsid,
+      secondaryPassword
+    );
+
+  if (applied) {
+    provisioningServer.send(
+      200,
+      "text/html",
+      provisioningPage(
+        "Wi-Fi configuration saved. The device is connected and ERP is reachable."
+      )
+    );
+
+    delay(500);
+    stopProvisioningAP();
+    stopBLEProvisioning();
+
+    reportWiFiRuntimeState(
+      activeWiFiNetworkName(),
+      ""
+    );
+  } else {
+    provisioningServer.send(
+      400,
+      "text/html",
+      provisioningPage(
+        "Configuration rejected. The device could not validate the network and ERP connection."
+      )
+    );
+  }
+}
+
+void handleProvisioningStatus() {
+  JsonDocument doc;
+
+  doc["deviceCode"] = DEVICE_CODE;
+  doc["activeNetwork"] =
+    activeWiFiNetworkName();
+  doc["wifiConnected"] =
+    WiFi.status() == WL_CONNECTED;
+  doc["ip"] =
+    WiFi.status() == WL_CONNECTED
+      ? WiFi.localIP().toString()
+      : "";
+  doc["configVersion"] =
+    wifiConfig.version;
+
+  String response;
+  serializeJson(doc, response);
+
+  provisioningServer.send(
+    200,
+    "application/json",
+    response
+  );
+}
+
+void startProvisioningAP() {
+  if (provisioningMode) {
+    return;
+  }
+
+  provisioningMode = true;
+  provisioningStartedAt = millis();
+
+  Serial.println();
+  Serial.println("====================================");
+  Serial.println(" STARTING WIFI PROVISIONING MODE");
+  Serial.println("====================================");
+
+  WiFi.disconnect(true, true);
+  delay(200);
+
+  WiFi.mode(WIFI_AP);
+
+  String apName =
+    provisioningApName();
+
+  bool apStarted =
+    WiFi.softAP(
+      apName.c_str(),
+      SETUP_AP_PASSWORD
+    );
+
+  if (!apStarted) {
+    Serial.println("Failed to start provisioning AP.");
+    provisioningMode = false;
+    return;
+  }
+
+  IPAddress apIp =
+    WiFi.softAPIP();
+
+  Serial.print("Provisioning SSID: ");
+  Serial.println(apName);
+  Serial.print("Provisioning password: ");
+  Serial.println(SETUP_AP_PASSWORD);
+  Serial.print("Provisioning IP: ");
+  Serial.println(apIp);
+
+  provisioningDnsServer.start(
+    DNS_PORT,
+    "*",
+    apIp
+  );
+
+  provisioningServer.on(
+    "/",
+    HTTP_GET,
+    handleProvisioningRoot
+  );
+
+  provisioningServer.on(
+    "/save",
+    HTTP_POST,
+    handleProvisioningSave
+  );
+
+  provisioningServer.on(
+    "/status",
+    HTTP_GET,
+    handleProvisioningStatus
+  );
+
+  provisioningServer.onNotFound(
+    []() {
+      provisioningServer.send(
+        200,
+        "text/html",
+        provisioningPage()
+      );
+    }
+  );
+
+  provisioningServer.begin();
+  provisioningServerStarted = true;
+
+  showOLED(
+    "WiFi Setup Mode",
+    apName,
+    apIp.toString(),
+    "Open browser"
+  );
+}
+
+void stopProvisioningAP() {
+  if (!provisioningMode) {
+    return;
+  }
+
+  if (provisioningServerStarted) {
+    provisioningServer.stop();
+    provisioningServerStarted = false;
+  }
+
+  provisioningDnsServer.stop();
+
+  WiFi.softAPdisconnect(true);
+
+  provisioningMode = false;
+
+  Serial.println("Provisioning AP stopped.");
+}
+
+void serviceProvisioningAP() {
+  if (!provisioningMode) {
+    return;
+  }
+
+  provisioningDnsServer.processNextRequest();
+  provisioningServer.handleClient();
+
+  if (
+    provisioningStartedAt > 0 &&
+    millis() - provisioningStartedAt >
+      PROVISIONING_IDLE_TIMEOUT
+  ) {
+    Serial.println(
+      "Provisioning idle timeout. Returning to normal mode."
+    );
+
+    stopProvisioningAP();
+    connectWiFi(true);
+    showAttendanceReady();
+  }
+}
+
+// ============================================================================
+// BLE PROVISIONING
+// ============================================================================
+
+class BLEConfigCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic* characteristic) override {
+    std::string value =
+      characteristic->getValue();
+
+    if (value.empty()) {
+      return;
+    }
+
+    String payload =
+      String(value.c_str());
+
+    Serial.println("BLE Wi-Fi configuration received.");
+
+    JsonDocument doc;
+
+    DeserializationError error =
+      deserializeJson(doc, payload);
+
+    if (error) {
+      bleStatusCharacteristic->setValue(
+        "ERROR: Invalid JSON"
+      );
+      bleStatusCharacteristic->notify();
+      return;
+    }
+
+    String primarySsid =
+      doc["primarySsid"] | "";
+
+    String primaryPassword =
+      doc["primaryPassword"] | "";
+
+    String secondarySsid =
+      doc["secondarySsid"] | "";
+
+    String secondaryPassword =
+      doc["secondaryPassword"] | "";
+
+    bool applied =
+      applyProvisioningCredentials(
+        primarySsid,
+        primaryPassword,
+        secondarySsid,
+        secondaryPassword
+      );
+
+    if (applied) {
+      bleStatusCharacteristic->setValue(
+        "OK: WiFi configuration applied"
+      );
+    } else {
+      bleStatusCharacteristic->setValue(
+        "ERROR: WiFi/ERP validation failed"
+      );
+    }
+
+    bleStatusCharacteristic->notify();
+  }
+};
+
+class ERPBLEServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer* server) override {
+    Serial.println("BLE provisioning client connected.");
+  }
+
+  void onDisconnect(BLEServer* server) override {
+    Serial.println("BLE provisioning client disconnected.");
+    BLEDevice::startAdvertising();
+  }
+};
+
+void startBLEProvisioning() {
+  if (bleProvisioningStarted) {
+    return;
+  }
+
+  BLEDevice::init(
+    provisioningApName().c_str()
+  );
+
+  bleServer =
+    BLEDevice::createServer();
+
+  bleServer->setCallbacks(
+    new ERPBLEServerCallbacks()
+  );
+
+  BLEService* service =
+    bleServer->createService(
+      BLE_SERVICE_UUID
+    );
+
+  bleConfigCharacteristic =
+    service->createCharacteristic(
+      BLE_CONFIG_UUID,
+      BLECharacteristic::PROPERTY_WRITE
+    );
+
+  bleConfigCharacteristic->setCallbacks(
+    new BLEConfigCallbacks()
+  );
+
+  bleStatusCharacteristic =
+    service->createCharacteristic(
+      BLE_STATUS_UUID,
+      BLECharacteristic::PROPERTY_READ |
+      BLECharacteristic::PROPERTY_NOTIFY
+    );
+
+  bleStatusCharacteristic->addDescriptor(
+    new BLE2902()
+  );
+
+  bleStatusCharacteristic->setValue(
+    "READY"
+  );
+
+  service->start();
+
+  BLEAdvertising* advertising =
+    BLEDevice::getAdvertising();
+
+  advertising->addServiceUUID(
+    BLE_SERVICE_UUID
+  );
+
+  advertising->setScanResponse(true);
+  advertising->start();
+
+  bleProvisioningStarted = true;
+
+  Serial.println("BLE provisioning started.");
+}
+
+void stopBLEProvisioning() {
+  if (!bleProvisioningStarted) {
+    return;
+  }
+
+  BLEDevice::getAdvertising()->stop();
+
+  BLEDevice::deinit(true);
+
+  bleProvisioningStarted = false;
+  bleServer = nullptr;
+  bleConfigCharacteristic = nullptr;
+  bleStatusCharacteristic = nullptr;
+
+  Serial.println("BLE provisioning stopped.");
+}
+
+void startRecoveryMode() {
+  Serial.println();
+  Serial.println("====================================");
+  Serial.println(" WIFI RECOVERY MODE");
+  Serial.println("====================================");
+
+  startProvisioningAP();
+  startBLEProvisioning();
+}
+
+void serviceRecoveryMode() {
+  serviceProvisioningAP();
+}
+
+void factoryResetWiFiConfiguration() {
+  Serial.println("Factory Wi-Fi reset requested.");
+
+  wifiPrefs.begin("wifi_cfg", false);
+  wifiPrefs.clear();
+  wifiPrefs.end();
+
+  wifiConfig.primary.ssid = "";
+  wifiConfig.primary.password = "";
+  wifiConfig.secondary.ssid = "";
+  wifiConfig.secondary.password = "";
+  wifiConfig.version = 0;
+
+  activeWiFiNetwork = WIFI_NETWORK_NONE;
+
+  WiFi.disconnect(true, true);
+
+  startRecoveryMode();
+
+  showOLED(
+    "WiFi Reset",
+    "Recovery Mode",
+    "Connect to Setup AP",
+    "Use browser/BLE"
+  );
+}
+
+void checkConfigButtonAtBoot() {
+  pinMode(
+    CONFIG_BUTTON_PIN,
+    INPUT_PULLUP
+  );
+
+  unsigned long start =
+    millis();
+
+  if (
+    digitalRead(CONFIG_BUTTON_PIN) != LOW
+  ) {
+    return;
+  }
+
+  Serial.println(
+    "CONFIG button detected. Hold to enter recovery."
+  );
+
+  while (
+    digitalRead(CONFIG_BUTTON_PIN) == LOW &&
+    millis() - start < CONFIG_BUTTON_HOLD_MS
+  ) {
+    digitalWrite(RED_LED, HIGH);
+    serviceOLED();
+    delay(50);
+  }
+
+  digitalWrite(RED_LED, LOW);
+
+  if (
+    millis() - start >=
+      CONFIG_BUTTON_HOLD_MS
+  ) {
+    startRecoveryMode();
+  }
 }
 
 // ============================================================================
@@ -2521,6 +4012,8 @@ void printCommands() {
   Serial.println("D = Delete physical sensor slot (confirmation required)");
   Serial.println("S = Sensor Information");
   Serial.println("W = Reconnect Wi-Fi");
+  Serial.println("F = Wi-Fi factory/network reset");
+  Serial.println("V = Enter Wi-Fi provisioning/recovery mode");
   Serial.println("R = Reinitialize OLED");
   Serial.println("T = Print runtime diagnostics");
   Serial.println("====================================");
@@ -2602,6 +4095,16 @@ void handleSerialCommands() {
   if (command == "W") {
     connectWiFi(true);
     showAttendanceReady();
+    return;
+  }
+
+  if (command == "F") {
+    factoryResetWiFiConfiguration();
+    return;
+  }
+
+  if (command == "V") {
+    startRecoveryMode();
     return;
   }
 
@@ -2710,6 +4213,10 @@ void setup() {
   // ----------------------------------------------------------
   loadPendingEnrollmentResult();
   loadAttendanceSequence();
+  loadWiFiConfiguration();
+
+  // Check physical CONFIG button before normal Wi-Fi startup.
+  checkConfigButtonAtBoot();
 
   // ----------------------------------------------------------
   // WIFI TEST
@@ -2721,20 +4228,30 @@ void setup() {
     "Please wait..."
   );
 
-  bool wifiOK = connectWiFi(true);
+  bool wifiOK = false;
 
-  if (wifiOK) {
+  if (provisioningMode) {
     showStartupStatus(
       "WiFi",
-      "OK",
-      WiFi.localIP().toString()
+      "SETUP MODE",
+      "Provisioning AP active"
     );
   } else {
-    showStartupStatus(
-      "WiFi",
-      "FAILED",
-      "Will retry in background"
-    );
+    wifiOK = connectWiFi(true);
+
+    if (wifiOK) {
+      showStartupStatus(
+        "WiFi",
+        activeWiFiNetworkName(),
+        WiFi.localIP().toString()
+      );
+    } else {
+      showStartupStatus(
+        "WiFi",
+        "FAILED",
+        "Recovery/Retry Available"
+      );
+    }
   }
 
   // ----------------------------------------------------------
@@ -2742,7 +4259,7 @@ void setup() {
   // ----------------------------------------------------------
   bool backendOK = false;
 
-  if (wifiOK) {
+  if (wifiOK && !provisioningMode) {
     showOLED(
       "Backend",
       "CHECKING...",
@@ -2776,7 +4293,14 @@ void setup() {
   // ----------------------------------------------------------
   // FINAL STARTUP RESULT
   // ----------------------------------------------------------
-  if (fingerprintOK && wifiOK && backendOK) {
+  if (provisioningMode) {
+    showOLED(
+      "WIFI SETUP MODE",
+      "Connect to Setup AP",
+      "BLE also available",
+      "Configure WiFi"
+    );
+  } else if (fingerprintOK && wifiOK && backendOK) {
     showOLED(
       "SYSTEM READY",
       "Fingerprint: OK",
@@ -2802,9 +4326,12 @@ void setup() {
     delay(350);
   }
 
-  // First enrollment poll happens immediately.
+  // First enrollment/Wi-Fi management polls happen immediately.
   lastEnrollmentPoll = millis() - ENROLLMENT_POLL_INTERVAL;
   lastEnrollmentResultRetry = millis() - ENROLLMENT_RESULT_RETRY_INTERVAL;
+  lastWiFiConfigPoll = millis() - WIFI_CONFIG_POLL_INTERVAL;
+  lastWiFiRuntimeReport = 0;
+  lastPrimaryReturnCheck = millis() - PRIMARY_RETURN_CHECK_INTERVAL;
 
   currentMode = ATTENDANCE_MODE;
   currentEnrollment.valid = false;
@@ -2823,11 +4350,27 @@ void setup() {
 void loop() {
   serviceOLED();
   handleSerialCommands();
+  serviceConfigButton();
 
-  // Background Wi-Fi maintenance. Do not constantly reconnect.
-  if (WiFi.status() != WL_CONNECTED) {
-    connectWiFi(false);
+  if (provisioningMode) {
+    serviceRecoveryMode();
+    delay(10);
+    return;
   }
+
+  // Background Wi-Fi maintenance. Primary is preferred, secondary is the
+  // automatic fallback, and the device periodically checks whether primary
+  // has returned.
+  if (WiFi.status() != WL_CONNECTED) {
+    if (!connectWiFi(false)) {
+      // If both configured networks are unavailable, expose recovery services.
+      startRecoveryMode();
+      delay(10);
+      return;
+    }
+  }
+
+  serviceWiFiManagement();
 
   if (currentMode == ATTENDANCE_MODE) {
     // Persisted enrollment result takes priority over requesting another job.

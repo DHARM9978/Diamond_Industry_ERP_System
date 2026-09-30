@@ -17,8 +17,15 @@ const router =
 
 
 // ==========================================
-// DEVICE AUTHENTICATION
+// ERP USER AUTHENTICATION
 // ==========================================
+//
+// All routes in this file are ERP/admin routes.
+//
+// ESP32/device-authenticated routes are handled
+// separately under /api/device using
+// deviceAuth.middleware.
+//
 
 router.use(
     authenticate
@@ -70,6 +77,31 @@ router.get(
 
 
 // ==========================================
+// GET WIFI CONFIGURATION STATUS
+//
+// CLIENT ADMIN:
+// - Can view Wi-Fi configuration status
+//
+// SUPERADMIN:
+// - Can view Wi-Fi configuration status
+//
+// IMPORTANT:
+// This does NOT return Wi-Fi passwords.
+// ==========================================
+
+router.get(
+    "/:id/wifi",
+    authorizeRoles(
+        "ADMIN",
+        "SUPERADMIN"
+    ),
+    asyncHandler(
+        deviceController.getWifiConfiguration
+    )
+);
+
+
+// ==========================================
 // CREATE DEVICE
 //
 // SUPERADMIN ONLY
@@ -85,6 +117,43 @@ router.post(
     ),
     asyncHandler(
         deviceController.createDevice
+    )
+);
+
+
+// ==========================================
+// SET WIFI CONFIGURATION
+//
+// SUPERADMIN ONLY
+//
+// This allows the ERP administrator to send
+// Primary + Secondary Wi-Fi credentials to
+// the device.
+//
+// The service encrypts the credentials before
+// storing them in the database.
+//
+// Example request body:
+//
+// {
+//     "primarySsid": "Office-WiFi",
+//     "primaryPassword": "password123",
+//     "secondarySsid": "Office-Backup",
+//     "secondaryPassword": "backup123"
+// }
+//
+// The credentials are marked PENDING until
+// the ESP32 retrieves, tests, and acknowledges
+// the configuration.
+// ==========================================
+
+router.put(
+    "/:id/wifi",
+    authorizeRoles(
+        "SUPERADMIN"
+    ),
+    asyncHandler(
+        deviceController.setWifiConfiguration
     )
 );
 

@@ -772,6 +772,64 @@ export const deviceService = {
         return unwrap(response);
     },
 
+
+    // ========================================================
+    // WIFI CONFIGURATION
+    // ========================================================
+
+    // --------------------------------------------------------
+    // GET WIFI CONFIGURATION METADATA
+    //
+    // GET /api/devices/:id/wifi
+    //
+    // Admin receives configuration status/metadata.
+    // Wi-Fi passwords are never exposed by this method.
+    // --------------------------------------------------------
+
+    getWifi: async (id) => {
+
+        const response =
+            await apiClient.get(
+                API.devices.getWifi(id)
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // SAVE WIFI CONFIGURATION
+    //
+    // PUT /api/devices/:id/wifi
+    //
+    // Expected data:
+    //
+    // {
+    //     primary: {
+    //         ssid: "...",
+    //         password: "..."
+    //     },
+    //     secondary: {
+    //         ssid: "...",
+    //         password: "..."
+    //     }
+    // }
+    //
+    // Secondary configuration is optional.
+    // The backend encrypts the credentials before storage.
+    // --------------------------------------------------------
+
+    setWifi: async (id, data) => {
+
+        const response =
+            await apiClient.put(
+                API.devices.setWifi(id),
+                data
+            );
+
+        return unwrap(response);
+    },
+
 };
 
 
@@ -788,6 +846,70 @@ export const deviceEnrollmentService = {
         const response =
             await apiClient.post(
                 API.device.fingerprintEnroll,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // ========================================================
+    // ESP32 WIFI CONFIGURATION
+    // ========================================================
+
+    // --------------------------------------------------------
+    // FETCH WIFI CONFIGURATION
+    //
+    // GET /api/device/wifi-config
+    //
+    // Intended for the ESP32 device. The device authenticates
+    // with x-device-code and x-device-secret.
+    // --------------------------------------------------------
+
+    getWifiConfig: async () => {
+
+        const response =
+            await apiClient.get(
+                API.device.wifiConfig
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // ACKNOWLEDGE WIFI CONFIGURATION
+    //
+    // POST /api/device/wifi-config/ack
+    // --------------------------------------------------------
+
+    acknowledgeWifiConfig: async (
+        data
+    ) => {
+
+        const response =
+            await apiClient.post(
+                API.device.wifiConfigAck,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
+    // REPORT WIFI RUNTIME STATE
+    //
+    // POST /api/device/wifi-config/runtime
+    // --------------------------------------------------------
+
+    updateWifiRuntime: async (
+        data
+    ) => {
+
+        const response =
+            await apiClient.post(
+                API.device.wifiConfigRuntime,
                 data
             );
 
