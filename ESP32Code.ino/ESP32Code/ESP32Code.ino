@@ -146,8 +146,8 @@
 const char* DEFAULT_PRIMARY_WIFI_SSID = "Dharm's S24";
 const char* DEFAULT_PRIMARY_WIFI_PASSWORD = "Bhadani@99";
 
-const char* DEFAULT_SECONDARY_WIFI_SSID = "Demo";
-const char* DEFAULT_SECONDARY_WIFI_PASSWORD = "Demo@1234";
+const char* DEFAULT_SECONDARY_WIFI_SSID = "Maulik's S24";
+const char* DEFAULT_SECONDARY_WIFI_PASSWORD = "12345678";
 
 // Physical CONFIG button. Change this pin if your hardware uses another GPIO.
 #define CONFIG_BUTTON_PIN 27
@@ -208,7 +208,7 @@ unsigned long configButtonPressedAt = 0;
 // ERP BACKEND CONFIGURATION
 // ===========================================================================
 
-const char* BACKEND_BASE_URL = "http://10.72.179.69:5000";
+const char* BACKEND_BASE_URL = "http://10.169.246.69:5000";
 const char* DEVICE_CODE = "ESP32-001";
 const char* DEVICE_SECRET = "c008c665a1ee695f7d088dc98da43f91e772c98fc388695d08bd34ab4c7c1b93";
 
@@ -1932,15 +1932,15 @@ void serviceProvisioningAP() {
 
 class BLEConfigCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* characteristic) override {
-    std::string value =
+    String value =
       characteristic->getValue();
 
-    if (value.empty()) {
+    if (value.length() == 0) {
       return;
     }
 
     String payload =
-      String(value.c_str());
+      value;
 
     Serial.println("BLE Wi-Fi configuration received.");
 

@@ -1067,17 +1067,64 @@ const handleGenerateCurrentPayroll =
   // DATE KEY
   // ==========================================================
 
-  const getDateKey = (value) => {
+  const getDateKey = (
+    value,
+    interpretAsIST = false
+  ) => {
     if (!value) return null;
 
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return null;
 
-    return `${date.getUTCFullYear()}-${String(
-      date.getUTCMonth() + 1
-    ).padStart(2, '0')}-${String(
-      date.getUTCDate()
-    ).padStart(2, '0')}`;
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    // Payroll records from Prisma are stored as UTC timestamps
+    // representing the payroll calendar date itself. Keep those
+    // records on their stored UTC calendar date.
+    //
+    // The current-period endpoint, however, returns the payroll
+    // calendar boundaries as UTC timestamps representing IST
+    // midnight/end-of-day. Convert those boundary values to the
+    // India calendar date before comparing them with payroll records.
+    if (!interpretAsIST) {
+      return `${date.getUTCFullYear()}-${String(
+        date.getUTCMonth() + 1
+      ).padStart(2, '0')}-${String(
+        date.getUTCDate()
+      ).padStart(2, '0')}`;
+    }
+
+    const parts = new Intl.DateTimeFormat(
+      'en-US',
+      {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }
+    ).formatToParts(date);
+
+    const year =
+      parts.find(
+        (part) => part.type === 'year'
+      )?.value;
+
+    const month =
+      parts.find(
+        (part) => part.type === 'month'
+      )?.value;
+
+    const day =
+      parts.find(
+        (part) => part.type === 'day'
+      )?.value;
+
+    if (!year || !month || !day) {
+      return null;
+    }
+
+    return `${year}-${month}-${day}`;
   };
 
 
@@ -1272,6 +1319,46 @@ const handleGenerateCurrentPayroll =
   };
 
 
+  // ==========================================================
+  // FORMAT DECIMAL HOURS
+  // ==========================================================
+
+  const formatHoursAndMinutes = (decimalHours) => {
+
+    const numericHours = Number(decimalHours);
+
+    if (!Number.isFinite(numericHours) || numericHours <= 0) {
+      return '0 minutes';
+    }
+
+    // Payroll stores hours as decimal hours. Convert the decimal
+    // fraction into minutes instead of displaying values such as
+    // 1.39 hours, which can be misread as 1 hour 39 minutes.
+    const totalMinutes = Math.round(numericHours * 60);
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    const parts = [];
+
+    if (hours > 0) {
+      parts.push(
+        `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+      );
+    }
+
+    if (minutes > 0) {
+      parts.push(
+        `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+      );
+    }
+
+    return parts.length > 0
+      ? parts.join(' ')
+      : '0 minutes';
+  };
+
+
   const getExtraHours = (record) => {
     return Math.max(
       Number(record?.extraHours) || 0,
@@ -1434,16 +1521,23 @@ const handleGenerateCurrentPayroll =
 
         const currentStart = getDateKey(
           branchCurrentPeriod.payPeriodStart ??
-          branchCurrentPeriod.periodStart
+          branchCurrentPeriod.periodStart,
+          true
         );
 
         const currentEnd = getDateKey(
           branchCurrentPeriod.payPeriodEnd ??
-          branchCurrentPeriod.periodEnd
+          branchCurrentPeriod.periodEnd,
+          true
         );
 
-        const recordStart = getDateKey(record.payPeriodStart);
-        const recordEnd = getDateKey(record.payPeriodEnd);
+        const recordStart = getDateKey(
+          record.payPeriodStart
+        );
+
+        const recordEnd = getDateKey(
+          record.payPeriodEnd
+        );
 
         return Boolean(
           currentStart &&
@@ -1455,6 +1549,88 @@ const handleGenerateCurrentPayroll =
         );
       });
     }, [records, selectedBranch, currentPeriodsByBranch]);
+
+
+  // ==========================================================
+  // LAST MONTH PENDING PAYROLL RECORDS
+  // ==========================================================
+
+  const lastMonthPendingPeriodsByBranch =
+    useMemo(() => {
+
+      const periodMap = {};
+
+      records.forEach((record) => {
+
+        if (isPayrollPaid(record)) return;
+
+        const branchId = getRecordBranchId(record);
+        if (branchId === null) return;
+
+        const currentPeriodForBranch =
+          currentPeriodsByBranch[Number(branchId)];
+
+        if (!currentPeriodForBranch) return;
+
+        const currentStart = getDateKey(
+          currentPeriodForBranch.payPeriodStart ??
+          currentPeriodForBranch.periodStart
+        );
+
+        const recordStart = getDateKey(record.payPeriodStart);
+        const recordEnd = getDateKey(record.payPeriodEnd);
+
+        if (!currentStart || !recordStart || !recordEnd) return;
+        if (recordStart >= currentStart) return;
+
+        const existing = periodMap[Number(branchId)];
+
+        if (!existing || recordStart > existing.payPeriodStart) {
+          periodMap[Number(branchId)] = {
+            payPeriodStart: recordStart,
+            payPeriodEnd: recordEnd,
+          };
+        }
+      });
+
+      return periodMap;
+
+    }, [records, currentPeriodsByBranch]);
+
+
+  const lastMonthPendingPayrollRecords =
+    useMemo(() => {
+
+      return records.filter((record) => {
+
+        if (isPayrollPaid(record)) return false;
+
+        const branchId = getRecordBranchId(record);
+        if (branchId === null) return false;
+
+        if (
+          selectedBranch !== 'ALL' &&
+          Number(branchId) !== Number(selectedBranch)
+        ) {
+          return false;
+        }
+
+        const previousPeriod =
+          lastMonthPendingPeriodsByBranch[Number(branchId)];
+
+        if (!previousPeriod) return false;
+
+        return (
+          getDateKey(record.payPeriodStart) === previousPeriod.payPeriodStart &&
+          getDateKey(record.payPeriodEnd) === previousPeriod.payPeriodEnd
+        );
+      });
+
+    }, [
+      records,
+      selectedBranch,
+      lastMonthPendingPeriodsByBranch,
+    ]);
 
 
   // HISTORY RECORDS
@@ -1671,6 +1847,53 @@ const handleGenerateCurrentPayroll =
       historyPayrollRecords,
       search,
       selectedBranch,
+      branches,
+    ]);
+
+
+  // ==========================================================
+  // FILTER LAST MONTH PENDING PAYROLL
+  // ==========================================================
+
+  const filteredLastMonthPendingPayroll =
+    useMemo(() => {
+
+      const searchTerm =
+        search
+          .trim()
+          .toLowerCase();
+
+      return lastMonthPendingPayrollRecords.filter((record) => {
+
+        if (!searchTerm) return true;
+
+        const employeeName =
+          getEmployeeName(record).toLowerCase();
+
+        const employeeId =
+          String(record?.employeeId ?? '').toLowerCase();
+
+        const email =
+          String(record?.employee?.email ?? '').toLowerCase();
+
+        const branchName =
+          getRecordBranchName(record).toLowerCase();
+
+        const month =
+          getPayrollMonth(record).toLowerCase();
+
+        return (
+          employeeName.includes(searchTerm) ||
+          employeeId.includes(searchTerm) ||
+          email.includes(searchTerm) ||
+          branchName.includes(searchTerm) ||
+          month.includes(searchTerm)
+        );
+      });
+
+    }, [
+      lastMonthPendingPayrollRecords,
+      search,
       branches,
     ]);
 
@@ -1941,7 +2164,9 @@ const handleGenerateCurrentPayroll =
     const exportRecords =
       payrollView === 'CURRENT'
         ? filteredCurrentPayroll
-        : filteredHistoryPayroll;
+        : payrollView === 'LAST_MONTH_PENDING'
+          ? filteredLastMonthPendingPayroll
+          : filteredHistoryPayroll;
 
     if (
       exportRecords.length === 0
@@ -2285,7 +2510,7 @@ const handleGenerateCurrentPayroll =
 
         render: (record) => (
           <span className="text-navy-600">
-            {getRegularWorkingHours(record).toFixed(2)} h
+            {formatHoursAndMinutes(getRegularWorkingHours(record))}
           </span>
         ),
 
@@ -2306,7 +2531,7 @@ const handleGenerateCurrentPayroll =
 
           return (
             <span className={hours > 0 ? 'font-semibold text-green-700' : 'text-navy-500'}>
-              {hours.toFixed(2)} h
+              {formatHoursAndMinutes(hours)}
             </span>
           );
         },
@@ -2328,7 +2553,7 @@ const handleGenerateCurrentPayroll =
 
           return (
             <span className={hours > 0 ? 'font-semibold text-error-600' : 'text-navy-500'}>
-              {hours.toFixed(2)} h
+              {formatHoursAndMinutes(hours)}
             </span>
           );
         },
@@ -2406,20 +2631,20 @@ const handleGenerateCurrentPayroll =
       {
         key: 'pendingAmount',
         label:
-          payrollView === 'CURRENT'
-            ? 'Pending Amount'
-            : 'Net Paid',
+          payrollView === 'HISTORY'
+            ? 'Net Paid'
+            : 'Pending Amount',
         align: 'right',
 
         render: (record) => {
 
           const amount =
-            payrollView === 'CURRENT'
-              ? getPendingAmount(record)
-              : (
+            payrollView === 'HISTORY'
+              ? (
                 record.netSalary ??
                 getPendingAmount(record)
-              );
+              )
+              : getPendingAmount(record);
 
           return (
 
@@ -2443,16 +2668,16 @@ const handleGenerateCurrentPayroll =
       {
         key: 'paymentDate',
         label:
-          payrollView === 'CURRENT'
-            ? 'Payment Date'
-            : 'Paid On',
+          payrollView === 'HISTORY'
+            ? 'Paid On'
+            : 'Payment Date',
 
         render: (record) => {
 
           const date =
-            payrollView === 'CURRENT'
-              ? getScheduledPaymentDate(record)
-              : record.paymentDate;
+            payrollView === 'HISTORY'
+              ? record.paymentDate
+              : getScheduledPaymentDate(record);
 
           return (
 
@@ -2476,7 +2701,8 @@ const handleGenerateCurrentPayroll =
     // ----------------------------------------------------------
 
     if (
-      payrollView === 'CURRENT'
+      payrollView === 'CURRENT' ||
+      payrollView === 'LAST_MONTH_PENDING'
     ) {
 
       baseColumns.push({
@@ -2739,7 +2965,9 @@ const handleGenerateCurrentPayroll =
   const displayedRecords =
     payrollView === 'CURRENT'
       ? filteredCurrentPayroll
-      : filteredHistoryPayroll;
+      : payrollView === 'LAST_MONTH_PENDING'
+        ? filteredLastMonthPendingPayroll
+        : filteredHistoryPayroll;
 
 
   // ==========================================================
@@ -2785,11 +3013,17 @@ const handleGenerateCurrentPayroll =
                   ? 's'
                   : ''
               }`
-            : `${filteredHistoryPayroll.length} paid payroll record${
-                filteredHistoryPayroll.length !== 1
-                  ? 's'
-                  : ''
-              }`
+            : payrollView === 'LAST_MONTH_PENDING'
+              ? `${filteredLastMonthPendingPayroll.length} last-month pending payroll record${
+                  filteredLastMonthPendingPayroll.length !== 1
+                    ? 's'
+                    : ''
+                }`
+              : `${filteredHistoryPayroll.length} paid payroll record${
+                  filteredHistoryPayroll.length !== 1
+                    ? 's'
+                    : ''
+                }`
         }
 
         actions={
@@ -2882,10 +3116,10 @@ const handleGenerateCurrentPayroll =
 
 
       {/* ======================================================
-          CURRENT / HISTORY TABS
+          CURRENT / LAST MONTH / HISTORY TABS
       ====================================================== */}
 
-      <div className="mb-5 flex items-center gap-1 rounded-xl border border-navy-100 bg-white p-1 w-fit">
+      <div className="mb-5 flex flex-wrap items-center gap-1 rounded-xl border border-navy-100 bg-white p-1 w-fit">
 
         <button
           type="button"
@@ -2900,27 +3134,40 @@ const handleGenerateCurrentPayroll =
               : 'text-navy-600 hover:bg-navy-50'
           }`}
         >
-
-          <Wallet
-            size={16}
-          />
-
+          <Wallet size={16} />
           Current Payroll
-
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs ${
-              payrollView === 'CURRENT'
-                ? 'bg-white/15 text-white'
-                : 'bg-navy-50 text-navy-600'
-            }`}
-          >
-
+          <span className={`rounded-full px-2 py-0.5 text-xs ${
+            payrollView === 'CURRENT'
+              ? 'bg-white/15 text-white'
+              : 'bg-navy-50 text-navy-600'
+          }`}>
             {currentPayrollRecords.length}
-
           </span>
-
         </button>
 
+        <button
+          type="button"
+          onClick={() => {
+            setPayrollView('LAST_MONTH_PENDING');
+            setPayrollMessage('');
+            setPayrollError('');
+          }}
+          className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+            payrollView === 'LAST_MONTH_PENDING'
+              ? 'bg-navy-800 text-white'
+              : 'text-navy-600 hover:bg-navy-50'
+          }`}
+        >
+          <CalendarDays size={16} />
+          Last Month Pending
+          <span className={`rounded-full px-2 py-0.5 text-xs ${
+            payrollView === 'LAST_MONTH_PENDING'
+              ? 'bg-white/15 text-white'
+              : 'bg-navy-50 text-navy-600'
+          }`}>
+            {lastMonthPendingPayrollRecords.length}
+          </span>
+        </button>
 
         <button
           type="button"
@@ -2935,25 +3182,15 @@ const handleGenerateCurrentPayroll =
               : 'text-navy-600 hover:bg-navy-50'
           }`}
         >
-
-          <CheckCircle2
-            size={16}
-          />
-
-          Payroll History
-
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs ${
-              payrollView === 'HISTORY'
-                ? 'bg-white/15 text-white'
-                : 'bg-navy-50 text-navy-600'
-            }`}
-          >
-
+          <CheckCircle2 size={16} />
+          Paid History
+          <span className={`rounded-full px-2 py-0.5 text-xs ${
+            payrollView === 'HISTORY'
+              ? 'bg-white/15 text-white'
+              : 'bg-navy-50 text-navy-600'
+          }`}>
             {historyPayrollRecords.length}
-
           </span>
-
         </button>
 
       </div>
@@ -3426,95 +3663,41 @@ const handleGenerateCurrentPayroll =
           SUMMARY
       ====================================================== */}
 
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-
-        {/* ----------------------------------------------------
-            CURRENT
-        ----------------------------------------------------- */}
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
 
         <div className="rounded-xl border border-navy-100 bg-white p-4">
-
-          <div className="text-xs font-medium text-navy-400">
-
-            Current Payroll
-
-          </div>
-
-          <div className="mt-1 text-2xl font-bold text-navy-900">
-
-            {currentPayrollRecords.length}
-
-          </div>
-
-          <div className="mt-1 text-xs text-navy-500">
-
-            Unpaid payroll records
-
-          </div>
-
+          <div className="text-xs font-medium text-navy-400">Current Payroll</div>
+          <div className="mt-1 text-2xl font-bold text-navy-900">{currentPayrollRecords.length}</div>
+          <div className="mt-1 text-xs text-navy-500">Unpaid current-period records</div>
         </div>
 
-
-        {/* ----------------------------------------------------
-            HISTORY
-        ----------------------------------------------------- */}
-
         <div className="rounded-xl border border-navy-100 bg-white p-4">
-
-          <div className="text-xs font-medium text-navy-400">
-
-            Payroll History
-
-          </div>
-
-          <div className="mt-1 text-2xl font-bold text-navy-900">
-
-            {historyPayrollRecords.length}
-
-          </div>
-
-          <div className="mt-1 text-xs text-navy-500">
-
-            Paid payroll records
-
-          </div>
-
+          <div className="text-xs font-medium text-navy-400">Last Month Pending</div>
+          <div className="mt-1 text-2xl font-bold text-navy-900">{lastMonthPendingPayrollRecords.length}</div>
+          <div className="mt-1 text-xs text-navy-500">Unpaid records from the previous payroll period</div>
         </div>
 
-
-        {/* ----------------------------------------------------
-            TOTAL PENDING
-        ----------------------------------------------------- */}
+        <div className="rounded-xl border border-navy-100 bg-white p-4">
+          <div className="text-xs font-medium text-navy-400">Paid History</div>
+          <div className="mt-1 text-2xl font-bold text-navy-900">{historyPayrollRecords.length}</div>
+          <div className="mt-1 text-xs text-navy-500">Already paid payroll records</div>
+        </div>
 
         <div className="rounded-xl border border-navy-100 bg-white p-4">
-
-          <div className="text-xs font-medium text-navy-400">
-
-            Total Pending
-
-          </div>
-
+          <div className="text-xs font-medium text-navy-400">Total Pending</div>
           <div className="mt-1 text-2xl font-bold text-navy-900">
-
             {formatCurrency(
-              filteredCurrentPayroll.reduce(
+              [
+                ...filteredCurrentPayroll,
+                ...filteredLastMonthPendingPayroll,
+              ].reduce(
                 (total, record) =>
-                  total +
-                  getPendingAmount(
-                    record
-                  ),
+                  total + getPendingAmount(record),
                 0
               )
             )}
-
           </div>
-
-          <div className="mt-1 text-xs text-navy-500">
-
-            After shortage and advance deductions
-
-          </div>
-
+          <div className="mt-1 text-xs text-navy-500">Current and last-month unpaid payroll</div>
         </div>
 
       </div>
@@ -3728,14 +3911,18 @@ const handleGenerateCurrentPayroll =
           title={
             payrollView === 'CURRENT'
               ? 'No current payroll records'
-              : 'No payroll history'
+              : payrollView === 'LAST_MONTH_PENDING'
+                ? 'No last-month pending payroll'
+                : 'No payroll history'
           }
           message={
             search
               ? 'No payroll records match your search.'
               : payrollView === 'CURRENT'
                 ? 'Current payroll records will appear here.'
-                : 'Paid payroll records will appear here after payroll is processed.'
+                : payrollView === 'LAST_MONTH_PENDING'
+                  ? 'Unpaid payroll from the previous payroll period will appear here.'
+                  : 'Paid payroll records will appear here after payroll is processed.'
           }
         />
 

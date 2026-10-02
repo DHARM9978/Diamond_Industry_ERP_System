@@ -124,7 +124,7 @@ router.post(
 // ==========================================
 // SET WIFI CONFIGURATION
 //
-// SUPERADMIN ONLY
+// CLIENT ADMIN + SUPERADMIN
 //
 // This allows the ERP administrator to send
 // Primary + Secondary Wi-Fi credentials to
@@ -150,6 +150,7 @@ router.post(
 router.put(
     "/:id/wifi",
     authorizeRoles(
+        "ADMIN",
         "SUPERADMIN"
     ),
     asyncHandler(
