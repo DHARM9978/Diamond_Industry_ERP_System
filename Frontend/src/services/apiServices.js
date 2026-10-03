@@ -830,6 +830,34 @@ export const deviceService = {
         return unwrap(response);
     },
 
+
+    // ========================================================
+    // ESP32 LIVE MACHINE OUTPUT
+    // ========================================================
+
+    // --------------------------------------------------------
+    // GET DEVICE LIVE OUTPUT
+    //
+    // GET /api/devices/:id/live-output
+    //
+    // Admin/frontend uses this endpoint to retrieve the
+    // latest live output reported by the ESP32 device.
+    //
+    // --------------------------------------------------------
+
+    getLiveOutput: async (id, params = {}) => {
+
+        const response =
+            await apiClient.get(
+                API.devices.liveOutput(id),
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
 };
 
 
@@ -910,6 +938,45 @@ export const deviceEnrollmentService = {
         const response =
             await apiClient.post(
                 API.device.wifiConfigRuntime,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
+    // ========================================================
+    // ESP32 LIVE MACHINE OUTPUT
+    // ========================================================
+
+    // --------------------------------------------------------
+    // REPORT LIVE MACHINE OUTPUT
+    //
+    // POST /api/device/live-output
+    //
+    // The authenticated ESP32 uses this method to send
+    // machine activity and diagnostic output to the ERP.
+    //
+    // Example data:
+    //
+    // {
+    //     level: "INFO",
+    //     category: "WIFI",
+    //     message: "Connected to primary Wi-Fi",
+    //     timestamp: "2026-10-03T07:30:00.000Z"
+    // }
+    //
+    // The backend is responsible for storing/serving the
+    // latest live output for the Admin Devices page.
+    // --------------------------------------------------------
+
+    sendLiveOutput: async (
+        data
+    ) => {
+
+        const response =
+            await apiClient.post(
+                API.device.liveOutput,
                 data
             );
 

@@ -1,6 +1,8 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const prisma = require("../config/database");
+const deviceLiveLogStore =
+    require("./deviceLiveLogStore");
 
 // ==========================================
 // CONSTANTS
@@ -402,11 +404,40 @@ const validateWifiConfiguration = (data) => {
 // ==========================================
 
 // Only safe Wi-Fi metadata is returned to the admin UI.
-// SSIDs/passwords and encrypted credential data are never
-// returned here.
+// Configured SSIDs are safe to display, but Wi-Fi passwords
+// and encrypted credential data are never returned here.
 const sanitizeWifiMetadata = (device) => {
     if (!device) {
         return null;
+    }
+
+    let primarySsid = null;
+    let secondarySsid = null;
+
+    // The complete Wi-Fi configuration is encrypted at rest.
+    // Decrypt it only inside the backend so the admin UI can
+    // display the configured network names without exposing
+    // either Wi-Fi password.
+    if (device.wifiConfigEncrypted) {
+        try {
+            const configuration =
+                decryptWifiConfiguration(
+                    device.wifiConfigEncrypted
+                );
+
+            primarySsid =
+                configuration?.primarySsid || null;
+
+            secondarySsid =
+                configuration?.secondarySsid || null;
+        } catch (error) {
+            // Do not fail the admin metadata request merely
+            // because an older/corrupt encrypted configuration
+            // cannot be decrypted. The encrypted value and
+            // passwords are still never returned.
+            primarySsid = null;
+            secondarySsid = null;
+        }
     }
 
     return {
@@ -425,8 +456,18 @@ const sanitizeWifiMetadata = (device) => {
         wifiConfigAcknowledgedAt:
             device.wifiConfigAcknowledgedAt,
 
+        // Configured Wi-Fi network names.
+        // Passwords are intentionally excluded.
+        primarySsid,
+        secondarySsid,
+
         wifiActiveNetwork:
             device.wifiActiveNetwork,
+
+        // Runtime SSID currently reported by the ESP32.
+        // Never expose Wi-Fi passwords.
+        wifiActiveSsid:
+            device.wifiActiveSsid,
 
         wifiLastError:
             device.wifiLastError,
@@ -929,11 +970,184 @@ const setWifiConfiguration = async (
     }
 
     // ======================================
-    // Validate Wi-Fi configuration
+    // Validate request
+    // ======================================
+    //
+    // Preferred selective format:
+    //
+    // {
+    //     profile: "PRIMARY",
+    //     ssid: "OfficeWiFi",
+    //     password: "password123"
+    // }
+    //
+    // or:
+    //
+    // {
+    //     profile: "SECONDARY",
+    //     ssid: "BackupWiFi",
+    //     password: "password123"
+    // }
+    //
+    // The unselected profile is preserved.
+    //
+    // The older complete-format payload is also accepted
+    // for backward compatibility:
+    //
+    // {
+    //     primarySsid: "...",
+    //     primaryPassword: "...",
+    //     secondarySsid: "...",
+    //     secondaryPassword: "..."
+    // }
+
+    if (
+        !data ||
+        typeof data !== "object" ||
+        Array.isArray(data)
+    ) {
+        const error = new Error(
+            "Wi-Fi configuration must be an object"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    let wifiConfiguration;
+
+    const profile =
+        data.profile === undefined ||
+        data.profile === null ||
+        data.profile === ""
+            ? null
+            : String(
+                  data.profile
+              )
+                  .trim()
+                  .toUpperCase();
+
+    // ======================================
+    // Selective Primary / Secondary update
     // ======================================
 
-    const wifiConfiguration =
-        validateWifiConfiguration(data);
+    if (profile !== null) {
+
+        if (
+            !Object.values(
+                WIFI_NETWORK
+            ).includes(profile)
+        ) {
+            const error = new Error(
+                "Wi-Fi profile must be PRIMARY or SECONDARY"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        const ssid =
+            normalizeWifiCredential(
+                data.ssid,
+                `${profile === WIFI_NETWORK.PRIMARY ? "Primary" : "Secondary"} Wi-Fi SSID`,
+                true
+            );
+
+        const password =
+            normalizeWifiCredential(
+                data.password,
+                `${profile === WIFI_NETWORK.PRIMARY ? "Primary" : "Secondary"} Wi-Fi password`,
+                true
+            );
+
+        if (ssid.length > 32) {
+            const error = new Error(
+                `${profile === WIFI_NETWORK.PRIMARY ? "Primary" : "Secondary"} Wi-Fi SSID cannot exceed 32 characters`
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        if (
+            password.length < 8 ||
+            password.length > 63
+        ) {
+            const error = new Error(
+                `${profile === WIFI_NETWORK.PRIMARY ? "Primary" : "Secondary"} Wi-Fi password must contain 8 to 63 characters`
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        let existingConfiguration = {
+            primarySsid: null,
+            primaryPassword: null,
+            secondarySsid: null,
+            secondaryPassword: null,
+        };
+
+        if (
+            existingDevice.wifiConfigEncrypted
+        ) {
+            existingConfiguration =
+                decryptWifiConfiguration(
+                    existingDevice.wifiConfigEncrypted
+                ) || existingConfiguration;
+        }
+
+        if (
+            profile ===
+            WIFI_NETWORK.PRIMARY
+        ) {
+            existingConfiguration.primarySsid =
+                ssid;
+
+            existingConfiguration.primaryPassword =
+                password;
+        } else {
+            existingConfiguration.secondarySsid =
+                ssid;
+
+            existingConfiguration.secondaryPassword =
+                password;
+        }
+
+        // Primary credentials must always exist.
+        if (
+            !existingConfiguration.primarySsid ||
+            !existingConfiguration.primaryPassword
+        ) {
+            const error = new Error(
+                "Primary Wi-Fi configuration is required before configuring a secondary network"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        wifiConfiguration =
+            validateWifiConfiguration(
+                existingConfiguration
+            );
+
+    } else {
+
+        // ==================================
+        // Backward-compatible complete update
+        // ==================================
+
+        wifiConfiguration =
+            validateWifiConfiguration(
+                data
+            );
+    }
 
     // ======================================
     // Encrypt credentials
@@ -994,8 +1208,10 @@ const setWifiConfiguration = async (
 // Get Wi-Fi Metadata For Admin
 // ==========================================
 //
-// Does NOT return Wi-Fi SSIDs,
-// passwords, or encrypted credentials.
+// Returns safe Wi-Fi metadata including configured
+// Primary/Secondary SSIDs and the currently active SSID.
+// Wi-Fi passwords and encrypted credential data are never
+// returned to the admin UI.
 
 const getWifiConfigurationMetadata =
     async (
@@ -1326,6 +1542,17 @@ const acknowledgeWifiConfiguration =
                         activeNetwork ||
                         undefined,
 
+                    wifiActiveSsid:
+                        data.activeSsid === undefined ||
+                        data.activeSsid === null ||
+                        data.activeSsid === ""
+                            ? undefined
+                            : String(
+                                  data.activeSsid
+                              )
+                                  .trim()
+                                  .slice(0, 100),
+
                     wifiLastError:
                         success
                             ? null
@@ -1354,6 +1581,10 @@ const acknowledgeWifiConfiguration =
             activeNetwork:
                 updatedDevice
                     .wifiActiveNetwork,
+
+            activeSsid:
+                updatedDevice
+                    .wifiActiveSsid,
 
             lastError:
                 updatedDevice.wifiLastError,
@@ -1424,6 +1655,16 @@ const updateWifiRuntimeState =
             throw error;
         }
 
+        const activeSsid =
+            data?.activeSsid ===
+                undefined ||
+            data?.activeSsid === null ||
+            data?.activeSsid === ""
+                ? null
+                : String(data.activeSsid)
+                      .trim()
+                      .slice(0, 100);
+
         const lastError =
             data?.lastError ===
                 undefined ||
@@ -1472,6 +1713,9 @@ const updateWifiRuntimeState =
                         activeNetwork ||
                         undefined,
 
+                    wifiActiveSsid:
+                        activeSsid,
+
                     wifiLastError:
                         lastError,
 
@@ -1491,6 +1735,10 @@ const updateWifiRuntimeState =
                 updatedDevice
                     .wifiActiveNetwork,
 
+            wifiActiveSsid:
+                updatedDevice
+                    .wifiActiveSsid,
+
             wifiLastError:
                 updatedDevice
                     .wifiLastError,
@@ -1499,6 +1747,310 @@ const updateWifiRuntimeState =
                 updatedDevice.lastSeenAt,
         };
     };
+
+// ==========================================
+// ESP32 LIVE MACHINE OUTPUT
+// ==========================================
+//
+// Live output is intentionally kept outside Prisma for the
+// current implementation. The in-memory store keeps a
+// bounded recent history for each device.
+//
+// Device endpoint:
+//     POST /api/device/live-output
+//
+// Admin endpoint:
+//     GET /api/devices/:id/live-output
+//
+// Device authentication is performed by the route/middleware.
+// These service methods still verify device identity and,
+// for admin retrieval, company ownership.
+//
+
+const validateLiveOutputData = (
+    data
+) => {
+    if (
+        !data ||
+        typeof data !== "object" ||
+        Array.isArray(data)
+    ) {
+        const error = new Error(
+            "Live output data must be an object"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    const message =
+        data.message === undefined ||
+        data.message === null
+            ? ""
+            : String(
+                  data.message
+              ).trim();
+
+    if (!message) {
+        const error = new Error(
+            "Live output message is required"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    return {
+        level:
+            data.level === undefined ||
+            data.level === null
+                ? "INFO"
+                : String(
+                      data.level
+                  )
+                      .trim()
+                      .toUpperCase(),
+
+        category:
+            data.category === undefined ||
+            data.category === null
+                ? "SYSTEM"
+                : String(
+                      data.category
+                  )
+                      .trim()
+                      .toUpperCase(),
+
+        message:
+            message.slice(
+                0,
+                2000
+            ),
+
+        timestamp:
+            data.timestamp,
+
+        metadata:
+            data.metadata &&
+            typeof data.metadata === "object" &&
+            !Array.isArray(data.metadata)
+                ? data.metadata
+                : null,
+    };
+};
+
+
+// ==========================================
+// Report Live Output From ESP32
+// ==========================================
+
+const appendDeviceLiveOutput = async (
+    deviceId,
+    deviceCode,
+    data
+) => {
+    const id =
+        toPositiveInteger(
+            deviceId,
+            "Device ID"
+        );
+
+    const normalizedDeviceCode =
+        String(
+            deviceCode || ""
+        ).trim();
+
+    if (!normalizedDeviceCode) {
+        const error = new Error(
+            "Device code is required"
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    const liveOutput =
+        validateLiveOutputData(
+            data
+        );
+
+    // ==================================
+    // Verify authenticated device
+    // ==================================
+
+    const device =
+        await prisma.iotDevice.findFirst({
+            where: {
+                deviceId: id,
+                deviceCode:
+                    normalizedDeviceCode,
+            },
+        });
+
+    if (!device) {
+        const error = new Error(
+            "Device not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    // ==================================
+    // Store live output
+    // ==================================
+
+    const entry =
+        deviceLiveLogStore.appendLiveOutput(
+            id,
+            liveOutput
+        );
+
+    // Keep the device online timestamp
+    // current whenever it sends live output.
+    await prisma.iotDevice.update({
+        where: {
+            deviceId: id,
+        },
+
+        data: {
+            lastSeenAt:
+                new Date(),
+        },
+    });
+
+    return {
+        deviceId:
+            device.deviceId,
+
+        deviceCode:
+            device.deviceCode,
+
+        entry,
+    };
+};
+
+
+// ==========================================
+// Get Device Live Output For Admin
+// ==========================================
+
+const getDeviceLiveOutput = async (
+    deviceId,
+    companyId,
+    limit = 50
+) => {
+    const id =
+        toPositiveInteger(
+            deviceId,
+            "Device ID"
+        );
+
+    const company =
+        toPositiveInteger(
+            companyId,
+            "Company ID"
+        );
+
+    // ==================================
+    // Verify device belongs to company
+    // ==================================
+
+    const device =
+        await prisma.iotDevice.findFirst({
+            where: {
+                deviceId: id,
+                companyId: company,
+            },
+        });
+
+    if (!device) {
+        const error = new Error(
+            "Device not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    const logs =
+        deviceLiveLogStore.getLiveOutput(
+            id,
+            limit
+        );
+
+    return {
+        deviceId:
+            device.deviceId,
+
+        deviceCode:
+            device.deviceCode,
+
+        logs,
+    };
+};
+
+
+// ==========================================
+// Clear Device Live Output
+// ==========================================
+
+const clearDeviceLiveOutput = async (
+    deviceId,
+    companyId
+) => {
+    const id =
+        toPositiveInteger(
+            deviceId,
+            "Device ID"
+        );
+
+    const company =
+        toPositiveInteger(
+            companyId,
+            "Company ID"
+        );
+
+    // ==================================
+    // Verify device belongs to company
+    // ==================================
+
+    const device =
+        await prisma.iotDevice.findFirst({
+            where: {
+                deviceId: id,
+                companyId: company,
+            },
+        });
+
+    if (!device) {
+        const error = new Error(
+            "Device not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    deviceLiveLogStore.clearLiveOutput(
+        id
+    );
+
+    return {
+        deviceId:
+            device.deviceId,
+
+        cleared:
+            true,
+    };
+};
+
 
 // ==========================================
 // MODULE EXPORTS
@@ -1523,4 +2075,9 @@ module.exports = {
     validateWifiConfiguration,
     encryptWifiConfiguration,
     decryptWifiConfiguration,
+
+    // ESP32 live-output operations
+    appendDeviceLiveOutput,
+    getDeviceLiveOutput,
+    clearDeviceLiveOutput,
 };

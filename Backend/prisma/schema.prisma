@@ -167,7 +167,12 @@ model IotDevice {
   wifiConfigUpdatedAt      DateTime? @map("wifi_config_updated_at")
   wifiConfigAcknowledgedAt DateTime? @map("wifi_config_acknowledged_at")
   wifiActiveNetwork        String?   @map("wifi_active_network") @db.VarChar(20)
-  wifiLastError            String?   @map("wifi_last_error") @db.Text
+
+  // SSID of the Wi-Fi network currently connected to the ESP32.
+  // This is runtime information only; Wi-Fi passwords are never stored here.
+  wifiActiveSsid String? @map("wifi_active_ssid") @db.VarChar(100)
+
+  wifiLastError String? @map("wifi_last_error") @db.Text
 
   attendancePunches AttendancePunch[]
   deviceLogs        DeviceLog[]

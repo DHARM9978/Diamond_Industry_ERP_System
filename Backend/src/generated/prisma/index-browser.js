@@ -190,6 +190,7 @@ exports.Prisma.IotDeviceScalarFieldEnum = {
   wifiConfigUpdatedAt: 'wifiConfigUpdatedAt',
   wifiConfigAcknowledgedAt: 'wifiConfigAcknowledgedAt',
   wifiActiveNetwork: 'wifiActiveNetwork',
+  wifiActiveSsid: 'wifiActiveSsid',
   wifiLastError: 'wifiLastError'
 };
 
@@ -448,6 +449,7 @@ exports.Prisma.IotDeviceOrderByRelevanceFieldEnum = {
   wifiConfigEncrypted: 'wifiConfigEncrypted',
   wifiConfigStatus: 'wifiConfigStatus',
   wifiActiveNetwork: 'wifiActiveNetwork',
+  wifiActiveSsid: 'wifiActiveSsid',
   wifiLastError: 'wifiLastError'
 };
 

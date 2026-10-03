@@ -102,6 +102,40 @@ router.get(
 
 
 // ==========================================
+// GET DEVICE LIVE OUTPUT
+//
+// CLIENT ADMIN:
+// - Can view recent ESP32 live output
+//
+// SUPERADMIN:
+// - Can view recent ESP32 live output
+//
+// IMPORTANT:
+//
+// This endpoint returns recent runtime messages
+// received from the ESP32.
+//
+// It does NOT expose Wi-Fi passwords or other
+// stored Wi-Fi credentials.
+//
+// Example:
+//
+// GET /api/devices/DEVICE_ID/live-output?limit=50
+// ==========================================
+
+router.get(
+    "/:id/live-output",
+    authorizeRoles(
+        "ADMIN",
+        "SUPERADMIN"
+    ),
+    asyncHandler(
+        deviceController.getDeviceLiveOutput
+    )
+);
+
+
+// ==========================================
 // CREATE DEVICE
 //
 // SUPERADMIN ONLY
@@ -124,23 +158,38 @@ router.post(
 // ==========================================
 // SET WIFI CONFIGURATION
 //
-// CLIENT ADMIN + SUPERADMIN
+// CLIENT ADMIN:
+// - Can change Primary Wi-Fi
+// - Can change Secondary Wi-Fi
 //
-// This allows the ERP administrator to send
-// Primary + Secondary Wi-Fi credentials to
-// the device.
+// SUPERADMIN:
+// - Can change Primary Wi-Fi
+// - Can change Secondary Wi-Fi
 //
-// The service encrypts the credentials before
-// storing them in the database.
+// IMPORTANT:
 //
-// Example request body:
+// The administrator can update only one
+// Wi-Fi profile without resending the other.
+//
+// Example Primary update:
 //
 // {
-//     "primarySsid": "Office-WiFi",
-//     "primaryPassword": "password123",
-//     "secondarySsid": "Office-Backup",
-//     "secondaryPassword": "backup123"
+//     "profile": "PRIMARY",
+//     "ssid": "Office-WiFi",
+//     "password": "password123"
 // }
+//
+// Example Secondary update:
+//
+// {
+//     "profile": "SECONDARY",
+//     "ssid": "Office-Backup",
+//     "password": "backup123"
+// }
+//
+// The service preserves the other Wi-Fi
+// profile and encrypts credentials before
+// storing them in the database.
 //
 // The credentials are marked PENDING until
 // the ESP32 retrieves, tests, and acknowledges

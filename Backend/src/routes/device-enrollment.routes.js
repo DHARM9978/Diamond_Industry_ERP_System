@@ -18,6 +18,7 @@ const router = express.Router();
 // ======================================================
 // DEVICE: LEGACY DIRECT FINGERPRINT ENROLLMENT
 // ======================================================
+//
 // POST /api/device/fingerprint-enroll
 //
 // Kept for compatibility with the existing API.
@@ -40,6 +41,7 @@ router.post(
 // ======================================================
 // DEVICE: FETCH PENDING ENROLLMENT
 // ======================================================
+//
 // GET /api/device/fingerprint-enroll/pending
 // ======================================================
 
@@ -55,6 +57,7 @@ router.get(
 // ======================================================
 // DEVICE: CHECK ENROLLMENT STATUS
 // ======================================================
+//
 // GET /api/device/fingerprint-enroll/:id/status
 //
 // Allows the ESP32 to detect status changes, including an
@@ -73,6 +76,7 @@ router.get(
 // ======================================================
 // DEVICE: REPORT ENROLLMENT PROGRESS LOG
 // ======================================================
+//
 // POST /api/device/fingerprint-enroll/log
 // ======================================================
 
@@ -88,6 +92,7 @@ router.post(
 // ======================================================
 // DEVICE: REPORT ENROLLMENT RESULT
 // ======================================================
+//
 // POST /api/device/fingerprint-enroll/result
 // ======================================================
 
@@ -103,6 +108,7 @@ router.post(
 // ======================================================
 // ESP32: FETCH WIFI CONFIGURATION
 // ======================================================
+//
 // GET /api/device/wifi-config
 //
 // Authentication:
@@ -135,6 +141,7 @@ router.get(
 // ======================================================
 // ESP32: ACKNOWLEDGE WIFI CONFIGURATION
 // ======================================================
+//
 // POST /api/device/wifi-config/ack
 //
 // Request body:
@@ -171,6 +178,7 @@ router.post(
 // ======================================================
 // ESP32: REPORT WIFI RUNTIME STATE
 // ======================================================
+//
 // POST /api/device/wifi-config/runtime
 //
 // Used by the ESP32 to report its current network state.
@@ -198,6 +206,68 @@ router.post(
     authenticateDevice,
     asyncHandler(
         deviceController.updateWifiRuntimeState
+    )
+);
+
+
+// ======================================================
+// ESP32: REPORT LIVE DEVICE OUTPUT
+// ======================================================
+//
+// POST /api/device/live-output
+//
+// Used by the ESP32 to send runtime messages to the ERP.
+//
+// Example:
+//
+// {
+//     "level": "INFO",
+//     "message": "Connected to PRIMARY Wi-Fi",
+//     "activeNetwork": "PRIMARY",
+//     "activeSsid": "OfficeWiFi"
+// }
+//
+// Other examples:
+//
+// {
+//     "level": "INFO",
+//     "message": "Checking for Wi-Fi configuration"
+// }
+//
+// {
+//     "level": "WARN",
+//     "message": "Primary Wi-Fi unavailable",
+//     "activeNetwork": "SECONDARY",
+//     "activeSsid": "BackupWiFi"
+// }
+//
+// {
+//     "level": "ERROR",
+//     "message": "ERP backend connection failed",
+//     "activeNetwork": "PRIMARY",
+//     "activeSsid": "OfficeWiFi"
+// }
+//
+// Authentication:
+//   x-device-code
+//   x-device-secret
+//
+// The device identity is obtained from req.device after
+// authenticateDevice succeeds.
+//
+// The ESP32 does not need to send its deviceId.
+//
+// Live output is stored in the bounded in-memory
+// deviceLiveLogStore through device.service.js.
+//
+// This endpoint does NOT modify stored Wi-Fi credentials.
+// ======================================================
+
+router.post(
+    "/live-output",
+    authenticateDevice,
+    asyncHandler(
+        deviceController.appendDeviceLiveOutput
     )
 );
 

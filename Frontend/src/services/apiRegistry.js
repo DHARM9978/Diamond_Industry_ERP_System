@@ -281,6 +281,28 @@ const API = {
         setWifi: (id) =>
             `/api/devices/${id}/wifi`,
 
+        // ====================================================
+        // ESP32 LIVE MACHINE OUTPUT
+        // ====================================================
+        //
+        // GET /api/devices/:id/live-output
+        //
+        // Admin/frontend uses this endpoint to retrieve the
+        // latest live output reported by the ESP32 device.
+        //
+        // This is intended for:
+        //
+        // - ESP32 machine activity
+        // - Wi-Fi connection messages
+        // - fingerprint sensor messages
+        // - attendance/punch messages
+        // - enrollment progress
+        // - backend communication messages
+        // - errors and diagnostics
+        //
+        liveOutput: (id) =>
+            `/api/devices/${id}/live-output`,
+
     },
 
 
@@ -335,6 +357,32 @@ const API = {
         // Wi-Fi runtime state.
         wifiConfigRuntime:
             "/api/device/wifi-config/runtime",
+
+
+        // ====================================================
+        // ESP32 LIVE MACHINE OUTPUT
+        // ====================================================
+        //
+        // POST /api/device/live-output
+        //
+        // Authenticated ESP32 sends live machine output
+        // and diagnostic messages to the ERP backend.
+        //
+        // The backend can temporarily store the latest
+        // messages for display on the Admin Devices page.
+        //
+        // Example message categories:
+        //
+        // - SYSTEM
+        // - WIFI
+        // - FINGERPRINT
+        // - ATTENDANCE
+        // - ENROLLMENT
+        // - API
+        // - ERROR
+        //
+        liveOutput:
+            "/api/device/live-output",
 
     },
 

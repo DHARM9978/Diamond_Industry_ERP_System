@@ -25,7 +25,18 @@ const prisma =
 //     POST /api/attendance/punch
 //     POST /api/attendance/batch
 //
+// Device configuration endpoints also use this middleware:
+//
+//     GET  /api/device/wifi-config
+//     POST /api/device/wifi-config/ack
+//     POST /api/device/wifi-config/runtime
+//
+// Future device live-output / diagnostic endpoints should
+// also use this middleware so that only registered and
+// authenticated ESP32 devices can communicate with the ERP.
+//
 // ======================================================
+
 
 const authenticateDevice = async (
     req,
@@ -164,6 +175,10 @@ const authenticateDevice = async (
         // Controllers/services use req.device to identify
         // the authenticated device and its company/branch.
         //
+        // This also allows Wi-Fi configuration and runtime
+        // endpoints to operate only on the authenticated
+        // ESP32 device.
+        //
         // ==============================================
 
         req.device =
@@ -172,6 +187,20 @@ const authenticateDevice = async (
 
         // ==============================================
         // Update device last-seen timestamp
+        // ==============================================
+        //
+        // Any successful authenticated request from the
+        // ESP32 updates the device activity timestamp.
+        //
+        // This includes:
+        //
+        // - attendance requests
+        // - fingerprint enrollment requests
+        // - Wi-Fi configuration requests
+        // - Wi-Fi acknowledgement
+        // - Wi-Fi runtime reports
+        // - future live-output requests
+        //
         // ==============================================
 
         await prisma.iotDevice.update({

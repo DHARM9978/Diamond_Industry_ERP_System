@@ -146,8 +146,8 @@
 const char* DEFAULT_PRIMARY_WIFI_SSID = "Dharm's S24";
 const char* DEFAULT_PRIMARY_WIFI_PASSWORD = "Bhadani@99";
 
-const char* DEFAULT_SECONDARY_WIFI_SSID = "Maulik's S24";
-const char* DEFAULT_SECONDARY_WIFI_PASSWORD = "12345678";
+const char* DEFAULT_SECONDARY_WIFI_SSID = "Bhadani_Laptop";
+const char* DEFAULT_SECONDARY_WIFI_PASSWORD = "Bhadani#99";
 
 // Physical CONFIG button. Change this pin if your hardware uses another GPIO.
 #define CONFIG_BUTTON_PIN 27
@@ -190,7 +190,15 @@ enum ActiveWiFiNetwork {
   WIFI_NETWORK_SECONDARY
 };
 
+enum RemoteWiFiProfile {
+  REMOTE_WIFI_PROFILE_UNKNOWN,
+  REMOTE_WIFI_PROFILE_PRIMARY,
+  REMOTE_WIFI_PROFILE_SECONDARY,
+  REMOTE_WIFI_PROFILE_BOTH
+};
+
 ActiveWiFiNetwork activeWiFiNetwork = WIFI_NETWORK_NONE;
+RemoteWiFiProfile pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_UNKNOWN;
 
 unsigned long lastWiFiConfigPoll = 0;
 unsigned long lastWiFiRuntimeReport = 0;
@@ -623,6 +631,42 @@ String activeWiFiNetworkName() {
   }
 
   return "NONE";
+}
+
+String activeWiFiSsid() {
+  if (WiFi.status() == WL_CONNECTED) {
+    String currentSsid = WiFi.SSID();
+
+    if (currentSsid.length() > 0) {
+      return currentSsid;
+    }
+  }
+
+  if (activeWiFiNetwork == WIFI_NETWORK_PRIMARY) {
+    return wifiConfig.primary.ssid;
+  }
+
+  if (activeWiFiNetwork == WIFI_NETWORK_SECONDARY) {
+    return wifiConfig.secondary.ssid;
+  }
+
+  return "";
+}
+
+String remoteWiFiProfileName() {
+  if (pendingRemoteWiFiProfile == REMOTE_WIFI_PROFILE_PRIMARY) {
+    return "PRIMARY";
+  }
+
+  if (pendingRemoteWiFiProfile == REMOTE_WIFI_PROFILE_SECONDARY) {
+    return "SECONDARY";
+  }
+
+  if (pendingRemoteWiFiProfile == REMOTE_WIFI_PROFILE_BOTH) {
+    return "BOTH";
+  }
+
+  return "UNKNOWN";
 }
 
 void loadWiFiConfiguration() {
@@ -1113,6 +1157,41 @@ bool parseWiFiConfigurationDocument(
   candidate.version =
     data["configVersion"] | 0;
 
+  // The backend may explicitly provide the profile in future.
+  // For backward compatibility, infer it by comparing the received
+  // candidate with the currently stored configuration. This lets a
+  // Primary-only or Secondary-only ERP change be applied independently.
+  String requestedProfile =
+    data["pendingProfile"] |
+    data["profile"] |
+    "";
+
+  requestedProfile.toUpperCase();
+
+  if (requestedProfile == "PRIMARY") {
+    pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_PRIMARY;
+  } else if (requestedProfile == "SECONDARY") {
+    pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_SECONDARY;
+  } else {
+    bool primaryChanged =
+      candidate.primary.ssid != wifiConfig.primary.ssid ||
+      candidate.primary.password != wifiConfig.primary.password;
+
+    bool secondaryChanged =
+      candidate.secondary.ssid != wifiConfig.secondary.ssid ||
+      candidate.secondary.password != wifiConfig.secondary.password;
+
+    if (primaryChanged && !secondaryChanged) {
+      pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_PRIMARY;
+    } else if (!primaryChanged && secondaryChanged) {
+      pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_SECONDARY;
+    } else if (primaryChanged && secondaryChanged) {
+      pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_BOTH;
+    } else {
+      pendingRemoteWiFiProfile = REMOTE_WIFI_PROFILE_UNKNOWN;
+    }
+  }
+
   return true;
 }
 
@@ -1141,6 +1220,7 @@ bool acknowledgeWiFiConfiguration(
   doc["configVersion"] = version;
   doc["success"] = applied;
   doc["activeNetwork"] = activeWiFiNetworkName();
+  doc["activeSsid"] = activeWiFiSsid();
 
   if (errorMessage.length() > 0) {
     doc["error"] = errorMessage;
@@ -1196,6 +1276,8 @@ bool reportWiFiRuntimeState(
     doc["activeNetwork"] = activeNetwork;
   }
 
+  doc["activeSsid"] = activeWiFiSsid();
+
   if (errorMessage.length() > 0) {
     doc["lastError"] = errorMessage;
   } else {
@@ -1228,57 +1310,149 @@ bool applyRemoteWiFiConfiguration(
   ActiveWiFiNetwork previousNetwork =
     activeWiFiNetwork;
 
+  RemoteWiFiProfile profile =
+    pendingRemoteWiFiProfile;
+
   Serial.println();
   Serial.println("====================================");
   Serial.println(" APPLYING REMOTE WIFI CONFIGURATION");
   Serial.println("====================================");
   Serial.print("Candidate version: ");
   Serial.println(candidate.version);
+  Serial.print("Target profile: ");
+  Serial.println(remoteWiFiProfileName());
+
+  showOLED(
+    "Changing WiFi",
+    profile == REMOTE_WIFI_PROFILE_SECONDARY
+      ? "Secondary"
+      : profile == REMOTE_WIFI_PROFILE_PRIMARY
+        ? "Primary"
+        : "WiFi Config",
+    "Testing new WiFi...",
+    "Please wait"
+  );
 
   bool connected = false;
+  ActiveWiFiNetwork testedNetwork = WIFI_NETWORK_NONE;
 
-  // Test PRIMARY first.
-  if (
-    candidate.primary.ssid.length() > 0 &&
-    candidate.primary.password.length() >= 8
-  ) {
+  // PRIMARY-only update: test ONLY the new primary credentials.
+  if (profile == REMOTE_WIFI_PROFILE_PRIMARY) {
+    Serial.println("Testing NEW PRIMARY Wi-Fi only.");
+
+    showOLED(
+      "Primary WiFi",
+      "Connecting...",
+      candidate.primary.ssid,
+      "Testing ERP"
+    );
+
     connected =
       connectToNetwork(
         candidate.primary,
         WIFI_NETWORK_PRIMARY
       );
 
+    testedNetwork = WIFI_NETWORK_PRIMARY;
+
     if (
       connected &&
       !checkBackendConnectivityForCurrentWiFi()
     ) {
       Serial.println(
-        "Candidate primary connected, but ERP test failed."
+        "New primary connected, but ERP test failed."
       );
       connected = false;
     }
   }
 
-  // Test SECONDARY if primary failed.
-  if (
-    !connected &&
-    candidate.secondary.ssid.length() > 0 &&
-    candidate.secondary.password.length() >= 8
-  ) {
+  // SECONDARY-only update: test ONLY the new secondary credentials.
+  // The current active network is restored after the test succeeds because
+  // changing the backup network must not unnecessarily move the machine off
+  // its current primary network.
+  if (profile == REMOTE_WIFI_PROFILE_SECONDARY) {
+    Serial.println("Testing NEW SECONDARY Wi-Fi only.");
+
+    showOLED(
+      "Secondary WiFi",
+      "Connecting...",
+      candidate.secondary.ssid,
+      "Testing ERP"
+    );
+
     connected =
       connectToNetwork(
         candidate.secondary,
         WIFI_NETWORK_SECONDARY
       );
 
+    testedNetwork = WIFI_NETWORK_SECONDARY;
+
     if (
       connected &&
       !checkBackendConnectivityForCurrentWiFi()
     ) {
       Serial.println(
-        "Candidate secondary connected, but ERP test failed."
+        "New secondary connected, but ERP test failed."
       );
       connected = false;
+    }
+  }
+
+  // Legacy/complete configuration fallback. If both profiles changed,
+  // preserve the original behavior: test primary first, then secondary.
+  if (profile == REMOTE_WIFI_PROFILE_BOTH ||
+      profile == REMOTE_WIFI_PROFILE_UNKNOWN) {
+    Serial.println(
+      "No single changed profile identified. "
+      "Using complete-configuration fallback."
+    );
+
+    if (
+      candidate.primary.ssid.length() > 0 &&
+      candidate.primary.password.length() >= 8
+    ) {
+      connected =
+        connectToNetwork(
+          candidate.primary,
+          WIFI_NETWORK_PRIMARY
+        );
+
+      testedNetwork = WIFI_NETWORK_PRIMARY;
+
+      if (
+        connected &&
+        !checkBackendConnectivityForCurrentWiFi()
+      ) {
+        Serial.println(
+          "Candidate primary connected, but ERP test failed."
+        );
+        connected = false;
+      }
+    }
+
+    if (
+      !connected &&
+      candidate.secondary.ssid.length() > 0 &&
+      candidate.secondary.password.length() >= 8
+    ) {
+      connected =
+        connectToNetwork(
+          candidate.secondary,
+          WIFI_NETWORK_SECONDARY
+        );
+
+      testedNetwork = WIFI_NETWORK_SECONDARY;
+
+      if (
+        connected &&
+        !checkBackendConnectivityForCurrentWiFi()
+      ) {
+        Serial.println(
+          "Candidate secondary connected, but ERP test failed."
+        );
+        connected = false;
+      }
     }
   }
 
@@ -1288,7 +1462,17 @@ bool applyRemoteWiFiConfiguration(
       "Restoring previous configuration."
     );
 
+    showOLED(
+      "WiFi Update",
+      profile == REMOTE_WIFI_PROFILE_SECONDARY
+        ? "Secondary FAILED"
+        : "Update FAILED",
+      "Old config kept",
+      "Restoring..."
+    );
+
     wifiConfig = previous;
+    activeWiFiNetwork = previousNetwork;
 
     bool restored = false;
 
@@ -1319,14 +1503,98 @@ bool applyRemoteWiFiConfiguration(
       restored = connectWiFi(true);
     }
 
+    if (restored) {
+      Serial.println("Previous Wi-Fi configuration restored.");
+      showOLED(
+        "WiFi Update",
+        "FAILED",
+        "Old config kept",
+        activeWiFiSsid()
+      );
+    } else {
+      Serial.println("Could not restore previous Wi-Fi configuration.");
+      showOLED(
+        "WiFi Update",
+        "FAILED",
+        "Recovery Required",
+        "Check Network"
+      );
+    }
+
     return false;
   }
 
-  // Only after connection + ERP validation succeeds do we commit to NVS.
+  // A successful Secondary-only test must not leave the machine running on
+  // the backup network when it was previously on Primary. Restore the old
+  // active network before committing the new secondary credentials.
+  if (
+    profile == REMOTE_WIFI_PROFILE_SECONDARY &&
+    previousNetwork == WIFI_NETWORK_PRIMARY
+  ) {
+    Serial.println(
+      "New secondary verified. Restoring PRIMARY as active network."
+    );
+
+    showOLED(
+      "Secondary WiFi",
+      "Verified",
+      "Restoring Primary",
+      "Please wait"
+    );
+
+    if (!connectToNetwork(previous.primary, WIFI_NETWORK_PRIMARY)) {
+      Serial.println(
+        "Could not restore PRIMARY after secondary verification. "
+        "New secondary will NOT be committed."
+      );
+
+      showOLED(
+        "Secondary WiFi",
+        "Update FAILED",
+        "Primary restore failed",
+        "Old config kept"
+      );
+
+      activeWiFiNetwork = previousNetwork;
+      return false;
+    }
+
+    if (!checkBackendConnectivityForCurrentWiFi()) {
+      Serial.println(
+        "PRIMARY restored but ERP is unreachable. "
+        "New secondary will NOT be committed."
+      );
+
+      showOLED(
+        "Secondary WiFi",
+        "Update FAILED",
+        "ERP check failed",
+        "Old config kept"
+      );
+
+      return false;
+    }
+  }
+
+  // Only after the targeted network test succeeds, and after PRIMARY is
+  // restored when changing Secondary, commit the complete candidate to NVS.
   saveWiFiConfiguration(candidate);
 
   Serial.println(
     "Remote Wi-Fi configuration committed to NVS."
+  );
+  Serial.print("Committed profile: ");
+  Serial.println(remoteWiFiProfileName());
+
+  showOLED(
+    "WiFi Updated",
+    profile == REMOTE_WIFI_PROFILE_SECONDARY
+      ? "Secondary"
+      : profile == REMOTE_WIFI_PROFILE_PRIMARY
+        ? "Primary"
+        : "WiFi Config",
+    "Update Successful",
+    activeWiFiSsid()
   );
 
   return true;
@@ -1468,14 +1736,7 @@ void pollRemoteWiFiConfiguration(bool force = false) {
       ""
     );
 
-    showOLED(
-      "WiFi Updated",
-      "Config Applied",
-      activeWiFiNetworkName(),
-      "ERP Connected"
-    );
-
-    delay(800);
+    delay(1000);
     showAttendanceReady();
 
   } else {
@@ -1486,8 +1747,11 @@ void pollRemoteWiFiConfiguration(bool force = false) {
     acknowledgeWiFiConfiguration(
       candidate.version,
       false,
-      "Could not connect to a configured network and ERP backend."
+      "Could not apply the selected Wi-Fi profile. Previous configuration was preserved."
     );
+
+    delay(1000);
+    showAttendanceReady();
   }
 
   wifiConfigRequestInProgress = false;
