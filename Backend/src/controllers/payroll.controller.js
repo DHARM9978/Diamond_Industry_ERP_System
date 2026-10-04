@@ -105,6 +105,129 @@ const getPayroll = async (
 
 
 // ============================================================
+// ============================================================
+// GET PAYROLL SUMMARY BY MONTH AND YEAR
+//
+// GET /api/payroll/summary?month=10&year=2026
+//
+// Returns payroll totals for the selected payroll month/year.
+// The service filters by payroll period, not paymentDate.
+// ============================================================
+
+const getPayrollSummary = async (
+    req,
+    res
+) => {
+
+    const month =
+        Number(
+            req.query.month
+        );
+
+    const year =
+        Number(
+            req.query.year
+        );
+
+
+    if (
+        !Number.isInteger(
+            month
+        ) ||
+        month < 1 ||
+        month > 12
+    ) {
+
+        const error =
+            new Error(
+                "Month must be an integer between 1 and 12"
+            );
+
+        error.statusCode =
+            400;
+
+        throw error;
+    }
+
+
+    if (
+        !Number.isInteger(
+            year
+        ) ||
+        year < 2000 ||
+        year > 2100
+    ) {
+
+        const error =
+            new Error(
+                "Year must be a valid four-digit year"
+            );
+
+        error.statusCode =
+            400;
+
+        throw error;
+    }
+
+
+    const branchId =
+        req.query.branchId !== undefined &&
+        req.query.branchId !== ""
+            ? Number(
+                req.query.branchId
+            )
+            : undefined;
+
+
+    if (
+        branchId !== undefined &&
+        (
+            !Number.isInteger(
+                branchId
+            ) ||
+            branchId < 1
+        )
+    ) {
+
+        const error =
+            new Error(
+                "Invalid branch ID"
+            );
+
+        error.statusCode =
+            400;
+
+        throw error;
+    }
+
+
+    const summary =
+        await payrollService.getPayrollSummaryByMonthYear(
+            req.user.companyId,
+            month,
+            year,
+            {
+                branchId
+            }
+        );
+
+
+    return res.status(200).json({
+
+        success:
+            true,
+
+        message:
+            "Payroll summary fetched successfully",
+
+        data:
+            summary
+
+    });
+
+};
+
+
 // GET PAYROLL BY ID
 //
 // GET /api/payroll/:id
@@ -960,6 +1083,8 @@ module.exports = {
     createPayroll,
 
     getPayroll,
+
+    getPayrollSummary,
 
     getPayrollById,
 

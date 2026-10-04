@@ -529,6 +529,10 @@ const API = {
         get: (id) =>
             `/api/payroll/${id}`,
 
+        // GET /api/payroll/summary?month=10&year=2026
+        summary:
+            "/api/payroll/summary",
+
         // POST /api/payroll
         create:
             "/api/payroll",

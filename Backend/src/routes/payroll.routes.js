@@ -151,6 +151,19 @@ router.patch(
 
 
 // ==========================================
+// Payroll Summary By Month / Year
+// GET /api/payroll/summary?month=10&year=2026
+// ==========================================
+
+router.get(
+    "/summary",
+    asyncHandler(
+        payrollController.getPayrollSummary
+    )
+);
+
+
+// ==========================================
 // Get Payroll By ID
 // GET /api/payroll/:id
 // ==========================================

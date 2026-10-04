@@ -58,6 +58,40 @@ export function AdminPayroll() {
     useState('ALL');
 
   // ==========================================================
+  // PAYROLL MONTH / YEAR FILTER
+  // ==========================================================
+
+  const today = new Date();
+
+  const [selectedPayrollMonth, setSelectedPayrollMonth] =
+    useState(today.getMonth() + 1);
+
+  const [selectedPayrollYear, setSelectedPayrollYear] =
+    useState(today.getFullYear());
+
+  const [payrollSummary, setPayrollSummary] =
+    useState(null);
+
+  const [payrollSummaryLoading, setPayrollSummaryLoading] =
+    useState(false);
+
+  const [payrollSummaryError, setPayrollSummaryError] =
+    useState('');
+
+  // ==========================================================
+  // SELECTED MONTH/YEAR PAYROLL RECORDS
+  // ==========================================================
+
+  const [selectedMonthPayrollRecords, setSelectedMonthPayrollRecords] =
+    useState([]);
+
+  const [selectedMonthPayrollLoading, setSelectedMonthPayrollLoading] =
+    useState(false);
+
+  const [selectedMonthPayrollError, setSelectedMonthPayrollError] =
+    useState('');
+
+  // ==========================================================
   // BRANCHES
   // ==========================================================
 
@@ -192,6 +226,60 @@ export function AdminPayroll() {
     } finally {
 
       setLoading(false);
+
+    }
+  };
+
+
+  // ==========================================================
+  // LOAD PAYROLL SUMMARY BY SELECTED MONTH / YEAR
+  // ==========================================================
+
+  const loadPayrollSummary = async (
+    month = selectedPayrollMonth,
+    year = selectedPayrollYear,
+    branchId = selectedBranch
+  ) => {
+
+    try {
+
+      setPayrollSummaryLoading(true);
+      setPayrollSummaryError('');
+
+      const params = {
+        month: Number(month),
+        year: Number(year),
+      };
+
+      if (branchId !== 'ALL' && branchId) {
+        params.branchId = Number(branchId);
+      }
+
+      const response =
+        await payrollService.summary(params);
+
+      const data = unwrapResponse(response);
+
+      setPayrollSummary(data || null);
+
+    } catch (error) {
+
+      console.error(
+        'Failed to load payroll summary:',
+        error
+      );
+
+      setPayrollSummary(null);
+
+      setPayrollSummaryError(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to load payroll summary.'
+      );
+
+    } finally {
+
+      setPayrollSummaryLoading(false);
 
     }
   };
@@ -592,6 +680,175 @@ export function AdminPayroll() {
 
 
   // ==========================================================
+  // LOAD PAYROLL RECORDS FOR SELECTED MONTH / YEAR
+  // ==========================================================
+  //
+  // Load employee payroll records directly from the backend using
+  // the selected calendar month. This keeps historical payroll
+  // selection independent from the live current payroll period.
+  //
+  // The existing payroll endpoint already supports startDate,
+  // endDate, and branchId, so no database change is required.
+  // ==========================================================
+
+  const loadSelectedMonthPayroll = async (
+    month = selectedPayrollMonth,
+    year = selectedPayrollYear,
+    branchId = selectedBranch
+  ) => {
+
+    try {
+
+      setSelectedMonthPayrollLoading(true);
+      setSelectedMonthPayrollError('');
+
+      const monthNumber = Number(month);
+      const yearNumber = Number(year);
+
+      if (
+        !Number.isInteger(monthNumber) ||
+        monthNumber < 1 ||
+        monthNumber > 12 ||
+        !Number.isInteger(yearNumber)
+      ) {
+        throw new Error('Invalid payroll month or year.');
+      }
+
+      const paddedMonth =
+        String(monthNumber).padStart(2, '0');
+
+      const lastDay =
+        new Date(yearNumber, monthNumber, 0).getDate();
+
+      const params = {
+        startDate:
+          `${yearNumber}-${paddedMonth}-01`,
+        endDate:
+          `${yearNumber}-${paddedMonth}-${String(lastDay).padStart(2, '0')}`,
+      };
+
+      if (
+        branchId !== 'ALL' &&
+        branchId !== null &&
+        branchId !== undefined &&
+        branchId !== ''
+      ) {
+        params.branchId = Number(branchId);
+      }
+
+      const response =
+        await payrollService.list(params);
+
+      const monthlyRecords =
+        getPayrollRecordsFromResponse(response);
+
+      if (monthlyRecords.length > 0) {
+        setSelectedMonthPayrollRecords(monthlyRecords);
+        return;
+      }
+
+      // Fallback to the already-loaded records when the backend
+      // returns an empty array. The fallback uses the same
+      // payPeriodStart month/year definition as the monthly report.
+      const fallbackRecords =
+        records.filter((record) => {
+
+          if (!record?.payPeriodStart) return false;
+
+          const date = new Date(record.payPeriodStart);
+
+          if (Number.isNaN(date.getTime())) return false;
+
+          if (
+            date.getUTCMonth() + 1 !== monthNumber ||
+            date.getUTCFullYear() !== yearNumber
+          ) {
+            return false;
+          }
+
+          if (
+            branchId !== 'ALL' &&
+            branchId !== null &&
+            branchId !== undefined &&
+            branchId !== ''
+          ) {
+            const recordBranchId = getRecordBranchId(record);
+
+            if (
+              recordBranchId === null ||
+              Number(recordBranchId) !== Number(branchId)
+            ) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+      setSelectedMonthPayrollRecords(fallbackRecords);
+
+    } catch (error) {
+
+      console.error(
+        'Failed to load selected-month payroll records:',
+        error
+      );
+
+      const monthNumber = Number(month);
+      const yearNumber = Number(year);
+
+      const fallbackRecords =
+        records.filter((record) => {
+
+          if (!record?.payPeriodStart) return false;
+
+          const date = new Date(record.payPeriodStart);
+
+          if (Number.isNaN(date.getTime())) return false;
+
+          if (
+            date.getUTCMonth() + 1 !== monthNumber ||
+            date.getUTCFullYear() !== yearNumber
+          ) {
+            return false;
+          }
+
+          if (
+            branchId !== 'ALL' &&
+            branchId !== null &&
+            branchId !== undefined &&
+            branchId !== ''
+          ) {
+            const recordBranchId = getRecordBranchId(record);
+
+            if (
+              recordBranchId === null ||
+              Number(recordBranchId) !== Number(branchId)
+            ) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+      setSelectedMonthPayrollRecords(fallbackRecords);
+
+      setSelectedMonthPayrollError(
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to load selected-month payroll records.'
+      );
+
+    } finally {
+
+      setSelectedMonthPayrollLoading(false);
+
+    }
+  };
+
+
+  // ==========================================================
   // INITIAL LOAD
   // ==========================================================
 
@@ -602,6 +859,8 @@ export function AdminPayroll() {
       await Promise.all([
         loadPayroll(),
         loadBranches(),
+        loadPayrollSummary(),
+        loadSelectedMonthPayroll(),
       ]);
 
     };
@@ -609,6 +868,31 @@ export function AdminPayroll() {
     initialize();
 
   }, []);
+
+
+  // ==========================================================
+  // LOAD PAYROLL SUMMARY WHEN MONTH / YEAR / BRANCH CHANGES
+  // ==========================================================
+
+  useEffect(() => {
+
+    loadPayrollSummary(
+      selectedPayrollMonth,
+      selectedPayrollYear,
+      selectedBranch
+    );
+
+    loadSelectedMonthPayroll(
+      selectedPayrollMonth,
+      selectedPayrollYear,
+      selectedBranch
+    );
+
+  }, [
+    selectedPayrollMonth,
+    selectedPayrollYear,
+    selectedBranch,
+  ]);
 
 
   // ==========================================================
@@ -666,6 +950,16 @@ export function AdminPayroll() {
     await Promise.all([
       loadPayroll(),
       loadBranches(),
+      loadPayrollSummary(
+        selectedPayrollMonth,
+        selectedPayrollYear,
+        selectedBranch
+      ),
+      loadSelectedMonthPayroll(
+        selectedPayrollMonth,
+        selectedPayrollYear,
+        selectedBranch
+      ),
     ]);
 
     await loadCurrentPeriodsForBranches(branches);
@@ -820,6 +1114,11 @@ const handleGenerateCurrentPayroll =
 
       // Reload payroll after generation
       await loadPayroll();
+      await loadSelectedMonthPayroll(
+        selectedPayrollMonth,
+        selectedPayrollYear,
+        selectedBranch
+      );
 
     } catch (error) {
 
@@ -1037,6 +1336,11 @@ const handleGenerateCurrentPayroll =
         }
 
         await loadPayroll();
+        await loadSelectedMonthPayroll(
+          selectedPayrollMonth,
+          selectedPayrollYear,
+          selectedBranch
+        );
         await loadCurrentPeriodsForBranches(branches);
 
       } catch (error) {
@@ -1502,13 +1806,6 @@ const handleGenerateCurrentPayroll =
 
         const recordBranchId = getRecordBranchId(record);
 
-        if (
-          selectedBranch !== 'ALL' &&
-          Number(recordBranchId) !== Number(selectedBranch)
-        ) {
-          return false;
-        }
-
         if (recordBranchId === null) return false;
 
         // Current Payroll means the exact current period for this
@@ -1548,7 +1845,7 @@ const handleGenerateCurrentPayroll =
           recordEnd === currentEnd
         );
       });
-    }, [records, selectedBranch, currentPeriodsByBranch]);
+    }, [records, currentPeriodsByBranch]);
 
 
   // ==========================================================
@@ -1651,95 +1948,153 @@ const handleGenerateCurrentPayroll =
   // FILTER CURRENT PAYROLL
   // ==========================================================
 
+  const normalizePayrollFilterText = (
+    value
+  ) => {
+
+    return String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+
+  };
+
+
+  const getPayrollSearchText = (
+    record
+  ) => {
+
+    const values = [
+      getEmployeeName(record),
+      record?.employeeId,
+      record?.employee?.employeeId,
+      record?.employee?.employeeCode,
+      record?.employee?.code,
+      record?.employee?.email,
+      record?.employee?.phone,
+      getRecordBranchName(record),
+      getRecordBranchId(record),
+      record?.payrollId,
+      getPayrollMonth(record),
+      formatDate(record?.payPeriodStart),
+      formatDate(record?.payPeriodEnd),
+    ];
+
+    return normalizePayrollFilterText(
+      values
+        .filter(
+          (value) =>
+            value !== null &&
+            value !== undefined
+        )
+        .join(' ')
+    );
+
+  };
+
+
+  // ==========================================================
+  // SELECTED MONTH/YEAR PAYROLL RECORDS
+  // ==========================================================
+  //
+  // Loaded by loadSelectedMonthPayroll() from the backend. This
+  // collection represents the complete payroll dataset for the
+  // selected month/year, including paid and unpaid records.
+  // ==========================================================
+
+  // ==========================================================
+  // FILTER SELECTED MONTH/YEAR EMPLOYEE RECORDS
+  // ==========================================================
+
+  const filteredSelectedMonthPayroll =
+    useMemo(() => {
+
+      const searchTerm =
+        normalizePayrollFilterText(search);
+
+      const searchTokens =
+        searchTerm
+          ? searchTerm.split(' ').filter(Boolean)
+          : [];
+
+      if (searchTokens.length === 0) {
+        return selectedMonthPayrollRecords;
+      }
+
+      return selectedMonthPayrollRecords.filter((record) => {
+
+        const searchableText =
+          getPayrollSearchText(record);
+
+        return searchTokens.every((token) =>
+          searchableText.includes(token)
+        );
+
+      });
+
+    }, [
+      selectedMonthPayrollRecords,
+      search,
+    ]);
+
+
   const filteredCurrentPayroll =
     useMemo(() => {
 
       const searchTerm =
-        search
-          .trim()
-          .toLowerCase();
+        normalizePayrollFilterText(search);
 
-      return currentPayrollRecords.filter(
-        (record) => {
+      const searchTokens =
+        searchTerm
+          ? searchTerm.split(' ').filter(Boolean)
+          : [];
 
-          // ----------------------------------------------------
-          // BRANCH
-          // ----------------------------------------------------
+      const branchFilter =
+        selectedBranch === 'ALL'
+          ? null
+          : Number(selectedBranch);
+
+      return currentPayrollRecords.filter((record) => {
+
+        // ----------------------------------------------------
+        // BRANCH
+        // ----------------------------------------------------
+
+        if (branchFilter !== null) {
+
+          const recordBranchId =
+            getRecordBranchId(record);
 
           if (
-            selectedBranch !== 'ALL'
+            recordBranchId === null ||
+            recordBranchId !== branchFilter
           ) {
-
-            const branchId =
-              getRecordBranchId(record);
-
-            if (
-              Number(branchId) !==
-              Number(selectedBranch)
-            ) {
-
-              return false;
-
-            }
-
+            return false;
           }
-
-
-          // ----------------------------------------------------
-          // SEARCH
-          // ----------------------------------------------------
-
-          if (!searchTerm) {
-            return true;
-          }
-
-          const employeeName =
-            getEmployeeName(
-              record
-            ).toLowerCase();
-
-          const employeeId =
-            String(
-              record?.employeeId ??
-              ''
-            ).toLowerCase();
-
-          const email =
-            String(
-              record?.employee?.email ??
-              ''
-            ).toLowerCase();
-
-          const branchName =
-            getRecordBranchName(
-              record
-            ).toLowerCase();
-
-          const month =
-            getPayrollMonth(
-              record
-            ).toLowerCase();
-
-          return (
-            employeeName.includes(
-              searchTerm
-            ) ||
-            employeeId.includes(
-              searchTerm
-            ) ||
-            email.includes(
-              searchTerm
-            ) ||
-            branchName.includes(
-              searchTerm
-            ) ||
-            month.includes(
-              searchTerm
-            )
-          );
 
         }
-      );
+
+
+        // ----------------------------------------------------
+        // SEARCH
+        // ----------------------------------------------------
+
+        if (searchTokens.length === 0) {
+          return true;
+        }
+
+        const searchableText =
+          getPayrollSearchText(record);
+
+        // Every typed word must be present somewhere in the
+        // current payroll record. This makes searches such as
+        // `john doe`, employee ID, email, branch or payroll ID
+        // work consistently.
+        return searchTokens.every((token) =>
+          searchableText.includes(token)
+        );
+
+      });
 
     }, [
       currentPayrollRecords,
@@ -2085,6 +2440,11 @@ const handleGenerateCurrentPayroll =
         setPaymentRecord(null);
 
         await loadPayroll();
+        await loadSelectedMonthPayroll(
+          selectedPayrollMonth,
+          selectedPayrollYear,
+          selectedBranch
+        );
 
       } catch (error) {
 
@@ -2163,7 +2523,7 @@ const handleGenerateCurrentPayroll =
 
     const exportRecords =
       payrollView === 'CURRENT'
-        ? filteredCurrentPayroll
+        ? filteredSelectedMonthPayroll
         : payrollView === 'LAST_MONTH_PENDING'
           ? filteredLastMonthPendingPayroll
           : filteredHistoryPayroll;
@@ -2630,16 +2990,16 @@ const handleGenerateCurrentPayroll =
 
       {
         key: 'pendingAmount',
-        label:
-          payrollView === 'HISTORY'
-            ? 'Net Paid'
-            : 'Pending Amount',
+        label: 'Pending / Net',
         align: 'right',
 
         render: (record) => {
 
+          const paid =
+            isPayrollPaid(record);
+
           const amount =
-            payrollView === 'HISTORY'
+            paid
               ? (
                 record.netSalary ??
                 getPendingAmount(record)
@@ -2667,15 +3027,12 @@ const handleGenerateCurrentPayroll =
 
       {
         key: 'paymentDate',
-        label:
-          payrollView === 'HISTORY'
-            ? 'Paid On'
-            : 'Payment Date',
+        label: 'Payment Date',
 
         render: (record) => {
 
           const date =
-            payrollView === 'HISTORY'
+            isPayrollPaid(record)
               ? record.paymentDate
               : getScheduledPaymentDate(record);
 
@@ -2959,12 +3316,22 @@ const handleGenerateCurrentPayroll =
 
 
   // ==========================================================
-  // CURRENT VIEW COUNT
+  // CURRENT VIEW RECORDS
+  // ==========================================================
+  //
+  // The Month / Year selector drives the employee data shown
+  // in the Current Payroll tab as well as the Monthly Payroll
+  // Report above. This keeps the summary cards and employee rows
+  // on the same selected payroll month/year.
+  //
+  // CURRENT             -> selected month/year payroll records
+  // LAST_MONTH_PENDING  -> previous unpaid payroll period records
+  // HISTORY             -> paid payroll records
   // ==========================================================
 
   const displayedRecords =
     payrollView === 'CURRENT'
-      ? filteredCurrentPayroll
+      ? filteredSelectedMonthPayroll
       : payrollView === 'LAST_MONTH_PENDING'
         ? filteredLastMonthPendingPayroll
         : filteredHistoryPayroll;
@@ -3008,11 +3375,18 @@ const handleGenerateCurrentPayroll =
 
         subtitle={
           payrollView === 'CURRENT'
-            ? `${filteredCurrentPayroll.length} current payroll record${
-                filteredCurrentPayroll.length !== 1
+            ? `${filteredSelectedMonthPayroll.length} payroll record${
+                filteredSelectedMonthPayroll.length !== 1
                   ? 's'
                   : ''
-              }`
+              } for ${new Date(
+                Number(selectedPayrollYear),
+                Number(selectedPayrollMonth) - 1,
+                1
+              ).toLocaleDateString('en-IN', {
+                month: 'long',
+                year: 'numeric',
+              })}`
             : payrollView === 'LAST_MONTH_PENDING'
               ? `${filteredLastMonthPendingPayroll.length} last-month pending payroll record${
                   filteredLastMonthPendingPayroll.length !== 1
@@ -3141,7 +3515,7 @@ const handleGenerateCurrentPayroll =
               ? 'bg-white/15 text-white'
               : 'bg-navy-50 text-navy-600'
           }`}>
-            {currentPayrollRecords.length}
+            {filteredSelectedMonthPayroll.length}
           </span>
         </button>
 
@@ -3298,9 +3672,202 @@ const handleGenerateCurrentPayroll =
 
           </button>
 
+
+          {(search || selectedBranch !== 'ALL') && (
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setSelectedBranch('ALL');
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors"
+            >
+
+              Clear Filters
+
+            </button>
+
+          )}
+
         </div>
 
       </div>
+
+
+      {/* ======================================================
+          PAYROLL MONTH / YEAR FILTER
+      ====================================================== */}
+
+      <div className="mb-5 rounded-xl border border-navy-100 bg-white p-5">
+
+        <div className="flex flex-col lg:flex-row lg:items-end gap-3">
+
+          <div className="w-full lg:w-56">
+
+            <label
+              htmlFor="payroll-month"
+              className="block text-xs font-medium text-navy-500 mb-1"
+            >
+              Payroll Month
+            </label>
+
+            <select
+              id="payroll-month"
+              value={selectedPayrollMonth}
+              onChange={(event) =>
+                setSelectedPayrollMonth(
+                  Number(event.target.value)
+                )
+              }
+              className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
+            >
+              {Array.from({ length: 12 }, (_, index) => {
+                const monthNumber = index + 1;
+                const monthName = new Date(
+                  2000,
+                  index,
+                  1
+                ).toLocaleDateString('en-IN', {
+                  month: 'long',
+                });
+
+                return (
+                  <option
+                    key={monthNumber}
+                    value={monthNumber}
+                  >
+                    {monthName}
+                  </option>
+                );
+              })}
+            </select>
+
+          </div>
+
+          <div className="w-full lg:w-40">
+
+            <label
+              htmlFor="payroll-year"
+              className="block text-xs font-medium text-navy-500 mb-1"
+            >
+              Payroll Year
+            </label>
+
+            <select
+              id="payroll-year"
+              value={selectedPayrollYear}
+              onChange={(event) =>
+                setSelectedPayrollYear(
+                  Number(event.target.value)
+                )
+              }
+              className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
+            >
+              {Array.from(
+                new Set([
+                  ...records
+                    .map((record) => {
+                      if (!record?.payPeriodStart) return null;
+                      const date = new Date(record.payPeriodStart);
+                      return Number.isNaN(date.getTime())
+                        ? null
+                        : date.getUTCFullYear();
+                    })
+                    .filter(Boolean),
+                  new Date().getFullYear() - 1,
+                  new Date().getFullYear(),
+                  new Date().getFullYear() + 1,
+                ])
+              )
+                .sort((a, b) => b - a)
+                .map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+            </select>
+
+          </div>
+
+          <div className="pb-2 text-sm text-navy-500">
+            Showing payroll period for{' '}
+            <span className="font-semibold text-navy-800">
+              {new Date(
+                Number(selectedPayrollYear),
+                Number(selectedPayrollMonth) - 1,
+                1
+              ).toLocaleDateString('en-IN', {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
+          SELECTED PAYROLL SUMMARY
+      ====================================================== */}
+
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+
+        {payrollSummaryLoading ? (
+
+          <div className="xl:col-span-6 rounded-xl border border-navy-100 bg-white p-5 text-sm text-navy-500">
+            Loading payroll summary...
+          </div>
+
+        ) : (
+          <>
+            {[
+              ['Total Payroll', payrollSummary?.totalPayroll ?? 0],
+              ['Total Paid', payrollSummary?.totalPaid ?? 0],
+              ['Total Pending', payrollSummary?.totalPending ?? 0],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-xl border border-navy-100 bg-white p-5"
+              >
+                <div className="text-xs font-medium text-navy-500">
+                  {label}
+                </div>
+                <div className="mt-2 text-xl font-bold text-navy-900">
+                  {formatCurrency(value)}
+                </div>
+              </div>
+            ))}
+
+            {[
+              ['Employees', payrollSummary?.employeeCount ?? 0],
+              ['Paid Employees', payrollSummary?.paidCount ?? 0],
+              ['Pending Employees', payrollSummary?.pendingCount ?? 0],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-xl border border-navy-100 bg-white p-5"
+              >
+                <div className="text-xs font-medium text-navy-500">
+                  {label}
+                </div>
+                <div className="mt-2 text-xl font-bold text-navy-900">
+                  {Number(value) || 0}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+      </div>
+
+      {payrollSummaryError && (
+        <div className="mb-5 rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700">
+          {payrollSummaryError}
+        </div>
+      )}
 
 
       {/* ======================================================
@@ -3660,44 +4227,33 @@ const handleGenerateCurrentPayroll =
 
 
       {/* ======================================================
-          SUMMARY
+          PAYROLL RECORD COUNTS
       ====================================================== */}
 
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
 
         <div className="rounded-xl border border-navy-100 bg-white p-4">
-          <div className="text-xs font-medium text-navy-400">Current Payroll</div>
-          <div className="mt-1 text-2xl font-bold text-navy-900">{currentPayrollRecords.length}</div>
-          <div className="mt-1 text-xs text-navy-500">Unpaid current-period records</div>
+          <div className="text-xs font-medium text-navy-400">Selected Month Payroll</div>
+          <div className="mt-1 text-2xl font-bold text-navy-900">
+            {filteredSelectedMonthPayroll.length}
+          </div>
+          <div className="mt-1 text-xs text-navy-500">Employee payroll records for the selected month</div>
         </div>
 
         <div className="rounded-xl border border-navy-100 bg-white p-4">
           <div className="text-xs font-medium text-navy-400">Last Month Pending</div>
-          <div className="mt-1 text-2xl font-bold text-navy-900">{lastMonthPendingPayrollRecords.length}</div>
+          <div className="mt-1 text-2xl font-bold text-navy-900">
+            {lastMonthPendingPayrollRecords.length}
+          </div>
           <div className="mt-1 text-xs text-navy-500">Unpaid records from the previous payroll period</div>
         </div>
 
         <div className="rounded-xl border border-navy-100 bg-white p-4">
           <div className="text-xs font-medium text-navy-400">Paid History</div>
-          <div className="mt-1 text-2xl font-bold text-navy-900">{historyPayrollRecords.length}</div>
-          <div className="mt-1 text-xs text-navy-500">Already paid payroll records</div>
-        </div>
-
-        <div className="rounded-xl border border-navy-100 bg-white p-4">
-          <div className="text-xs font-medium text-navy-400">Total Pending</div>
           <div className="mt-1 text-2xl font-bold text-navy-900">
-            {formatCurrency(
-              [
-                ...filteredCurrentPayroll,
-                ...filteredLastMonthPendingPayroll,
-              ].reduce(
-                (total, record) =>
-                  total + getPendingAmount(record),
-                0
-              )
-            )}
+            {historyPayrollRecords.length}
           </div>
-          <div className="mt-1 text-xs text-navy-500">Current and last-month unpaid payroll</div>
+          <div className="mt-1 text-xs text-navy-500">Already paid payroll records</div>
         </div>
 
       </div>
@@ -3900,7 +4456,22 @@ const handleGenerateCurrentPayroll =
           PAYROLL TABLE
       ====================================================== */}
 
-      {displayedRecords.length === 0 ? (
+      {payrollView === 'CURRENT' &&
+        selectedMonthPayrollLoading ? (
+
+        <div className="rounded-xl border border-navy-100 bg-white p-6 text-sm text-navy-500">
+          Loading payroll records for the selected month...
+        </div>
+
+      ) : payrollView === 'CURRENT' &&
+        selectedMonthPayrollError &&
+        displayedRecords.length === 0 ? (
+
+        <div className="rounded-xl border border-error-200 bg-error-50 p-6 text-sm text-error-700">
+          {selectedMonthPayrollError}
+        </div>
+
+      ) : displayedRecords.length === 0 ? (
 
         <EmptyState
           icon={

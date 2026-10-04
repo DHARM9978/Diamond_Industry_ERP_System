@@ -1378,6 +1378,34 @@ export const advanceService = {
 export const payrollService = {
 
     // --------------------------------------------------------
+    // GET PAYROLL SUMMARY BY MONTH / YEAR
+    //
+    // GET /api/payroll/summary?month=10&year=2026
+    //
+    // Optional:
+    // branchId
+    //
+    // The backend determines the selected payroll period using
+    // payPeriodStart / payPeriodEnd, not paymentDate.
+    // --------------------------------------------------------
+
+    summary: async (
+        params = {}
+    ) => {
+
+        const response =
+            await apiClient.get(
+                API.payroll.summary,
+                {
+                    params,
+                }
+            );
+
+        return unwrap(response);
+    },
+
+
+    // --------------------------------------------------------
     // GET ALL PAYROLL
     // --------------------------------------------------------
 
