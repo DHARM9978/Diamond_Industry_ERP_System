@@ -8,6 +8,10 @@ const {
     startPayrollScheduler
 } = require("./src/services/payroll.scheduler");
 
+const {
+    startAttendanceAutoCloseScheduler
+} = require("./src/services/attendanceAutoClose.scheduler");
+
 
 // ============================================================
 // PORT
@@ -51,6 +55,13 @@ const server =
             // --------------------------------------------------
 
             startPayrollScheduler();
+
+
+            // --------------------------------------------------
+            // Start automatic attendance close scheduler
+            // --------------------------------------------------
+
+            startAttendanceAutoCloseScheduler();
 
         }
     );

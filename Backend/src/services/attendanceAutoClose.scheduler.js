@@ -369,23 +369,48 @@ const calculateSessions = (
 // PROCESS ONE COMPANY
 // ============================================================
 
-const processCompany = async (
-    setting,
+const buildCloseInstantForDate = (
+    date,
+    officeCloseTime
+) => {
+
+    const parsed =
+        parseOfficeCloseTime(
+            officeCloseTime
+        );
+
+    if (!parsed) {
+        return null;
+    }
+
+    const parts =
+        getISTParts(date);
+
+    return new Date(
+        Date.UTC(
+            parts.year,
+            parts.month,
+            parts.day,
+            parsed.hours,
+            parsed.minutes,
+            0,
+            0
+        ) -
+        IST_OFFSET_MS
+    );
+};
+
+
+const processCompanyForDate = async (
+    companyId,
+    officeCloseTime,
+    attendanceDateSource,
     now
 ) => {
 
-    const companyId =
-        Number(
-            setting.companyId
-        );
-
-    const officeCloseTime =
-        setting.value;
-
-
     const closeInstant =
-        buildTodayCloseInstant(
-            now,
+        buildCloseInstantForDate(
+            attendanceDateSource,
             officeCloseTime
         );
 
@@ -400,7 +425,12 @@ const processCompany = async (
 
 
     // --------------------------------------------------------
-    // OFFICE CLOSE NOT REACHED
+    // OFFICE CLOSE NOT REACHED FOR THIS ATTENDANCE DATE
+    // --------------------------------------------------------
+    //
+    // Each calendar date has its own configured office close
+    // instant. This allows the scheduler to settle yesterday's
+    // open attendance after midnight as well as today's attendance.
     // --------------------------------------------------------
 
     if (
@@ -413,12 +443,12 @@ const processCompany = async (
 
 
     // --------------------------------------------------------
-    // CURRENT IST DAY ONLY
+    // USE THE SPECIFIC IST CALENDAR DATE BEING PROCESSED
     // --------------------------------------------------------
 
     const dayStart =
         getISTStartOfDay(
-            now
+            attendanceDateSource
         );
 
     const dayEnd =
@@ -433,8 +463,20 @@ const processCompany = async (
         );
 
 
+    const attendanceDate =
+        getISTCalendarDate(
+            attendanceDateSource
+        );
+
+
+    const dateKey =
+        getISTDateKey(
+            attendanceDateSource
+        );
+
+
     // --------------------------------------------------------
-    // FETCH RAW PUNCHES
+    // FETCH RAW PUNCHES FOR THIS ATTENDANCE DATE
     // --------------------------------------------------------
     //
     // This reads AttendancePunch only.
@@ -499,12 +541,6 @@ const processCompany = async (
 
     let closedCount =
         0;
-
-
-    const attendanceDate =
-        getISTCalendarDate(
-            now
-        );
 
 
     const autoCloseTime =
@@ -767,10 +803,98 @@ const processCompany = async (
 
         console.log(
 
-            `[Attendance Auto Close] Company ${companyId} | Employee ${employeeId} | ${getISTDateKey(now)} | closed at ${officeCloseTime} | total ${totalHours.toFixed(2)}h`
+            `[Attendance Auto Close] Company ${companyId} | Employee ${employeeId} | ${dateKey} | closed at ${officeCloseTime} | total ${totalHours.toFixed(2)}h`
 
         );
     }
+
+
+    return closedCount;
+};
+
+
+// ============================================================
+// PROCESS ONE COMPANY
+// ============================================================
+//
+// IMPORTANT:
+// The scheduler must settle both the current IST calendar day
+// and the previous IST calendar day. A backend restart after
+// midnight must not leave yesterday's unmatched IN sessions open.
+//
+// Each date is checked against its own office closing instant.
+// Therefore a company whose office closes at 22:00 will settle
+// yesterday at 22:00 even when the scheduler runs at 01:30 today.
+// ============================================================
+
+const processCompany = async (
+    setting,
+    now
+) => {
+
+    const companyId =
+        Number(
+            setting.companyId
+        );
+
+    const officeCloseTime =
+        setting.value;
+
+
+    const currentDateSource =
+        new Date(
+            now
+        );
+
+
+    const previousDateSource =
+        new Date(
+            now.getTime() -
+            (
+                24 *
+                60 *
+                60 *
+                1000
+            )
+        );
+
+
+    let closedCount =
+        0;
+
+
+    // --------------------------------------------------------
+    // CURRENT IST CALENDAR DAY
+    // --------------------------------------------------------
+
+    closedCount +=
+        await processCompanyForDate(
+            companyId,
+            officeCloseTime,
+            currentDateSource,
+            now
+        );
+
+
+    // --------------------------------------------------------
+    // PREVIOUS IST CALENDAR DAY
+    // --------------------------------------------------------
+    //
+    // This is the critical recovery path for the situation where:
+    //
+    //   Oct 3 22:00  -> office close
+    //   Oct 4 01:30  -> backend/scheduler is running
+    //
+    // Oct 3 must still be processed and settled at Oct 3 22:00.
+    // --------------------------------------------------------
+
+    closedCount +=
+        await processCompanyForDate(
+            companyId,
+            officeCloseTime,
+            previousDateSource,
+            now
+        );
 
 
     return closedCount;

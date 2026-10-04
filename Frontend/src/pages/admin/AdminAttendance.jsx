@@ -477,21 +477,78 @@ return `${hours.toFixed(2)}h`;
 };
 
 // ============================================================
-// HISTORICAL OPEN SESSION CHECK
+// ATTENDANCE CORRECTION WINDOW
+// ============================================================
+//
+// AUTO_CLOSE attendance can be corrected for three calendar days:
+// attendance date + the next two calendar days.
+//
+// Example:
+// 03/10/2026 -> editable on 03/10, 04/10 and 05/10
+// 06/10/2026 -> locked
+//
+// Historical open sessions use the same correction window.
+// The backend remains the final authority for the correction.
 // ============================================================
 
-const isHistoricalPendingSettlement = (record) => {
+const getCorrectionWindow = (record) => {
 const recordDate =
 getDateForFilter(record?.date);
 
 const todayDate =
 getISTTodayString();
 
-return Boolean(
-recordDate &&
+if (!recordDate) {
+return {
+recordDate: '',
+lastEditableDate: '',
+lockDate: '',
+withinWindow: false,
+canCorrect: false,
+locked: false,
+};
+}
+
+const lockDate =
+addDaysToDateString(recordDate, 3);
+
+const lastEditableDate =
+addDaysToDateString(recordDate, 2);
+
+const withinWindow =
+todayDate >= recordDate &&
+todayDate < lockDate;
+
+const isAutoClose =
+record?.resolutionSource === 'AUTO_CLOSE' &&
+record?.manualOverride !== true;
+
+const isHistoricalOpenSession =
 recordDate < todayDate &&
-record?.hasOpenSession === true
-);
+record?.hasOpenSession === true;
+
+const isCorrectionRecord =
+isAutoClose ||
+isHistoricalOpenSession;
+
+return {
+recordDate,
+lastEditableDate,
+lockDate,
+withinWindow,
+canCorrect:
+withinWindow &&
+isCorrectionRecord,
+locked:
+isCorrectionRecord &&
+!withinWindow,
+isAutoClose,
+isHistoricalOpenSession,
+};
+};
+
+const canCorrectAttendance = (record) => {
+return getCorrectionWindow(record).canCorrect === true;
 };
 
 // ============================================================
@@ -499,8 +556,28 @@ record?.hasOpenSession === true
 // ============================================================
 
 const openCheckoutCorrection = (record) => {
+const correction =
+getCorrectionWindow(record);
+
+if (!correction.canCorrect) {
+toast(
+correction.locked
+? `This attendance is locked after ${formatPeriodDate(
+correction.lastEditableDate,
+)}.`
+: 'This attendance record cannot be corrected.',
+'error',
+);
+return;
+}
+
 setEditingRecord(record);
-setCheckoutTime('');
+
+setCheckoutTime(
+record?.checkOutTime
+? String(record.checkOutTime).slice(0, 5)
+: ''
+);
 };
 
 const closeCheckoutCorrection = () => {
@@ -532,7 +609,9 @@ checkOutTime: `${checkoutTime}:00`,
 );
 
 toast(
-'Attendance hours settled successfully.',
+editingRecord?.resolutionSource === 'AUTO_CLOSE'
+? 'Attendance checkout corrected successfully.'
+: 'Attendance hours settled successfully.',
 'success'
 );
 
@@ -2136,16 +2215,29 @@ Resolved at office close
 <StatusBadge status={getRecordStatus(record)} />
 </td>
 <td className="px-4 py-3 text-center" onClick={(event) => event.stopPropagation()}>
-{isHistoricalPendingSettlement(record) ? (
+{canCorrectAttendance(record) ? (
 <button
 type="button"
 onClick={() => openCheckoutCorrection(record)}
 className="inline-flex items-center gap-1.5 rounded-lg border border-warning-300 bg-warning-50 px-3 py-1.5 text-xs font-semibold text-warning-800 hover:bg-warning-100"
-title="Settle historical missing checkout"
+title={
+record?.resolutionSource === 'AUTO_CLOSE'
+? 'Correct automatically closed checkout'
+: 'Settle historical missing checkout'
+}
 >
 <Pencil size={14} />
-Settle
+{record?.resolutionSource === 'AUTO_CLOSE'
+? 'Edit'
+: 'Settle'}
 </button>
+) : getCorrectionWindow(record).locked ? (
+<span
+className="inline-flex items-center rounded-lg border border-navy-100 bg-navy-50 px-3 py-1.5 text-xs font-semibold text-navy-400"
+title="Attendance correction window has expired"
+>
+Locked
+</span>
 ) : (
 <span className="text-xs text-navy-300">--</span>
 )}
@@ -2518,7 +2610,11 @@ Close
 <Modal
  open={Boolean(editingRecord)}
  onClose={closeCheckoutCorrection}
- title="Settle Missing Checkout"
+ title={
+editingRecord?.resolutionSource === 'AUTO_CLOSE'
+? 'Correct Auto-Closed Checkout'
+: 'Settle Missing Checkout'
+}
  size="sm"
 >
 <div className="space-y-5">
@@ -2538,8 +2634,21 @@ Current resolution: {getResolutionSourceLabel(editingRecord.resolutionSource)}
 )}
 
 <p className="mt-2 text-xs text-warning-700">
-Enter the checkout time for the missing final session. The existing checkout shown in this row may belong to an earlier completed IN/OUT session and is not used as the settlement time. Completed sessions are preserved, and the system recalculates the full day from the fingerprint punches.
+{editingRecord?.resolutionSource === 'AUTO_CLOSE'
+? 'This record was automatically closed at the company office closing time. You can change that checkout time during the three-day correction window.'
+: 'Enter the checkout time for the missing final session. The existing checkout shown in this row may belong to an earlier completed IN/OUT session and is not used as the settlement time. Completed sessions are preserved, and the system recalculates the full day from the fingerprint punches.'}
 </p>
+
+{editingRecord?.date && (
+<p className="mt-2 text-xs text-warning-700">
+Editable through{' '}
+<strong>
+{formatPeriodDate(
+getCorrectionWindow(editingRecord).lastEditableDate,
+)}
+</strong>
+</p>
+)}
 </div>
 
 <div>
@@ -2580,7 +2689,11 @@ Cancel
  className="btn-primary inline-flex items-center gap-2"
 >
 <Save size={16} />
-{savingCorrection ? 'Settling...' : 'Settle Hours'}
+{savingCorrection
+? 'Saving...'
+: editingRecord?.resolutionSource === 'AUTO_CLOSE'
+? 'Save Correction'
+: 'Settle Hours'}
 </button>
 </div>
 

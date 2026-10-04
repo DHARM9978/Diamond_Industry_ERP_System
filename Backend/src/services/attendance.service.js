@@ -6109,102 +6109,98 @@ return {
 // ======================================================
 
 const updateAttendance = async (
-attendanceId,
-data,
-adminUser = null
+    attendanceId,
+    data,
+    adminUser = null
 ) => {
 
-const id =
-    Number(attendanceId);
+    const id =
+        Number(attendanceId);
 
 
-if (
-    !Number.isInteger(id) ||
-    id < 1
-) {
-    const error = new Error(
-        "Invalid attendance ID"
-    );
+    if (
+        !Number.isInteger(id) ||
+        id < 1
+    ) {
+        const error = new Error(
+            "Invalid attendance ID"
+        );
 
-    error.statusCode = 400;
+        error.statusCode = 400;
 
-    throw error;
-}
+        throw error;
+    }
 
 
-const existingAttendance =
-    await prisma.attendance.findUnique({
-        where: {
-            attendanceId: id
-        },
+    const existingAttendance =
+        await prisma.attendance.findUnique({
+            where: {
+                attendanceId: id
+            },
 
-        include: {
-            employee: {
-                select: {
-                    employeeId: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    status: true
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
                 }
             }
-        }
-    });
+        });
 
 
-if (!existingAttendance) {
-    const error = new Error(
-        "Attendance record not found"
-    );
+    if (!existingAttendance) {
+        const error = new Error(
+            "Attendance record not found"
+        );
 
-    error.statusCode = 404;
+        error.statusCode = 404;
 
-    throw error;
-}
-
-
-const {
-    checkInTime,
-    checkOutTime,
-    status
-} = data;
+        throw error;
+    }
 
 
-if (
-    checkInTime === undefined &&
-    checkOutTime === undefined &&
-    status === undefined
-) {
-    const error = new Error(
-        "At least one attendance field is required"
-    );
-
-    error.statusCode = 400;
-
-    throw error;
-}
+    const {
+        checkInTime,
+        checkOutTime,
+        status
+    } = data;
 
 
-// ======================================================
-// HISTORICAL MISSING-CHECKOUT SETTLEMENT
-// ======================================================
-//
-// An administrator may settle a previous day's final open IN.
-// We never overwrite or delete raw fingerprint punches.
-// Instead, we recalculate the whole day from those punches:
-//
-//   IN -> OUT -> IN -> admin settlement OUT
-//
-// Completed sessions remain intact and only the final unmatched
-// IN is closed using the administrator's supplied checkout time.
-//
-// Today's unresolved IN is intentionally NOT settled through this
-// path. The employee still has the current day available to punch OUT.
-// ======================================================
+    if (
+        checkInTime === undefined &&
+        checkOutTime === undefined &&
+        status === undefined
+    ) {
+        const error = new Error(
+            "At least one attendance field is required"
+        );
 
-if (
-    checkOutTime !== undefined
-) {
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+
+    // ======================================================
+    // ATTENDANCE CORRECTION WINDOW
+    // ======================================================
+    //
+    // An AUTO_CLOSE checkout remains editable for three calendar
+    // days, including the attendance date itself.
+    //
+    // Example:
+    //   Attendance date : 2026-10-03
+    //   Editable         : Oct 03, Oct 04, Oct 05
+    //   Locked from      : Oct 06
+    //
+    // The backend enforces this rule so it cannot be bypassed by
+    // calling the API directly from outside the frontend.
+    // ======================================================
+
     const attendanceDate =
         existingAttendance.date;
 
@@ -6218,11 +6214,96 @@ if (
             new Date()
         );
 
-    const isHistoricalDate =
-        attendanceDateString <
-        todayDateString;
+    const isAutoClosed =
+        existingAttendance.resolutionSource ===
+            "AUTO_CLOSE" &&
+        existingAttendance.manualOverride !== true;
 
-    if (isHistoricalDate) {
+
+    const getDateAfterDays = (
+        dateString,
+        days
+    ) => {
+        const parts =
+            String(dateString)
+                .split("-")
+                .map(Number);
+
+        if (
+            parts.length !== 3 ||
+            parts.some(
+                value =>
+                    !Number.isInteger(value)
+            )
+        ) {
+            return null;
+        }
+
+        const date =
+            new Date(
+                Date.UTC(
+                    parts[0],
+                    parts[1] - 1,
+                    parts[2]
+                )
+            );
+
+        date.setUTCDate(
+            date.getUTCDate() +
+            days
+        );
+
+        return date
+            .toISOString()
+            .slice(0, 10);
+    };
+
+
+    const correctionLockDate =
+        getDateAfterDays(
+            attendanceDateString,
+            3
+        );
+
+
+    const correctionWindowOpen =
+        Boolean(
+            correctionLockDate &&
+            todayDateString <
+                correctionLockDate
+        );
+
+
+    // ======================================================
+    // AUTO-CLOSE CHECKOUT CORRECTION
+    // ======================================================
+    //
+    // AUTO_CLOSE creates a stored checkout even though there is no
+    // real fingerprint OUT punch. Therefore it must not be treated
+    // as an already-settled raw punch.
+    //
+    // An administrator can replace that automatic checkout during
+    // the three-day correction window. Raw punches remain untouched.
+    // ======================================================
+
+    if (
+        checkOutTime !== undefined &&
+        isAutoClosed
+    ) {
+
+        if (!correctionWindowOpen) {
+            const error = new Error(
+                `This AUTO_CLOSE attendance is locked. Admin correction was allowed only until ${correctionLockDate}.`
+            );
+
+            error.statusCode = 409;
+            error.code =
+                "ATTENDANCE_CORRECTION_LOCKED";
+
+            throw error;
+        }
+
+
         const settlementTime =
             parseTime(
                 checkOutTime,
@@ -6261,373 +6342,545 @@ if (
                 rawPunches
             );
 
-        if (punchState.hasOpenSession) {
-            const storedCheckout =
-                formatTimeValue(
-                    existingAttendance.checkOutTime
-                );
+        if (!punchState.hasOpenSession) {
+            const error = new Error(
+                "This AUTO_CLOSE attendance no longer has an unresolved final IN session."
+            );
 
-            const lastRawOut =
-                punchState.lastOut
-                    ? formatTimeValue(
-                        createMySQLTimeFromIST(
-                            punchState.lastOut
-                        )
-                    )
-                    : null;
+            error.statusCode = 409;
 
-            // If the raw punches still end with IN but the stored checkout
-            // is already different from the last real OUT, the day has
-            // already been settled by an administrator. Do not settle it
-            // a second time.
-            const alreadySettled =
-                storedCheckout !== null &&
-                (
-                    lastRawOut === null ||
-                    storedCheckout !== lastRawOut
-                );
-
-            if (alreadySettled) {
-                const error = new Error(
-                    "This historical attendance has already been settled."
-                );
-
-                error.statusCode = 409;
-
-                throw error;
-            }
-
-            const settlementInstant =
-                combineAttendanceDateAndTime(
-                    attendanceDate,
-                    settlementTime
-                );
-
-            if (
-                !settlementInstant
-            ) {
-                const error = new Error(
-                    "Invalid settlement checkout time"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            // Historical settlement closes the final unmatched IN on the
-            // SAME attendance date. Never add 24 hours implicitly here.
-            // The admin must enter a checkout time later than that final IN.
-            if (
-                settlementInstant.getTime() <=
-                punchState.openIn.getTime()
-            ) {
-                const error = new Error(
-                    "Settlement checkout time must be later than the final unmatched IN time on the same attendance date."
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            const finalSessionMilliseconds =
-                settlementInstant.getTime() -
-                punchState.openIn.getTime();
-
-            if (
-                finalSessionMilliseconds <= 0
-            ) {
-                const error = new Error(
-                    "Settlement checkout time must be after the final unmatched IN time"
-                );
-
-                error.statusCode = 400;
-
-                throw error;
-            }
-
-            const finalSessionHours =
-                finalSessionMilliseconds /
-                (1000 * 60 * 60);
-
-            const totalHours =
-                Number(
-                    (
-                        punchState.completedHours +
-                        finalSessionHours
-                    ).toFixed(2)
-                );
-
-            const totalHoursFormatted =
-                formatDuration(
-                    totalHours
-                );
-
-            const updatedAttendance =
-                await prisma.attendance.update({
-                    where: {
-                        attendanceId: id
-                    },
-
-                    data: {
-                        checkOutTime:
-                            settlementTime,
-
-                        totalHours,
-
-                        status:
-                            status !== undefined
-                                ? status
-                                : "PRESENT",
-
-                        resolutionSource:
-                            "ADMIN",
-
-                        manualOverride:
-                            true,
-
-                        manualOverrideAt:
-                            new Date(),
-
-                        manualOverrideBy:
-                            getAdminIdFromUser(
-                                adminUser
-                            )
-                    },
-
-                    include: {
-                        employee: {
-                            select: {
-                                employeeId: true,
-                                firstName: true,
-                                lastName: true,
-                                email: true,
-                                status: true
-                            }
-                        }
-                    }
-                });
-
-            return {
-                attendance:
-                    serializeAttendance(
-                        updatedAttendance
-                    ),
-
-                totalHours,
-
-                totalHoursFormatted,
-
-                correctedBy:
-                    adminUser?.userId ||
-                    adminUser?.id ||
-                    null
-            };
+            throw error;
         }
 
-        // Historical checkout correction is only valid as a settlement
-        // when the raw punches currently have an unmatched final IN.
-        // Do not let the generic correction path overwrite a settled
-        // historical record a second time.
-        const error = new Error(
-            "This historical attendance does not have an unresolved final IN session to settle."
-        );
 
-        error.statusCode = 409;
+        const settlementInstant =
+            combineAttendanceDateAndTime(
+                attendanceDate,
+                settlementTime
+            );
 
-        throw error;
-    }
-}
+        if (!settlementInstant) {
+            const error = new Error(
+                "Invalid correction checkout time"
+            );
 
+            error.statusCode = 400;
 
-// ======================================================
-// NORMAL ATTENDANCE CORRECTION
-// ======================================================
-
-const newCheckInTime =
-    checkInTime !== undefined
-        ? parseTime(
-            checkInTime,
-            "checkInTime"
-        )
-        : existingAttendance.checkInTime;
+            throw error;
+        }
 
 
-const newCheckOutTime =
-    checkOutTime !== undefined
-        ? parseTime(
-            checkOutTime,
-            "checkOutTime"
-        )
-        : existingAttendance.checkOutTime;
+        if (
+            settlementInstant.getTime() <=
+            punchState.openIn.getTime()
+        ) {
+            const error = new Error(
+                "Correction checkout time must be later than the final unmatched IN time on the same attendance date."
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
 
 
-let totalHours = null;
-let totalHoursFormatted =
-    "0 minutes";
+        const finalSessionMilliseconds =
+            settlementInstant.getTime() -
+            punchState.openIn.getTime();
 
+        const finalSessionHours =
+            finalSessionMilliseconds /
+            (1000 * 60 * 60);
 
-if (
-    newCheckInTime &&
-    newCheckOutTime
-) {
-    const checkInMinutes =
-        timeValueToMinutes(
-            newCheckInTime
-        );
-
-    const checkOutMinutes =
-        timeValueToMinutes(
-            newCheckOutTime
-        );
-
-    let durationMinutes =
-        checkOutMinutes -
-        checkInMinutes;
-
-    if (
-        durationMinutes < 0
-    ) {
-        durationMinutes +=
-            24 * 60;
-    }
-
-    if (
-        durationMinutes > 0
-    ) {
-        totalHours =
+        const totalHours =
             Number(
                 (
-                    durationMinutes / 60
+                    punchState.completedHours +
+                    finalSessionHours
                 ).toFixed(2)
             );
 
-        totalHoursFormatted =
+        const totalHoursFormatted =
             formatDuration(
                 totalHours
             );
+
+
+        const updatedAttendance =
+            await prisma.attendance.update({
+                where: {
+                    attendanceId: id
+                },
+
+                data: {
+                    checkOutTime:
+                        settlementTime,
+
+                    totalHours,
+
+                    status:
+                        status !== undefined
+                            ? status
+                            : "PRESENT",
+
+                    resolutionSource:
+                        "ADMIN",
+
+                    manualOverride:
+                        true,
+
+                    manualOverrideAt:
+                        new Date(),
+
+                    manualOverrideBy:
+                        getAdminIdFromUser(
+                            adminUser
+                        )
+                },
+
+                include: {
+                    employee: {
+                        select: {
+                            employeeId: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            status: true
+                        }
+                    }
+                }
+            });
+
+
+        return {
+            attendance:
+                serializeAttendance(
+                    updatedAttendance
+                ),
+
+            totalHours,
+
+            totalHoursFormatted,
+
+            correctedBy:
+                adminUser?.userId ||
+                adminUser?.id ||
+                null
+        };
     }
-}
 
 
-const updateData = {};
-
-
-if (
-    checkInTime !== undefined
-) {
-    updateData.checkInTime =
-        newCheckInTime;
-}
-
-
-if (
-    checkOutTime !== undefined
-) {
-    updateData.checkOutTime =
-        newCheckOutTime;
-}
-
-
-if (
-    checkInTime !== undefined ||
-    checkOutTime !== undefined
-) {
-    updateData.totalHours =
-        totalHours;
-}
-
-
-if (
-    status !== undefined
-) {
-    const allowedStatuses = [
-        "PRESENT",
-        "ABSENT"
-    ];
+    // ======================================================
+    // HISTORICAL MISSING-CHECKOUT SETTLEMENT
+    // ======================================================
+    //
+    // An administrator may settle a previous day's final open IN.
+    // We never overwrite or delete raw fingerprint punches.
+    // Instead, we recalculate the whole day from those punches.
+    //
+    // Historical missing-checkout settlement is also subject to the
+    // same three-calendar-day correction window.
+    // ======================================================
 
     if (
-        !allowedStatuses.includes(
-            status
-        )
+        checkOutTime !== undefined
     ) {
-        const error = new Error(
-            "Invalid attendance status"
-        );
+        const isHistoricalDate =
+            attendanceDateString <
+            todayDateString;
 
-        error.statusCode = 400;
+        if (isHistoricalDate) {
 
-        throw error;
+            if (!correctionWindowOpen) {
+                const error = new Error(
+                    `This attendance correction is locked. Admin correction was allowed only until ${correctionLockDate}.`
+                );
+
+                error.statusCode = 409;
+                error.code =
+                    "ATTENDANCE_CORRECTION_LOCKED";
+
+                throw error;
+            }
+
+
+            const settlementTime =
+                parseTime(
+                    checkOutTime,
+                    "checkOutTime"
+                );
+
+            const dayStart =
+                getStartOfDay(
+                    attendanceDate
+                );
+
+            const dayEnd =
+                getEndOfDay(
+                    attendanceDate
+                );
+
+            const rawPunches =
+                await prisma.attendancePunch.findMany({
+                    where: {
+                        employeeId:
+                            existingAttendance.employeeId,
+
+                        punchedAt: {
+                            gte: dayStart,
+                            lte: dayEnd
+                        }
+                    },
+
+                    orderBy: {
+                        punchedAt: "asc"
+                    }
+                });
+
+            const punchState =
+                calculatePunchSessionState(
+                    rawPunches
+                );
+
+            if (punchState.hasOpenSession) {
+                const storedCheckout =
+                    formatTimeValue(
+                        existingAttendance.checkOutTime
+                    );
+
+                const lastRawOut =
+                    punchState.lastOut
+                        ? formatTimeValue(
+                            createMySQLTimeFromIST(
+                                punchState.lastOut
+                            )
+                        )
+                        : null;
+
+                const alreadyAdminCorrected =
+                    existingAttendance.manualOverride ===
+                    true;
+
+                const alreadySettledByRealOut =
+                    !alreadyAdminCorrected &&
+                    storedCheckout !== null &&
+                    lastRawOut !== null &&
+                    storedCheckout === lastRawOut;
+
+                if (alreadySettledByRealOut) {
+                    const error = new Error(
+                        "This historical attendance already has a real device checkout and cannot be settled as a missing checkout."
+                    );
+
+                    error.statusCode = 409;
+
+                    throw error;
+                }
+
+                const settlementInstant =
+                    combineAttendanceDateAndTime(
+                        attendanceDate,
+                        settlementTime
+                    );
+
+                if (!settlementInstant) {
+                    const error = new Error(
+                        "Invalid settlement checkout time"
+                    );
+
+                    error.statusCode = 400;
+
+                    throw error;
+                }
+
+                if (
+                    settlementInstant.getTime() <=
+                    punchState.openIn.getTime()
+                ) {
+                    const error = new Error(
+                        "Settlement checkout time must be later than the final unmatched IN time on the same attendance date."
+                    );
+
+                    error.statusCode = 400;
+
+                    throw error;
+                }
+
+                const finalSessionMilliseconds =
+                    settlementInstant.getTime() -
+                    punchState.openIn.getTime();
+
+                const finalSessionHours =
+                    finalSessionMilliseconds /
+                    (1000 * 60 * 60);
+
+                const totalHours =
+                    Number(
+                        (
+                            punchState.completedHours +
+                            finalSessionHours
+                        ).toFixed(2)
+                    );
+
+                const totalHoursFormatted =
+                    formatDuration(
+                        totalHours
+                    );
+
+                const updatedAttendance =
+                    await prisma.attendance.update({
+                        where: {
+                            attendanceId: id
+                        },
+
+                        data: {
+                            checkOutTime:
+                                settlementTime,
+
+                            totalHours,
+
+                            status:
+                                status !== undefined
+                                    ? status
+                                    : "PRESENT",
+
+                            resolutionSource:
+                                "ADMIN",
+
+                            manualOverride:
+                                true,
+
+                            manualOverrideAt:
+                                new Date(),
+
+                            manualOverrideBy:
+                                getAdminIdFromUser(
+                                    adminUser
+                                )
+                        },
+
+                        include: {
+                            employee: {
+                                select: {
+                                    employeeId: true,
+                                    firstName: true,
+                                    lastName: true,
+                                    email: true,
+                                    status: true
+                                }
+                            }
+                        }
+                    });
+
+                return {
+                    attendance:
+                        serializeAttendance(
+                            updatedAttendance
+                        ),
+
+                    totalHours,
+
+                    totalHoursFormatted,
+
+                    correctedBy:
+                        adminUser?.userId ||
+                        adminUser?.id ||
+                        null
+                };
+            }
+
+            const error = new Error(
+                "This historical attendance does not have an unresolved final IN session to settle."
+            );
+
+            error.statusCode = 409;
+
+            throw error;
+        }
     }
 
-    updateData.status =
-        status;
-}
+
+    // ======================================================
+    // NORMAL ATTENDANCE CORRECTION
+    // ======================================================
+
+    const newCheckInTime =
+        checkInTime !== undefined
+            ? parseTime(
+                checkInTime,
+                "checkInTime"
+            )
+            : existingAttendance.checkInTime;
 
 
-
-// ======================================================
-// PROTECT EXPLICIT ADMIN CORRECTION
-// ======================================================
-//
-// Any successful manual attendance edit becomes the authoritative
-// ERP resolution for that date. Raw biometric punches remain
-// unchanged for auditability.
-// ======================================================
-
-updateData.resolutionSource =
-"ADMIN";
-
-updateData.manualOverride =
-true;
-
-updateData.manualOverrideAt =
-new Date();
-
-updateData.manualOverrideBy =
-getAdminIdFromUser(
-adminUser
-);
+    const newCheckOutTime =
+        checkOutTime !== undefined
+            ? parseTime(
+                checkOutTime,
+                "checkOutTime"
+            )
+            : existingAttendance.checkOutTime;
 
 
-const updatedAttendance =
-    await prisma.attendance.update({
-        where: {
-            attendanceId: id
-        },
+    let totalHours = null;
+    let totalHoursFormatted =
+        "0 minutes";
 
-        data: updateData,
 
-        include: {
-            employee: {
-                select: {
-                    employeeId: true,
-                    firstName: true,
-                    lastName: true,
-                    email: true,
-                    status: true
+    if (
+        newCheckInTime &&
+        newCheckOutTime
+    ) {
+        const checkInMinutes =
+            timeValueToMinutes(
+                newCheckInTime
+            );
+
+        const checkOutMinutes =
+            timeValueToMinutes(
+                newCheckOutTime
+            );
+
+        let durationMinutes =
+            checkOutMinutes -
+            checkInMinutes;
+
+        if (
+            durationMinutes < 0
+        ) {
+            durationMinutes +=
+                24 * 60;
+        }
+
+        if (
+            durationMinutes > 0
+        ) {
+            totalHours =
+                Number(
+                    (
+                        durationMinutes / 60
+                    ).toFixed(2)
+                );
+
+            totalHoursFormatted =
+                formatDuration(
+                    totalHours
+                );
+        }
+    }
+
+
+    const updateData = {};
+
+
+    if (
+        checkInTime !== undefined
+    ) {
+        updateData.checkInTime =
+            newCheckInTime;
+    }
+
+
+    if (
+        checkOutTime !== undefined
+    ) {
+        updateData.checkOutTime =
+            newCheckOutTime;
+    }
+
+
+    if (
+        checkInTime !== undefined ||
+        checkOutTime !== undefined
+    ) {
+        updateData.totalHours =
+            totalHours;
+    }
+
+
+    if (
+        status !== undefined
+    ) {
+        const allowedStatuses = [
+            "PRESENT",
+            "ABSENT"
+        ];
+
+        if (
+            !allowedStatuses.includes(
+                status
+            )
+        ) {
+            const error = new Error(
+                "Invalid attendance status"
+            );
+
+            error.statusCode = 400;
+
+            throw error;
+        }
+
+        updateData.status =
+            status;
+    }
+
+
+    // ======================================================
+    // PROTECT EXPLICIT ADMIN CORRECTION
+    // ======================================================
+
+    updateData.resolutionSource =
+        "ADMIN";
+
+    updateData.manualOverride =
+        true;
+
+    updateData.manualOverrideAt =
+        new Date();
+
+    updateData.manualOverrideBy =
+        getAdminIdFromUser(
+            adminUser
+        );
+
+
+    const updatedAttendance =
+        await prisma.attendance.update({
+            where: {
+                attendanceId: id
+            },
+
+            data: updateData,
+
+            include: {
+                employee: {
+                    select: {
+                        employeeId: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true,
+                        status: true
+                    }
                 }
             }
-        }
-    });
+        });
 
 
-return {
-    attendance:
-        serializeAttendance(
-            updatedAttendance
-        ),
+    return {
+        attendance:
+            serializeAttendance(
+                updatedAttendance
+            ),
 
-    totalHours,
+        totalHours,
 
-    totalHoursFormatted,
+        totalHoursFormatted,
 
-    correctedBy:
-        adminUser?.userId ||
-        adminUser?.id ||
-        null
-};
+        correctedBy:
+            adminUser?.userId ||
+            adminUser?.id ||
+            null
+    };
 
 };
 
