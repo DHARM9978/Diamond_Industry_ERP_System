@@ -8,6 +8,13 @@ import {
   Save,
   CheckCircle2,
   Loader2,
+  SlidersHorizontal,
+  X,
+  IndianRupee,
+  Clock,
+  Users,
+  UserCheck,
+  UserX,
 } from 'lucide-react';
 
 import {
@@ -910,7 +917,7 @@ export function AdminPayroll() {
 
 
   // ==========================================================
-  //   // LOAD CONFIGURATION WHEN BRANCH CHANGES
+  // LOAD CONFIGURATION WHEN BRANCH CHANGES
   // ==========================================================
 
   useEffect(() => {
@@ -980,166 +987,162 @@ export function AdminPayroll() {
   // GENERATE CURRENT PAYROLL
   // ==========================================================
 
-// ==========================================================
-// GENERATE CURRENT PAYROLL
-// ==========================================================
+  const handleGenerateCurrentPayroll =
+    async () => {
 
-const handleGenerateCurrentPayroll =
-  async () => {
+      try {
 
-    try {
+        setGeneratingPayroll(true);
+        setPayrollMessage('');
+        setPayrollError('');
 
-      setGeneratingPayroll(true);
-      setPayrollMessage('');
-      setPayrollError('');
+        if (branches.length === 0) {
+          setPayrollError(
+            'No branches are available.'
+          );
+          return;
+        }
 
-      if (branches.length === 0) {
-        setPayrollError(
-          'No branches are available.'
-        );
-        return;
-      }
+        const branchesToGenerate =
+          selectedBranch === 'ALL'
+            ? branches
+            : branches.filter(
+                (branch) =>
+                  Number(branch.branchId) ===
+                  Number(selectedBranch)
+              );
 
-      const branchesToGenerate =
-        selectedBranch === 'ALL'
-          ? branches
-          : branches.filter(
-              (branch) =>
-                Number(branch.branchId) ===
-                Number(selectedBranch)
+        const generationResults = [];
+
+        for (
+          const branch
+          of branchesToGenerate
+        ) {
+
+          const branchId =
+            Number(
+              branch.branchId
             );
 
-      const generationResults = [];
+          const response =
+            await payrollService.generateCurrentBranch(
+              branchId
+            );
 
-      for (
-        const branch
-        of branchesToGenerate
-      ) {
+          generationResults.push(
+            response
+          );
+        }
 
-        const branchId =
-          Number(
-            branch.branchId
+
+        const generatedCount =
+          generationResults.reduce(
+            (
+              total,
+              result
+            ) =>
+              total +
+              Number(
+                result?.generatedCount || 0
+              ),
+            0
           );
 
-        const response =
-          await payrollService.generateCurrentBranch(
-            branchId
+
+        const alreadyGeneratedCount =
+          generationResults.reduce(
+            (
+              total,
+              result
+            ) =>
+              total +
+              Number(
+                result?.alreadyGeneratedCount || 0
+              ),
+            0
           );
 
-        generationResults.push(
-          response
+
+        const employeeErrors =
+          generationResults.flatMap(
+            (result) =>
+              Array.isArray(
+                result?.results
+              )
+                ? result.results.filter(
+                    (item) =>
+                      item?.success === false
+                  )
+                : []
+          );
+
+
+        if (
+          employeeErrors.length > 0
+        ) {
+
+          setPayrollError(
+            employeeErrors
+              .map(
+                (item) =>
+                  `Employee ${item.employeeId}: ${item.error}`
+              )
+              .join(' | ')
+          );
+
+        } else if (
+          generatedCount > 0
+        ) {
+
+          setPayrollMessage(
+            `${generatedCount} payroll record(s) generated successfully.`
+          );
+
+        } else if (
+          alreadyGeneratedCount > 0
+        ) {
+
+          setPayrollMessage(
+            'Payroll is already generated for the current period.'
+          );
+
+        } else {
+
+          setPayrollError(
+            'Payroll generation completed, but no employee payroll records were created.'
+          );
+
+        }
+
+
+        // Reload payroll after generation
+        await loadPayroll();
+        await loadSelectedMonthPayroll(
+          selectedPayrollMonth,
+          selectedPayrollYear,
+          selectedBranch
         );
-      }
 
+      } catch (error) {
 
-      const generatedCount =
-        generationResults.reduce(
-          (
-            total,
-            result
-          ) =>
-            total +
-            Number(
-              result?.generatedCount || 0
-            ),
-          0
+        console.error(
+          'Failed to generate current payroll:',
+          error
         );
-
-
-      const alreadyGeneratedCount =
-        generationResults.reduce(
-          (
-            total,
-            result
-          ) =>
-            total +
-            Number(
-              result?.alreadyGeneratedCount || 0
-            ),
-          0
-        );
-
-
-      const employeeErrors =
-        generationResults.flatMap(
-          (result) =>
-            Array.isArray(
-              result?.results
-            )
-              ? result.results.filter(
-                  (item) =>
-                    item?.success === false
-                )
-              : []
-        );
-
-
-      if (
-        employeeErrors.length > 0
-      ) {
 
         setPayrollError(
-          employeeErrors
-            .map(
-              (item) =>
-                `Employee ${item.employeeId}: ${item.error}`
-            )
-            .join(' | ')
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to generate current payroll.'
         );
 
-      } else if (
-        generatedCount > 0
-      ) {
+      } finally {
 
-        setPayrollMessage(
-          `${generatedCount} payroll record(s) generated successfully.`
-        );
-
-      } else if (
-        alreadyGeneratedCount > 0
-      ) {
-
-        setPayrollMessage(
-          'Payroll is already generated for the current period.'
-        );
-
-      } else {
-
-        setPayrollError(
-          'Payroll generation completed, but no employee payroll records were created.'
-        );
+        setGeneratingPayroll(false);
 
       }
 
-
-      // Reload payroll after generation
-      await loadPayroll();
-      await loadSelectedMonthPayroll(
-        selectedPayrollMonth,
-        selectedPayrollYear,
-        selectedBranch
-      );
-
-    } catch (error) {
-
-      console.error(
-        'Failed to generate current payroll:',
-        error
-      );
-
-      setPayrollError(
-        error?.response?.data?.message ||
-        error?.message ||
-        'Failed to generate current payroll.'
-      );
-
-    } finally {
-
-      setGeneratingPayroll(false);
-
-    }
-
-  };
+    };
 
 
   // ==========================================================
@@ -1433,7 +1436,7 @@ const handleGenerateCurrentPayroll =
 
 
   // ==========================================================
-  //   // PAYROLL MONTH
+  // PAYROLL MONTH
   // ==========================================================
 
   const getPayrollMonth = (
@@ -3358,6 +3361,152 @@ const handleGenerateCurrentPayroll =
 
 
   // ==========================================================
+  // DERIVED VALUES FOR FILTER + SUMMARY SECTION
+  // ==========================================================
+
+  const selectedPeriodLabel =
+    new Date(
+      Number(selectedPayrollYear),
+      Number(selectedPayrollMonth) - 1,
+      1
+    ).toLocaleDateString('en-IN', {
+      month: 'long',
+      year: 'numeric',
+    });
+
+  const selectedBranchLabel =
+    selectedBranch === 'ALL'
+      ? 'All Branches'
+      : (
+          branches.find(
+            (branch) =>
+              Number(branch.branchId) ===
+              Number(selectedBranch)
+          )?.branchName ||
+          `Branch ${selectedBranch}`
+        );
+
+  const yearOptions = Array.from(
+    new Set([
+      ...records
+        .map((record) => {
+          if (!record?.payPeriodStart) return null;
+          const date = new Date(record.payPeriodStart);
+          return Number.isNaN(date.getTime())
+            ? null
+            : date.getUTCFullYear();
+        })
+        .filter(Boolean),
+      new Date().getFullYear() - 1,
+      new Date().getFullYear(),
+      new Date().getFullYear() + 1,
+    ])
+  ).sort((a, b) => b - a);
+
+  const summaryTotalPayroll =
+    Number(payrollSummary?.totalPayroll) || 0;
+
+  const summaryTotalPaid =
+    Number(payrollSummary?.totalPaid) || 0;
+
+  const summaryTotalPending =
+    Number(payrollSummary?.totalPending) || 0;
+
+  const summaryEmployeeCount =
+    Number(payrollSummary?.employeeCount) || 0;
+
+  const summaryPaidCount =
+    Number(payrollSummary?.paidCount) || 0;
+
+  const summaryPendingCount =
+    Number(payrollSummary?.pendingCount) || 0;
+
+  // ==========================================================
+  // MONTHLY PAYROLL / ADVANCE SUMMARY
+  // ==========================================================
+  //
+  // These values are calculated from the same selected-month
+  // payroll records used by the Current Payroll employee table.
+  // This keeps the summary aligned with the selected month/year
+  // and branch filter.
+  //
+  // Total Advance Taken     -> sum of payroll advance deductions
+  // Total Payroll Generated -> paid payroll + pending payroll +
+  //                            advance deductions
+  //
+  // For both PAID and UNPAID records, advanceDeduction is the
+  // amount that was taken from the employee for that payroll
+  // period. Adding it back to the net payroll reconstructs the
+  // generated payroll amount before the advance deduction.
+  // ==========================================================
+
+  const monthlySummaryRecords =
+    Array.isArray(selectedMonthPayrollRecords)
+      ? selectedMonthPayrollRecords
+      : [];
+
+  const summaryTotalAdvanceTaken =
+    monthlySummaryRecords.reduce(
+      (total, record) => {
+        let advance =
+          Number(
+            record?.advanceDeduction ??
+            0
+          );
+
+        // Older/alternate payroll responses may expose advance
+        // details without the aggregate advanceDeduction field.
+        if (
+          !Number.isFinite(advance) ||
+          advance < 0
+        ) {
+          advance = 0;
+        }
+
+        if (advance === 0 && Array.isArray(record?.advancePayments)) {
+          advance = record.advancePayments.reduce(
+            (advanceTotal, payment) => {
+              const deduction = Number(
+                payment?.deductionAmount ??
+                payment?.paidAmount ??
+                0
+              );
+
+              return advanceTotal +
+                (Number.isFinite(deduction)
+                  ? Math.max(deduction, 0)
+                  : 0);
+            },
+            0
+          );
+        }
+
+        return total + advance;
+      },
+      0
+    );
+
+  const summaryPayrollGenerated =
+    summaryTotalPaid +
+    summaryTotalPending +
+    summaryTotalAdvanceTaken;
+
+  const paidPercentage =
+    summaryTotalPayroll > 0
+      ? Math.min(
+          100,
+          (summaryTotalPaid / summaryTotalPayroll) * 100
+        )
+      : 0;
+
+  const hasActiveFilters =
+    Boolean(search) || selectedBranch !== 'ALL';
+
+  const fieldClassName =
+    'w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200';
+
+
+  // ==========================================================
   // PAGE
   // ==========================================================
 
@@ -3379,14 +3528,7 @@ const handleGenerateCurrentPayroll =
                 filteredSelectedMonthPayroll.length !== 1
                   ? 's'
                   : ''
-              } for ${new Date(
-                Number(selectedPayrollYear),
-                Number(selectedPayrollMonth) - 1,
-                1
-              ).toLocaleDateString('en-IN', {
-                month: 'long',
-                year: 'numeric',
-              })}`
+              } for ${selectedPeriodLabel}`
             : payrollView === 'LAST_MONTH_PENDING'
               ? `${filteredLastMonthPendingPayroll.length} last-month pending payroll record${
                   filteredLastMonthPendingPayroll.length !== 1
@@ -3571,139 +3713,134 @@ const handleGenerateCurrentPayroll =
 
 
       {/* ======================================================
-          FILTERS
+          FILTERS (BRANCH / MONTH / YEAR / SEARCH)
       ====================================================== */}
 
-      <div className="mb-5 flex flex-col lg:flex-row gap-3">
+      <div className="mb-5 rounded-xl border border-navy-100 bg-white">
 
         {/* ----------------------------------------------------
-            BRANCH
+            FILTER HEADER
         ----------------------------------------------------- */}
 
-        <div className="w-full lg:w-64">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-navy-100 px-5 py-3">
 
-          <label
-            htmlFor="payroll-branch"
-            className="block text-xs font-medium text-navy-500 mb-1"
-          >
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
 
-            Branch
+            <div className="flex items-center gap-2">
 
-          </label>
+              <SlidersHorizontal
+                size={16}
+                className="text-navy-600"
+              />
 
+              <h2 className="text-sm font-semibold text-navy-800">
+                Filters
+              </h2>
 
-          <select
-            id="payroll-branch"
-            value={selectedBranch}
-            onChange={(event) =>
-              setSelectedBranch(
-                event.target.value
-              )
-            }
-            className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
-          >
+            </div>
 
-            <option value="ALL">
+            <span className="rounded-full border border-navy-100 bg-navy-50 px-2.5 py-0.5 text-xs text-navy-600">
+              <span className="font-semibold text-navy-800">
+                {selectedPeriodLabel}
+              </span>
+              {' • '}
+              {selectedBranchLabel}
+            </span>
 
-              All Branches
-
-            </option>
+          </div>
 
 
-            {branches.map(
-              (branch) => (
+          <div className="flex items-center gap-2">
 
-                <option
-                  key={branch.branchId}
-                  value={branch.branchId}
-                >
+            {hasActiveFilters && (
 
-                  {branch.branchName}
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  setSelectedBranch('ALL');
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-navy-600 hover:bg-navy-50 transition-colors"
+              >
 
-                </option>
+                <X size={14} />
 
-              )
+                Clear filters
+
+              </button>
+
             )}
-
-          </select>
-
-        </div>
-
-
-        {/* ----------------------------------------------------
-            SEARCH
-        ----------------------------------------------------- */}
-
-        <div className="flex-1">
-
-          <label className="block text-xs font-medium text-navy-500 mb-1">
-
-            Search Employee
-
-          </label>
-
-
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search by employee name, ID, email or branch..."
-          />
-
-        </div>
-
-
-        {/* ----------------------------------------------------
-            REFRESH
-        ----------------------------------------------------- */}
-
-        <div className="flex items-end">
-
-          <button
-            type="button"
-            onClick={handleRefresh}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors"
-          >
-
-            <RefreshCw
-              size={16}
-            />
-
-            Refresh
-
-          </button>
-
-
-          {(search || selectedBranch !== 'ALL') && (
 
             <button
               type="button"
-              onClick={() => {
-                setSearch('');
-                setSelectedBranch('ALL');
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors"
+              onClick={handleRefresh}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-navy-200 px-3 py-1.5 text-xs font-medium text-navy-700 hover:bg-navy-50 transition-colors"
             >
 
-              Clear Filters
+              <RefreshCw size={14} />
+
+              Refresh
 
             </button>
 
-          )}
+          </div>
 
         </div>
 
-      </div>
+
+        {/* ----------------------------------------------------
+            FILTER FIELDS
+        ----------------------------------------------------- */}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-12 gap-4 p-5">
+
+          {/* BRANCH */}
+
+          <div className="xl:col-span-3">
+
+            <label
+              htmlFor="payroll-branch"
+              className="block text-xs font-medium text-navy-500 mb-1"
+            >
+              Branch
+            </label>
+
+            <select
+              id="payroll-branch"
+              value={selectedBranch}
+              onChange={(event) =>
+                setSelectedBranch(
+                  event.target.value
+                )
+              }
+              className={fieldClassName}
+            >
+
+              <option value="ALL">
+                All Branches
+              </option>
+
+              {branches.map(
+                (branch) => (
+
+                  <option
+                    key={branch.branchId}
+                    value={branch.branchId}
+                  >
+                    {branch.branchName}
+                  </option>
+
+                )
+              )}
+
+            </select>
+
+          </div>
 
 
-      {/* ======================================================
-          PAYROLL MONTH / YEAR FILTER
-      ====================================================== */}
+          {/* MONTH */}
 
-      <div className="mb-5 rounded-xl border border-navy-100 bg-white p-5">
-
-        <div className="flex flex-col lg:flex-row lg:items-end gap-3">
-
-          <div className="w-full lg:w-56">
+          <div className="xl:col-span-2">
 
             <label
               htmlFor="payroll-month"
@@ -3720,7 +3857,7 @@ const handleGenerateCurrentPayroll =
                   Number(event.target.value)
                 )
               }
-              className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
+              className={fieldClassName}
             >
               {Array.from({ length: 12 }, (_, index) => {
                 const monthNumber = index + 1;
@@ -3745,7 +3882,10 @@ const handleGenerateCurrentPayroll =
 
           </div>
 
-          <div className="w-full lg:w-40">
+
+          {/* YEAR */}
+
+          <div className="xl:col-span-2">
 
             <label
               htmlFor="payroll-year"
@@ -3762,46 +3902,32 @@ const handleGenerateCurrentPayroll =
                   Number(event.target.value)
                 )
               }
-              className="w-full px-3 py-2 rounded-lg border border-navy-200 bg-white text-navy-700 focus:outline-none focus:ring-2 focus:ring-navy-200"
+              className={fieldClassName}
             >
-              {Array.from(
-                new Set([
-                  ...records
-                    .map((record) => {
-                      if (!record?.payPeriodStart) return null;
-                      const date = new Date(record.payPeriodStart);
-                      return Number.isNaN(date.getTime())
-                        ? null
-                        : date.getUTCFullYear();
-                    })
-                    .filter(Boolean),
-                  new Date().getFullYear() - 1,
-                  new Date().getFullYear(),
-                  new Date().getFullYear() + 1,
-                ])
-              )
-                .sort((a, b) => b - a)
-                .map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
             </select>
 
           </div>
 
-          <div className="pb-2 text-sm text-navy-500">
-            Showing payroll period for{' '}
-            <span className="font-semibold text-navy-800">
-              {new Date(
-                Number(selectedPayrollYear),
-                Number(selectedPayrollMonth) - 1,
-                1
-              ).toLocaleDateString('en-IN', {
-                month: 'long',
-                year: 'numeric',
-              })}
-            </span>
+
+          {/* SEARCH */}
+
+          <div className="sm:col-span-2 xl:col-span-5">
+
+            <label className="block text-xs font-medium text-navy-500 mb-1">
+              Search Employee
+            </label>
+
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search by employee name, ID, email or branch..."
+            />
+
           </div>
 
         </div>
@@ -3813,52 +3939,267 @@ const handleGenerateCurrentPayroll =
           SELECTED PAYROLL SUMMARY
       ====================================================== */}
 
-      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+      <div className="mb-6">
 
         {payrollSummaryLoading ? (
 
-          <div className="xl:col-span-6 rounded-xl border border-navy-100 bg-white p-5 text-sm text-navy-500">
+          <div className="rounded-xl border border-navy-100 bg-white p-5 text-sm text-navy-500 flex items-center gap-2">
+
+            <Loader2
+              size={16}
+              className="animate-spin"
+            />
+
             Loading payroll summary...
+
           </div>
 
         ) : (
-          <>
-            {[
-              ['Total Payroll', payrollSummary?.totalPayroll ?? 0],
-              ['Total Paid', payrollSummary?.totalPaid ?? 0],
-              ['Total Pending', payrollSummary?.totalPending ?? 0],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-xl border border-navy-100 bg-white p-5"
-              >
-                <div className="text-xs font-medium text-navy-500">
-                  {label}
-                </div>
-                <div className="mt-2 text-xl font-bold text-navy-900">
-                  {formatCurrency(value)}
-                </div>
-              </div>
-            ))}
 
-            {[
-              ['Employees', payrollSummary?.employeeCount ?? 0],
-              ['Paid Employees', payrollSummary?.paidCount ?? 0],
-              ['Pending Employees', payrollSummary?.pendingCount ?? 0],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-xl border border-navy-100 bg-white p-5"
-              >
-                <div className="text-xs font-medium text-navy-500">
-                  {label}
+          <div className="space-y-4">
+
+            {/* ------------------------------------------------
+                MONTHLY SUMMARY CARDS
+            ------------------------------------------------- */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+              {/* TOTAL PAYROLL */}
+
+              <div className="rounded-xl border border-navy-100 bg-white p-5 flex items-start gap-4">
+
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy-50 text-navy-700">
+                  <IndianRupee size={20} />
                 </div>
-                <div className="mt-2 text-xl font-bold text-navy-900">
-                  {Number(value) || 0}
+
+                <div className="min-w-0">
+
+                  <div className="text-xs font-medium text-navy-500">
+                    Total Payroll
+                  </div>
+
+                  <div className="mt-1 truncate text-2xl font-bold text-navy-900">
+                    {formatCurrency(summaryTotalPayroll)}
+                  </div>
+
+                  <div className="mt-1 text-xs text-navy-400">
+                    Gross payroll for {selectedPeriodLabel}
+                  </div>
+
                 </div>
+
               </div>
-            ))}
-          </>
+
+
+              {/* TOTAL ADVANCE TAKEN */}
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-5 flex items-start gap-4">
+
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                  <Wallet size={20} />
+                </div>
+
+                <div className="min-w-0">
+
+                  <div className="text-xs font-medium text-amber-700">
+                    Total Advance Taken
+                  </div>
+
+                  <div className="mt-1 truncate text-2xl font-bold text-navy-900">
+                    {formatCurrency(summaryTotalAdvanceTaken)}
+                  </div>
+
+                  <div className="mt-1 text-xs text-navy-500">
+                    Advance amount deducted in {selectedPeriodLabel}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* TOTAL PAYROLL GENERATED */}
+
+              <div className="rounded-xl border border-accent-200 bg-accent-50/50 p-5 flex items-start gap-4">
+
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent-100 text-accent-700">
+                  <IndianRupee size={20} />
+                </div>
+
+                <div className="min-w-0">
+
+                  <div className="text-xs font-medium text-accent-700">
+                    Total Payroll Generated
+                  </div>
+
+                  <div className="mt-1 truncate text-2xl font-bold text-navy-900">
+                    {formatCurrency(summaryPayrollGenerated)}
+                  </div>
+
+                  <div className="mt-1 text-xs text-navy-500">
+                    Paid + pending payroll + advances
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* PAID PAYROLL */}
+
+              <div className="rounded-xl border border-green-200 bg-green-50/60 p-5 flex items-start gap-4">
+
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700">
+                  <CheckCircle2 size={20} />
+                </div>
+
+                <div className="min-w-0">
+
+                  <div className="text-xs font-medium text-green-700">
+                    Paid Payroll
+                  </div>
+
+                  <div className="mt-1 truncate text-2xl font-bold text-navy-900">
+                    {formatCurrency(summaryTotalPaid)}
+                  </div>
+
+                  <div className="mt-1 text-xs text-navy-500">
+                    {summaryPaidCount} employee{summaryPaidCount !== 1 ? 's' : ''} paid
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* PENDING PAYROLL */}
+
+              <div className="rounded-xl border border-navy-100 bg-white p-5 flex items-start gap-4">
+
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy-800 text-white">
+                  <Clock size={20} />
+                </div>
+
+                <div className="min-w-0">
+
+                  <div className="text-xs font-medium text-navy-500">
+                    Pending Payroll
+                  </div>
+
+                  <div className="mt-1 truncate text-2xl font-bold text-navy-900">
+                    {formatCurrency(summaryTotalPending)}
+                  </div>
+
+                  <div className="mt-1 text-xs text-navy-400">
+                    {summaryPendingCount} employee{summaryPendingCount !== 1 ? 's' : ''} awaiting payment
+                  </div>
+
+                </div>
+
+              </div>
+
+
+
+            </div>
+
+
+            {/* ------------------------------------------------
+                PAYMENT PROGRESS
+            ------------------------------------------------- */}
+
+            <div className="rounded-xl border border-navy-100 bg-white p-5">
+
+              <div className="flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-8">
+
+                {/* PROGRESS BAR */}
+
+                <div className="flex-1">
+
+                  <div className="flex items-baseline justify-between mb-2">
+
+                    <span className="text-sm font-semibold text-navy-800">
+                      Payment progress
+                    </span>
+
+                    <span className="text-sm font-bold text-navy-900">
+                      {paidPercentage.toFixed(paidPercentage > 0 && paidPercentage < 1 ? 2 : 0)}%
+                    </span>
+
+                  </div>
+
+                  <div
+                    className="h-2.5 w-full overflow-hidden rounded-full bg-navy-100"
+                    role="progressbar"
+                    aria-valuenow={Math.round(paidPercentage)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Payroll paid percentage"
+                  >
+                    <div
+                      className="h-full rounded-full bg-green-600 transition-all duration-500"
+                      style={{
+                        width: `${paidPercentage}%`,
+                      }}
+                    />
+                  </div>
+
+                  <div className="mt-2 text-xs text-navy-400">
+                    {formatCurrency(summaryTotalPaid)} of {formatCurrency(summaryTotalPayroll)} paid
+                  </div>
+
+                </div>
+
+
+                {/* EMPLOYEE COUNTS */}
+
+                <div className="grid grid-cols-3 gap-3 lg:w-[420px]">
+
+                  <div className="rounded-lg border border-navy-100 bg-navy-50/50 px-3 py-2.5">
+
+                    <div className="flex items-center gap-1.5 text-xs text-navy-500">
+                      <Users size={14} />
+                      Employees
+                    </div>
+
+                    <div className="mt-1 text-lg font-bold text-navy-900">
+                      {summaryEmployeeCount}
+                    </div>
+
+                  </div>
+
+                  <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2.5">
+
+                    <div className="flex items-center gap-1.5 text-xs text-green-700">
+                      <UserCheck size={14} />
+                      Paid
+                    </div>
+
+                    <div className="mt-1 text-lg font-bold text-navy-900">
+                      {summaryPaidCount}
+                    </div>
+
+                  </div>
+
+                  <div className="rounded-lg border border-navy-100 bg-white px-3 py-2.5">
+
+                    <div className="flex items-center gap-1.5 text-xs text-navy-500">
+                      <UserX size={14} />
+                      Pending
+                    </div>
+
+                    <div className="mt-1 text-lg font-bold text-navy-900">
+                      {summaryPendingCount}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
         )}
 
       </div>
@@ -3911,20 +4252,7 @@ const handleGenerateCurrentPayroll =
 
             <span className="font-semibold text-navy-800">
 
-              {selectedBranch === 'ALL'
-                ? 'All Branches'
-                : (
-                    branches.find(
-                      (branch) =>
-                        Number(
-                          branch.branchId
-                        ) ===
-                        Number(
-                          selectedBranch
-                        )
-                    )?.branchName ||
-                    `Branch ${selectedBranch}`
-                  )}
+              {selectedBranchLabel}
 
             </span>
 
@@ -4274,20 +4602,7 @@ const handleGenerateCurrentPayroll =
 
         <span className="text-sm font-semibold text-navy-800">
 
-          {selectedBranch === 'ALL'
-            ? 'All Branches'
-            : (
-                branches.find(
-                  (branch) =>
-                    Number(
-                      branch.branchId
-                    ) ===
-                    Number(
-                      selectedBranch
-                    )
-                )?.branchName ||
-                `Branch ${selectedBranch}`
-              )}
+          {selectedBranchLabel}
 
         </span>
 
