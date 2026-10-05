@@ -1115,8 +1115,19 @@ export function AdminPayroll() {
         }
 
 
-        // Reload payroll after generation
+        // Reload payroll and branch current periods after generation.
+        // The Current Payroll tab depends on both datasets, and the
+        // period refresh prevents stale branch boundaries from hiding
+        // newly generated employee payroll rows.
         await loadPayroll();
+        await loadCurrentPeriodsForBranches(
+          branchesToGenerate
+        );
+        await loadPayrollSummary(
+          selectedPayrollMonth,
+          selectedPayrollYear,
+          selectedBranch
+        );
         await loadSelectedMonthPayroll(
           selectedPayrollMonth,
           selectedPayrollYear,
@@ -1798,57 +1809,286 @@ export function AdminPayroll() {
 
 
   // ==========================================================
-  // CURRENT PAYROLL RECORDS
+  // PAID PAYROLL PERIOD KEYS
+  // ==========================================================
+  //
+  // A historical data problem can leave both a PAID and an
+  // UNPAID record for the same employee and payroll period.
+  // Once a matching PAID record exists, that period is settled
+  // and the unpaid duplicate must not appear in Current Payroll
+  // or Last Month Pending.
   // ==========================================================
 
-  const currentPayrollRecords =
+  const paidPayrollPeriodKeys =
     useMemo(() => {
-      return records.filter((record) => {
-        // Paid payrolls always belong to History.
-        if (isPayrollPaid(record)) return false;
 
-        const recordBranchId = getRecordBranchId(record);
+      const keys =
+        new Set();
 
-        if (recordBranchId === null) return false;
+      records.forEach((record) => {
 
-        // Current Payroll means the exact current period for this
-        // payroll record's branch. Older and future unpaid records
-        // must not appear in Current Payroll.
-        const branchCurrentPeriod =
-          currentPeriodsByBranch[Number(recordBranchId)];
+        if (!isPayrollPaid(record)) {
+          return;
+        }
 
-        if (!branchCurrentPeriod) return false;
+        const employeeId =
+          record?.employeeId ??
+          record?.employee?.employeeId;
 
-        const currentStart = getDateKey(
-          branchCurrentPeriod.payPeriodStart ??
-          branchCurrentPeriod.periodStart,
-          true
-        );
+        const periodStart =
+          getDateKey(
+            record?.payPeriodStart
+          );
 
-        const currentEnd = getDateKey(
-          branchCurrentPeriod.payPeriodEnd ??
-          branchCurrentPeriod.periodEnd,
-          true
-        );
+        const periodEnd =
+          getDateKey(
+            record?.payPeriodEnd
+          );
 
-        const recordStart = getDateKey(
-          record.payPeriodStart
-        );
+        if (
+          employeeId === null ||
+          employeeId === undefined ||
+          !periodStart ||
+          !periodEnd
+        ) {
+          return;
+        }
 
-        const recordEnd = getDateKey(
-          record.payPeriodEnd
-        );
-
-        return Boolean(
-          currentStart &&
-          currentEnd &&
-          recordStart &&
-          recordEnd &&
-          recordStart === currentStart &&
-          recordEnd === currentEnd
+        keys.add(
+          `${Number(employeeId)}|${periodStart}|${periodEnd}`
         );
       });
-    }, [records, currentPeriodsByBranch]);
+
+      return keys;
+
+    }, [records]);
+
+
+  const getPayrollPeriodKey = (
+    record
+  ) => {
+
+    const employeeId =
+      record?.employeeId ??
+      record?.employee?.employeeId;
+
+    const periodStart =
+      getDateKey(
+        record?.payPeriodStart
+      );
+
+    const periodEnd =
+      getDateKey(
+        record?.payPeriodEnd
+      );
+
+    if (
+      employeeId === null ||
+      employeeId === undefined ||
+      !periodStart ||
+      !periodEnd
+    ) {
+      return null;
+    }
+
+    return `${Number(employeeId)}|${periodStart}|${periodEnd}`;
+  };
+
+
+  // ==========================================================
+  // CURRENT PAYROLL RECORDS
+  // ==========================================================
+  //
+  // Current Payroll is branch-specific.
+  //
+  // IMPORTANT:
+  // Do not select the "closest" unpaid payroll period because an
+  // older payroll period can be only one day away from the current
+  // period when payroll dates cross a UTC/IST boundary. That was
+  // causing a branch to display its previous-month payroll as the
+  // current payroll.
+  //
+  // When the branch current-period endpoint is available, only an
+  // exact calendar-period match is accepted. We test both the UTC
+  // and IST calendar representation returned by the API. If the
+  // current-period endpoint is unavailable for a branch, we fall back
+  // to the newest unpaid period for that branch.
+  // ==========================================================
+
+  const getCurrentPeriodTargetByBranch = useMemo(() => {
+    const targetMap = {};
+
+    const unpaidRecords = records.filter(
+      (record) => !isPayrollPaid(record)
+    );
+
+    const recordsByBranch = {};
+
+    unpaidRecords.forEach((record) => {
+      const branchId = getRecordBranchId(record);
+
+      if (branchId === null) {
+        return;
+      }
+
+      if (!recordsByBranch[branchId]) {
+        recordsByBranch[branchId] = [];
+      }
+
+      recordsByBranch[branchId].push(record);
+    });
+
+    Object.entries(recordsByBranch).forEach(
+      ([branchIdKey, branchRecords]) => {
+        const branchId = Number(branchIdKey);
+
+        if (!Number.isInteger(branchId)) {
+          return;
+        }
+
+        const periods = {};
+
+        branchRecords.forEach((record) => {
+          const startKey = getDateKey(record.payPeriodStart);
+          const endKey = getDateKey(record.payPeriodEnd);
+
+          if (!startKey || !endKey) {
+            return;
+          }
+
+          const periodKey = `${startKey}|${endKey}`;
+
+          if (!periods[periodKey]) {
+            periods[periodKey] = {
+              payPeriodStart: startKey,
+              payPeriodEnd: endKey,
+            };
+          }
+        });
+
+        const periodList = Object.values(periods);
+
+        if (periodList.length === 0) {
+          return;
+        }
+
+        const branchCurrentPeriod =
+          currentPeriodsByBranch[branchId];
+
+        let selectedPeriod = null;
+
+        if (branchCurrentPeriod) {
+          const currentStartValue =
+            branchCurrentPeriod.payPeriodStart ??
+            branchCurrentPeriod.periodStart;
+
+          const currentEndValue =
+            branchCurrentPeriod.payPeriodEnd ??
+            branchCurrentPeriod.periodEnd;
+
+          const currentStartCandidates = [
+            getDateKey(currentStartValue),
+            getDateKey(currentStartValue, true),
+          ].filter(Boolean);
+
+          const currentEndCandidates = [
+            getDateKey(currentEndValue),
+            getDateKey(currentEndValue, true),
+          ].filter(Boolean);
+
+          // Build every valid UTC/IST representation pair. This
+          // handles the timezone representation without allowing the
+          // previous payroll period to become the current period.
+          const exactCurrentPeriodKeys = new Set();
+
+          currentStartCandidates.forEach((startKey) => {
+            currentEndCandidates.forEach((endKey) => {
+              exactCurrentPeriodKeys.add(
+                `${startKey}|${endKey}`
+              );
+            });
+          });
+
+          selectedPeriod =
+            periodList.find((period) =>
+              exactCurrentPeriodKeys.has(
+                `${period.payPeriodStart}|${period.payPeriodEnd}`
+              )
+            ) || null;
+        }
+
+        // Only fall back when the current-period endpoint itself is
+        // unavailable. Do NOT fall back to the newest unpaid period
+        // when the endpoint exists but its current period has not yet
+        // been generated. That would incorrectly show last month's
+        // payroll as Current Payroll.
+        if (!selectedPeriod && !branchCurrentPeriod) {
+          periodList.sort((left, right) => {
+            if (left.payPeriodEnd !== right.payPeriodEnd) {
+              return right.payPeriodEnd.localeCompare(
+                left.payPeriodEnd
+              );
+            }
+
+            return right.payPeriodStart.localeCompare(
+              left.payPeriodStart
+            );
+          });
+
+          selectedPeriod = periodList[0] || null;
+        }
+
+        if (selectedPeriod) {
+          targetMap[branchId] = selectedPeriod;
+        }
+      }
+    );
+
+    return targetMap;
+  }, [records, currentPeriodsByBranch]);
+
+
+  const currentPayrollRecords = useMemo(() => {
+    return records.filter((record) => {
+      if (isPayrollPaid(record)) {
+        return false;
+      }
+
+      const periodKey =
+        getPayrollPeriodKey(record);
+
+      if (
+        periodKey &&
+        paidPayrollPeriodKeys.has(periodKey)
+      ) {
+        return false;
+      }
+
+      const branchId = getRecordBranchId(record);
+
+      if (branchId === null) {
+        return false;
+      }
+
+      const targetPeriod =
+        getCurrentPeriodTargetByBranch[branchId];
+
+      if (!targetPeriod) {
+        return false;
+      }
+
+      return (
+        getDateKey(record.payPeriodStart) ===
+          targetPeriod.payPeriodStart &&
+        getDateKey(record.payPeriodEnd) ===
+          targetPeriod.payPeriodEnd
+      );
+    });
+  }, [
+    records,
+    getCurrentPeriodTargetByBranch,
+    paidPayrollPeriodKeys,
+  ]);
 
 
   // ==========================================================
@@ -1905,6 +2145,16 @@ export function AdminPayroll() {
 
         if (isPayrollPaid(record)) return false;
 
+        const periodKey =
+          getPayrollPeriodKey(record);
+
+        if (
+          periodKey &&
+          paidPayrollPeriodKeys.has(periodKey)
+        ) {
+          return false;
+        }
+
         const branchId = getRecordBranchId(record);
         if (branchId === null) return false;
 
@@ -1930,6 +2180,7 @@ export function AdminPayroll() {
       records,
       selectedBranch,
       lastMonthPendingPeriodsByBranch,
+      paidPayrollPeriodKeys,
     ]);
 
 
@@ -2526,7 +2777,7 @@ export function AdminPayroll() {
 
     const exportRecords =
       payrollView === 'CURRENT'
-        ? filteredSelectedMonthPayroll
+        ? filteredCurrentPayroll
         : payrollView === 'LAST_MONTH_PENDING'
           ? filteredLastMonthPendingPayroll
           : filteredHistoryPayroll;
@@ -3322,19 +3573,19 @@ export function AdminPayroll() {
   // CURRENT VIEW RECORDS
   // ==========================================================
   //
-  // The Month / Year selector drives the employee data shown
-  // in the Current Payroll tab as well as the Monthly Payroll
-  // Report above. This keeps the summary cards and employee rows
-  // on the same selected payroll month/year.
+  // The Month / Year selector drives the Monthly Payroll Report.
+  // Current Payroll remains tied to the exact current payroll
+  // period for each branch, while Last Month Pending and History
+  // remain independent record views.
   //
-  // CURRENT             -> selected month/year payroll records
+  // CURRENT             -> exact current payroll period records
   // LAST_MONTH_PENDING  -> previous unpaid payroll period records
   // HISTORY             -> paid payroll records
   // ==========================================================
 
   const displayedRecords =
     payrollView === 'CURRENT'
-      ? filteredSelectedMonthPayroll
+      ? filteredCurrentPayroll
       : payrollView === 'LAST_MONTH_PENDING'
         ? filteredLastMonthPendingPayroll
         : filteredHistoryPayroll;
@@ -3524,11 +3775,11 @@ export function AdminPayroll() {
 
         subtitle={
           payrollView === 'CURRENT'
-            ? `${filteredSelectedMonthPayroll.length} payroll record${
-                filteredSelectedMonthPayroll.length !== 1
+            ? `${filteredCurrentPayroll.length} current payroll record${
+                filteredCurrentPayroll.length !== 1
                   ? 's'
                   : ''
-              } for ${selectedPeriodLabel}`
+              } for the current payroll period`
             : payrollView === 'LAST_MONTH_PENDING'
               ? `${filteredLastMonthPendingPayroll.length} last-month pending payroll record${
                   filteredLastMonthPendingPayroll.length !== 1
@@ -3657,7 +3908,7 @@ export function AdminPayroll() {
               ? 'bg-white/15 text-white'
               : 'bg-navy-50 text-navy-600'
           }`}>
-            {filteredSelectedMonthPayroll.length}
+            {filteredCurrentPayroll.length}
           </span>
         </button>
 

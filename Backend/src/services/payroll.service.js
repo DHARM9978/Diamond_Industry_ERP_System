@@ -234,6 +234,55 @@ const endOfDay = (
 
 
 // ============================================================
+// HELPER: Payroll Paid State
+// ============================================================
+
+const isPayrollPaidRecord = (
+    payroll
+) => {
+
+    return (
+        String(
+            payroll?.status ||
+            ""
+        ).toUpperCase() ===
+            "PAID" ||
+        Boolean(
+            payroll?.paymentDate
+        )
+    );
+};
+
+
+// ============================================================
+// HELPER: Payroll Period Key
+// ============================================================
+
+const getPayrollPeriodKey = (
+    payroll
+) => {
+
+    const start =
+        payroll?.payPeriodStart
+            ? new Date(
+                payroll.payPeriodStart
+            ).toISOString().slice(0, 10)
+            : "";
+
+    const end =
+        payroll?.payPeriodEnd
+            ? new Date(
+                payroll.payPeriodEnd
+            ).toISOString().slice(0, 10)
+            : "";
+
+    return `${Number(
+        payroll?.employeeId || 0
+    )}|${start}|${end}`;
+};
+
+
+// ============================================================
 // HELPER: Add Days
 // ============================================================
 
@@ -1053,11 +1102,21 @@ const findOverlappingPayroll = async (
         employeeId:
             Number(employeeId),
 
+        /*
+         * Payroll periods that only touch at the boundary are
+         * adjacent periods, not overlapping periods.
+         *
+         * Example:
+         * 31 Aug -> 30 Sep
+         * 30 Sep -> 31 Oct
+         *
+         * The second period must be allowed to generate.
+         */
         AND: [
 
             {
                 payPeriodStart: {
-                    lte:
+                    lt:
                         new Date(
                             payPeriodEnd
                         )
@@ -1066,7 +1125,7 @@ const findOverlappingPayroll = async (
 
             {
                 payPeriodEnd: {
-                    gte:
+                    gt:
                         new Date(
                             payPeriodStart
                         )
@@ -2037,67 +2096,6 @@ const getScheduledPaymentDate = async (
 
 
 // ============================================================
-// HELPER: Get Payroll Salary Snapshot
-// ============================================================
-//
-// Payroll records keep their own salary snapshot so an older
-// unpaid payroll is not silently changed when the employee's
-// current salary configuration changes later.
-//
-// This helper is intentionally based on the payroll record,
-// not the current employee row.
-// ============================================================
-
-const getPayrollSalarySnapshot = (
-    payroll
-) => {
-
-    const baseSalary =
-        Math.max(
-            0,
-            roundMoney(
-                decimalToNumber(
-                    payroll?.baseSalary !== undefined &&
-                    payroll?.baseSalary !== null
-                        ? payroll.baseSalary
-                        : payroll?.basicSalary
-                )
-            )
-        );
-
-    const expectedHours =
-        Math.max(
-            0,
-            decimalToNumber(
-                payroll?.monthlyExpectedHours
-            )
-        );
-
-    const storedHourlyRate =
-        decimalToNumber(
-            payroll?.salaryRatePerHour
-        );
-
-    const salaryRatePerHour =
-        storedHourlyRate > 0
-            ? roundMoney(storedHourlyRate)
-            : calculateHourlyRate(
-                baseSalary,
-                expectedHours
-            );
-
-    return {
-
-        baseSalary,
-
-        expectedHours,
-
-        salaryRatePerHour
-    };
-};
-
-
-// ============================================================
 // HELPER: Decorate Payroll
 // ============================================================
 
@@ -2118,6 +2116,13 @@ const decoratePayroll = async (
                 : "UNPAID"
         );
 
+    // [CHANGED] basicSalary is the actual regular payable salary.
+    // baseSalary remains the monthly salary snapshot.
+    const salaryAmount =
+        decimalToNumber(
+            payroll.basicSalary
+        );
+
     const scheduledPaymentDate =
         await getScheduledPaymentDate(
             payroll
@@ -2125,8 +2130,8 @@ const decoratePayroll = async (
 
     /*
      * PAID payroll is historical.
-     * Never recalculate it from current attendance,
-     * current employee salary, or current advances.
+     * Do not recalculate it from current
+     * advances or current employee salary.
      */
     if (
         status === "PAID"
@@ -2189,9 +2194,10 @@ const decoratePayroll = async (
                     payroll.netSalary
                 ),
 
-            // A paid payroll has no amount pending.
             pendingAmount:
-                0,
+                decimalToNumber(
+                    payroll.netSalary
+                ),
 
             scheduledPaymentDate,
 
@@ -2201,24 +2207,14 @@ const decoratePayroll = async (
     }
 
     /*
-     * UNPAID payroll is recalculated only from values that belong
-     * to the payroll record itself.
+     * UNPAID payroll is live.
      *
-     * The employee's current salary row must NOT overwrite the
-     * payroll salary snapshot. Otherwise an older unpaid payroll
-     * can change when the employee's salary is edited later.
+     * Re-read attendance for the payroll period so that
+     * payroll does not display stale totalWorkingHours,
+     * regularWorkingHours, shortageHours, extraHours, or
+     * basicSalary values from the moment the payroll row
+     * was originally created.
      */
-    const salarySnapshot =
-        getPayrollSalarySnapshot(
-            payroll
-        );
-
-    const historicalUnpaid =
-        hasPeriodEnded(
-            payroll.payPeriodEnd,
-            new Date()
-        );
-
     let liveWorkingHours =
         decimalToNumber(
             payroll.totalWorkingHours
@@ -2243,6 +2239,66 @@ const decoratePayroll = async (
         );
     }
 
+    // UNPAID payroll uses the employee's CURRENT salary configuration.
+    // PAID payrolls remain historical snapshots and are handled above.
+    const currentEmployee =
+        await prisma.employee.findUnique({
+
+            where: {
+
+                employeeId:
+                    Number(payroll.employeeId)
+            },
+
+            select: {
+
+                baseSalary: true,
+
+                monthlyExpectedHours: true,
+
+                salaryRatePerHour: true
+            }
+        });
+
+    const liveBaseSalary =
+        currentEmployee
+            ? decimalToNumber(
+                currentEmployee.baseSalary
+            )
+            : decimalToNumber(
+                payroll.baseSalary
+            );
+
+    const liveExpectedHours =
+        currentEmployee
+            ? decimalToNumber(
+                currentEmployee.monthlyExpectedHours
+            )
+            : decimalToNumber(
+                payroll.monthlyExpectedHours
+            );
+
+    const liveHourlyRate =
+        currentEmployee
+            ? (
+                decimalToNumber(
+                    currentEmployee.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            )
+            : (
+                decimalToNumber(
+                    payroll.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            );
+
     const livePaidHolidayHours =
         await getPaidPublicHolidayHoursForPeriod(
             payroll.employeeId,
@@ -2254,18 +2310,27 @@ const decoratePayroll = async (
     const liveAttendanceBreakdown =
         calculateAttendanceBreakdown(
             liveWorkingHours,
-            salarySnapshot.expectedHours,
-            salarySnapshot.salaryRatePerHour,
+            liveExpectedHours,
+            liveHourlyRate,
             livePaidHolidayHours
         );
 
     /*
-     * Pending payroll starts from the payroll record's salary
-     * snapshot. The attendance calculation supplies the shortage
-     * deduction separately.
+     * Pending amount is based on the employee's monthly base salary,
+     * then shortage deduction and advance deduction are applied.
+     *
+     * regularSalary/basicSalary is the attendance-earned salary and
+     * is kept separately for payroll reporting. It must not be used
+     * as the pending base here because shortage deduction is stored
+     * as a separate deduction.
      */
     const pendingBaseSalary =
-        salarySnapshot.baseSalary;
+        Math.max(
+            0,
+            roundMoney(
+                liveBaseSalary
+            )
+        );
 
     const liveShortageDeduction =
         Math.min(
@@ -2278,77 +2343,12 @@ const decoratePayroll = async (
             )
         );
 
-    let advanceDeduction =
-        0;
-
-    let liveAdvanceSummary = {
-
-        totalAdvance:
-            0,
-
-        advances:
-            []
-    };
-
-    if (
-        historicalUnpaid
-    ) {
-
-        /*
-         * The payroll period has ended. Preserve the advance
-         * deduction that belongs to this payroll snapshot instead
-         * of importing advances from a later state of the employee.
-         */
-        advanceDeduction =
-            Math.min(
-                Math.max(
-                    0,
-                    roundMoney(
-                        pendingBaseSalary -
-                        liveShortageDeduction
-                    )
-                ),
-                Math.max(
-                    0,
-                    roundMoney(
-                        decimalToNumber(
-                            payroll.advanceDeduction
-                        )
-                    )
-                )
-            );
-
-    } else {
-
-        /*
-         * The current payroll period is still active. Keep the
-         * existing live advance behaviour for the current period.
-         */
-        liveAdvanceSummary =
-            await getLiveAdvanceSummary(
-                payroll.employeeId,
-                payroll.payPeriodStart,
-                payroll.payPeriodEnd
-            );
-
-        const amountAfterShortage =
-            Math.max(
-                0,
-                roundMoney(
-                    pendingBaseSalary -
-                    liveShortageDeduction
-                )
-            );
-
-        advanceDeduction =
-            Math.min(
-                amountAfterShortage,
-                Math.max(
-                    0,
-                    liveAdvanceSummary.totalAdvance
-                )
-            );
-    }
+    const liveAdvanceSummary =
+        await getLiveAdvanceSummary(
+            payroll.employeeId,
+            payroll.payPeriodStart,
+            payroll.payPeriodEnd
+        );
 
     const amountAfterShortage =
         Math.max(
@@ -2356,6 +2356,15 @@ const decoratePayroll = async (
             roundMoney(
                 pendingBaseSalary -
                 liveShortageDeduction
+            )
+        );
+
+    const advanceDeduction =
+        Math.min(
+            amountAfterShortage,
+            Math.max(
+                0,
+                liveAdvanceSummary.totalAdvance
             )
         );
 
@@ -2374,6 +2383,10 @@ const decoratePayroll = async (
      * liveAttendanceBreakdown.extraHours is the total overtime
      * generated inside the payroll period. It is NOT the current
      * unpaid overtime balance after previous settlements.
+     *
+     * Subtract only overtime records for this payroll that have
+     * already been closed as SETTLED or REJECTED. The remaining
+     * value is the employee's current accumulation cycle.
      */
     const closedExtraWork =
         await getClosedExtraWorkForPayroll(
@@ -2390,6 +2403,13 @@ const decoratePayroll = async (
             )
         );
 
+    /*
+     * Find only the currently active accumulation record.
+     *
+     * A SETTLED/REJECTED record is historical and is never reused.
+     * When the current balance becomes positive after a settlement,
+     * a new ACCUMULATED record is created for the new cycle.
+     */
     const currentAccumulatedExtraWork =
         await prisma.extraWork.findFirst({
 
@@ -2423,6 +2443,10 @@ const decoratePayroll = async (
             currentAccumulatedExtraWork
         ) {
 
+            /*
+             * Update only the active cycle.
+             * Historical SETTLED/REJECTED rows remain unchanged.
+             */
             await prisma.extraWork.update({
 
                 where: {
@@ -2440,6 +2464,10 @@ const decoratePayroll = async (
 
         } else {
 
+            /*
+             * A previous cycle has already been settled/rejected,
+             * so this is a new accumulation cycle.
+             */
             await prisma.extraWork.create({
 
                 data: {
@@ -2466,6 +2494,11 @@ const decoratePayroll = async (
         ) !== 0
     ) {
 
+        /*
+         * No current overtime remains after closed historical
+         * overtime is deducted. Keep the active record at zero
+         * rather than carrying an old balance forward.
+         */
         await prisma.extraWork.update({
 
             where: {
@@ -2482,6 +2515,10 @@ const decoratePayroll = async (
         });
     }
 
+    /*
+     * Current unsettled extra-work balance across the employee.
+     * Only ACCUMULATED records with no settlement are included.
+     */
     const accumulatedExtraWork =
         await getAccumulatedExtraWork(
             payroll.employeeId
@@ -2494,9 +2531,12 @@ const decoratePayroll = async (
         status:
             "UNPAID",
 
+        // Live attendance values for the payroll UI.
         totalWorkingHours:
             liveWorkingHours,
 
+        // Paid public-holiday entitlement for this payroll period.
+        // This is separate from actual fingerprint attendance.
         paidHolidayHours:
             liveAttendanceBreakdown.paidHolidayHours,
 
@@ -2507,18 +2547,22 @@ const decoratePayroll = async (
             liveAttendanceBreakdown.shortageHours,
 
         shortageDeduction:
-            liveShortageDeduction,
+            liveAttendanceBreakdown.shortageDeduction,
 
+        /*
+         * Show only the current unpaid overtime cycle.
+         * Previously this returned the full live payroll-period
+         * overtime, which caused already-settled hours to appear again.
+         */
         extraHours:
             currentExtraHours,
 
-        // Keep the payroll record salary snapshot separate from
-        // attendance-earned regular salary.
-        baseSalary:
-            salarySnapshot.baseSalary,
-
+        // Regular salary is capped at expected hours.
         basicSalary:
             liveAttendanceBreakdown.regularSalary,
+
+        shortageDeduction:
+            liveShortageDeduction,
 
         advanceDeduction:
             roundMoney(
@@ -2527,21 +2571,24 @@ const decoratePayroll = async (
 
         pendingAmount,
 
+        /*
+         * For the current payroll view,
+         * netSalary represents the live amount
+         * currently payable after advances.
+         */
         netSalary:
             pendingAmount,
 
+        // Extra hours remain separate from regular salary.
         accumulatedExtraHours:
             accumulatedExtraWork.totalHours,
 
         scheduledPaymentDate,
 
         advancePayments:
-            historicalUnpaid
-                ? []
-                : liveAdvanceSummary.advances
+            liveAdvanceSummary.advances
     };
 };
-
 
 // ============================================================
 // [NEW] REFRESH PAYROLLS FOR PUBLIC HOLIDAY CHANGE
@@ -2676,23 +2723,73 @@ const refreshPayrollsForPublicHolidayChange = async (
         of affectedPayrolls
     ) {
 
-        const salarySnapshot =
-            getPayrollSalarySnapshot(
-                payroll
-            );
-
-        const historicalUnpaid =
-            hasPeriodEnded(
-                payroll.payPeriodEnd,
-                new Date()
-            );
-
         const liveWorkingHours =
             await getAttendanceWorkingHoursForPeriod(
                 payroll.employeeId,
                 payroll.payPeriodStart,
                 payroll.payPeriodEnd
             );
+
+        const employee =
+            await prisma.employee.findUnique({
+
+                where: {
+
+                    employeeId:
+                        Number(payroll.employeeId)
+                },
+
+                select: {
+
+                    baseSalary:
+                        true,
+
+                    monthlyExpectedHours:
+                        true,
+
+                    salaryRatePerHour:
+                        true
+                }
+            });
+
+        const liveBaseSalary =
+            employee
+                ? decimalToNumber(
+                    employee.baseSalary
+                )
+                : decimalToNumber(
+                    payroll.baseSalary
+                );
+
+        const liveExpectedHours =
+            employee
+                ? decimalToNumber(
+                    employee.monthlyExpectedHours
+                )
+                : decimalToNumber(
+                    payroll.monthlyExpectedHours
+                );
+
+        const liveHourlyRate =
+            employee
+                ? (
+                    decimalToNumber(
+                        employee.salaryRatePerHour
+                    ) ||
+                    calculateHourlyRate(
+                        liveBaseSalary,
+                        liveExpectedHours
+                    )
+                )
+                : (
+                    decimalToNumber(
+                        payroll.salaryRatePerHour
+                    ) ||
+                    calculateHourlyRate(
+                        liveBaseSalary,
+                        liveExpectedHours
+                    )
+                );
 
         const livePaidHolidayHours =
             await getPaidPublicHolidayHoursForPeriod(
@@ -2705,82 +2802,19 @@ const refreshPayrollsForPublicHolidayChange = async (
         const attendanceBreakdown =
             calculateAttendanceBreakdown(
                 liveWorkingHours,
-                salarySnapshot.expectedHours,
-                salarySnapshot.salaryRatePerHour,
+                liveExpectedHours,
+                liveHourlyRate,
                 livePaidHolidayHours
             );
 
-        const shortageDeduction =
-            Math.min(
-                salarySnapshot.baseSalary,
-                Math.max(
-                    0,
-                    roundMoney(
-                        attendanceBreakdown.shortageDeduction
-                    )
-                )
-            );
-
-        let advanceDeduction;
-
-        if (
-            historicalUnpaid
-        ) {
-
-            advanceDeduction =
-                Math.min(
-                    Math.max(
-                        0,
-                        roundMoney(
-                            salarySnapshot.baseSalary -
-                            shortageDeduction
-                        )
-                    ),
-                    Math.max(
-                        0,
-                        roundMoney(
-                            decimalToNumber(
-                                payroll.advanceDeduction
-                            )
-                        )
-                    )
-                );
-
-        } else {
-
-            const liveAdvanceSummary =
-                await getLiveAdvanceSummary(
-                    payroll.employeeId,
-                    payroll.payPeriodStart,
-                    payroll.payPeriodEnd
-                );
-
-            advanceDeduction =
-                Math.min(
-                    Math.max(
-                        0,
-                        roundMoney(
-                            salarySnapshot.baseSalary -
-                            shortageDeduction
-                        )
-                    ),
-                    Math.max(
-                        0,
-                        liveAdvanceSummary.totalAdvance
-                    )
-                );
-        }
-
-        const pendingAmount =
-            Math.max(
-                0,
-                roundMoney(
-                    salarySnapshot.baseSalary -
-                    shortageDeduction -
-                    advanceDeduction
-                )
-            );
-
+        /*
+         * Persist the period-level attendance calculations.
+         *
+         * extraHours here means total extra hours inside the
+         * payroll period. decoratePayroll() separately handles
+         * the active ExtraWork accumulation cycle by subtracting
+         * already SETTLED/REJECTED hours.
+         */
         const refreshedPayroll =
             await prisma.payroll.update({
 
@@ -2805,25 +2839,24 @@ const refreshPayrollsForPublicHolidayChange = async (
                         attendanceBreakdown.shortageHours,
 
                     shortageDeduction:
-                        shortageDeduction,
+                        attendanceBreakdown.shortageDeduction,
 
                     extraHours:
                         attendanceBreakdown.extraHours,
 
                     basicSalary:
-                        attendanceBreakdown.regularSalary,
-
-                    advanceDeduction:
-                        advanceDeduction,
-
-                    netSalary:
-                        pendingAmount
+                        attendanceBreakdown.regularSalary
                 },
 
                 include:
                     payrollInclude
             });
 
+        /*
+         * Re-run the existing live payroll logic. This keeps
+         * ExtraWork accumulation in one place and immediately
+         * updates the employee's active bonus balance.
+         */
         await decoratePayroll(
             refreshedPayroll
         );
@@ -3807,7 +3840,74 @@ const getAllPayroll = async (
         );
     }
 
-    return decorated;
+    /*
+     * ========================================================
+     * RESOLVE HISTORICAL DUPLICATES
+     * ========================================================
+     *
+     * Older payroll data can contain two records for the same
+     * employee and payroll period, for example one PAID record
+     * and one UNPAID record. The PAID record is authoritative for
+     * that employee/period and the unpaid duplicate must not be
+     * returned to the payroll page or used in payroll summaries.
+     *
+     * We do not delete database rows here. We only make the API
+     * representation deterministic and safe.
+     */
+
+    const payrollByPeriod =
+        new Map();
+
+    for (
+        const payroll
+        of decorated
+    ) {
+
+        const key =
+            getPayrollPeriodKey(
+                payroll
+            );
+
+        const existing =
+            payrollByPeriod.get(
+                key
+            );
+
+        if (!existing) {
+
+            payrollByPeriod.set(
+                key,
+                payroll
+            );
+
+            continue;
+        }
+
+        const existingPaid =
+            isPayrollPaidRecord(
+                existing
+            );
+
+        const candidatePaid =
+            isPayrollPaidRecord(
+                payroll
+            );
+
+        if (
+            candidatePaid &&
+            !existingPaid
+        ) {
+
+            payrollByPeriod.set(
+                key,
+                payroll
+            );
+        }
+    }
+
+    return Array.from(
+        payrollByPeriod.values()
+    );
 };
 
 
@@ -3849,24 +3949,7 @@ const getPayrollSummaryByMonthYear = async (
             }
         );
 
-    /*
-     * Payroll summary rules:
-     *
-     * totalPayroll = gross payroll using each payroll record's
-     *                  monthly salary snapshot (baseSalary).
-     * totalNetPayroll = current net/payable amount for the selected
-     *                   payroll period after deductions.
-     * totalPaid = net amount already paid.
-     * totalPending = net amount still pending.
-     *
-     * The selected month is the payroll-period month based on
-     * payPeriodStart, not paymentDate.
-     */
-
     let totalPayroll =
-        0;
-
-    let totalNetPayroll =
         0;
 
     let totalPaid =
@@ -3886,14 +3969,7 @@ const getPayrollSummaryByMonthYear = async (
         of payrolls
     ) {
 
-        const grossAmount =
-            roundMoney(
-                decimalToNumber(
-                    payroll.baseSalary
-                )
-            );
-
-        const netAmount =
+        const amount =
             roundMoney(
                 decimalToNumber(
                     payroll.netSalary
@@ -3901,10 +3977,7 @@ const getPayrollSummaryByMonthYear = async (
             );
 
         totalPayroll +=
-            grossAmount;
-
-        totalNetPayroll +=
-            netAmount;
+            amount;
 
         const status =
             String(
@@ -3917,15 +3990,14 @@ const getPayrollSummaryByMonthYear = async (
         ) {
 
             totalPaid +=
-                netAmount;
+                amount;
 
             paidCount +=
                 1;
-
         } else {
 
             totalPending +=
-                netAmount;
+                amount;
 
             pendingCount +=
                 1;
@@ -3975,11 +4047,6 @@ const getPayrollSummaryByMonthYear = async (
         totalPayroll:
             roundMoney(
                 totalPayroll
-            ),
-
-        totalNetPayroll:
-            roundMoney(
-                totalNetPayroll
             ),
 
         totalPaid:
@@ -4673,10 +4740,66 @@ const markPayrollPaid = async (
             payroll.payPeriodEnd
         );
 
-    const salarySnapshot =
-        getPayrollSalarySnapshot(
-            payroll
-        );
+    const liveEmployee =
+        await prisma.employee.findUnique({
+
+            where: {
+
+                employeeId:
+                    Number(payroll.employeeId)
+            },
+
+            select: {
+
+                baseSalary:
+                    true,
+
+                monthlyExpectedHours:
+                    true,
+
+                salaryRatePerHour:
+                    true
+            }
+        });
+
+    const liveBaseSalary =
+        liveEmployee
+            ? decimalToNumber(
+                liveEmployee.baseSalary
+            )
+            : decimalToNumber(
+                payroll.baseSalary
+            );
+
+    const liveExpectedHours =
+        liveEmployee
+            ? decimalToNumber(
+                liveEmployee.monthlyExpectedHours
+            )
+            : decimalToNumber(
+                payroll.monthlyExpectedHours
+            );
+
+    const liveHourlyRate =
+        liveEmployee
+            ? (
+                decimalToNumber(
+                    liveEmployee.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            )
+            : (
+                decimalToNumber(
+                    payroll.salaryRatePerHour
+                ) ||
+                calculateHourlyRate(
+                    liveBaseSalary,
+                    liveExpectedHours
+                )
+            );
 
     const livePaidHolidayHours =
         await getPaidPublicHolidayHoursForPeriod(
@@ -4689,8 +4812,8 @@ const markPayrollPaid = async (
     const liveAttendanceBreakdown =
         calculateAttendanceBreakdown(
             liveWorkingHours,
-            salarySnapshot.expectedHours,
-            salarySnapshot.salaryRatePerHour,
+            liveExpectedHours,
+            liveHourlyRate,
             livePaidHolidayHours
         );
 
