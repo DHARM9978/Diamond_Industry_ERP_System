@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import {
   CalendarDays,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Edit3,
   Loader2,
   Plus,
@@ -11,235 +14,32 @@ import {
   XCircle,
 } from 'lucide-react';
 
+import {
+  PageHeader,
+} from '@/components/ui/PageComponents';
+
+import {
+  FullPageSpinner,
+} from '@/components/ui/Spinner';
+
+import {
+  branchService,
+} from '@/services/apiServices';
+
 import apiClient from '@/services/apiClient';
 
-import { formatISTDate } from '@/utils/dateTime';
-import { branchService } from '@/services/apiServices';
 
-const getISTTodayString = () => {
-  return new Intl.DateTimeFormat(
-    'en-CA',
-    {
-      timeZone: 'Asia/Kolkata',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }
-  ).format(new Date());
-};
-
-
-const getResponseData = (response) => {
-  return response?.data?.data ?? response?.data ?? response;
-};
-
-const getArrayResponse = (response) => {
-  const data = getResponseData(response);
-
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.records)) return data.records;
-  if (Array.isArray(data?.holidays)) return data.holidays;
-  if (Array.isArray(data?.data)) return data.data;
-
-  return [];
-};
-
-const getErrorMessage = (error, fallback) => {
-  return (
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    error?.message ||
-    fallback
-  );
-};
-
-const toDateKey = (value) => {
-  if (!value) return '';
-
-  if (
-    typeof value === 'string' &&
-    /^\d{4}-\d{2}-\d{2}$/.test(value)
-  ) {
-    return value;
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return '';
-
-  return [
-    date.getUTCFullYear(),
-    String(date.getUTCMonth() + 1).padStart(2, '0'),
-    String(date.getUTCDate()).padStart(2, '0'),
-  ].join('-');
-};
-
-const formatDate = (value) => {
-  const key = toDateKey(value);
-
-  if (!key) return '-';
-
-  const formatted = formatISTDate(key, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-
-  return formatted === '—'
-    ? '-'
-    : formatted;
-};
-
-const getDateRange = (start, end) => {
-  if (!start) return [];
-
-  const finalEnd = end || start;
-
-  if (finalEnd < start) return [];
-
-  const result = [];
-  const cursor = new Date(`${start}T00:00:00`);
-  const last = new Date(`${finalEnd}T00:00:00`);
-
-  while (cursor <= last) {
-    result.push(
-      [
-        cursor.getFullYear(),
-        String(cursor.getMonth() + 1).padStart(2, '0'),
-        String(cursor.getDate()).padStart(2, '0'),
-      ].join('-')
-    );
-
-    cursor.setDate(cursor.getDate() + 1);
-  }
-
-  return result;
-};
-
-
-const getBranchId = (holiday) => {
-  return Number(
-    holiday?.branchId ??
-    holiday?.branch?.branchId ??
-    0
-  );
-};
-
-const getHolidaySignature = (holiday) => {
-  return [
-    String(holiday?.holidayName || '').trim().toLowerCase(),
-    Number(holiday?.dailyWorkingHours ?? 0),
-    Boolean(holiday?.isPaid),
-  ].join('|');
-};
-
-const getBranchSignature = (records) => {
-  return records
-    .map((record) => getBranchId(record))
-    .filter((id) => id > 0)
-    .sort((a, b) => a - b)
-    .join(',');
-};
-
-const isConsecutiveDate = (previousDate, currentDate) => {
-  const previous = new Date(`${previousDate}T00:00:00`);
-  const current = new Date(`${currentDate}T00:00:00`);
-
-  previous.setDate(previous.getDate() + 1);
-
-  return (
-    previous.getFullYear() === current.getFullYear() &&
-    previous.getMonth() === current.getMonth() &&
-    previous.getDate() === current.getDate()
-  );
-};
-
-const getDateRangeLabel = (startDate, endDate) => {
-  if (!startDate) return '-';
-
-  if (!endDate || startDate === endDate) {
-    return formatDate(startDate);
-  }
-
-  return `${formatDate(startDate)} – ${formatDate(endDate)}`;
-};
-
-const groupHolidayRecords = (records) => {
-  const validRecords = [...records]
-    .map((record) => ({
-      ...record,
-      _dateKey: toDateKey(record?.holidayDate),
-      _branchId: getBranchId(record),
-    }))
-    .filter(
-      (record) =>
-        record._dateKey &&
-        record._branchId > 0
-    )
-    .sort((a, b) => {
-      if (a._branchId !== b._branchId) {
-        return a._branchId - b._branchId;
-      }
-
-      if (a._dateKey !== b._dateKey) {
-        return a._dateKey.localeCompare(b._dateKey);
-      }
-
-      return getHolidaySignature(a).localeCompare(
-        getHolidaySignature(b)
-      );
-    });
-
-  const result = [];
-
-  for (const record of validRecords) {
-    const last = result[result.length - 1];
-
-    const canMerge =
-      last &&
-      last.branchId === record._branchId &&
-      last.signature === getHolidaySignature(record) &&
-      isConsecutiveDate(
-        last.endDate,
-        record._dateKey
-      );
-
-    if (canMerge) {
-      last.endDate = record._dateKey;
-      last.records.push(record);
-      last.dayCount += 1;
-      continue;
-    }
-
-    result.push({
-      startDate: record._dateKey,
-      endDate: record._dateKey,
-      signature: getHolidaySignature(record),
-      branchId: record._branchId,
-      branchName: record?.branch?.branchName || null,
-      holidayName: record?.holidayName || '-',
-      dailyWorkingHours:
-        record?.dailyWorkingHours ?? 0,
-      isPaid: record?.isPaid !== false,
-      dayCount: 1,
-      records: [record],
-    });
-  }
-
-  return result;
-};
-
+// ============================================================
+// ADMIN PUBLIC HOLIDAYS
+// ============================================================
 
 export function AdminPublicHolidays() {
-  const currentYear = new Date().getFullYear();
+  // ==========================================================
+  // STATE
+  // ==========================================================
 
   const [holidays, setHolidays] = useState([]);
   const [branches, setBranches] = useState([]);
-
-  const [selectedYear, setSelectedYear] = useState(
-    String(currentYear)
-  );
-  const [filterBranchId, setFilterBranchId] = useState('ALL');
 
   const [loading, setLoading] = useState(true);
   const [branchesLoading, setBranchesLoading] = useState(true);
@@ -255,33 +55,195 @@ export function AdminPublicHolidays() {
   const [dailyWorkingHours, setDailyWorkingHours] = useState('8');
   const [isPaid, setIsPaid] = useState(true);
 
+  const currentYear = new Date().getFullYear();
+
+  const [selectedYear, setSelectedYear] = useState(
+    String(currentYear)
+  );
+
+  const [filterBranchId, setFilterBranchId] = useState('ALL');
+
+  const [selectedMonth, setSelectedMonth] = useState(
+    String(
+      selectedYear === String(currentYear)
+        ? new Date().getMonth()
+        : 0
+    )
+  );
+
+  const [selectedCalendarDate, setSelectedCalendarDate] =
+    useState(null);
+
+  const [holidayView, setHolidayView] = useState('upcoming');
+
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const clearMessages = () => {
-    setMessage('');
-    setError('');
+
+  // ==========================================================
+  // RESPONSE HELPERS
+  // ==========================================================
+
+  const unwrapResponse = (response) => {
+    return (
+      response?.data?.data ??
+      response?.data ??
+      response
+    );
   };
 
-  const branchName = (branchId) => {
+
+  const getArray = (response) => {
+    const data = unwrapResponse(response);
+
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    if (Array.isArray(data?.records)) {
+      return data.records;
+    }
+
+    if (Array.isArray(data?.data)) {
+      return data.data;
+    }
+
+    if (Array.isArray(data?.holidays)) {
+      return data.holidays;
+    }
+
+    return [];
+  };
+
+
+  const getErrorMessage = (requestError, fallback) => {
+    return (
+      requestError?.response?.data?.message ||
+      requestError?.response?.data?.error ||
+      requestError?.message ||
+      fallback
+    );
+  };
+
+
+  // ==========================================================
+  // DATE HELPERS
+  // ==========================================================
+
+  const getDateKey = (value) => {
+    if (!value) {
+      return null;
+    }
+
+    if (
+      typeof value === 'string' &&
+      /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ) {
+      return value;
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return [
+      date.getUTCFullYear(),
+      String(date.getUTCMonth() + 1).padStart(2, '0'),
+      String(date.getUTCDate()).padStart(2, '0'),
+    ].join('-');
+  };
+
+
+  const formatDateForDisplay = (value) => {
+    const dateKey = getDateKey(value);
+
+    if (!dateKey) {
+      return '-';
+    }
+
+    const [year, month, day] = dateKey.split('-');
+
+    return new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    ).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+
+  const getDateRange = (start, end) => {
+    if (!start) {
+      return [];
+    }
+
+    const finalEnd = end || start;
+
+    if (finalEnd < start) {
+      return [];
+    }
+
+    const dates = [];
+    const cursor = new Date(`${start}T00:00:00`);
+    const lastDate = new Date(`${finalEnd}T00:00:00`);
+
+    while (cursor <= lastDate) {
+      dates.push(
+        [
+          cursor.getFullYear(),
+          String(cursor.getMonth() + 1).padStart(2, '0'),
+          String(cursor.getDate()).padStart(2, '0'),
+        ].join('-')
+      );
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return dates;
+  };
+
+
+  // ==========================================================
+  // BRANCH HELPERS
+  // ==========================================================
+
+  const getBranchName = (branchId) => {
     const branch = branches.find(
-      (item) => Number(item?.branchId) === Number(branchId)
+      (item) =>
+        Number(item?.branchId) === Number(branchId)
     );
 
-    return branch?.branchName || `Branch ${branchId ?? '-'}`;
+    return (
+      branch?.branchName ||
+      `Branch ${branchId ?? '-'}`
+    );
   };
+
+
+  // ==========================================================
+  // LOAD BRANCHES
+  // ==========================================================
 
   const loadBranches = async () => {
     setBranchesLoading(true);
 
     try {
       const response = await branchService.list();
-      setBranches(getArrayResponse(response));
+      setBranches(getArray(response));
     } catch (requestError) {
-      console.error('Failed to load branches:', requestError);
+      console.error(
+        'Failed to load branches:',
+        requestError
+      );
+
       setError(
         getErrorMessage(
           requestError,
@@ -293,11 +255,18 @@ export function AdminPublicHolidays() {
     }
   };
 
-  const loadHolidays = async ({ silent = false } = {}) => {
-    if (silent) {
-      setRefreshing(true);
-    } else {
+
+  // ==========================================================
+  // LOAD HOLIDAYS
+  // ==========================================================
+
+  const loadHolidays = async ({
+    showSpinner = true,
+  } = {}) => {
+    if (showSpinner) {
       setLoading(true);
+    } else {
+      setRefreshing(true);
     }
 
     try {
@@ -314,7 +283,7 @@ export function AdminPublicHolidays() {
         { params }
       );
 
-      setHolidays(getArrayResponse(response));
+      setHolidays(getArray(response));
     } catch (requestError) {
       console.error(
         'Failed to load public holidays:',
@@ -328,21 +297,154 @@ export function AdminPublicHolidays() {
         )
       );
     } finally {
-      if (silent) {
-        setRefreshing(false);
-      } else {
+      if (showSpinner) {
         setLoading(false);
+      } else {
+        setRefreshing(false);
       }
     }
   };
+
+
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
 
   useEffect(() => {
     loadBranches();
   }, []);
 
+
   useEffect(() => {
     loadHolidays();
   }, [selectedYear, filterBranchId]);
+
+
+  useEffect(() => {
+    const month =
+      selectedYear === String(currentYear)
+        ? new Date().getMonth()
+        : 0;
+
+    setSelectedMonth(String(month));
+    setSelectedCalendarDate(null);
+  }, [selectedYear, currentYear]);
+
+
+  // ==========================================================
+  // CALENDAR HELPERS
+  // ==========================================================
+
+  const calendarHolidayMap = useMemo(() => {
+    const map = new Map();
+
+    holidays.forEach((holiday) => {
+      const dateKey =
+        getDateKey(holiday?.holidayDate);
+
+      if (!dateKey) {
+        return;
+      }
+
+      const existing =
+        map.get(dateKey) || [];
+
+      existing.push(holiday);
+      map.set(dateKey, existing);
+    });
+
+    return map;
+  }, [holidays]);
+
+
+  const calendarDays = useMemo(() => {
+    const year = Number(selectedYear);
+    const month = Number(selectedMonth);
+
+    if (!Number.isInteger(year) || !Number.isInteger(month)) {
+      return [];
+    }
+
+    const firstDay = new Date(year, month, 1);
+    const firstWeekday = firstDay.getDay();
+    const daysInMonth = new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+    const totalCells = Math.ceil(
+      (firstWeekday + daysInMonth) / 7
+    ) * 7;
+
+    return Array.from({ length: totalCells }, (_, index) => {
+      const dayNumber =
+        index - firstWeekday + 1;
+
+      if (dayNumber < 1 || dayNumber > daysInMonth) {
+        return null;
+      }
+
+      const dateKey = [
+        year,
+        String(month + 1).padStart(2, '0'),
+        String(dayNumber).padStart(2, '0'),
+      ].join('-');
+
+      return {
+        day: dayNumber,
+        dateKey,
+        holidays: calendarHolidayMap.get(dateKey) || [],
+      };
+    });
+  }, [
+    calendarHolidayMap,
+    selectedMonth,
+    selectedYear,
+  ]);
+
+
+  const selectedCalendarHolidays =
+    selectedCalendarDate
+      ? calendarHolidayMap.get(selectedCalendarDate) || []
+      : [];
+
+
+  const calendarMonthLabel = new Date(
+    Number(selectedYear),
+    Number(selectedMonth),
+    1
+  ).toLocaleDateString('en-IN', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+
+  const goToPreviousMonth = () => {
+    setSelectedMonth((current) =>
+      String(Math.max(0, Number(current) - 1))
+    );
+    setSelectedCalendarDate(null);
+  };
+
+
+  const goToNextMonth = () => {
+    setSelectedMonth((current) =>
+      String(Math.min(11, Number(current) + 1))
+    );
+    setSelectedCalendarDate(null);
+  };
+
+
+  // ==========================================================
+  // MODAL HELPERS
+  // ==========================================================
+
+  const clearMessages = () => {
+    setMessage('');
+    setError('');
+  };
+
 
   const openCreateModal = () => {
     clearMessages();
@@ -364,78 +466,61 @@ export function AdminPublicHolidays() {
     setShowModal(true);
   };
 
-  const openEditModal = (holidayGroup) => {
+
+  const openEditModal = (holiday) => {
     clearMessages();
 
-    const records = Array.isArray(
-      holidayGroup?.records
-    )
-      ? holidayGroup.records
-      : [holidayGroup];
+    const holidayDate =
+      getDateKey(holiday?.holidayDate) || '';
 
-    const firstRecord = records[0];
+    setEditingHoliday(holiday);
 
-    setEditingHoliday({
-      ...holidayGroup,
-      records,
-      isGrouped: records.length > 1,
-    });
-
-    // Editing is always branch-specific. The branch is already known
-    // from the row, so the administrator cannot accidentally update
-    // another branch.
     setSelectedBranchId(
       String(
-        holidayGroup?.branchId ??
-        getBranchId(firstRecord)
+        holiday?.branchId ??
+        holiday?.branch?.branchId ??
+        ''
       )
     );
 
-    // IMPORTANT: both dates are loaded from the range row.
-    setStartDate(
-      holidayGroup?.startDate ||
-      toDateKey(firstRecord?.holidayDate)
-    );
-
-    setEndDate(
-      holidayGroup?.endDate ||
-      toDateKey(firstRecord?.holidayDate)
-    );
+    setStartDate(holidayDate);
+    setEndDate(holidayDate);
 
     setHolidayName(
-      holidayGroup?.holidayName ||
-      firstRecord?.holidayName ||
-      ''
+      holiday?.holidayName || ''
     );
 
     setDailyWorkingHours(
       String(
-        holidayGroup?.dailyWorkingHours ??
-        firstRecord?.dailyWorkingHours ??
-        0
+        holiday?.dailyWorkingHours ?? 0
       )
     );
 
     setIsPaid(
-      holidayGroup?.isPaid ??
-      firstRecord?.isPaid !== false
+      holiday?.isPaid !== false
     );
 
     setShowModal(true);
   };
 
+
   const closeModal = () => {
-    if (saving) return;
+    if (saving) {
+      return;
+    }
 
     setShowModal(false);
     setEditingHoliday(null);
   };
 
+
+  // ==========================================================
+  // VALIDATION
+  // ==========================================================
+
   const validateForm = () => {
     if (!selectedBranchId) {
-      return editingHoliday?.isGrouped
-        ? 'Please select the branch you want to modify.'
-        : 'Please select a branch or choose All Branches.';
+      return 'Please select a branch or choose All Branches.';
     }
 
     if (
@@ -449,30 +534,11 @@ export function AdminPublicHolidays() {
       return 'The selected branch is not available.';
     }
 
-    if (
-      editingHoliday?.isGrouped &&
-      !editingHoliday.records?.some(
-        (record) =>
-          getBranchId(record) ===
-          Number(selectedBranchId)
-      )
-    ) {
-      return 'The selected branch is not part of this holiday group.';
-    }
-
     if (!startDate) {
-      return 'Please select the holiday date.';
+      return 'Please select a holiday date.';
     }
 
-    if (!endDate) {
-      return 'Please select the end date.';
-    }
-
-    if (!editingHoliday && startDate < getISTTodayString()) {
-      return 'New public holidays can only be created for today or a future date.';
-    }
-
-    if (endDate < startDate) {
+    if (!editingHoliday && endDate && endDate < startDate) {
       return 'End date cannot be before start date.';
     }
 
@@ -493,6 +559,11 @@ export function AdminPublicHolidays() {
     return null;
   };
 
+
+  // ==========================================================
+  // CREATE HOLIDAY(S)
+  // ==========================================================
+
   const createHolidays = async () => {
     const validationError = validateForm();
 
@@ -506,8 +577,10 @@ export function AdminPublicHolidays() {
       endDate
     );
 
-    if (!dates.length) {
-      setError('Please provide a valid holiday date range.');
+    if (dates.length === 0) {
+      setError(
+        'Please provide a valid holiday date range.'
+      );
       return;
     }
 
@@ -515,12 +588,10 @@ export function AdminPublicHolidays() {
       selectedBranchId === 'ALL'
         ? branches
             .map((branch) => Number(branch?.branchId))
-            .filter(
-              (id) => Number.isInteger(id) && id > 0
-            )
+            .filter((branchId) => Number.isInteger(branchId) && branchId > 0)
         : [Number(selectedBranchId)];
 
-    if (!branchIds.length) {
+    if (branchIds.length === 0) {
       setError(
         'No branches are available. Please create a branch first.'
       );
@@ -531,26 +602,31 @@ export function AdminPublicHolidays() {
     clearMessages();
 
     try {
-      const failed = [];
-      let successful = 0;
+      const failedRecords = [];
+      let successfulCount = 0;
 
       for (const branchId of branchIds) {
+        const branchName = getBranchName(branchId);
+
         for (const holidayDate of dates) {
           try {
-            await apiClient.post('/api/holidays', {
-              branchId,
-              holidayDate,
-              holidayName: holidayName.trim(),
-              dailyWorkingHours: Number(
-                dailyWorkingHours
-              ),
-              isPaid: Boolean(isPaid),
-            });
+            await apiClient.post(
+              '/api/holidays',
+              {
+                branchId,
+                holidayDate,
+                holidayName: holidayName.trim(),
+                dailyWorkingHours: Number(
+                  dailyWorkingHours
+                ),
+                isPaid: Boolean(isPaid),
+              }
+            );
 
-            successful += 1;
+            successfulCount += 1;
           } catch (requestError) {
-            failed.push({
-              branchId,
+            failedRecords.push({
+              branchName,
               date: holidayDate,
               message: getErrorMessage(
                 requestError,
@@ -561,38 +637,53 @@ export function AdminPublicHolidays() {
         }
       }
 
-      await loadHolidays({ silent: true });
+      await loadHolidays({
+        showSpinner: false,
+      });
 
-      const total =
+      const totalRecords =
         branchIds.length * dates.length;
 
-      if (failed.length) {
-        const summary = failed
-          .slice(0, 8)
-          .map(
-            (item) =>
-              `${branchName(item.branchId)} - ${item.date}: ${item.message}`
-          )
-          .join(' | ');
+      if (failedRecords.length > 0) {
+        const failureSummary =
+          failedRecords
+            .slice(0, 10)
+            .map(
+              (item) =>
+                `${item.branchName} - ${item.date}: ${item.message}`
+            )
+            .join(' | ');
 
-        if (successful) {
+        const moreFailures =
+          failedRecords.length > 10
+            ? ` | And ${failedRecords.length - 10} more failure(s).`
+            : '';
+
+        if (successfulCount > 0) {
           setMessage(
-            `${successful} of ${total} holiday record(s) created.`
+            `${successfulCount} of ${totalRecords} holiday record(s) created successfully.`
           );
         }
 
         setError(
-          `${failed.length} record(s) failed. ${summary}`
+          `${failedRecords.length} holiday record(s) could not be created: ` +
+          `${failureSummary}${moreFailures}`
         );
 
-        if (!successful) return;
+        return;
+      }
+
+      if (selectedBranchId === 'ALL') {
+        setMessage(
+          `${dates.length} holiday date(s) applied to ` +
+          `${branchIds.length} branch(es) successfully. ` +
+          `${successfulCount} holiday record(s) created.`
+        );
       } else {
         setMessage(
-          selectedBranchId === 'ALL'
-            ? `${dates.length} holiday date(s) applied to ${branchIds.length} branch(es).`
-            : dates.length === 1
-              ? 'Public holiday added successfully.'
-              : `${dates.length} public holidays added successfully.`
+          dates.length === 1
+            ? 'Public holiday added successfully.'
+            : `${dates.length} public holidays added successfully.`
         );
       }
 
@@ -615,6 +706,11 @@ export function AdminPublicHolidays() {
     }
   };
 
+
+  // ==========================================================
+  // UPDATE HOLIDAY
+  // ==========================================================
+
   const updateHoliday = async () => {
     const validationError = validateForm();
 
@@ -623,29 +719,19 @@ export function AdminPublicHolidays() {
       return;
     }
 
-    const targetBranchId = Number(selectedBranchId);
-
-    const existingRecords = Array.isArray(
-      editingHoliday?.records
-    )
-      ? editingHoliday.records
-      : [];
-
-    if (!targetBranchId || !existingRecords.length) {
+    if (!editingHoliday?.publicHolidayId) {
       setError(
-        'The selected branch holiday could not be identified.'
+        'The selected holiday could not be identified.'
       );
       return;
     }
 
-    const newDates = getDateRange(
-      startDate,
-      endDate || startDate
-    );
+    const editingHolidayDate =
+      getDateKey(editingHoliday?.holidayDate) || '';
 
-    if (!newDates.length) {
+    if (editingHolidayDate && editingHolidayDate < todayKey) {
       setError(
-        'Please provide a valid holiday date range.'
+        'Past public holidays are read-only and cannot be edited.'
       );
       return;
     }
@@ -654,95 +740,25 @@ export function AdminPublicHolidays() {
     clearMessages();
 
     try {
-      const existingByDate = new Map(
-        existingRecords.map((record) => [
-          toDateKey(record.holidayDate),
-          record,
-        ])
+      await apiClient.put(
+        `/api/holidays/${editingHoliday.publicHolidayId}`,
+        {
+          branchId: Number(selectedBranchId),
+          holidayDate: startDate,
+          holidayName: holidayName.trim(),
+          dailyWorkingHours: Number(
+            dailyWorkingHours
+          ),
+          isPaid: Boolean(isPaid),
+        }
       );
 
-      const newDateSet = new Set(newDates);
-
-      /*
-       * Keep the first existing record when possible. Then:
-       * - update records whose dates remain in the range
-       * - create dates newly added to the range
-       * - delete records whose dates were removed from the range
-       */
-      const updates = [];
-      const creates = [];
-      const deletes = [];
-
-      for (const date of newDates) {
-        const existing = existingByDate.get(date);
-
-        if (existing) {
-          updates.push({
-            id: existing.publicHolidayId,
-            data: {
-              branchId: targetBranchId,
-              holidayDate: date,
-              holidayName: holidayName.trim(),
-              dailyWorkingHours: Number(
-                dailyWorkingHours
-              ),
-              isPaid: Boolean(isPaid),
-            },
-          });
-        } else {
-          creates.push({
-            branchId: targetBranchId,
-            holidayDate: date,
-            holidayName: holidayName.trim(),
-            dailyWorkingHours: Number(
-              dailyWorkingHours
-            ),
-            isPaid: Boolean(isPaid),
-          });
-        }
-      }
-
-      for (const record of existingRecords) {
-        const oldDate = toDateKey(
-          record.holidayDate
-        );
-
-        if (
-          !newDateSet.has(oldDate) &&
-          record.publicHolidayId
-        ) {
-          deletes.push(record.publicHolidayId);
-        }
-      }
-
-      for (const item of updates) {
-        await apiClient.put(
-          `/api/holidays/${item.id}`,
-          item.data
-        );
-      }
-
-      for (const payload of creates) {
-        await apiClient.post(
-          '/api/holidays',
-          payload
-        );
-      }
-
-      for (const id of deletes) {
-        await apiClient.delete(
-          `/api/holidays/${id}`
-        );
-      }
-
-      await loadHolidays({ silent: true });
+      await loadHolidays({
+        showSpinner: false,
+      });
 
       setMessage(
-        `Public holiday updated for ${branchName(
-          targetBranchId
-        )}. Date range now contains ${
-          newDates.length
-        } day${newDates.length === 1 ? '' : 's'}.`
+        'Public holiday updated successfully.'
       );
 
       setShowModal(false);
@@ -756,7 +772,7 @@ export function AdminPublicHolidays() {
       setError(
         getErrorMessage(
           requestError,
-          'Failed to update public holiday range.'
+          'Failed to update public holiday.'
         )
       );
     } finally {
@@ -773,50 +789,44 @@ export function AdminPublicHolidays() {
     }
   };
 
-  const handleDelete = async (holidayOrGroup) => {
-    const records = Array.isArray(
-      holidayOrGroup?.records
-    )
-      ? holidayOrGroup.records
-      : [holidayOrGroup];
 
-    const validRecords = records.filter(
-      (record) => record?.publicHolidayId
-    );
+  // ==========================================================
+  // DELETE HOLIDAY
+  // ==========================================================
 
-    if (!validRecords.length) return;
-
-    const first = validRecords[0];
+  const handleDelete = async (holiday) => {
+    if (!holiday?.publicHolidayId) {
+      return;
+    }
 
     const confirmed = window.confirm(
-      validRecords.length === 1
-        ? `Delete "${first.holidayName || 'Public Holiday'}" on ${formatDate(
-            first.holidayDate
-          )} for ${branchName(getBranchId(first))}?`
-        : `Delete the complete ${validRecords.length}-day public holiday period for ${branchName(
-            getBranchId(first)
-          )}?`
+      `Delete "${holiday.holidayName || 'Public Holiday'}" on ${formatDateForDisplay(
+        holiday.holidayDate
+      )}?`
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
-    setDeletingId(first.publicHolidayId);
+    setDeletingId(
+      holiday.publicHolidayId
+    );
+
     clearMessages();
 
     try {
-      for (const record of validRecords) {
-        await apiClient.delete(
-          `/api/holidays/${record.publicHolidayId}`
-        );
-      }
-
-      await loadHolidays({ silent: true });
+      await apiClient.delete(
+        `/api/holidays/${holiday.publicHolidayId}`
+      );
 
       setMessage(
-        validRecords.length === 1
-          ? 'Public holiday deleted successfully.'
-          : `The ${validRecords.length}-day public holiday period was deleted successfully.`
+        'Public holiday deleted successfully.'
       );
+
+      await loadHolidays({
+        showSpinner: false,
+      });
     } catch (requestError) {
       console.error(
         'Failed to delete public holiday:',
@@ -835,465 +845,983 @@ export function AdminPublicHolidays() {
   };
 
 
-  const groupedHolidays = useMemo(() => {
-    return groupHolidayRecords(holidays);
+  // ==========================================================
+  // SORT
+  // ==========================================================
+
+  const sortedHolidays = useMemo(() => {
+    return [...holidays].sort((first, second) => {
+      const firstDate =
+        getDateKey(first?.holidayDate) || '';
+
+      const secondDate =
+        getDateKey(second?.holidayDate) || '';
+
+      if (firstDate !== secondDate) {
+        return firstDate.localeCompare(secondDate);
+      }
+
+      return String(
+        first?.holidayName || ''
+      ).localeCompare(
+        String(second?.holidayName || '')
+      );
+    });
   }, [holidays]);
+
+
+  // ==========================================================
+  // UPCOMING / PAST HOLIDAYS
+  //
+  // Today is treated as an upcoming/current holiday so that
+  // today's record remains editable. Past dates are read-only.
+  // ==========================================================
+
+  const todayKey = (() => {
+    const today = new Date();
+
+    return [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+  })();
+
+
+  const upcomingHolidays = useMemo(() => {
+    return sortedHolidays.filter((holiday) => {
+      const dateKey = getDateKey(holiday?.holidayDate) || '';
+      return dateKey >= todayKey;
+    });
+  }, [sortedHolidays, todayKey]);
+
+
+  const pastHolidays = useMemo(() => {
+    return sortedHolidays
+      .filter((holiday) => {
+        const dateKey = getDateKey(holiday?.holidayDate) || '';
+        return dateKey < todayKey;
+      })
+      .sort((first, second) => {
+        const firstDate = getDateKey(first?.holidayDate) || '';
+        const secondDate = getDateKey(second?.holidayDate) || '';
+        return secondDate.localeCompare(firstDate);
+      });
+  }, [sortedHolidays, todayKey]);
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
 
   if (loading) {
     return (
-      <div className="flex min-h-[300px] items-center justify-center">
-        <div className="flex items-center gap-3 text-navy-600">
-          <Loader2
-            size={22}
-            className="animate-spin"
-          />
-          <span>Loading public holidays...</span>
-        </div>
-      </div>
+      <FullPageSpinner
+        message="Loading public holidays..."
+      />
     );
   }
 
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
   return (
     <div className="space-y-6">
-      {/* PAGE HEADER */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-navy-900">
-            Public Holidays
-          </h1>
-          <p className="mt-1 text-base text-navy-500">
-            Manage branch-specific public holidays, paid holiday hours, and holiday dates.
-          </p>
-        </div>
 
-        {/* ONLY ONE CREATE BUTTON */}
-        <button
-          type="button"
-          onClick={openCreateModal}
-          disabled={branchesLoading}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={18} />
-          Add Public Holiday
-        </button>
-      </div>
+      <PageHeader
+        title="Public Holidays"
+        subtitle="Manage branch-specific public holidays, paid holiday hours, and holiday dates."
+        actions={
+          <button
+            type="button"
+            onClick={openCreateModal}
+            disabled={branchesLoading}
+            className="btn-primary inline-flex items-center justify-center gap-2"
+          >
+            <Plus size={18} />
+            Add Public Holiday
+          </button>
+        }
+      />
 
-      {/* MESSAGES */}
+
+      {/* ======================================================
+          MESSAGES
+      ======================================================= */}
+
       {message && (
-        <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800">
+        <div className="flex items-start gap-3 rounded-lg border border-success-200 bg-success-50 p-4 text-success-800">
           <CheckCircle2
             size={20}
             className="mt-0.5 shrink-0"
           />
-          <p className="text-sm">{message}</p>
+
+          <p className="text-sm">
+            {message}
+          </p>
         </div>
       )}
 
+
       {error && (
-        <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">
+        <div className="flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 p-4 text-error-800">
           <XCircle
             size={20}
             className="mt-0.5 shrink-0"
           />
-          <p className="break-words text-sm">
+
+          <p className="text-sm break-words">
             {error}
           </p>
         </div>
       )}
 
-      {/* FILTERS */}
-      <div className="rounded-xl border border-navy-100 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-xl">
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-navy-700">
-                Year
-              </label>
-              <select
-                value={selectedYear}
-                onChange={(event) =>
-                  setSelectedYear(event.target.value)
-                }
-                className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              >
-                {[currentYear - 1, currentYear, currentYear + 1].map(
-                  (year) => (
-                    <option
-                      key={year}
-                      value={year}
-                    >
-                      {year}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-navy-700">
-                Branch
-              </label>
-              <select
-                value={filterBranchId}
-                onChange={(event) =>
-                  setFilterBranchId(event.target.value)
-                }
-                disabled={branchesLoading}
-                className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-              >
-                <option value="ALL">
-                  All Branches
-                </option>
+      {/* ======================================================
+          FILTERS / ACTIONS
+      ======================================================= */}
 
-                {branches.map((branch) => (
+      <div className="card flex flex-col gap-4 p-4 lg:flex-row lg:items-end lg:justify-between">
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Year
+            </label>
+
+            <select
+              value={selectedYear}
+              onChange={(event) =>
+                setSelectedYear(event.target.value)
+              }
+              className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+            >
+              {[0, 1, 2].map((offset) => {
+                const year =
+                  currentYear + offset;
+
+                return (
                   <option
-                    key={branch.branchId}
-                    value={branch.branchId}
+                    key={year}
+                    value={year}
                   >
-                    {branch.branchName}
+                    {year}
                   </option>
-                ))}
-              </select>
-            </div>
+                );
+              })}
+            </select>
           </div>
+
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-navy-700">
+              Branch
+            </label>
+
+            <select
+              value={filterBranchId}
+              onChange={(event) =>
+                setFilterBranchId(
+                  event.target.value
+                )
+              }
+              disabled={branchesLoading}
+              className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+            >
+              <option value="ALL">
+                All Branches
+              </option>
+
+              {branches.map((branch) => (
+                <option
+                  key={branch.branchId}
+                  value={branch.branchId}
+                >
+                  {branch.branchName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+        </div>
+
+
+        <div className="flex flex-wrap gap-2">
 
           <button
             type="button"
-            onClick={() => loadHolidays({ silent: true })}
+            onClick={() =>
+              loadHolidays({
+                showSpinner: false,
+              })
+            }
             disabled={refreshing}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-semibold text-navy-700 transition hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 disabled:opacity-50"
           >
             <RefreshCw
               size={17}
               className={
-                refreshing ? 'animate-spin' : ''
+                refreshing
+                  ? 'animate-spin'
+                  : ''
               }
             />
+
             Refresh
           </button>
+
         </div>
+
       </div>
 
-      {/* INFORMATION */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50 p-5">
+
+      {/* ======================================================
+          INFORMATION
+      ======================================================= */}
+
+      <div className="rounded-lg border border-primary-100 bg-primary-50 p-4">
         <div className="flex items-start gap-3">
+
           <CalendarDays
-            size={21}
-            className="mt-0.5 shrink-0 text-blue-600"
+            size={20}
+            className="mt-0.5 shrink-0 text-primary-600"
           />
+
           <div>
-            <p className="font-semibold text-blue-900">
+            <p className="font-semibold text-primary-800">
               Public holiday rules
             </p>
-            <p className="mt-1 text-sm leading-6 text-blue-800">
-              Public holidays are maintained separately for each branch.
-              Paid holidays contribute the configured daily working hours
-              to payroll; unpaid holidays do not contribute working hours.
+
+            <p className="mt-1 text-sm leading-6 text-primary-700">
+              Public holidays are maintained separately
+              for each branch. Paid holidays can contribute
+              the configured daily working hours to payroll;
+              unpaid holidays do not contribute working hours.
             </p>
           </div>
+
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-hidden rounded-xl border border-navy-100 bg-white shadow-sm">
-        {groupedHolidays.length === 0 ? (
-          <div className="p-12 text-center">
-            <CalendarDays
-              size={44}
-              className="mx-auto text-navy-300"
-            />
-            <h3 className="mt-4 text-lg font-semibold text-navy-800">
-              No public holidays
-            </h3>
-            <p className="mt-1 text-sm text-navy-500">
-              No public holidays have been added for the selected year and branch.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-navy-100">
-              <thead className="bg-navy-50">
-                <tr>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Date
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Holiday
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Branch
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Daily Hours
-                  </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Payment
-                  </th>
-                  <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-navy-600">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
 
-              <tbody className="divide-y divide-navy-100 bg-white">
-                {groupedHolidays.map((holidayGroup) => (
-                  <tr
-                    key={`${holidayGroup.branchId}-${holidayGroup.startDate}-${holidayGroup.endDate}-${holidayGroup.signature}`}
-                    className="hover:bg-navy-50/50"
+      {/* ======================================================
+          UPCOMING / HISTORY / CALENDAR
+      ======================================================= */}
+
+      <section className="space-y-4">
+
+        {/* SECTION SWITCHER */}
+        <div className="card p-2.5">
+
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+
+            <button
+              type="button"
+              onClick={() => setHolidayView('upcoming')}
+              className={[
+                'min-h-[68px] rounded-lg px-4 py-3 text-left transition-colors',
+                holidayView === 'upcoming'
+                  ? 'bg-navy-800 text-white shadow-sm'
+                  : 'bg-white text-navy-700 hover:bg-navy-50',
+              ].join(' ')}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold">
+                    Upcoming Holidays
+                  </p>
+                  <p
+                    className={
+                      holidayView === 'upcoming'
+                        ? 'mt-0.5 text-xs text-white/80'
+                        : 'mt-0.5 text-xs text-navy-500'
+                    }
                   >
-                    <td className="px-5 py-4 text-sm font-medium text-navy-800">
-                      <div className="whitespace-nowrap">
-                        {getDateRangeLabel(
-                          holidayGroup.startDate,
-                          holidayGroup.endDate
-                        )}
-                      </div>
+                    Today and future dates
+                  </p>
+                </div>
 
-                      <div className="mt-1 text-xs font-medium text-navy-500">
-                        {holidayGroup.dayCount === 1
-                          ? '1 day'
-                          : `${holidayGroup.dayCount} days`}
-                      </div>
-                    </td>
+                <span
+                  className={
+                    holidayView === 'upcoming'
+                      ? 'rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold text-white'
+                      : 'rounded-full bg-success-50 px-2.5 py-1 text-xs font-semibold text-success-700'
+                  }
+                >
+                  {upcomingHolidays.length}
+                </span>
+              </div>
+            </button>
 
-                    <td className="px-5 py-4 text-sm text-navy-800">
-                      <div className="font-medium">
-                        {holidayGroup.holidayName}
-                      </div>
 
-                      {holidayGroup.dayCount > 1 && (
-                        <div className="mt-1 text-xs text-navy-500">
-                          Consecutive holiday period
-                        </div>
-                      )}
-                    </td>
+            <button
+              type="button"
+              onClick={() => setHolidayView('history')}
+              className={[
+                'min-h-[68px] rounded-lg px-4 py-3 text-left transition-colors',
+                holidayView === 'history'
+                  ? 'bg-navy-800 text-white shadow-sm'
+                  : 'bg-white text-navy-700 hover:bg-navy-50',
+              ].join(' ')}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold">
+                    Holiday History
+                  </p>
+                  <p
+                    className={
+                      holidayView === 'history'
+                        ? 'mt-0.5 text-xs text-white/80'
+                        : 'mt-0.5 text-xs text-navy-500'
+                    }
+                  >
+                    Past dates — read only
+                  </p>
+                </div>
 
-                    <td className="px-5 py-4 text-sm font-medium text-navy-700">
-                      {branchName(
-                        holidayGroup.branchId
-                      )}
-                    </td>
+                <span
+                  className={
+                    holidayView === 'history'
+                      ? 'rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold text-white'
+                      : 'rounded-full bg-navy-50 px-2.5 py-1 text-xs font-semibold text-navy-600'
+                  }
+                >
+                  {pastHolidays.length}
+                </span>
+              </div>
+            </button>
 
-                    <td className="whitespace-nowrap px-5 py-4 text-sm text-navy-700">
-                      {Number(
-                        holidayGroup.dailyWorkingHours ?? 0
-                      ).toFixed(2)}{' '}
-                      hrs/day
-                    </td>
 
-                    <td className="px-5 py-4">
-                      {holidayGroup.isPaid ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
-                          <CheckCircle2 size={14} />
-                          Paid
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-600">
-                          <XCircle size={14} />
-                          Unpaid
-                        </span>
-                      )}
-                    </td>
+            <button
+              type="button"
+              onClick={() => setHolidayView('calendar')}
+              className={[
+                'min-h-[68px] rounded-lg px-4 py-3 text-left transition-colors',
+                holidayView === 'calendar'
+                  ? 'bg-navy-800 text-white shadow-sm'
+                  : 'bg-white text-navy-700 hover:bg-navy-50',
+              ].join(' ')}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold">
+                    Holiday Calendar
+                  </p>
+                  <p
+                    className={
+                      holidayView === 'calendar'
+                        ? 'mt-0.5 text-xs text-white/80'
+                        : 'mt-0.5 text-xs text-navy-500'
+                    }
+                  >
+                    View holidays by date
+                  </p>
+                </div>
 
-                    <td className="px-5 py-4">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            openEditModal(
-                              holidayGroup
-                            )
-                          }
-                          className="inline-flex items-center gap-1 rounded-lg border border-navy-200 px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
+                <span
+                  className={
+                    holidayView === 'calendar'
+                      ? 'rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold text-white'
+                      : 'rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700'
+                  }
+                >
+                  {holidays.length}
+                </span>
+              </div>
+            </button>
+
+          </div>
+
+        </div>
+
+
+        {/* ====================================================
+            UPCOMING HOLIDAYS
+        ===================================================== */}
+        {holidayView === 'upcoming' && (
+          <div className="space-y-3">
+
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-bold text-navy-900">
+                  Upcoming Holidays
+                </h2>
+                <p className="mt-1 text-sm text-navy-500">
+                  Only current and future public holidays are shown here. They can be edited or deleted.
+                </p>
+              </div>
+
+              <span className="rounded-full bg-success-50 px-3 py-1 text-xs font-semibold text-success-700">
+                {upcomingHolidays.length} record{upcomingHolidays.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            <div className="card overflow-hidden">
+              {upcomingHolidays.length === 0 ? (
+                <div className="p-10 text-center">
+                  <CalendarDays
+                    size={44}
+                    className="mx-auto text-navy-300"
+                  />
+                  <h3 className="mt-4 text-lg font-semibold text-navy-800">
+                    No upcoming public holidays
+                  </h3>
+                  <p className="mt-1 text-sm text-navy-500">
+                    There are no current or future public holidays for the selected filters.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-navy-100">
+                    <thead className="bg-navy-50">
+                      <tr>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Date</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Holiday</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Branch</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Daily Hours</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Payment</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-navy-600">Actions</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="divide-y divide-navy-100 bg-white">
+                      {upcomingHolidays.map((holiday) => (
+                        <tr
+                          key={holiday.publicHolidayId}
+                          className="hover:bg-navy-50/50"
                         >
-                          <Edit3 size={15} />
-                          Edit
-                        </button>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-navy-800">
+                            {formatDateForDisplay(holiday.holidayDate)}
+                          </td>
+                          <td className="px-5 py-4 text-sm text-navy-800">
+                            {holiday.holidayName || '-'}
+                          </td>
+                          <td className="px-5 py-4 text-sm text-navy-700">
+                            {holiday?.branch?.branchName || getBranchName(holiday.branchId)}
+                          </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-navy-700">
+                            {Number(holiday.dailyWorkingHours ?? 0).toFixed(2)} hrs
+                          </td>
+                          <td className="px-5 py-4">
+                            {holiday.isPaid ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-3 py-1 text-xs font-semibold text-success-700">
+                                <CheckCircle2 size={14} />
+                                Paid
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-600">
+                                <XCircle size={14} />
+                                Unpaid
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openEditModal(holiday)}
+                                className="inline-flex items-center gap-1 rounded-lg border border-navy-200 px-3 py-2 text-sm font-medium text-navy-700 hover:bg-navy-50"
+                              >
+                                <Edit3 size={15} />
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(holiday)}
+                                disabled={deletingId === holiday.publicHolidayId}
+                                className="inline-flex items-center gap-1 rounded-lg border border-error-200 px-3 py-2 text-sm font-medium text-error-700 hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {deletingId === holiday.publicHolidayId ? (
+                                  <Loader2 size={15} className="animate-spin" />
+                                ) : (
+                                  <Trash2 size={15} />
+                                )}
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDelete(
-                              holidayGroup
-                            )
-                          }
-                          disabled={
-                            deletingId ===
-                            holidayGroup.records[0]
-                              ?.publicHolidayId
-                          }
-                          className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {deletingId ===
-                          holidayGroup.records[0]
-                            ?.publicHolidayId ? (
-                            <Loader2
-                              size={15}
-                              className="animate-spin"
-                            />
-                          ) : (
-                            <Trash2 size={15} />
-                          )}
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         )}
-      </div>
 
-      {/* CREATE / EDIT MODAL */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              closeModal();
-            }
-          }}
-        >
-          <div
-            className="flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-            style={{ maxHeight: '86vh' }}
-            onMouseDown={(event) =>
-              event.stopPropagation()
-            }
-          >
-            {/* MODAL HEADER */}
-            <div className="flex shrink-0 items-start justify-between border-b border-navy-100 px-6 py-5">
+
+        {/* ====================================================
+            HOLIDAY HISTORY
+        ===================================================== */}
+        {holidayView === 'history' && (
+          <div className="space-y-3">
+
+            <div className="flex items-end justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-bold text-navy-900">
+                <h2 className="text-lg font-bold text-navy-900">
+                  Holiday History
+                </h2>
+                <p className="mt-1 text-sm text-navy-500">
+                  Past public holidays are preserved for reference and cannot be edited or deleted.
+                </p>
+              </div>
+
+              <span className="rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-600">
+                {pastHolidays.length} record{pastHolidays.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            <div className="card overflow-hidden">
+              {pastHolidays.length === 0 ? (
+                <div className="p-10 text-center">
+                  <CalendarDays
+                    size={44}
+                    className="mx-auto text-navy-300"
+                  />
+                  <h3 className="mt-4 text-lg font-semibold text-navy-800">
+                    No holiday history
+                  </h3>
+                  <p className="mt-1 text-sm text-navy-500">
+                    No past public holidays exist for the selected filters.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-navy-100">
+                    <thead className="bg-navy-50">
+                      <tr>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Date</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Holiday</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Branch</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Daily Hours</th>
+                        <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-navy-600">Payment</th>
+                        <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-navy-600">Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody className="divide-y divide-navy-100 bg-white">
+                      {pastHolidays.map((holiday) => (
+                        <tr
+                          key={holiday.publicHolidayId}
+                          className="bg-navy-50/20"
+                        >
+                          <td className="whitespace-nowrap px-5 py-4 text-sm font-medium text-navy-600">
+                            {formatDateForDisplay(holiday.holidayDate)}
+                          </td>
+                          <td className="px-5 py-4 text-sm text-navy-700">
+                            {holiday.holidayName || '-'}
+                          </td>
+                          <td className="px-5 py-4 text-sm text-navy-600">
+                            {holiday?.branch?.branchName || getBranchName(holiday.branchId)}
+                          </td>
+                          <td className="whitespace-nowrap px-5 py-4 text-sm text-navy-600">
+                            {Number(holiday.dailyWorkingHours ?? 0).toFixed(2)} hrs
+                          </td>
+                          <td className="px-5 py-4">
+                            {holiday.isPaid ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-3 py-1 text-xs font-semibold text-success-700">
+                                <CheckCircle2 size={14} />
+                                Paid
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-navy-100 px-3 py-1 text-xs font-semibold text-navy-500">
+                                <XCircle size={14} />
+                                Unpaid
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <span className="inline-flex items-center rounded-full bg-navy-100 px-3 py-1 text-xs font-semibold text-navy-500">
+                              Read Only
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+
+
+        {/* ====================================================
+            HOLIDAY CALENDAR
+        ===================================================== */}
+        {holidayView === 'calendar' && (
+          <div className="space-y-4">
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-navy-900">
+                  Holiday Calendar
+                </h2>
+                <p className="mt-1 text-sm text-navy-500">
+                  View all configured holiday dates for the selected year and branch filter.
+                </p>
+              </div>
+
+              <span className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700">
+                {holidays.length} total record{holidays.length === 1 ? '' : 's'}
+              </span>
+            </div>
+
+            <div className="card mx-auto w-full max-w-3xl overflow-hidden">
+
+              <div className="flex items-center justify-between gap-3 border-b border-navy-100 px-4 py-3">
+                <div>
+                  <p className="text-sm font-bold text-navy-900">
+                    Holiday Calendar
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-navy-500">
+                    {holidays.length} configured date{holidays.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={goToPreviousMonth}
+                    disabled={Number(selectedMonth) === 0}
+                    aria-label="Previous month"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-navy-200 bg-white text-navy-700 hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <div className="min-w-[128px] rounded-lg bg-navy-50 px-3 py-2 text-center">
+                    <span className="text-xs font-semibold text-navy-700">
+                      {calendarMonthLabel}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={goToNextMonth}
+                    disabled={Number(selectedMonth) === 11}
+                    aria-label="Next month"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-navy-200 bg-white text-navy-700 hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-4">
+
+                <div className="grid grid-cols-7 gap-1.5 text-[10px] font-bold uppercase tracking-wide text-navy-400">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="py-1.5 text-center">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-1.5">
+                  {calendarDays.map((calendarDay, index) => {
+                    if (!calendarDay) {
+                      return (
+                        <div
+                          key={`calendar-empty-${index}`}
+                          className="min-h-[68px] rounded-lg"
+                        />
+                      );
+                    }
+
+                    const isSelected =
+                      selectedCalendarDate === calendarDay.dateKey;
+
+                    const holidayCount =
+                      calendarDay.holidays.length;
+
+                    const isHoliday = holidayCount > 0;
+
+                    return (
+                      <button
+                        key={calendarDay.dateKey}
+                        type="button"
+                        onClick={() =>
+                          setSelectedCalendarDate(
+                            isHoliday ? calendarDay.dateKey : null
+                          )
+                        }
+                        className={[
+                          'min-h-[68px] rounded-lg border p-2 text-left transition-all',
+                          isHoliday
+                            ? 'border-success-200 bg-success-50/70 hover:border-success-300 hover:bg-success-50'
+                            : 'border-navy-100 bg-white hover:border-primary-200 hover:bg-primary-50/40',
+                          isSelected
+                            ? 'ring-2 ring-inset ring-primary-500'
+                            : '',
+                        ].join(' ')}
+                      >
+                        <div className="flex items-start justify-between gap-1">
+                          <span
+                            className={[
+                              'flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold',
+                              isHoliday
+                                ? 'bg-success-100 text-success-800'
+                                : 'bg-navy-50 text-navy-700',
+                            ].join(' ')}
+                          >
+                            {calendarDay.day}
+                          </span>
+
+                          {holidayCount > 1 && (
+                            <span className="rounded-full bg-white px-1.5 py-0.5 text-[8px] font-bold text-success-700 ring-1 ring-success-100">
+                              {holidayCount}
+                            </span>
+                          )}
+                        </div>
+
+                        {isHoliday && (
+                          <div className="mt-1.5 space-y-0.5">
+                            {calendarDay.holidays.slice(0, 2).map((holiday) => (
+                              <div
+                                key={holiday.publicHolidayId}
+                                className="flex min-w-0 items-center gap-1.5"
+                                title={`${holiday.holidayName || 'Public Holiday'}${holiday.isPaid ? ' • Paid' : ' • Unpaid'}`}
+                              >
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success-500" />
+                                <span className="truncate text-[7px] font-semibold text-success-800">
+                                  {holiday.holidayName || 'Public Holiday'}
+                                </span>
+                              </div>
+                            ))}
+
+                            {holidayCount > 2 && (
+                              <div className="text-[8px] font-semibold text-primary-700">
+                                +{holidayCount - 2} more
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-navy-100 pt-3 text-[10px] text-navy-500">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-success-500" />
+                    Public Holiday
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-navy-300" />
+                    Regular Day
+                  </span>
+                  <span>
+                    Click a date to view its holiday details.
+                  </span>
+                </div>
+
+                {selectedCalendarDate && selectedCalendarHolidays.length > 0 && (
+                  <div className="mt-3 rounded-lg border border-success-200 bg-success-50/60 p-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-success-700">
+                          Selected Holiday Date
+                        </p>
+                        <p className="mt-1 text-sm font-bold text-success-900">
+                          {formatDateForDisplay(selectedCalendarDate)}
+                        </p>
+                      </div>
+
+                      <span className="w-fit rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-success-700 ring-1 ring-success-100">
+                        {selectedCalendarHolidays.length === 1
+                          ? '1 holiday'
+                          : `${selectedCalendarHolidays.length} holidays`}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {selectedCalendarHolidays.map((holiday) => (
+                        <div
+                          key={holiday.publicHolidayId}
+                          className="rounded-lg border border-success-100 bg-white p-3"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold text-navy-800">
+                                {holiday.holidayName || 'Public Holiday'}
+                              </p>
+                              <p className="mt-0.5 truncate text-[10px] text-navy-500">
+                                {holiday?.branch?.branchName || getBranchName(holiday.branchId)}
+                              </p>
+                            </div>
+
+                            {holiday.isPaid ? (
+                              <span className="shrink-0 rounded-full bg-success-50 px-2 py-0.5 text-[9px] font-bold text-success-700">
+                                Paid
+                              </span>
+                            ) : (
+                              <span className="shrink-0 rounded-full bg-navy-50 px-2 py-0.5 text-[9px] font-bold text-navy-600">
+                                Unpaid
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="mt-2 text-[10px] text-navy-600">
+                            Daily Hours:{' '}
+                            <span className="font-bold">
+                              {Number(holiday.dailyWorkingHours ?? 0).toFixed(2)} hrs
+                            </span>
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+
+          </div>
+        )}
+
+      </section>
+
+
+      {/* ======================================================
+          CREATE / EDIT MODAL
+      ======================================================= */}
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+
+          <div className="flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+            {/* HEADER */}
+
+            <div className="flex items-center justify-between border-b border-navy-100 px-5 py-4">
+
+              <div>
+                <h2 className="text-base font-bold text-navy-900">
                   {editingHoliday
-                    ? editingHoliday.isGrouped
-                      ? 'Edit Branch Public Holiday'
-                      : 'Edit Public Holiday'
+                    ? 'Edit Public Holiday'
                     : 'Add Public Holiday'}
                 </h2>
 
                 <p className="mt-1 text-sm text-navy-500">
                   {editingHoliday
-                    ? 'Change the branch holiday details or adjust its date range.'
+                    ? 'Change the holiday details or date.'
                     : 'Add one date or a consecutive range of public holidays.'}
                 </p>
               </div>
+
 
               <button
                 type="button"
                 onClick={closeModal}
                 disabled={saving}
-                aria-label="Close"
-                className="rounded-lg p-2 text-navy-500 transition hover:bg-navy-50 hover:text-navy-800 disabled:opacity-50"
+                className="rounded-lg p-2 text-navy-500 hover:bg-navy-50 disabled:opacity-50"
               >
-                <X size={23} />
+                <X size={20} />
               </button>
+
             </div>
 
-            {/* MODAL BODY */}
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
-              <div className="space-y-5">
-                {/* BRANCH */}
+
+            {/* BODY */}
+
+            <div className="min-h-0 flex-1 overflow-y-auto space-y-5 px-6 py-5">
+
+              {/* BRANCH */}
+
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                  Branch
+                  <span className="text-error-600"> *</span>
+                </label>
+
+                <select
+                  value={selectedBranchId}
+                  onChange={(event) =>
+                    setSelectedBranchId(
+                      event.target.value
+                    )
+                  }
+                  disabled={
+                    saving ||
+                    branchesLoading
+                  }
+                  className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                >
+                  <option value="">
+                    Select Branch
+                  </option>
+
+                  {!editingHoliday && (
+                    <option value="ALL">
+                      All Branches
+                    </option>
+                  )}
+
+                  {branches.map((branch) => (
+                    <option
+                      key={branch.branchId}
+                      value={branch.branchId}
+                    >
+                      {branch.branchName}
+                    </option>
+                  ))}
+                </select>
+
+                {!editingHoliday && (
+                  <p className="mt-1.5 text-xs text-navy-500">
+                    Choose All Branches to create the same holiday
+                    for every branch in the company.
+                  </p>
+                )}
+              </div>
+
+
+              {/* DATES */}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
                 <div>
-                  <label className="mb-2 block text-base font-semibold text-navy-700">
-                    Branch <span className="text-red-600">*</span>
+                  <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                    {editingHoliday
+                      ? 'Date'
+                      : 'Start Date'}
+                    <span className="text-error-600"> *</span>
                   </label>
 
-                  <select
-                    value={selectedBranchId}
+                  <input
+                    type="date"
+                    value={startDate}
                     onChange={(event) =>
-                      setSelectedBranchId(
+                      setStartDate(
                         event.target.value
                       )
                     }
-                    disabled={
-                      saving ||
-                      branchesLoading
-                    }
-                    className="w-full rounded-lg border border-navy-200 bg-white px-4 py-3 text-base text-navy-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                  >
-                    <option value="">
-                      {editingHoliday?.isGrouped
-                        ? 'Select Branch to Modify'
-                        : 'Select Branch'}
-                    </option>
-
-                    {!editingHoliday && (
-                      <option value="ALL">
-                        All Branches
-                      </option>
-                    )}
-
-                    {branches.map((branch) => (
-                      <option
-                        key={branch.branchId}
-                        value={branch.branchId}
-                      >
-                        {branch.branchName}
-                      </option>
-                    ))}
-                  </select>
-
-                  {!editingHoliday && (
-                    <p className="mt-2 text-sm text-navy-500">
-                      Choose All Branches to create the same holiday for every branch in the company.
-                    </p>
-                  )}
-
-                  {editingHoliday && (
-                    <p className="mt-2 text-sm text-blue-700">
-                      You are editing only this branch. Other branch holidays
-                      will not be changed.
-                    </p>
-                  )}
+                    disabled={saving}
+                    className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  />
                 </div>
 
-                {/* DATES */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-base font-semibold text-navy-700">
-                      Start Date{' '}
-                      <span className="text-red-600">*</span>
-                    </label>
 
-                    <input
-                      type="date"
-                      value={startDate}
-                      min={
-                        editingHoliday
-                          ? undefined
-                          : getISTTodayString()
-                      }
-                      onChange={(event) =>
-                        setStartDate(
-                          event.target.value
-                        )
-                      }
-                      disabled={saving}
-                      className="w-full rounded-lg border border-navy-200 bg-white px-4 py-3 text-base text-navy-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-
+                {!editingHoliday && (
                   <div>
-                    <label className="mb-2 block text-base font-semibold text-navy-700">
-                      End Date{' '}
-                      <span className="text-red-600">*</span>
+                    <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                      End Date
                     </label>
 
                     <input
                       type="date"
                       value={endDate}
                       min={
-                        editingHoliday
-                          ? (startDate || undefined)
-                          : (
-                              startDate &&
-                              startDate > getISTTodayString()
-                                ? startDate
-                                : getISTTodayString()
-                            )
+                        startDate ||
+                        undefined
                       }
                       onChange={(event) =>
                         setEndDate(
@@ -1301,166 +1829,182 @@ export function AdminPublicHolidays() {
                         )
                       }
                       disabled={saving}
-                      className="w-full rounded-lg border border-navy-200 bg-white px-4 py-3 text-base text-navy-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                     />
-                  </div>
-                </div>
-
-                {editingHoliday && (
-                  <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-800">
-                    You can increase or reduce the holiday duration by
-                    changing the Start Date and End Date. Only the selected
-                    branch will be updated.
                   </div>
                 )}
 
-                {/* HOLIDAY NAME */}
+              </div>
+
+
+              {/* NAME */}
+
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                  Holiday Name
+                  <span className="text-error-600"> *</span>
+                </label>
+
+                <input
+                  type="text"
+                  value={holidayName}
+                  onChange={(event) =>
+                    setHolidayName(
+                      event.target.value
+                    )
+                  }
+                  placeholder="Example: Diwali"
+                  maxLength={150}
+                  disabled={saving}
+                  className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                />
+              </div>
+
+
+              {/* HOURS / PAID */}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
                 <div>
-                  <label className="mb-2 block text-base font-semibold text-navy-700">
-                    Holiday Name{' '}
-                    <span className="text-red-600">*</span>
+                  <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                    Daily Working Hours
+                    <span className="text-error-600"> *</span>
                   </label>
 
                   <input
-                    type="text"
-                    value={holidayName}
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="0.25"
+                    value={dailyWorkingHours}
                     onChange={(event) =>
-                      setHolidayName(
+                      setDailyWorkingHours(
                         event.target.value
                       )
                     }
-                    placeholder="Example: Diwali"
-                    maxLength={150}
                     disabled={saving}
-                    className="w-full rounded-lg border border-navy-200 bg-white px-4 py-3 text-base text-navy-800 outline-none transition placeholder:text-navy-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
                   />
+
+                  <p className="mt-1 text-xs text-navy-500">
+                    Example: 8 hours
+                  </p>
                 </div>
 
-                {/* HOURS + PAYMENT */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-base font-semibold text-navy-700">
-                      Daily Working Hours{' '}
-                      <span className="text-red-600">*</span>
-                    </label>
+
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-navy-700">
+                    Holiday Payment
+                  </label>
+
+                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-navy-200 px-3 py-2.5">
 
                     <input
-                      type="number"
-                      min="0"
-                      max="24"
-                      step="0.25"
-                      value={dailyWorkingHours}
+                      type="checkbox"
+                      checked={isPaid}
                       onChange={(event) =>
-                        setDailyWorkingHours(
-                          event.target.value
+                        setIsPaid(
+                          event.target.checked
                         )
                       }
                       disabled={saving}
-                      className="w-full rounded-lg border border-navy-200 bg-white px-4 py-3 text-base text-navy-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      className="h-4 w-4 rounded border-navy-300 text-primary-600"
                     />
 
-                    <p className="mt-1.5 text-sm text-navy-500">
-                      Example: 8 hours
-                    </p>
-                  </div>
+                    <span className="text-sm font-medium text-navy-700">
+                      Paid Public Holiday
+                    </span>
 
-                  <div>
-                    <label className="mb-2 block text-base font-semibold text-navy-700">
-                      Holiday Payment
-                    </label>
-
-                    <label className="flex h-[50px] cursor-pointer items-center gap-3 rounded-lg border border-navy-200 px-4">
-                      <input
-                        type="checkbox"
-                        checked={isPaid}
-                        onChange={(event) =>
-                          setIsPaid(
-                            event.target.checked
-                          )
-                        }
-                        disabled={saving}
-                        className="h-5 w-5 accent-blue-600"
-                      />
-
-                      <span className="text-base font-medium text-navy-700">
-                        Paid Public Holiday
-                      </span>
-                    </label>
-                  </div>
+                  </label>
                 </div>
 
-                {/* DATE PREVIEW */}
-                {startDate &&
-                  endDate &&
-                  getDateRange(
-                    startDate,
-                    endDate
-                  ).length > 1 && (
-                    <div className="rounded-lg border border-blue-100 bg-blue-50 p-4">
-                      <p className="text-sm font-semibold text-blue-900">
-                        {editingHoliday
-                          ? 'New holiday duration'
-                          : 'Dates to be added'}
-                      </p>
-
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {getDateRange(
-                          startDate,
-                          endDate
-                        ).map((date) => (
-                          <span
-                            key={date}
-                            className="rounded-full bg-white px-3 py-1 text-xs font-medium text-blue-700 shadow-sm"
-                          >
-                            {formatDate(date)}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
               </div>
+
+
+              {/* DATE PREVIEW */}
+
+              {!editingHoliday &&
+                startDate &&
+                endDate &&
+                getDateRange(
+                  startDate,
+                  endDate
+                ).length > 1 && (
+                  <div className="rounded-lg border border-primary-100 bg-primary-50 p-4">
+
+                    <p className="text-sm font-semibold text-primary-800">
+                      Dates to be added
+                    </p>
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+
+                      {getDateRange(
+                        startDate,
+                        endDate
+                      ).map((date) => (
+                        <span
+                          key={date}
+                          className="rounded-full bg-white px-3 py-1 text-xs font-medium text-primary-700 shadow-sm"
+                        >
+                          {formatDateForDisplay(date)}
+                        </span>
+                      ))}
+
+                    </div>
+
+                  </div>
+                )}
+
             </div>
 
-            {/* MODAL FOOTER */}
+
+            {/* FOOTER */}
+
             <div className="shrink-0 border-t border-navy-100 bg-white px-6 py-4">
+
               <div className="flex w-full items-center justify-between gap-4">
-                {/* LEFT: SUBMIT */}
+
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="inline-flex min-w-[165px] items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-md transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-300"
+                  className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? (
                     <Loader2
-                      size={19}
+                      size={18}
                       className="animate-spin"
                     />
                   ) : (
-                    <Plus size={20} />
+                    <Plus size={19} />
                   )}
 
                   {editingHoliday
-                    ? 'Update Holiday'
+                    ? 'Save Changes'
                     : 'Add Holiday'}
                 </button>
 
-                {/* RIGHT: CANCEL */}
                 <button
                   type="button"
                   onClick={closeModal}
                   disabled={saving}
-                  className="inline-flex min-w-[130px] items-center justify-center rounded-xl border border-navy-200 bg-white px-6 py-3 text-base font-semibold text-navy-700 transition hover:bg-navy-50 focus:outline-none focus:ring-2 focus:ring-navy-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-w-[150px] items-center justify-center rounded-xl border border-navy-200 bg-white px-6 py-3 text-base font-semibold text-navy-700 transition-colors hover:bg-navy-50 focus:outline-none focus:ring-2 focus:ring-navy-300 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Cancel
                 </button>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 }
+
 
 export default AdminPublicHolidays;
