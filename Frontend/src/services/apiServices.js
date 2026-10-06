@@ -2111,6 +2111,20 @@ export const selfService = {
     },
 
 
+    changePassword: async (
+        data
+    ) => {
+
+        const response =
+            await apiClient.post(
+                API.me.changePassword,
+                data
+            );
+
+        return unwrap(response);
+    },
+
+
     attendance: async (
         params = {}
     ) => {

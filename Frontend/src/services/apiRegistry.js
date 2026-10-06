@@ -758,6 +758,10 @@ const API = {
         profile:
             "/api/me/profile",
 
+        // POST /api/me/password
+        changePassword:
+            "/api/me/password",
+
         // GET /api/me/attendance
         attendance:
             "/api/me/attendance",

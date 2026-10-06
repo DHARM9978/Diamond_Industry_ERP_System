@@ -147,7 +147,87 @@ const loginEmployee = async (email, password) => {
 
 
 
+const changeEmployeePassword = async (
+    employeeId,
+    companyId,
+    currentPassword,
+    newPassword
+) => {
+
+    const employee =
+        await prisma.employee.findFirst({
+            where: {
+                employeeId: Number(employeeId),
+                companyId: Number(companyId)
+            },
+            select: {
+                employeeId: true,
+                passwordHash: true,
+                status: true
+            }
+        });
+
+    if (!employee) {
+        const error = new Error(
+            "Employee account not found"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (employee.status !== "ACTIVE") {
+        const error = new Error(
+            "Employee account is inactive"
+        );
+        error.statusCode = 403;
+        throw error;
+    }
+
+    const currentPasswordMatches =
+        await bcrypt.compare(
+            currentPassword,
+            employee.passwordHash
+        );
+
+    if (!currentPasswordMatches) {
+        const error = new Error(
+            "Current password is incorrect"
+        );
+        error.statusCode = 401;
+        throw error;
+    }
+
+    if (currentPassword === newPassword) {
+        const error = new Error(
+            "New password must be different from the current password"
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const passwordHash =
+        await bcrypt.hash(
+            newPassword,
+            12
+        );
+
+    await prisma.employee.update({
+        where: {
+            employeeId: employee.employeeId
+        },
+        data: {
+            passwordHash
+        }
+    });
+
+    return {
+        success: true
+    };
+};
+
+
 module.exports = {
     loginAdmin,
-    loginEmployee
+    loginEmployee,
+    changeEmployeePassword
 };

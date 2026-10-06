@@ -27,6 +27,19 @@ router.use(
 
 
 // ==========================================
+// Change My Password
+// POST /api/me/password
+// ==========================================
+
+router.post(
+    "/password",
+    asyncHandler(
+        employeeSelfController.changeMyPassword
+    )
+);
+
+
+// ==========================================
 // Get My Profile
 // GET /api/me/profile
 // ==========================================

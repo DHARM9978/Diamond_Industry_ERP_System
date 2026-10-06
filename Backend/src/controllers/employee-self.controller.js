@@ -10,6 +10,9 @@ const payrollService =
 const advanceService =
     require("../services/advance.service");
 
+const authService =
+    require("../services/auth.service");
+
 
 // ==========================================
 // Helpers
@@ -83,6 +86,76 @@ const getDateValueOrNull = (value) => {
 
 
     return parsed;
+};
+
+
+// ==========================================
+// Change My Password
+// POST /api/me/password
+// ==========================================
+
+const changeMyPassword = async (
+    req,
+    res
+) => {
+
+    const {
+        currentPassword,
+        newPassword
+    } = req.body || {};
+
+    if (
+        typeof currentPassword !== "string" ||
+        !currentPassword.length
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Current password is required"
+        });
+    }
+
+    if (
+        typeof newPassword !== "string" ||
+        !newPassword.length
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "New password is required"
+        });
+    }
+
+    if (newPassword.length < 8) {
+        return res.status(400).json({
+            success: false,
+            message: "New password must be at least 8 characters long"
+        });
+    }
+
+    if (newPassword.length > 72) {
+        return res.status(400).json({
+            success: false,
+            message: "New password must not exceed 72 characters"
+        });
+    }
+
+    if (currentPassword === newPassword) {
+        return res.status(400).json({
+            success: false,
+            message: "New password must be different from the current password"
+        });
+    }
+
+    await authService.changeEmployeePassword(
+        req.user.employeeId,
+        req.user.companyId,
+        currentPassword,
+        newPassword
+    );
+
+    return res.status(200).json({
+        success: true,
+        message: "Password changed successfully"
+    });
 };
 
 
@@ -540,6 +613,7 @@ const createMyAdvance = async (
 // ==========================================
 
 module.exports = {
+    changeMyPassword,
 
     getMyProfile,
 
