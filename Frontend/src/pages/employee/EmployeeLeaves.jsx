@@ -144,6 +144,299 @@ const getISTTodayInputValue = () => {
   return `${values.year}-${values.month}-${values.day}`;
 };
 
+const getCurrentISTMonthYear = () => {
+  const parts = new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'numeric',
+    }
+  ).formatToParts(new Date());
+
+  const values = {};
+
+  parts.forEach((part) => {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  });
+
+  return {
+    month: Number(values.month) || 1,
+    year: Number(values.year) || new Date().getFullYear(),
+  };
+};
+
+
+const getCalendarDateParts = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}/.test(value)
+  ) {
+    const match = value.match(
+      /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+    if (match) {
+      return {
+        year: Number(match[1]),
+        month: Number(match[2]),
+        day: Number(match[3]),
+      };
+    }
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const parts = new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    }
+  ).formatToParts(date);
+
+  const values = {};
+
+  parts.forEach((part) => {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  });
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+  };
+};
+
+
+const getMonthStartDayNumber = (year, month) => {
+  return `${year}-${String(month).padStart(2, '0')}-01`;
+};
+
+
+const getMonthEndDayNumber = (year, month) => {
+  const lastDay = new Date(
+    Number(year),
+    Number(month),
+    0
+  ).getDate();
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+};
+
+
+const compareCalendarDates = (a, b) => {
+  const aValue = a
+    ? `${a.year}-${String(a.month).padStart(2, '0')}-${String(a.day).padStart(2, '0')}`
+    : null;
+
+  const bValue = b
+    ? `${b.year}-${String(b.month).padStart(2, '0')}-${String(b.day).padStart(2, '0')}`
+    : null;
+
+  if (!aValue || !bValue) {
+    return 0;
+  }
+
+  if (aValue < bValue) {
+    return -1;
+  }
+
+  if (aValue > bValue) {
+    return 1;
+  }
+
+  return 0;
+};
+
+
+const leaveOverlapsSelectedMonth = (
+  request,
+  month,
+  year
+) => {
+  const requestStart = getCalendarDateParts(
+    getRequestStartDate(request)
+  );
+
+  const requestEnd = getCalendarDateParts(
+    getRequestEndDate(request)
+  );
+
+  if (!requestStart || !requestEnd) {
+    return false;
+  }
+
+  const selectedStart = getCalendarDateParts(
+    getMonthStartDayNumber(year, month)
+  );
+
+  const selectedEnd = getCalendarDateParts(
+    getMonthEndDayNumber(year, month)
+  );
+
+  if (!selectedStart || !selectedEnd) {
+    return false;
+  }
+
+  return (
+    compareCalendarDates(requestStart, selectedEnd) <= 0 &&
+    compareCalendarDates(requestEnd, selectedStart) >= 0
+  );
+};
+
+
+const getCalendarDayNumber = (parts) => {
+  if (!parts) {
+    return null;
+  }
+
+  return Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day)
+  );
+};
+
+
+const countLeaveDaysInSelectedMonth = (
+  request,
+  month,
+  year
+) => {
+  if (
+    getRequestStatus(request) !== 'APPROVED'
+  ) {
+    return 0;
+  }
+
+  const startValue =
+    getBlockingStartDate(request);
+
+  const endValue =
+    getBlockingEndDate(request);
+
+  const requestStart =
+    getCalendarDateParts(startValue);
+
+  const requestEnd =
+    getCalendarDateParts(endValue);
+
+  if (!requestStart || !requestEnd) {
+    return 0;
+  }
+
+  const selectedStart =
+    getCalendarDateParts(
+      getMonthStartDayNumber(
+        year,
+        month
+      )
+    );
+
+  const selectedEnd =
+    getCalendarDateParts(
+      getMonthEndDayNumber(
+        year,
+        month
+      )
+    );
+
+  if (!selectedStart || !selectedEnd) {
+    return 0;
+  }
+
+  if (
+    compareCalendarDates(
+      requestStart,
+      requestEnd
+    ) > 0 ||
+    compareCalendarDates(
+      requestStart,
+      selectedEnd
+    ) > 0 ||
+    compareCalendarDates(
+      requestEnd,
+      selectedStart
+    ) < 0
+  ) {
+    return 0;
+  }
+
+  const effectiveStart =
+    compareCalendarDates(
+      requestStart,
+      selectedStart
+    ) > 0
+      ? requestStart
+      : selectedStart;
+
+  const effectiveEnd =
+    compareCalendarDates(
+      requestEnd,
+      selectedEnd
+    ) < 0
+      ? requestEnd
+      : selectedEnd;
+
+  const startDay =
+    getCalendarDayNumber(
+      effectiveStart
+    );
+
+  const endDay =
+    getCalendarDayNumber(
+      effectiveEnd
+    );
+
+  if (
+    startDay === null ||
+    endDay === null ||
+    endDay < startDay
+  ) {
+    return 0;
+  }
+
+  return (
+    Math.round(
+      (endDay - startDay) /
+        86400000
+    ) + 1
+  );
+};
+
+
+const getMonthLabel = (month, year) => {
+  return new Intl.DateTimeFormat(
+    'en-IN',
+    {
+      month: 'long',
+      year: 'numeric',
+    }
+  ).format(
+    new Date(
+      Number(year),
+      Number(month) - 1,
+      1
+    )
+  );
+};
+
+
 const getRequestId = (request) => {
   return (
     request?.leaveRequestId ??
@@ -660,6 +953,15 @@ export function EmployeeLeaves() {
   const [openingModal, setOpeningModal] =
     useState(false);
 
+  const currentMonthYear =
+    getCurrentISTMonthYear();
+
+  const [selectedMonth, setSelectedMonth] =
+    useState(currentMonthYear.month);
+
+  const [selectedYear, setSelectedYear] =
+    useState(currentMonthYear.year);
+
 
   /*
   |--------------------------------------------------------------------------
@@ -741,6 +1043,25 @@ export function EmployeeLeaves() {
   useEffect(() => {
     loadLeaveData();
   }, [loadLeaveData]);
+
+
+  useEffect(() => {
+    if (
+      Number(selectedYear) ===
+        currentMonthYear.year &&
+      Number(selectedMonth) >
+        currentMonthYear.month
+    ) {
+      setSelectedMonth(
+        currentMonthYear.month
+      );
+    }
+  }, [
+    selectedYear,
+    selectedMonth,
+    currentMonthYear.month,
+    currentMonthYear.year,
+  ]);
 
 
   /*
@@ -1104,6 +1425,69 @@ export function EmployeeLeaves() {
         };
       }
     );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Leave history month/year filter
+  |--------------------------------------------------------------------------
+  |
+  | Current month is shown by default. A leave request is included when its
+  | requested date range overlaps the selected calendar month. This handles
+  | requests that span across two months without splitting the request.
+  */
+
+  const availableYears = Array.from(
+    { length: 6 },
+    (_, index) =>
+      currentMonthYear.year - index
+  );
+
+  const availableMonths = Array.from(
+    { length: 12 },
+    (_, index) => index + 1
+  ).filter((month) =>
+    Number(selectedYear) <
+      currentMonthYear.year ||
+    month <= currentMonthYear.month
+  );
+
+  const filteredLeaves = leaves.filter(
+    (request) =>
+      leaveOverlapsSelectedMonth(
+        request,
+        selectedMonth,
+        selectedYear
+      )
+  );
+
+  /*
+   * IMPORTANT:
+   * The total-leave card must use the SAME month-filtered request
+   * collection as the table. That guarantees the card changes when
+   * the Month/Year selectors change.
+   *
+   * Only APPROVED leave is counted as leave taken. For approved
+   * partial-month or cross-month leave, count only the approved
+   * calendar days that fall inside the selected month.
+   */
+  const totalLeavesTakenInSelectedMonth =
+    filteredLeaves.reduce(
+      (total, request) =>
+        total +
+        countLeaveDaysInSelectedMonth(
+          request,
+          selectedMonth,
+          selectedYear
+        ),
+      0
+    );
+
+  const isCurrentMonthSelected =
+    Number(selectedMonth) ===
+      currentMonthYear.month &&
+    Number(selectedYear) ===
+      currentMonthYear.year;
 
 
   /*
@@ -1504,6 +1888,147 @@ export function EmployeeLeaves() {
       />
 
 
+            <div className="mb-5 rounded-xl border border-navy-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-navy-800">
+              Leave History
+            </p>
+
+            <p className="mt-1 text-xs text-navy-400">
+              Current month is shown first. Select an earlier month only when you need to view older leave requests.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="leave-month-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Month
+              </label>
+
+              <select
+                id="leave-month-filter"
+                value={selectedMonth}
+                onChange={(event) =>
+                  setSelectedMonth(
+                    Number(event.target.value)
+                  )
+                }
+                className="h-10 min-w-[170px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+                {availableMonths.map((month) => (
+                  <option
+                    key={month}
+                    value={month}
+                  >
+                    {new Intl.DateTimeFormat(
+                      'en-IN',
+                      { month: 'long' }
+                    ).format(
+                      new Date(2000, month - 1, 1)
+                    )}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="leave-year-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Year
+              </label>
+
+              <select
+                id="leave-year-filter"
+                value={selectedYear}
+                onChange={(event) =>
+                  setSelectedYear(
+                    Number(event.target.value)
+                  )
+                }
+                className="h-10 min-w-[120px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+                {availableYears.map((year) => (
+                  <option
+                    key={year}
+                    value={year}
+                  >
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/*
+      |--------------------------------------------------------------------------
+      | Monthly Leave Taken
+      |--------------------------------------------------------------------------
+      */}
+
+      <div
+        className="
+          mb-6
+          rounded-xl
+          border border-navy-100
+          bg-white
+          p-5
+          shadow-sm
+        "
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-navy-400">
+              Total Leaves Taken
+            </p>
+
+            <p className="mt-1 text-3xl font-bold text-navy-800">
+              {totalLeavesTakenInSelectedMonth}
+            </p>
+
+            <p className="mt-1 text-sm text-navy-500">
+              {totalLeavesTakenInSelectedMonth === 1
+                ? 'day taken'
+                : 'days taken'} in {getMonthLabel(
+                  selectedMonth,
+                  selectedYear
+                )}
+            </p>
+          </div>
+
+          <div
+            className="
+              flex
+              h-11
+              w-11
+              shrink-0
+              items-center
+              justify-center
+              rounded-lg
+              bg-navy-50
+            "
+          >
+            <CalendarDays
+              size={21}
+              className="text-navy-600"
+            />
+          </div>
+        </div>
+
+        <p className="mt-4 text-xs leading-5 text-navy-400">
+          Only approved leave days are counted. Pending, rejected, and cancelled requests are not included. Partial approvals count only the approved dates that fall inside the selected month.
+        </p>
+      </div>
+
+
       {/*
       |--------------------------------------------------------------------------
       | Leave Balance Cards
@@ -1805,16 +2330,30 @@ export function EmployeeLeaves() {
       </div>
 
 
-      {leaves.length === 0 ? (
+
+
+
+      {filteredLeaves.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
-          title="No leave requests"
-          message="You have not submitted any leave requests yet."
+          title={
+            isCurrentMonthSelected
+              ? 'No leave requests this month'
+              : `No leave requests for ${getMonthLabel(
+                  selectedMonth,
+                  selectedYear
+                )}`
+          }
+          message={
+            isCurrentMonthSelected
+              ? 'You have not submitted any leave requests for the current month. Previous months remain available through the filter above.'
+              : 'No leave requests overlap the selected month.'
+          }
         />
       ) : (
         <DataTable
           columns={columns}
-          data={leaves}
+          data={filteredLeaves}
         />
       )}
 
