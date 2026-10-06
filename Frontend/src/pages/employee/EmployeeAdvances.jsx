@@ -23,6 +23,23 @@ import {
 
 
 // ============================================================
+// MONEY HELPER
+// ============================================================
+// Keep monetary calculations consistent across the page.
+const roundMoney = (value) => {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return 0;
+  }
+
+  return Math.round(
+    (numericValue + Number.EPSILON) * 100
+  ) / 100;
+};
+
+
+// ============================================================
 // EMPLOYEE ADVANCES
 // ============================================================
 
@@ -277,10 +294,6 @@ export function EmployeeAdvances() {
     }, [employeeProfile, advances]);
 
 
-  // ==========================================================
-  // Advances belonging to the selected month
-  // ==========================================================
-
   const selectedMonthAdvances =
     useMemo(() => {
       return advances.filter((advance) => {
@@ -303,17 +316,8 @@ export function EmployeeAdvances() {
     ]);
 
 
-  // ==========================================================
-  // Salary value for selected month
-  //
-  // If historical advance records contain a historical baseSalary,
-  // use that amount for the selected month. Otherwise fall back to
-  // the employee's current profile salary.
-  // ==========================================================
-
   const selectedBaseSalary =
     useMemo(() => {
-
       const recordWithSalary =
         selectedMonthAdvances.find(
           (advance) =>
@@ -333,36 +337,25 @@ export function EmployeeAdvances() {
       return selectedSalary > 0
         ? selectedSalary
         : employeeBaseSalary;
-
     }, [
       selectedMonthAdvances,
       employeeBaseSalary,
     ]);
 
 
-  // ==========================================================
-  // Outstanding advance for selected month
-  // ==========================================================
-
   const selectedOutstandingAdvance =
     useMemo(() => {
-
       return calculateOutstandingAdvance(
         advances,
         selectedMonth,
         selectedYear
       );
-
     }, [
       advances,
       selectedMonth,
       selectedYear,
     ]);
 
-
-  // ==========================================================
-  // Available advance for selected month
-  // ==========================================================
 
   const selectedAvailableAdvance =
     Math.max(
@@ -372,22 +365,15 @@ export function EmployeeAdvances() {
     );
 
 
-  // ==========================================================
-  // CURRENT MONTH REQUEST LIMIT
-  //
-  // The request form always uses the current month's allowance,
-  // even while the user is viewing an older month.
-  // ==========================================================
-
+  // The request form always uses the current month's
+  // allowance, even while the user is viewing historical months.
   const currentMonthOutstandingAdvance =
     useMemo(() => {
-
       return calculateOutstandingAdvance(
         advances,
         currentMonthYear.month,
         currentMonthYear.year
       );
-
     }, [
       advances,
       currentMonthYear,
@@ -406,26 +392,17 @@ export function EmployeeAdvances() {
     employeeBaseSalary > 0;
 
 
-  // The table uses the same month currently selected
-  // for the summary cards.
-  const filteredAdvances =
-    selectedMonthAdvances;
+  const filteredAdvances = selectedMonthAdvances;
 
-
-  // ==========================================================
-  // AVAILABLE MONTHS
-  // ==========================================================
 
   const availableMonths =
     useMemo(() => {
-
       const current =
         getCurrentISTMonthYear();
 
       return Array.from(
         { length: 12 },
         (_, index) => {
-
           const month =
             index + 1;
 
@@ -435,14 +412,9 @@ export function EmployeeAdvances() {
               'en-IN',
               { month: 'long' }
             ).format(
-              new Date(
-                2000,
-                month - 1,
-                1
-              )
+              new Date(2000, month - 1, 1)
             ),
           };
-
         }
       ).filter(
         (option) =>
@@ -451,19 +423,12 @@ export function EmployeeAdvances() {
           option.value <=
             current.month
       );
-
     }, [selectedYear]);
 
 
-  // ==========================================================
-  // AVAILABLE YEARS
-  // ==========================================================
-
   const availableYears =
     useMemo(() => {
-
       const years = [];
-
       const current =
         getCurrentISTMonthYear();
 
@@ -476,7 +441,6 @@ export function EmployeeAdvances() {
       }
 
       return years;
-
     }, []);
 
 
@@ -616,7 +580,6 @@ export function EmployeeAdvances() {
 
 
   useEffect(() => {
-
     const current =
       getCurrentISTMonthYear();
 
@@ -626,13 +589,8 @@ export function EmployeeAdvances() {
       Number(selectedMonth) >
       current.month
     ) {
-
-      setSelectedMonth(
-        current.month
-      );
-
+      setSelectedMonth(current.month);
     }
-
   }, [
     selectedYear,
     selectedMonth,
@@ -673,7 +631,6 @@ export function EmployeeAdvances() {
         maximumFractionDigits: 2,
       }
     )}`;
-
   };
 
 
@@ -708,7 +665,6 @@ export function EmployeeAdvances() {
         year: 'numeric',
       }
     );
-
   };
 
 
@@ -735,9 +691,10 @@ export function EmployeeAdvances() {
        * POST /api/advances
        */
 
-      await selfService.createAdvance(
-        data
-      );
+      const response =
+        await selfService.createAdvance(
+          data
+        );
 
       // The backend is the source of truth. Reload the records after
       // a successful request so the salary/outstanding/available values
@@ -775,7 +732,6 @@ export function EmployeeAdvances() {
       setSubmitting(false);
 
     }
-
   };
 
 
@@ -797,15 +753,11 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
-
         <span className="font-bold text-navy-900">
-
           {formatCurrency(
             row.amount
           )}
-
         </span>
-
       ),
     },
 
@@ -822,15 +774,11 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
-
         <span className="font-semibold text-success-700">
-
           {formatCurrency(
             row.approvedAmount
           )}
-
         </span>
-
       ),
     },
 
@@ -847,15 +795,11 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
-
         <span className="font-semibold text-navy-900">
-
           {formatCurrency(
             row.paidAmount
           )}
-
         </span>
-
       ),
     },
 
@@ -870,18 +814,12 @@ export function EmployeeAdvances() {
       label: 'Reason',
 
       render: (row) => (
-
         <span
           className="text-sm text-navy-500"
-          title={
-            row.reason || ''
-          }
+          title={row.reason || ''}
         >
-
           {row.reason || '-'}
-
         </span>
-
       ),
     },
 
@@ -896,16 +834,12 @@ export function EmployeeAdvances() {
       label: 'Requested Date',
 
       render: (row) => (
-
         <span className="text-navy-400 text-sm">
-
           {formatDate(
             row.createdAt ||
               row.paymentDate
           )}
-
         </span>
-
       ),
     },
 
@@ -922,11 +856,9 @@ export function EmployeeAdvances() {
       align: 'center',
 
       render: (row) => (
-
         <StatusBadge
           status={row.status}
         />
-
       ),
     },
 
@@ -953,7 +885,6 @@ export function EmployeeAdvances() {
   // ==========================================================
 
   return (
-
     <div>
 
       <PageHeader
@@ -974,24 +905,19 @@ export function EmployeeAdvances() {
             }
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-
             <Plus size={18} />
 
             Request Advance
-
           </button>
 
         }
-
       />
 
 
       {!salaryLimitKnown && (
 
         <div className="mb-5 rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
-
           Unable to determine your monthly salary limit. Please refresh the page before requesting an advance.
-
         </div>
 
       )}
@@ -1005,103 +931,43 @@ export function EmployeeAdvances() {
 
         <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
 
-          {/* ==================================================
-              Monthly Base Salary
-              ================================================== */}
-
           <div className="rounded-xl border border-navy-100 bg-navy-50 p-4">
-
             <p className="text-xs font-medium uppercase tracking-wide text-navy-400">
-
               Monthly Base Salary
-
             </p>
-
             <p className="mt-1 text-xl font-bold text-navy-900">
-
-              {formatCurrency(
-                selectedBaseSalary
-              )}
-
+              {formatCurrency(selectedBaseSalary)}
             </p>
-
             <p className="mt-1 text-[11px] text-navy-400">
-
-              {getMonthLabel(
-                selectedMonth,
-                selectedYear
-              )}
-
+              {getMonthLabel(selectedMonth, selectedYear)}
             </p>
-
           </div>
-
-
-          {/* ==================================================
-              Outstanding Advance
-              ================================================== */}
 
           <div className="rounded-xl border border-error-100 bg-error-50 p-4">
-
             <p className="text-xs font-medium uppercase tracking-wide text-error-500">
-
               Outstanding Advance
-
             </p>
-
             <p className="mt-1 text-xl font-bold text-error-700">
-
-              {formatCurrency(
-                selectedOutstandingAdvance
-              )}
-
+              {formatCurrency(selectedOutstandingAdvance)}
             </p>
-
             <p className="mt-1 text-[11px] text-error-500">
-
-              {getMonthLabel(
-                selectedMonth,
-                selectedYear
-              )}
-
+              {getMonthLabel(selectedMonth, selectedYear)}
             </p>
-
           </div>
 
-
-          {/* ==================================================
-              Available Advance
-              ================================================== */}
-
           <div className="rounded-xl border border-success-100 bg-success-50 p-4">
-
             <p className="text-xs font-medium uppercase tracking-wide text-success-600">
-
               Available Advance
-
             </p>
-
             <p className="mt-1 text-xl font-bold text-success-700">
-
-              {formatCurrency(
-                selectedAvailableAdvance
-              )}
-
+              {formatCurrency(selectedAvailableAdvance)}
             </p>
-
             <p className="mt-1 text-[11px] text-success-600">
-
-              {getMonthLabel(
-                selectedMonth,
-                selectedYear
-              )}
-
+              {getMonthLabel(selectedMonth, selectedYear)}
             </p>
-
           </div>
 
         </div>
-
       )}
 
 
@@ -1114,10 +980,7 @@ export function EmployeeAdvances() {
         <button
           type="button"
           onClick={loadAdvances}
-          disabled={
-            loading ||
-            submitting
-          }
+          disabled={loading || submitting}
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
 
@@ -1141,127 +1004,76 @@ export function EmployeeAdvances() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 
           <div>
-
             <p className="text-sm font-semibold text-navy-800">
-
               Advance History
-
             </p>
 
             <p className="mt-1 text-xs text-navy-400">
-
               Current month is shown first. Select an earlier month only when you need to view older advance requests.
-
             </p>
-
           </div>
-
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-            {/* ==================================================
-                Month
-                ================================================== */}
-
             <div>
-
               <label
                 htmlFor="advance-month-filter"
                 className="mb-1.5 block text-xs font-medium text-navy-500"
               >
-
                 Month
-
               </label>
-
 
               <select
                 id="advance-month-filter"
-                value={
-                  selectedMonth
-                }
+                value={selectedMonth}
                 onChange={(event) =>
                   setSelectedMonth(
-                    Number(
-                      event.target.value
-                    )
+                    Number(event.target.value)
                   )
                 }
                 className="h-10 min-w-[170px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
               >
-
-                {availableMonths.map(
-                  (month) => (
-
-                    <option
-                      key={month.value}
-                      value={month.value}
-                    >
-
-                      {month.label}
-
-                    </option>
-
-                  )
-                )}
-
+                {availableMonths.map((month) => (
+                  <option
+                    key={month.value}
+                    value={month.value}
+                  >
+                    {month.label}
+                  </option>
+                ))}
               </select>
-
             </div>
 
-
-            {/* ==================================================
-                Year
-                ================================================== */}
-
             <div>
-
               <label
                 htmlFor="advance-year-filter"
                 className="mb-1.5 block text-xs font-medium text-navy-500"
               >
-
                 Year
-
               </label>
-
 
               <select
                 id="advance-year-filter"
-                value={
-                  selectedYear
-                }
+                value={selectedYear}
                 onChange={(event) =>
                   setSelectedYear(
-                    Number(
-                      event.target.value
-                    )
+                    Number(event.target.value)
                   )
                 }
                 className="h-10 min-w-[120px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
               >
-
-                {availableYears.map(
-                  (year) => (
-
-                    <option
-                      key={year}
-                      value={year}
-                    >
-
-                      {year}
-
-                    </option>
-
-                  )
-                )}
-
+                {availableYears.map((year) => (
+                  <option
+                    key={year}
+                    value={year}
+                  >
+                    {year}
+                  </option>
+                ))}
               </select>
-
             </div>
 
           </div>
-
         </div>
 
       </div>
@@ -1275,7 +1087,6 @@ export function EmployeeAdvances() {
 
         <EmptyState
           icon={Banknote}
-
           title={
             isCurrentMonthSelected
               ? 'No advances this month'
@@ -1284,7 +1095,6 @@ export function EmployeeAdvances() {
                   selectedYear
                 )}`
           }
-
           message={
             isCurrentMonthSelected
               ? "You haven't requested any advances this month. Previous months remain available through the filter above."
@@ -1295,12 +1105,8 @@ export function EmployeeAdvances() {
       ) : (
 
         <DataTable
-          columns={
-            columns
-          }
-          data={
-            filteredAdvances
-          }
+          columns={columns}
+          data={filteredAdvances}
         />
 
       )}
@@ -1311,59 +1117,42 @@ export function EmployeeAdvances() {
           ====================================================== */}
 
       <Modal
-        open={
-          modalOpen
-        }
-
+        open={modalOpen}
         onClose={() =>
           !submitting &&
           setModalOpen(false)
         }
-
         title="Request Salary Advance"
       >
 
         <AdvanceForm
-
           onCancel={() =>
             !submitting &&
             setModalOpen(false)
           }
-
-          onSave={
-            handleApply
-          }
-
-          submitting={
-            submitting
-          }
-
+          onSave={handleApply}
+          submitting={submitting}
           maxAdvanceAmount={
             salaryLimitKnown
               ? currentMonthAvailableAdvance
               : null
           }
-
           outstandingAdvance={
             salaryLimitKnown
               ? currentMonthOutstandingAdvance
               : null
           }
-
           baseSalary={
             salaryLimitKnown
               ? employeeBaseSalary
               : null
           }
-
         />
 
       </Modal>
 
     </div>
-
   );
-
 }
 
 
@@ -1390,18 +1179,13 @@ function AdvanceForm({
   const [validationError, setValidationError] =
     useState('');
 
-
   const formatFormCurrency = (
     amount
   ) => {
-
-    const numericAmount =
-      Number(amount);
+    const numericAmount = Number(amount);
 
     if (
-      !Number.isFinite(
-        numericAmount
-      )
+      !Number.isFinite(numericAmount)
     ) {
       return '₹0';
     }
@@ -1413,7 +1197,6 @@ function AdvanceForm({
         maximumFractionDigits: 2,
       }
     )}`;
-
   };
 
 
@@ -1449,73 +1232,47 @@ function AdvanceForm({
     event.preventDefault();
 
     const amount =
-      Number(
-        form.amount
-      );
-
+      Number(form.amount);
 
     if (
       !Number.isFinite(amount) ||
       amount < 1000
     ) {
-
       setValidationError(
         'Advance amount must be at least ₹1,000.'
       );
-
       return;
-
     }
-
 
     if (
       maxAdvanceAmount !== null &&
-      amount >
-        Number(
-          maxAdvanceAmount
-        )
+      amount > Number(maxAdvanceAmount)
     ) {
-
       setValidationError(
         `You can request a maximum of ${formatFormCurrency(
           maxAdvanceAmount
         )}. Your existing outstanding advances are already counted.`
       );
-
       return;
-
     }
-
 
     if (
       !form.reason.trim()
     ) {
-
       return;
-
     }
-
 
     if (
       !form.paymentDate
     ) {
-
       return;
-
     }
 
-
-    if (
-      form.paymentDate <
-      getISTTodayString()
-    ) {
-
+    if (form.paymentDate < getISTTodayString()) {
       setValidationError(
         'Payment date must be today or a future date.'
       );
-
       return;
-
     }
 
 
@@ -1553,13 +1310,11 @@ function AdvanceForm({
           htmlFor="advance-amount"
           className="text-sm font-medium text-navy-700"
         >
-
           Amount (₹)
 
           <span className="text-error-500">
             {' '}*
           </span>
-
         </label>
 
 
@@ -1585,16 +1340,12 @@ function AdvanceForm({
           }
           placeholder="Enter amount"
           required
-          disabled={
-            submitting
-          }
+          disabled={submitting}
         />
 
 
         <p className="text-xs text-navy-400">
-
           Minimum ₹1,000. Your current-month outstanding advances reduce the amount you can request.
-
         </p>
 
       </div>
@@ -1606,89 +1357,37 @@ function AdvanceForm({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
-            {/* ==================================================
-                Monthly salary
-                ================================================== */}
-
             <div>
-
-              <p className="text-xs text-navy-400">
-
-                Monthly Salary
-
-              </p>
-
+              <p className="text-xs text-navy-400">Monthly Salary</p>
               <p className="mt-1 font-semibold text-navy-900">
-
-                {formatFormCurrency(
-                  baseSalary
-                )}
-
+                {formatFormCurrency(baseSalary)}
               </p>
-
             </div>
 
-
-            {/* ==================================================
-                Outstanding
-                ================================================== */}
-
             <div>
-
-              <p className="text-xs text-navy-400">
-
-                Outstanding
-
-              </p>
-
+              <p className="text-xs text-navy-400">Outstanding</p>
               <p className="mt-1 font-semibold text-error-700">
-
-                {formatFormCurrency(
-                  outstandingAdvance
-                )}
-
+                {formatFormCurrency(outstandingAdvance)}
               </p>
-
             </div>
 
-
-            {/* ==================================================
-                Maximum request
-                ================================================== */}
-
             <div>
-
-              <p className="text-xs text-navy-400">
-
-                Maximum You Can Request
-
-              </p>
-
+              <p className="text-xs text-navy-400">Maximum You Can Request</p>
               <p className="mt-1 font-semibold text-success-700">
-
-                {formatFormCurrency(
-                  maxAdvanceAmount
-                )}
-
+                {formatFormCurrency(maxAdvanceAmount)}
               </p>
-
             </div>
 
           </div>
 
         </div>
-
       )}
 
 
       {validationError && (
-
         <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2.5 text-sm text-error-700">
-
           {validationError}
-
         </div>
-
       )}
 
 
@@ -1702,13 +1401,11 @@ function AdvanceForm({
           htmlFor="advance-payment-date"
           className="text-sm font-medium text-navy-700"
         >
-
           Required Payment Date
 
           <span className="text-error-500">
             {' '}*
           </span>
-
         </label>
 
 
@@ -1729,16 +1426,12 @@ function AdvanceForm({
             )
           }
           required
-          disabled={
-            submitting
-          }
+          disabled={submitting}
         />
 
 
         <p className="text-xs text-navy-400">
-
           Select the date by which you are requesting the advance.
-
         </p>
 
       </div>
@@ -1754,13 +1447,11 @@ function AdvanceForm({
           htmlFor="advance-reason"
           className="text-sm font-medium text-navy-700"
         >
-
           Reason
 
           <span className="text-error-500">
             {' '}*
           </span>
-
         </label>
 
 
@@ -1779,9 +1470,7 @@ function AdvanceForm({
           }
           placeholder="Enter reason for requesting the advance"
           required
-          disabled={
-            submitting
-          }
+          disabled={submitting}
         />
 
       </div>
@@ -1798,9 +1487,7 @@ function AdvanceForm({
           Your request will first be marked as{' '}
 
           <strong className="text-navy-700">
-
             PENDING
-
           </strong>
 
           . An administrator will review it and may approve an amount lower than the amount you requested. The requested amount cannot be greater than your monthly base salary.
@@ -1818,25 +1505,17 @@ function AdvanceForm({
 
         <button
           type="button"
-          onClick={
-            onCancel
-          }
-          disabled={
-            submitting
-          }
+          onClick={onCancel}
+          disabled={submitting}
           className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
-
           Cancel
-
         </button>
 
 
         <button
           type="submit"
-          disabled={
-            submitting
-          }
+          disabled={submitting}
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
 
@@ -1866,5 +1545,4 @@ function AdvanceForm({
     </form>
 
   );
-
 }

@@ -2,6 +2,32 @@ const prisma =
     require("../config/database");
 
 
+// ==========================================================
+// Helper: Round Money
+// ==========================================================
+// Keep monetary calculations to two decimal places.
+// This helper is local to the advance service so the service
+// does not depend on another module for basic money arithmetic.
+// ==========================================================
+
+const roundMoney = (value) => {
+
+    const numericValue =
+        Number(value);
+
+
+    if (!Number.isFinite(numericValue)) {
+        return 0;
+    }
+
+
+    return Math.round(
+        (numericValue + Number.EPSILON) *
+        100
+    ) / 100;
+};
+
+
 const getISTTodayDateKey = () => {
     return new Intl.DateTimeFormat(
         'en-CA',
