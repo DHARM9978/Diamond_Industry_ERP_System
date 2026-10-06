@@ -14,6 +14,82 @@ const getISTTodayDateKey = () => {
     ).format(new Date());
 };
 
+// ==========================================================
+// Helper: Get Calendar Month Range (IST)
+// ==========================================================
+//
+// Advance availability is evaluated per salary month.
+// The paymentDate determines which month the advance belongs to.
+// A new month therefore receives a fresh advance allowance.
+//
+// The database field is a DATE, so the range is built using
+// UTC midnights to avoid accidental timezone day shifts.
+// ==========================================================
+
+const getISTMonthRange = (value = new Date()) => {
+
+    let dateKey;
+
+    if (
+        typeof value === 'string' &&
+        /^\d{4}-\d{2}-\d{2}/.test(value)
+    ) {
+        dateKey = String(value).slice(0, 10);
+    } else {
+        dateKey = new Intl.DateTimeFormat(
+            'en-CA',
+            {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }
+        ).format(
+            value instanceof Date
+                ? value
+                : new Date(value)
+        );
+    }
+
+    const match =
+        /^(\d{4})-(\d{2})-(\d{2})$/.exec(
+            dateKey
+        );
+
+    if (!match) {
+        const error =
+            new Error(
+                'Advance payment month could not be determined'
+            );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+
+    return {
+
+        start: new Date(
+            Date.UTC(
+                year,
+                month - 1,
+                1
+            )
+        ),
+
+        end: new Date(
+            Date.UTC(
+                year,
+                month,
+                1
+            )
+        )
+    };
+};
+
 
 const validateNotPastPaymentDate = (
     paymentDate,
@@ -155,13 +231,18 @@ const validateAdvanceAgainstSalary = (
 // ==========================================================
 //
 // Outstanding advance is the amount that is still reserved
-// against the employee's monthly/base salary.
+// against the employee's salary limit for the selected calendar month.
+//
+// The month is determined by the advance paymentDate.
 //
 // PENDING  -> requested amount counts
 // APPROVED -> approved amount counts
 // PAID     -> paid amount counts until the corresponding payroll
 //             deduction has actually been completed (deductedAt).
 // REJECTED -> does not count
+//
+// Previous-month records are not included in the new month's
+// allowance calculation.
 //
 // This helper is deliberately backend-only so the salary limit
 // cannot be bypassed by calling the API directly.
@@ -170,8 +251,14 @@ const validateAdvanceAgainstSalary = (
 const getOutstandingAdvanceSummary = async (
     employeeId,
     companyId,
-    excludeAdvanceId = null
+    excludeAdvanceId = null,
+    paymentDate = null
 ) => {
+
+    const monthRange =
+        getISTMonthRange(
+            paymentDate || new Date()
+        );
 
     const advances =
         await prisma.advancePayment.findMany({
@@ -195,6 +282,15 @@ const getOutstandingAdvanceSummary = async (
                         }
                     }
                     : {}),
+
+                // Only advances belonging to the same salary month
+                // participate in the monthly allowance calculation.
+                paymentDate: {
+                    gte:
+                        monthRange.start,
+                    lt:
+                        monthRange.end
+                },
 
                 OR: [
 
@@ -358,7 +454,8 @@ const validateAdvanceAgainstAvailableLimit = async (
     requestedAmount,
     employee,
     companyId,
-    excludeAdvanceId = null
+    excludeAdvanceId = null,
+    paymentDate = null
 ) => {
 
     const salaryAmount =
@@ -372,7 +469,8 @@ const validateAdvanceAgainstAvailableLimit = async (
         await getOutstandingAdvanceSummary(
             employee.employeeId,
             companyId,
-            excludeAdvanceId
+            excludeAdvanceId,
+            paymentDate
         );
 
 
@@ -627,7 +725,9 @@ const createAdvance = async (
     await validateAdvanceAgainstAvailableLimit(
         requestedAmount,
         employee,
-        companyId
+        companyId,
+        null,
+        paymentDate
     );
 
 
@@ -1283,7 +1383,8 @@ const updateAdvanceStatus = async (
             finalApprovedAmount,
             advance.employee,
             companyId,
-            parsedAdvanceId
+            parsedAdvanceId,
+            advance.paymentDate
         );
 
 
@@ -1470,7 +1571,8 @@ const updateAdvanceStatus = async (
             finalPaidAmount,
             advance.employee,
             companyId,
-            parsedAdvanceId
+            parsedAdvanceId,
+            advance.paymentDate
         );
 
 
@@ -1937,7 +2039,9 @@ const createMyAdvance = async (
     await validateAdvanceAgainstAvailableLimit(
         requestedAmount,
         employee,
-        companyId
+        companyId,
+        null,
+        paymentDate
     );
 
 

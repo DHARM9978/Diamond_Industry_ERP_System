@@ -39,6 +39,170 @@ const getISTTodayString = () => {
 };
 
 
+const getCurrentISTMonthYear = () => {
+  const parts = new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'numeric',
+    }
+  ).formatToParts(new Date());
+
+  const values = {};
+
+  parts.forEach((part) => {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  });
+
+  return {
+    month: Number(values.month) || 1,
+    year: Number(values.year) || new Date().getFullYear(),
+  };
+};
+
+
+const getAdvanceCalendarDate = (advance) => {
+  const value =
+    advance?.paymentDate ||
+    advance?.createdAt;
+
+  if (!value) {
+    return null;
+  }
+
+  if (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}/.test(value)
+  ) {
+    const match = value.match(
+      /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+    if (match) {
+      return {
+        year: Number(match[1]),
+        month: Number(match[2]),
+        day: Number(match[3]),
+      };
+    }
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const parts = new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    }
+  ).formatToParts(date);
+
+  const values = {};
+
+  parts.forEach((part) => {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  });
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+  };
+};
+
+
+const getMonthLabel = (month, year) => {
+  return new Intl.DateTimeFormat(
+    'en-IN',
+    {
+      month: 'long',
+      year: 'numeric',
+    }
+  ).format(
+    new Date(
+      Number(year),
+      Number(month) - 1,
+      1
+    )
+  );
+};
+
+
+const calculateOutstandingAdvance = (records, month, year) => {
+  return records.reduce(
+    (total, advance) => {
+      const calendarDate =
+        getAdvanceCalendarDate(advance);
+
+      if (!calendarDate) {
+        return total;
+      }
+
+      if (
+        calendarDate.year !== Number(year) ||
+        calendarDate.month !== Number(month)
+      ) {
+        return total;
+      }
+
+      const status =
+        String(
+          advance?.status || ''
+        )
+          .trim()
+          .toUpperCase();
+
+      // Already recovered through a paid payroll.
+      if (advance?.deductedAt) {
+        return total;
+      }
+
+      // Legacy safety case: an old record may already point to
+      // a payroll that has been paid even if deductedAt is null.
+      if (
+        status === 'PAID' &&
+        advance?.deductedInPayroll?.status ===
+          'PAID'
+      ) {
+        return total;
+      }
+
+      let amount = 0;
+
+      if (status === 'PENDING') {
+        amount =
+          Number(advance?.amount) ||
+          0;
+      } else if (status === 'APPROVED') {
+        amount =
+          Number(
+            advance?.approvedAmount ??
+              advance?.amount
+          ) || 0;
+      } else if (status === 'PAID') {
+        amount =
+          Number(advance?.paidAmount) ||
+          0;
+      }
+
+      return total + Math.max(0, amount);
+    },
+    0
+  );
+};
+
+
 export function EmployeeAdvances() {
 
   const { toast } = useToast();
@@ -57,6 +221,19 @@ export function EmployeeAdvances() {
 
   const [submitting, setSubmitting] =
     useState(false);
+
+
+  const currentMonthYear =
+    useMemo(
+      () => getCurrentISTMonthYear(),
+      []
+    );
+
+  const [selectedMonth, setSelectedMonth] =
+    useState(currentMonthYear.month);
+
+  const [selectedYear, setSelectedYear] =
+    useState(currentMonthYear.year);
 
 
   // ==========================================================
@@ -100,69 +277,214 @@ export function EmployeeAdvances() {
     }, [employeeProfile, advances]);
 
 
-  const outstandingAdvance =
+  // ==========================================================
+  // Advances belonging to the selected month
+  // ==========================================================
+
+  const selectedMonthAdvances =
+    useMemo(() => {
+      return advances.filter((advance) => {
+        const calendarDate =
+          getAdvanceCalendarDate(advance);
+
+        if (!calendarDate) {
+          return false;
+        }
+
+        return (
+          calendarDate.year === Number(selectedYear) &&
+          calendarDate.month === Number(selectedMonth)
+        );
+      });
+    }, [
+      advances,
+      selectedMonth,
+      selectedYear,
+    ]);
+
+
+  // ==========================================================
+  // Salary value for selected month
+  //
+  // If historical advance records contain a historical baseSalary,
+  // use that amount for the selected month. Otherwise fall back to
+  // the employee's current profile salary.
+  // ==========================================================
+
+  const selectedBaseSalary =
     useMemo(() => {
 
-      return advances.reduce(
-        (total, advance) => {
+      const recordWithSalary =
+        selectedMonthAdvances.find(
+          (advance) =>
+            advance?.employee?.baseSalary !==
+              undefined &&
+            advance?.employee?.baseSalary !==
+              null
+        );
 
-          const status =
-            String(
-              advance?.status || ''
-            )
-              .trim()
-              .toUpperCase();
+      const selectedSalary =
+        recordWithSalary
+          ? Number(
+              recordWithSalary.employee.baseSalary
+            ) || 0
+          : 0;
 
-          // Already recovered through a paid payroll.
-          if (advance?.deductedAt) {
-            return total;
-          }
+      return selectedSalary > 0
+        ? selectedSalary
+        : employeeBaseSalary;
 
-          // Legacy safety case: an old record may already point to
-          // a payroll that has been paid even if deductedAt is null.
-          if (
-            status === 'PAID' &&
-            advance?.deductedInPayroll?.status ===
-              'PAID'
-          ) {
-            return total;
-          }
+    }, [
+      selectedMonthAdvances,
+      employeeBaseSalary,
+    ]);
 
-          let amount = 0;
 
-          if (status === 'PENDING') {
-            amount =
-              Number(advance?.amount) ||
-              0;
-          } else if (status === 'APPROVED') {
-            amount =
-              Number(
-                advance?.approvedAmount ??
-                  advance?.amount
-              ) || 0;
-          } else if (status === 'PAID') {
-            amount =
-              Number(advance?.paidAmount) ||
-              0;
-          }
+  // ==========================================================
+  // Outstanding advance for selected month
+  // ==========================================================
 
-          return total + Math.max(0, amount);
-        },
-        0
+  const selectedOutstandingAdvance =
+    useMemo(() => {
+
+      return calculateOutstandingAdvance(
+        advances,
+        selectedMonth,
+        selectedYear
       );
-    }, [advances]);
+
+    }, [
+      advances,
+      selectedMonth,
+      selectedYear,
+    ]);
 
 
-  const availableAdvance =
+  // ==========================================================
+  // Available advance for selected month
+  // ==========================================================
+
+  const selectedAvailableAdvance =
+    Math.max(
+      0,
+      selectedBaseSalary -
+        selectedOutstandingAdvance
+    );
+
+
+  // ==========================================================
+  // CURRENT MONTH REQUEST LIMIT
+  //
+  // The request form always uses the current month's allowance,
+  // even while the user is viewing an older month.
+  // ==========================================================
+
+  const currentMonthOutstandingAdvance =
+    useMemo(() => {
+
+      return calculateOutstandingAdvance(
+        advances,
+        currentMonthYear.month,
+        currentMonthYear.year
+      );
+
+    }, [
+      advances,
+      currentMonthYear,
+    ]);
+
+
+  const currentMonthAvailableAdvance =
     Math.max(
       0,
       employeeBaseSalary -
-        outstandingAdvance
+        currentMonthOutstandingAdvance
     );
 
 
   const salaryLimitKnown =
     employeeBaseSalary > 0;
+
+
+  // The table uses the same month currently selected
+  // for the summary cards.
+  const filteredAdvances =
+    selectedMonthAdvances;
+
+
+  // ==========================================================
+  // AVAILABLE MONTHS
+  // ==========================================================
+
+  const availableMonths =
+    useMemo(() => {
+
+      const current =
+        getCurrentISTMonthYear();
+
+      return Array.from(
+        { length: 12 },
+        (_, index) => {
+
+          const month =
+            index + 1;
+
+          return {
+            value: month,
+            label: new Intl.DateTimeFormat(
+              'en-IN',
+              { month: 'long' }
+            ).format(
+              new Date(
+                2000,
+                month - 1,
+                1
+              )
+            ),
+          };
+
+        }
+      ).filter(
+        (option) =>
+          Number(selectedYear) <
+            current.year ||
+          option.value <=
+            current.month
+      );
+
+    }, [selectedYear]);
+
+
+  // ==========================================================
+  // AVAILABLE YEARS
+  // ==========================================================
+
+  const availableYears =
+    useMemo(() => {
+
+      const years = [];
+
+      const current =
+        getCurrentISTMonthYear();
+
+      for (
+        let year = current.year;
+        year >= current.year - 5;
+        year -= 1
+      ) {
+        years.push(year);
+      }
+
+      return years;
+
+    }, []);
+
+
+  const isCurrentMonthSelected =
+    Number(selectedMonth) ===
+      currentMonthYear.month &&
+    Number(selectedYear) ===
+      currentMonthYear.year;
 
 
   // ==========================================================
@@ -293,6 +615,30 @@ export function EmployeeAdvances() {
   }, []);
 
 
+  useEffect(() => {
+
+    const current =
+      getCurrentISTMonthYear();
+
+    if (
+      Number(selectedYear) ===
+      current.year &&
+      Number(selectedMonth) >
+      current.month
+    ) {
+
+      setSelectedMonth(
+        current.month
+      );
+
+    }
+
+  }, [
+    selectedYear,
+    selectedMonth,
+  ]);
+
+
   // ==========================================================
   // Format currency
   // ==========================================================
@@ -327,6 +673,7 @@ export function EmployeeAdvances() {
         maximumFractionDigits: 2,
       }
     )}`;
+
   };
 
 
@@ -361,6 +708,7 @@ export function EmployeeAdvances() {
         year: 'numeric',
       }
     );
+
   };
 
 
@@ -387,10 +735,9 @@ export function EmployeeAdvances() {
        * POST /api/advances
        */
 
-      const response =
-        await selfService.createAdvance(
-          data
-        );
+      await selfService.createAdvance(
+        data
+      );
 
       // The backend is the source of truth. Reload the records after
       // a successful request so the salary/outstanding/available values
@@ -428,6 +775,7 @@ export function EmployeeAdvances() {
       setSubmitting(false);
 
     }
+
   };
 
 
@@ -449,11 +797,15 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
+
         <span className="font-bold text-navy-900">
+
           {formatCurrency(
             row.amount
           )}
+
         </span>
+
       ),
     },
 
@@ -470,11 +822,15 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
+
         <span className="font-semibold text-success-700">
+
           {formatCurrency(
             row.approvedAmount
           )}
+
         </span>
+
       ),
     },
 
@@ -491,11 +847,15 @@ export function EmployeeAdvances() {
       align: 'right',
 
       render: (row) => (
+
         <span className="font-semibold text-navy-900">
+
           {formatCurrency(
             row.paidAmount
           )}
+
         </span>
+
       ),
     },
 
@@ -510,12 +870,18 @@ export function EmployeeAdvances() {
       label: 'Reason',
 
       render: (row) => (
+
         <span
           className="text-sm text-navy-500"
-          title={row.reason || ''}
+          title={
+            row.reason || ''
+          }
         >
+
           {row.reason || '-'}
+
         </span>
+
       ),
     },
 
@@ -530,12 +896,16 @@ export function EmployeeAdvances() {
       label: 'Requested Date',
 
       render: (row) => (
+
         <span className="text-navy-400 text-sm">
+
           {formatDate(
             row.createdAt ||
               row.paymentDate
           )}
+
         </span>
+
       ),
     },
 
@@ -552,9 +922,11 @@ export function EmployeeAdvances() {
       align: 'center',
 
       render: (row) => (
+
         <StatusBadge
           status={row.status}
         />
+
       ),
     },
 
@@ -581,6 +953,7 @@ export function EmployeeAdvances() {
   // ==========================================================
 
   return (
+
     <div>
 
       <PageHeader
@@ -597,23 +970,28 @@ export function EmployeeAdvances() {
             disabled={
               submitting ||
               !salaryLimitKnown ||
-              availableAdvance < 1000
+              currentMonthAvailableAdvance < 1000
             }
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
+
             <Plus size={18} />
 
             Request Advance
+
           </button>
 
         }
+
       />
 
 
       {!salaryLimitKnown && (
 
         <div className="mb-5 rounded-xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
+
           Unable to determine your monthly salary limit. Please refresh the page before requesting an advance.
+
         </div>
 
       )}
@@ -627,34 +1005,103 @@ export function EmployeeAdvances() {
 
         <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
 
-          <div className="rounded-xl border border-navy-100 bg-navy-50 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-navy-400">
+          {/* ==================================================
               Monthly Base Salary
+              ================================================== */}
+
+          <div className="rounded-xl border border-navy-100 bg-navy-50 p-4">
+
+            <p className="text-xs font-medium uppercase tracking-wide text-navy-400">
+
+              Monthly Base Salary
+
             </p>
+
             <p className="mt-1 text-xl font-bold text-navy-900">
-              {formatCurrency(employeeBaseSalary)}
+
+              {formatCurrency(
+                selectedBaseSalary
+              )}
+
             </p>
+
+            <p className="mt-1 text-[11px] text-navy-400">
+
+              {getMonthLabel(
+                selectedMonth,
+                selectedYear
+              )}
+
+            </p>
+
           </div>
+
+
+          {/* ==================================================
+              Outstanding Advance
+              ================================================== */}
 
           <div className="rounded-xl border border-error-100 bg-error-50 p-4">
+
             <p className="text-xs font-medium uppercase tracking-wide text-error-500">
+
               Outstanding Advance
+
             </p>
+
             <p className="mt-1 text-xl font-bold text-error-700">
-              {formatCurrency(outstandingAdvance)}
+
+              {formatCurrency(
+                selectedOutstandingAdvance
+              )}
+
             </p>
+
+            <p className="mt-1 text-[11px] text-error-500">
+
+              {getMonthLabel(
+                selectedMonth,
+                selectedYear
+              )}
+
+            </p>
+
           </div>
 
-          <div className="rounded-xl border border-success-100 bg-success-50 p-4">
-            <p className="text-xs font-medium uppercase tracking-wide text-success-600">
+
+          {/* ==================================================
               Available Advance
+              ================================================== */}
+
+          <div className="rounded-xl border border-success-100 bg-success-50 p-4">
+
+            <p className="text-xs font-medium uppercase tracking-wide text-success-600">
+
+              Available Advance
+
             </p>
+
             <p className="mt-1 text-xl font-bold text-success-700">
-              {formatCurrency(availableAdvance)}
+
+              {formatCurrency(
+                selectedAvailableAdvance
+              )}
+
             </p>
+
+            <p className="mt-1 text-[11px] text-success-600">
+
+              {getMonthLabel(
+                selectedMonth,
+                selectedYear
+              )}
+
+            </p>
+
           </div>
 
         </div>
+
       )}
 
 
@@ -667,7 +1114,10 @@ export function EmployeeAdvances() {
         <button
           type="button"
           onClick={loadAdvances}
-          disabled={loading || submitting}
+          disabled={
+            loading ||
+            submitting
+          }
           className="flex items-center gap-2 px-4 py-2 rounded-lg border border-navy-200 text-navy-700 hover:bg-navy-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
 
@@ -683,22 +1133,174 @@ export function EmployeeAdvances() {
 
 
       {/* ======================================================
+          Advance history filter
+          ====================================================== */}
+
+      <div className="mb-5 rounded-xl border border-navy-100 bg-white p-4 shadow-sm">
+
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+
+          <div>
+
+            <p className="text-sm font-semibold text-navy-800">
+
+              Advance History
+
+            </p>
+
+            <p className="mt-1 text-xs text-navy-400">
+
+              Current month is shown first. Select an earlier month only when you need to view older advance requests.
+
+            </p>
+
+          </div>
+
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+            {/* ==================================================
+                Month
+                ================================================== */}
+
+            <div>
+
+              <label
+                htmlFor="advance-month-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+
+                Month
+
+              </label>
+
+
+              <select
+                id="advance-month-filter"
+                value={
+                  selectedMonth
+                }
+                onChange={(event) =>
+                  setSelectedMonth(
+                    Number(
+                      event.target.value
+                    )
+                  )
+                }
+                className="h-10 min-w-[170px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+
+                {availableMonths.map(
+                  (month) => (
+
+                    <option
+                      key={month.value}
+                      value={month.value}
+                    >
+
+                      {month.label}
+
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+
+            {/* ==================================================
+                Year
+                ================================================== */}
+
+            <div>
+
+              <label
+                htmlFor="advance-year-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+
+                Year
+
+              </label>
+
+
+              <select
+                id="advance-year-filter"
+                value={
+                  selectedYear
+                }
+                onChange={(event) =>
+                  setSelectedYear(
+                    Number(
+                      event.target.value
+                    )
+                  )
+                }
+                className="h-10 min-w-[120px] rounded-lg border border-navy-200 bg-white px-3 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+
+                {availableYears.map(
+                  (year) => (
+
+                    <option
+                      key={year}
+                      value={year}
+                    >
+
+                      {year}
+
+                    </option>
+
+                  )
+                )}
+
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
           Advance table
           ====================================================== */}
 
-      {advances.length === 0 ? (
+      {filteredAdvances.length === 0 ? (
 
         <EmptyState
           icon={Banknote}
-          title="No advance requests"
-          message="You haven't requested any salary advances."
+
+          title={
+            isCurrentMonthSelected
+              ? 'No advances this month'
+              : `No advances for ${getMonthLabel(
+                  selectedMonth,
+                  selectedYear
+                )}`
+          }
+
+          message={
+            isCurrentMonthSelected
+              ? "You haven't requested any advances this month. Previous months remain available through the filter above."
+              : 'No salary advance requests were recorded for the selected month.'
+          }
         />
 
       ) : (
 
         <DataTable
-          columns={columns}
-          data={advances}
+          columns={
+            columns
+          }
+          data={
+            filteredAdvances
+          }
         />
 
       )}
@@ -709,42 +1311,59 @@ export function EmployeeAdvances() {
           ====================================================== */}
 
       <Modal
-        open={modalOpen}
+        open={
+          modalOpen
+        }
+
         onClose={() =>
           !submitting &&
           setModalOpen(false)
         }
+
         title="Request Salary Advance"
       >
 
         <AdvanceForm
+
           onCancel={() =>
             !submitting &&
             setModalOpen(false)
           }
-          onSave={handleApply}
-          submitting={submitting}
+
+          onSave={
+            handleApply
+          }
+
+          submitting={
+            submitting
+          }
+
           maxAdvanceAmount={
             salaryLimitKnown
-              ? availableAdvance
+              ? currentMonthAvailableAdvance
               : null
           }
+
           outstandingAdvance={
             salaryLimitKnown
-              ? outstandingAdvance
+              ? currentMonthOutstandingAdvance
               : null
           }
+
           baseSalary={
             salaryLimitKnown
               ? employeeBaseSalary
               : null
           }
+
         />
 
       </Modal>
 
     </div>
+
   );
+
 }
 
 
@@ -771,13 +1390,18 @@ function AdvanceForm({
   const [validationError, setValidationError] =
     useState('');
 
+
   const formatFormCurrency = (
     amount
   ) => {
-    const numericAmount = Number(amount);
+
+    const numericAmount =
+      Number(amount);
 
     if (
-      !Number.isFinite(numericAmount)
+      !Number.isFinite(
+        numericAmount
+      )
     ) {
       return '₹0';
     }
@@ -789,6 +1413,7 @@ function AdvanceForm({
         maximumFractionDigits: 2,
       }
     )}`;
+
   };
 
 
@@ -824,47 +1449,73 @@ function AdvanceForm({
     event.preventDefault();
 
     const amount =
-      Number(form.amount);
+      Number(
+        form.amount
+      );
+
 
     if (
       !Number.isFinite(amount) ||
       amount < 1000
     ) {
+
       setValidationError(
         'Advance amount must be at least ₹1,000.'
       );
+
       return;
+
     }
+
 
     if (
       maxAdvanceAmount !== null &&
-      amount > Number(maxAdvanceAmount)
+      amount >
+        Number(
+          maxAdvanceAmount
+        )
     ) {
+
       setValidationError(
         `You can request a maximum of ${formatFormCurrency(
           maxAdvanceAmount
         )}. Your existing outstanding advances are already counted.`
       );
+
       return;
+
     }
+
 
     if (
       !form.reason.trim()
     ) {
+
       return;
+
     }
+
 
     if (
       !form.paymentDate
     ) {
+
       return;
+
     }
 
-    if (form.paymentDate < getISTTodayString()) {
+
+    if (
+      form.paymentDate <
+      getISTTodayString()
+    ) {
+
       setValidationError(
         'Payment date must be today or a future date.'
       );
+
       return;
+
     }
 
 
@@ -902,11 +1553,13 @@ function AdvanceForm({
           htmlFor="advance-amount"
           className="text-sm font-medium text-navy-700"
         >
+
           Amount (₹)
 
           <span className="text-error-500">
             {' '}*
           </span>
+
         </label>
 
 
@@ -932,12 +1585,16 @@ function AdvanceForm({
           }
           placeholder="Enter amount"
           required
-          disabled={submitting}
+          disabled={
+            submitting
+          }
         />
 
 
         <p className="text-xs text-navy-400">
-          Minimum ₹1,000. Your existing outstanding advances reduce the amount you can request.
+
+          Minimum ₹1,000. Your current-month outstanding advances reduce the amount you can request.
+
         </p>
 
       </div>
@@ -949,37 +1606,89 @@ function AdvanceForm({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
+            {/* ==================================================
+                Monthly salary
+                ================================================== */}
+
             <div>
-              <p className="text-xs text-navy-400">Monthly Salary</p>
+
+              <p className="text-xs text-navy-400">
+
+                Monthly Salary
+
+              </p>
+
               <p className="mt-1 font-semibold text-navy-900">
-                {formatFormCurrency(baseSalary)}
+
+                {formatFormCurrency(
+                  baseSalary
+                )}
+
               </p>
+
             </div>
 
+
+            {/* ==================================================
+                Outstanding
+                ================================================== */}
+
             <div>
-              <p className="text-xs text-navy-400">Outstanding</p>
+
+              <p className="text-xs text-navy-400">
+
+                Outstanding
+
+              </p>
+
               <p className="mt-1 font-semibold text-error-700">
-                {formatFormCurrency(outstandingAdvance)}
+
+                {formatFormCurrency(
+                  outstandingAdvance
+                )}
+
               </p>
+
             </div>
 
+
+            {/* ==================================================
+                Maximum request
+                ================================================== */}
+
             <div>
-              <p className="text-xs text-navy-400">Maximum You Can Request</p>
-              <p className="mt-1 font-semibold text-success-700">
-                {formatFormCurrency(maxAdvanceAmount)}
+
+              <p className="text-xs text-navy-400">
+
+                Maximum You Can Request
+
               </p>
+
+              <p className="mt-1 font-semibold text-success-700">
+
+                {formatFormCurrency(
+                  maxAdvanceAmount
+                )}
+
+              </p>
+
             </div>
 
           </div>
 
         </div>
+
       )}
 
 
       {validationError && (
+
         <div className="rounded-lg border border-error-200 bg-error-50 px-3 py-2.5 text-sm text-error-700">
+
           {validationError}
+
         </div>
+
       )}
 
 
@@ -993,11 +1702,13 @@ function AdvanceForm({
           htmlFor="advance-payment-date"
           className="text-sm font-medium text-navy-700"
         >
+
           Required Payment Date
 
           <span className="text-error-500">
             {' '}*
           </span>
+
         </label>
 
 
@@ -1018,12 +1729,16 @@ function AdvanceForm({
             )
           }
           required
-          disabled={submitting}
+          disabled={
+            submitting
+          }
         />
 
 
         <p className="text-xs text-navy-400">
+
           Select the date by which you are requesting the advance.
+
         </p>
 
       </div>
@@ -1039,11 +1754,13 @@ function AdvanceForm({
           htmlFor="advance-reason"
           className="text-sm font-medium text-navy-700"
         >
+
           Reason
 
           <span className="text-error-500">
             {' '}*
           </span>
+
         </label>
 
 
@@ -1062,7 +1779,9 @@ function AdvanceForm({
           }
           placeholder="Enter reason for requesting the advance"
           required
-          disabled={submitting}
+          disabled={
+            submitting
+          }
         />
 
       </div>
@@ -1079,7 +1798,9 @@ function AdvanceForm({
           Your request will first be marked as{' '}
 
           <strong className="text-navy-700">
+
             PENDING
+
           </strong>
 
           . An administrator will review it and may approve an amount lower than the amount you requested. The requested amount cannot be greater than your monthly base salary.
@@ -1097,17 +1818,25 @@ function AdvanceForm({
 
         <button
           type="button"
-          onClick={onCancel}
-          disabled={submitting}
+          onClick={
+            onCancel
+          }
+          disabled={
+            submitting
+          }
           className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
+
           Cancel
+
         </button>
 
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={
+            submitting
+          }
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
 
@@ -1137,4 +1866,5 @@ function AdvanceForm({
     </form>
 
   );
+
 }
