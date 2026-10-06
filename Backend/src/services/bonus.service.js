@@ -1,4 +1,3 @@
-
 const prisma =
     require("../config/database");
 
@@ -109,6 +108,138 @@ const decimalToNumber = (
     }
 
     return Number(value);
+};
+
+
+// ------------------------------------------------------------
+// Build Accumulated Extra-Work Summary
+// ------------------------------------------------------------
+//
+// The business rule is employee-level accumulation, not
+// payroll-month accumulation. All currently ACCUMULATED and
+// unsettled ExtraWork records for an employee contribute to
+// the employee's current bonus balance.
+//
+const buildAccumulatedExtraWorkSummary = (
+    records
+) => {
+
+    const employeeMap =
+        new Map();
+
+
+    records.forEach((record) => {
+
+        if (
+            record.status !==
+            "ACCUMULATED" ||
+            record.settlementId
+        ) {
+            return;
+        }
+
+
+        const employeeId =
+            Number(
+                record.employeeId
+            );
+
+
+        if (!employeeMap.has(employeeId)) {
+
+            employeeMap.set(
+                employeeId,
+                {
+                    employeeId,
+                    employee: record.employee || null,
+                    accumulatedExtraHours: 0,
+                    accumulatedRecordCount: 0
+                }
+            );
+        }
+
+
+        const summary =
+            employeeMap.get(employeeId);
+
+
+        summary.accumulatedExtraHours =
+            roundMoney(
+                summary.accumulatedExtraHours +
+                decimalToNumber(
+                    record.extraHours
+                )
+            );
+
+        summary.accumulatedRecordCount += 1;
+    });
+
+
+    const summaries =
+        Array.from(
+            employeeMap.values()
+        ).map((summary) => ({
+
+            employeeId:
+                summary.employeeId,
+
+            employee:
+                summary.employee,
+
+            accumulatedExtraHours:
+                roundMoney(
+                    summary.accumulatedExtraHours
+                ),
+
+            accumulatedRecordCount:
+                summary.accumulatedRecordCount,
+
+            status:
+                "ACCUMULATED"
+
+        }));
+
+
+    summaries.sort((a, b) => {
+
+        const hoursDifference =
+            b.accumulatedExtraHours -
+            a.accumulatedExtraHours;
+
+        if (hoursDifference !== 0) {
+            return hoursDifference;
+        }
+
+        return a.employeeId - b.employeeId;
+    });
+
+
+    return {
+
+        employeeCount:
+            summaries.length,
+
+        accumulatedExtraHours:
+            roundMoney(
+                summaries.reduce(
+                    (total, summary) =>
+                        total +
+                        summary.accumulatedExtraHours,
+                    0
+                )
+            ),
+
+        accumulatedRecordCount:
+            summaries.reduce(
+                (total, summary) =>
+                    total +
+                    summary.accumulatedRecordCount,
+                0
+            ),
+
+        employeeSummaries:
+            summaries
+    };
 };
 
 
@@ -348,67 +479,112 @@ const getExtraWorkRecords = async (
         });
 
 
-    return records.map(
-        (
-            record
-        ) => ({
+    const formattedRecords =
+        records.map(
+            (
+                record
+            ) => {
 
-            extraWorkId:
-                record.extraWorkId,
+                const expectedHours =
+                    record.payroll
+                        ? decimalToNumber(
+                            record.payroll
+                                .monthlyExpectedHours
+                        )
+                        : 0;
 
-            employeeId:
-                record.employeeId,
+                const regularWorkingHours =
+                    record.payroll
+                        ? decimalToNumber(
+                            record.payroll
+                                .regularWorkingHours
+                        )
+                        : 0;
 
-            employee:
-                record.employee,
+                const extraHours =
+                    decimalToNumber(
+                        record.extraHours
+                    );
 
-            payrollId:
-                record.payrollId,
+                return {
 
-            payPeriodStart:
-                record.payroll
-                    ? record.payroll.payPeriodStart
-                    : null,
+                    extraWorkId:
+                        record.extraWorkId,
 
-            payPeriodEnd:
-                record.payroll
-                    ? record.payroll.payPeriodEnd
-                    : null,
+                    employeeId:
+                        record.employeeId,
 
-            expectedHours:
-                record.payroll
-                    ? decimalToNumber(
+                    employee:
+                        record.employee,
+
+                    payrollId:
+                        record.payrollId,
+
+                    payPeriodStart:
                         record.payroll
-                            .monthlyExpectedHours
-                    )
-                    : 0,
+                            ? record.payroll.payPeriodStart
+                            : null,
 
-            regularWorkingHours:
-                record.payroll
-                    ? decimalToNumber(
+                    payPeriodEnd:
                         record.payroll
-                            .regularWorkingHours
-                    )
-                    : 0,
+                            ? record.payroll.payPeriodEnd
+                            : null,
 
-            extraHours:
-                decimalToNumber(
-                    record.extraHours
-                ),
+                    expectedHours,
 
-            status:
-                record.status,
+                    regularWorkingHours,
 
-            settlementId:
-                record.settlementId,
+                    extraHours,
 
-            createdAt:
-                record.createdAt,
+                    totalWorkingHours:
+                        roundMoney(
+                            regularWorkingHours +
+                            extraHours
+                        ),
 
-            updatedAt:
-                record.updatedAt
-        })
-    );
+                    status:
+                        record.status,
+
+                    settlementId:
+                        record.settlementId,
+
+                    createdAt:
+                        record.createdAt,
+
+                    updatedAt:
+                        record.updatedAt
+                };
+            }
+        );
+
+
+    const summary =
+        buildAccumulatedExtraWorkSummary(
+            formattedRecords
+        );
+
+
+    return {
+
+        records:
+            formattedRecords,
+
+        summary: {
+
+            accumulatedExtraHours:
+                summary.accumulatedExtraHours,
+
+            accumulatedRecordCount:
+                summary.accumulatedRecordCount,
+
+            employeeCount:
+                summary.employeeCount
+        },
+
+        employeeSummaries:
+            summary.employeeSummaries
+
+    };
 };
 
 
@@ -1278,6 +1454,21 @@ const getEmployeeBonuses = async (
                         record.extraHours
                     ),
 
+                totalWorkingHours:
+                    roundMoney(
+                        (
+                            record.payroll
+                                ? decimalToNumber(
+                                    record.payroll
+                                        .regularWorkingHours
+                                )
+                                : 0
+                        ) +
+                        decimalToNumber(
+                            record.extraHours
+                        )
+                    ),
+
                 status:
                     record.status,
 
@@ -1435,6 +1626,14 @@ const getEmployeeBonuses = async (
 
             accumulatedExtraHours:
                 totalExtraHours,
+
+            accumulatedRecordCount:
+                formattedExtraWork.filter(
+                    (record) =>
+                        record.status ===
+                        "ACCUMULATED" &&
+                        !record.settlementId
+                ).length,
 
             totalSettledHours,
 

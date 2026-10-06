@@ -226,12 +226,12 @@ export function EmployeeBonus() {
   }, [bonusData.settlements]);
 
   const pendingHours = useMemo(() => {
-    const summaryValue = getNumber(
+    const summaryValue = Number(
       bonusData.summary?.accumulatedExtraHours
     );
 
-    if (summaryValue > 0) {
-      return summaryValue;
+    if (Number.isFinite(summaryValue)) {
+      return Math.max(0, summaryValue);
     }
 
     return pendingRecords.reduce(
@@ -239,6 +239,16 @@ export function EmployeeBonus() {
         total + getNumber(record?.extraHours),
       0
     );
+  }, [bonusData.summary, pendingRecords]);
+
+  const accumulatedRecordCount = useMemo(() => {
+    const summaryValue = Number(bonusData.summary?.accumulatedRecordCount);
+
+    if (Number.isFinite(summaryValue)) {
+      return Math.max(0, Math.trunc(summaryValue));
+    }
+
+    return pendingRecords.length;
   }, [bonusData.summary, pendingRecords]);
 
   const totalBonus = useMemo(() => {
@@ -319,6 +329,17 @@ export function EmployeeBonus() {
       render: (record) => (
         <span className="font-medium text-amber-700">
           {formatNumber(record?.extraHours)} hrs
+        </span>
+      ),
+    },
+
+    {
+      key: 'totalWorkingHours',
+      label: 'Total Working Hours',
+      align: 'right',
+      render: (record) => (
+        <span className="text-navy-700">
+          {formatNumber(record?.totalWorkingHours)} hrs
         </span>
       ),
     },
@@ -447,7 +468,7 @@ export function EmployeeBonus() {
 
             <div>
               <div className="text-xs font-medium text-navy-500">
-                Pending Extra Hours
+                Accumulated Extra Hours
               </div>
 
               <div className="mt-1 text-2xl font-bold text-navy-900">
@@ -455,6 +476,10 @@ export function EmployeeBonus() {
                 <span className="ml-1 text-sm font-medium text-navy-500">
                   hrs
                 </span>
+              </div>
+
+              <div className="mt-1 text-xs text-navy-500">
+                {accumulatedRecordCount} accumulated record{accumulatedRecordCount === 1 ? '' : 's'}
               </div>
             </div>
           </div>
@@ -504,12 +529,29 @@ export function EmployeeBonus() {
         <section>
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-navy-900">
-              Pending Bonus Hours
+              Current Accumulated Extra Work
             </h2>
 
             <p className="mt-1 text-sm text-navy-500">
-              Extra-work hours currently accumulated and awaiting bonus settlement.
+              All unsettled extra-work hours remain accumulated until your bonus is settled.
             </p>
+          </div>
+
+          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div className="text-xs font-medium uppercase tracking-wide text-amber-700">
+                  Current Accumulated Balance
+                </div>
+                <div className="mt-1 text-xl font-bold text-amber-900">
+                  {formatNumber(pendingHours)} hrs
+                </div>
+              </div>
+
+              <div className="text-sm text-amber-800">
+                {accumulatedRecordCount} record{accumulatedRecordCount === 1 ? '' : 's'} awaiting settlement
+              </div>
+            </div>
           </div>
 
           <DataTable

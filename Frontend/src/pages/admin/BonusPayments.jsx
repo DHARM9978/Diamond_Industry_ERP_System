@@ -33,6 +33,7 @@ export function BonusPayments() {
   // ==========================================================
 
   const [records, setRecords] = useState([]);
+  const [employeeSummaries, setEmployeeSummaries] = useState([]);
   const [history, setHistory] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -310,6 +311,67 @@ export function BonusPayments() {
 
 
   // ==========================================================
+  // BUILD EMPLOYEE SUMMARIES (FALLBACK)
+  // ==========================================================
+
+  const buildEmployeeSummaries = (pendingRecords) => {
+
+    const grouped = new Map();
+
+    pendingRecords.forEach((record) => {
+
+      const employeeId =
+        record?.employeeId;
+
+      if (employeeId === null || employeeId === undefined) {
+        return;
+      }
+
+      const key = String(employeeId);
+      const existing = grouped.get(key);
+
+      if (!existing) {
+
+        grouped.set(key, {
+          employeeId,
+          employee: record?.employee || null,
+          accumulatedExtraHours: 0,
+          accumulatedRecordCount: 0,
+          status: 'ACCUMULATED',
+          records: [],
+        });
+
+      }
+
+      const summary = grouped.get(key);
+
+      if (record?.status === 'ACCUMULATED' && !record?.settlementId) {
+
+        summary.accumulatedExtraHours +=
+          getExtraHours(record);
+
+        summary.accumulatedRecordCount += 1;
+        summary.records.push(record);
+
+      }
+
+    });
+
+    return Array.from(grouped.values())
+      .filter(
+        (summary) =>
+          summary.accumulatedExtraHours > 0
+      )
+      .sort(
+        (a, b) =>
+          b.accumulatedExtraHours -
+          a.accumulatedExtraHours
+      );
+
+  };
+
+
+  // ==========================================================
   // LOAD PENDING BONUS RECORDS
   // ==========================================================
 
@@ -320,15 +382,58 @@ export function BonusPayments() {
         status: 'ACCUMULATED',
       });
 
+    const data = unwrap(response);
+
     const pendingRecords =
       getArray(response).filter(
         (record) =>
+          record?.status === 'ACCUMULATED' &&
+          !record?.settlementId &&
           getExtraHours(record) > 0
       );
 
-    setRecords(
-      pendingRecords
-    );
+    const apiSummaries =
+      Array.isArray(data?.employeeSummaries)
+        ? data.employeeSummaries
+        : [];
+
+    const summaries =
+      apiSummaries.length > 0
+        ? apiSummaries.map((summary) => {
+
+            const summaryRecords =
+              pendingRecords.filter(
+                (record) =>
+                  String(record?.employeeId ?? '') ===
+                  String(summary?.employeeId ?? '')
+              );
+
+            return {
+              ...summary,
+              accumulatedExtraHours:
+                getNumber(summary?.accumulatedExtraHours),
+              accumulatedRecordCount:
+                getNumber(summary?.accumulatedRecordCount) ||
+                summaryRecords.length,
+              records: summaryRecords,
+            };
+
+          })
+            .filter(
+              (summary) =>
+                summary.accumulatedExtraHours > 0
+            )
+            .sort(
+              (a, b) =>
+                b.accumulatedExtraHours -
+                a.accumulatedExtraHours
+            )
+        : buildEmployeeSummaries(
+            pendingRecords
+          );
+
+    setRecords(pendingRecords);
+    setEmployeeSummaries(summaries);
 
   };
 
@@ -436,10 +541,10 @@ export function BonusPayments() {
 
 
   // ==========================================================
-  // FILTER PENDING RECORDS
+  // FILTER PENDING EMPLOYEE SUMMARIES
   // ==========================================================
 
-  const filteredRecords =
+  const filteredEmployeeSummaries =
     useMemo(() => {
 
       const term =
@@ -448,50 +553,51 @@ export function BonusPayments() {
           .toLowerCase();
 
       if (!term) {
-        return records;
+        return employeeSummaries;
       }
 
-      return records.filter(
-        (record) => {
+      return employeeSummaries.filter(
+        (summary) => {
 
           const employeeName =
             getEmployeeName(
-              record
+              summary
             ).toLowerCase();
 
           const employeeId =
             String(
-              record?.employeeId ?? ''
+              summary?.employeeId ?? ''
             ).toLowerCase();
 
           const email =
             getEmployeeEmail(
-              record
+              summary
             ).toLowerCase();
 
-          const period =
-            getPeriod(
-              record
-            ).toLowerCase();
-
-          const status =
-            String(
-              record?.status ?? ''
-            ).toLowerCase();
+          const periods =
+            (Array.isArray(summary?.records)
+              ? summary.records
+              : []
+            )
+              .map((record) => getPeriod(record))
+              .join(' ')
+              .toLowerCase();
 
           return (
             employeeName.includes(term) ||
             employeeId.includes(term) ||
             email.includes(term) ||
-            period.includes(term) ||
-            status.includes(term)
+            periods.includes(term) ||
+            String(summary?.status ?? '')
+              .toLowerCase()
+              .includes(term)
           );
 
         }
       );
 
     }, [
-      records,
+      employeeSummaries,
       search,
     ]);
 
@@ -587,28 +693,20 @@ export function BonusPayments() {
 
   const handleApproveAndPay = async () => {
 
-    if (
-      !selectedRecord?.employeeId
-    ) {
+    if (!selectedRecord?.employeeId) {
 
       setError(
-        'Employee ID is missing for this bonus record.'
+        'Employee ID is missing for this bonus settlement.'
       );
 
       return;
 
     }
 
-
     const amount =
       Number(
         incentiveAmount || 0
       );
-
-
-    // --------------------------------------------------------
-    // BONUS AMOUNT VALIDATION
-    // --------------------------------------------------------
 
     if (
       !Number.isFinite(amount) ||
@@ -623,26 +721,22 @@ export function BonusPayments() {
 
     }
 
-
     const accumulatedHours =
       getAccumulatedHours(
         selectedRecord
       );
 
-
     if (
-      amount > 0 &&
       accumulatedHours <= 0
     ) {
 
       setError(
-        'A bonus cannot be entered when there are no accumulated extra hours.'
+        'There are no accumulated extra hours available for this employee.'
       );
 
       return;
 
     }
-
 
     try {
 
@@ -653,39 +747,30 @@ export function BonusPayments() {
       setMessage('');
       setError('');
 
-
-      // ------------------------------------------------------
-      // BONUS PAYMENT
-      // ------------------------------------------------------
-
       await bonusService.pay({
 
         employeeId:
           selectedRecord.employeeId,
 
         payrollId:
-          selectedRecord.payrollId || null,
+          null,
 
         incentiveAmount:
           amount,
 
       });
 
+      const employeeName =
+        getEmployeeName(
+          selectedRecord
+        );
 
       setSelectedRecord(null);
       setIncentiveAmount('');
 
-
       setMessage(
-        `${getEmployeeName(
-          selectedRecord
-        )}'s accumulated extra-work bonus was paid successfully. Regular payroll remains unchanged.`
+        `${employeeName}'s full accumulated extra-work bonus was paid successfully. The accumulated balance has been settled and reset to 0. Regular payroll remains unchanged.`
       );
-
-
-      // ------------------------------------------------------
-      // REFRESH
-      // ------------------------------------------------------
 
       await loadPending();
       await loadHistory();
@@ -764,8 +849,8 @@ export function BonusPayments() {
 
 
       if (
-        selectedRecord?.extraWorkId ===
-        record.extraWorkId
+        String(selectedRecord?.employeeId ?? '') ===
+        String(record?.employeeId ?? '')
       ) {
 
         setSelectedRecord(null);
@@ -810,7 +895,7 @@ export function BonusPayments() {
 
 
   // ==========================================================
-  // PENDING TABLE COLUMNS
+  // PENDING EMPLOYEE SUMMARY TABLE COLUMNS
   // ==========================================================
 
   const pendingColumns =
@@ -821,10 +906,10 @@ export function BonusPayments() {
           key: 'employeeId',
           label: 'Emp ID',
 
-          render: (record) => (
+          render: (summary) => (
 
             <span className="font-mono text-xs font-semibold text-navy-600">
-              {record?.employeeId ?? '-'}
+              {summary?.employeeId ?? '-'}
             </span>
 
           ),
@@ -835,18 +920,18 @@ export function BonusPayments() {
           key: 'employee',
           label: 'Employee',
 
-          render: (record) => (
+          render: (summary) => (
 
             <div>
 
               <div className="font-medium text-navy-900">
-                {getEmployeeName(record)}
+                {getEmployeeName(summary)}
               </div>
 
-              {getEmployeeEmail(record) && (
+              {getEmployeeEmail(summary) && (
 
                 <div className="text-xs text-navy-400">
-                  {getEmployeeEmail(record)}
+                  {getEmployeeEmail(summary)}
                 </div>
 
               )}
@@ -858,47 +943,32 @@ export function BonusPayments() {
 
 
         {
-          key: 'period',
-          label: 'Period',
-
-          render: (record) => (
-
-            <span className="text-sm text-navy-700">
-              {getPeriod(record)}
-            </span>
-
-          ),
-        },
-
-
-        {
-          key: 'extraHours',
-          label: 'Extra Hours',
-
-          render: (record) => (
-
-            <span className="font-semibold text-navy-900">
-              {formatHours(
-                record?.extraHours
-              )}{' '}
-              h
-            </span>
-
-          ),
-        },
-
-
-        {
           key: 'accumulatedExtraHours',
-          label: 'Accumulated Balance',
+          label: 'Accumulated Extra Hours',
 
-          render: (record) => (
+          render: (summary) => (
 
             <span className="font-semibold text-amber-700">
               {formatHours(
-                getAccumulatedHours(record)
+                summary?.accumulatedExtraHours
               )}{' '}
               h
+            </span>
+
+          ),
+        },
+
+
+        {
+          key: 'recordCount',
+          label: 'Records',
+
+          render: (summary) => (
+
+            <span className="font-medium text-navy-700">
+              {summary?.accumulatedRecordCount ??
+                summary?.records?.length ??
+                0}
             </span>
 
           ),
@@ -909,14 +979,14 @@ export function BonusPayments() {
           key: 'status',
           label: 'Status',
 
-          render: (record) => (
+          render: (summary) => (
 
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
 
               <Clock3 size={13} />
 
               {String(
-                record?.status ||
+                summary?.status ||
                 'ACCUMULATED'
               ).toUpperCase()}
 
@@ -930,75 +1000,42 @@ export function BonusPayments() {
           key: 'actions',
           label: 'Action',
 
-          render: (record) => {
+          render: (summary) => {
 
             const isPaying =
               payingEmployeeId ===
-              record?.employeeId;
-
-            const isRejecting =
-              rejectingExtraWorkId ===
-              record?.extraWorkId;
-
+              summary?.employeeId;
 
             return (
 
-              <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  openReview(summary)
+                }
+                disabled={isPaying}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-navy-800 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-navy-900 disabled:cursor-not-allowed disabled:opacity-50"
+              >
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    openReview(record)
-                  }
-                  disabled={
-                    isPaying ||
-                    isRejecting
-                  }
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-navy-800 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-navy-900 disabled:cursor-not-allowed disabled:opacity-50"
-                >
+                {isPaying ? (
+
+                  <Loader2
+                    size={14}
+                    className="animate-spin"
+                  />
+
+                ) : (
 
                   <Wallet size={14} />
 
-                  Review & Pay
+                )}
 
-                </button>
+                {isPaying
+                  ? 'Paying...'
+                  : 'Review & Pay'
+                }
 
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleReject(record)
-                  }
-                  disabled={
-                    isPaying ||
-                    isRejecting
-                  }
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-xs font-semibold text-error-700 transition-colors hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-
-                  {isRejecting ? (
-
-                    <Loader2
-                      size={14}
-                      className="animate-spin"
-                    />
-
-                  ) : (
-
-                    <XCircle
-                      size={14}
-                    />
-
-                  )}
-
-                  {isRejecting
-                    ? 'Rejecting...'
-                    : 'Reject'
-                  }
-
-                </button>
-
-              </div>
+              </button>
 
             );
 
@@ -1008,7 +1045,6 @@ export function BonusPayments() {
       ],
       [
         payingEmployeeId,
-        rejectingExtraWorkId,
       ]
     );
 
@@ -1147,18 +1183,20 @@ export function BonusPayments() {
   // ==========================================================
 
   const pendingHours =
-    useMemo(() => {
+    useMemo(
+      () => {
 
-      return filteredRecords.reduce(
-        (total, record) =>
-          total +
-          getAccumulatedHours(record),
-        0
-      );
+        return filteredEmployeeSummaries.reduce(
+          (total, summary) =>
+            total +
+            getAccumulatedHours(summary),
+          0
+        );
 
-    }, [
-      filteredRecords,
-    ]);
+      }, [
+        filteredEmployeeSummaries,
+      ]
+    );
 
 
   const settledHours =
@@ -1226,11 +1264,11 @@ export function BonusPayments() {
         title="Bonus Payments"
         subtitle={
           view === 'PENDING'
-            ? `${filteredRecords.length} pending bonus payment${
-                filteredRecords.length !== 1
+            ? `${filteredEmployeeSummaries.length} employee${
+                filteredEmployeeSummaries.length !== 1
                   ? 's'
                   : ''
-              }`
+              } with accumulated bonus`
             : `${filteredHistory.length} bonus payment record${
                 filteredHistory.length !== 1
                   ? 's'
@@ -1360,7 +1398,7 @@ export function BonusPayments() {
             }`}
           >
 
-            {records.length}
+            {employeeSummaries.length}
 
           </span>
 
@@ -1484,7 +1522,7 @@ export function BonusPayments() {
 
       {view === 'PENDING' ? (
 
-        filteredRecords.length === 0 ? (
+        filteredEmployeeSummaries.length === 0 ? (
 
           <EmptyState
             icon={Clock3}
@@ -1492,7 +1530,7 @@ export function BonusPayments() {
             message={
               search
                 ? 'No bonus records match your search.'
-                : 'Accumulated extra-work records will appear here.'
+                : 'Employees with accumulated extra-work hours will appear here.'
             }
           />
 
@@ -1500,7 +1538,7 @@ export function BonusPayments() {
 
           <DataTable
             columns={pendingColumns}
-            data={filteredRecords}
+            data={filteredEmployeeSummaries}
           />
 
         )
@@ -1551,7 +1589,7 @@ export function BonusPayments() {
 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 
-          <div className="w-full max-w-xl rounded-2xl bg-white shadow-2xl">
+          <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
 
             {/* ------------------------------------------------
                 MODAL HEADER
@@ -1562,7 +1600,7 @@ export function BonusPayments() {
               <div>
 
                 <h2 className="text-lg font-semibold text-navy-900">
-                  Review Bonus Payment
+                  Review Accumulated Bonus
                 </h2>
 
                 <p className="mt-0.5 text-sm text-navy-500">
@@ -1602,9 +1640,7 @@ export function BonusPayments() {
 
             <div className="p-5">
 
-              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-
-                {/* EMPLOYEE ID */}
+              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
 
                 <div className="rounded-lg border border-navy-100 bg-navy-50/40 p-3">
 
@@ -1619,107 +1655,169 @@ export function BonusPayments() {
                 </div>
 
 
-                {/* PAYROLL PERIOD */}
-
-                <div className="rounded-lg border border-navy-100 bg-navy-50/40 p-3">
-
-                  <div className="text-xs text-navy-400">
-                    Payroll Period
-                  </div>
-
-                  <div className="mt-1 font-semibold text-navy-800">
-                    {getPeriod(
-                      selectedRecord
-                    )}
-                  </div>
-
-                </div>
-
-
-                {/* EXPECTED HOURS */}
-
-                <div className="rounded-lg border border-navy-100 bg-navy-50/40 p-3">
-
-                  <div className="text-xs text-navy-400">
-                    Expected Hours
-                  </div>
-
-                  <div className="mt-1 font-semibold text-navy-800">
-
-                    {formatHours(
-                      getExpectedHours(
-                        selectedRecord
-                      )
-                    )}{' '}
-                    h
-
-                  </div>
-
-                </div>
-
-
-                {/* REGULAR HOURS */}
-
-                <div className="rounded-lg border border-navy-100 bg-navy-50/40 p-3">
-
-                  <div className="text-xs text-navy-400">
-                    Regular Hours
-                  </div>
-
-                  <div className="mt-1 font-semibold text-navy-800">
-
-                    {formatHours(
-                      getRegularHours(
-                        selectedRecord
-                      )
-                    )}{' '}
-                    h
-
-                  </div>
-
-                </div>
-
-
-                {/* THIS RECORD EXTRA */}
-
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
 
                   <div className="text-xs text-amber-600">
-                    This Record Extra
-                  </div>
-
-                  <div className="mt-1 font-semibold text-amber-800">
-
-                    {formatHours(
-                      getExtraHours(
-                        selectedRecord
-                      )
-                    )}{' '}
-                    h
-
-                  </div>
-
-                </div>
-
-
-                {/* ACCUMULATED BALANCE */}
-
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-
-                  <div className="text-xs text-amber-600">
-                    Accumulated Balance
+                    Accumulated Extra Hours
                   </div>
 
                   <div className="mt-1 text-lg font-bold text-amber-800">
-
                     {formatHours(
                       getAccumulatedHours(
                         selectedRecord
                       )
                     )}{' '}
                     h
-
                   </div>
+
+                </div>
+
+
+                <div className="rounded-lg border border-navy-100 bg-navy-50/40 p-3">
+
+                  <div className="text-xs text-navy-400">
+                    Pending Records
+                  </div>
+
+                  <div className="mt-1 font-semibold text-navy-800">
+                    {selectedRecord?.accumulatedRecordCount ??
+                      selectedRecord?.records?.length ??
+                      0}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* ------------------------------------------------
+                  DETAILED RECORDS
+              ------------------------------------------------- */}
+
+              <div className="mb-5 rounded-xl border border-navy-100 bg-white">
+
+                <div className="border-b border-navy-100 px-4 py-3">
+
+                  <h3 className="text-sm font-semibold text-navy-800">
+                    Accumulated Extra-Work Records
+                  </h3>
+
+                  <p className="mt-0.5 text-xs text-navy-500">
+                    These records are kept individually. Paying the bonus settles all current accumulated records for this employee together.
+                  </p>
+
+                </div>
+
+
+                <div className="max-h-72 overflow-y-auto">
+
+                  {(Array.isArray(selectedRecord?.records)
+                    ? selectedRecord.records
+                    : []
+                  ).length === 0 ? (
+
+                    <div className="px-4 py-8 text-center text-sm text-navy-500">
+                      No accumulated extra-work records are available.
+                    </div>
+
+                  ) : (
+
+                    <div className="divide-y divide-navy-100">
+
+                      {selectedRecord.records.map(
+                        (record) => (
+
+                          <div
+                            key={
+                              record?.extraWorkId ??
+                              `${record?.employeeId}-${record?.payPeriodStart}-${record?.createdAt}`
+                            }
+                            className="px-4 py-3"
+                          >
+
+                            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+
+                              <div className="min-w-0 flex-1">
+
+                                <div className="text-sm font-medium text-navy-800">
+                                  {getPeriod(record)}
+                                </div>
+
+                                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-navy-500">
+
+                                  <span>
+                                    Regular: {formatHours(
+                                      getRegularHours(record)
+                                    )} h
+                                  </span>
+
+                                  <span>
+                                    Extra: {formatHours(
+                                      getExtraHours(record)
+                                    )} h
+                                  </span>
+
+                                  <span>
+                                    Total: {formatHours(
+                                      record?.totalWorkingHours ??
+                                      getRegularHours(record) +
+                                        getExtraHours(record)
+                                    )} h
+                                  </span>
+
+                                </div>
+
+                              </div>
+
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleReject(record)
+                                }
+                                disabled={
+                                  Boolean(
+                                    payingEmployeeId ||
+                                    rejectingExtraWorkId
+                                  )
+                                }
+                                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-xs font-semibold text-error-700 hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+
+                                {rejectingExtraWorkId ===
+                                record?.extraWorkId ? (
+
+                                  <Loader2
+                                    size={14}
+                                    className="animate-spin"
+                                  />
+
+                                ) : (
+
+                                  <XCircle
+                                    size={14}
+                                  />
+
+                                )}
+
+                                {rejectingExtraWorkId ===
+                                record?.extraWorkId
+                                  ? 'Rejecting...'
+                                  : 'Reject Record'
+                                }
+
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        )
+                      )}
+
+                    </div>
+
+                  )}
 
                 </div>
 
@@ -1740,12 +1838,8 @@ export function BonusPayments() {
                 </label>
 
                 <div className="mb-2 text-xs text-navy-500">
-
-                  Enter the bonus amount to settle against
-                  the employee's accumulated extra work.
-
+                  Enter the amount to settle against all of the employee's currently accumulated extra work.
                 </div>
-
 
                 <div className="flex items-center rounded-lg border border-navy-200 bg-white focus-within:ring-2 focus-within:ring-navy-200">
 
@@ -1768,7 +1862,8 @@ export function BonusPayments() {
                     className="w-full rounded-r-lg border-0 px-2 py-2.5 text-navy-800 focus:outline-none"
                     disabled={
                       Boolean(
-                        payingEmployeeId
+                        payingEmployeeId ||
+                        rejectingExtraWorkId
                       )
                     }
                   />
@@ -1783,13 +1878,7 @@ export function BonusPayments() {
               ------------------------------------------------- */}
 
               <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-700">
-
-                Paying the bonus settles the employee's
-                current accumulated extra-work balance,
-                records the bonus in payment history, and
-                resets the current accumulated balance.
-                Regular salary payroll remains unchanged.
-
+                Paying the bonus settles <strong>all current accumulated extra-work records</strong> for this employee into one bonus settlement. Those ledger records remain preserved as SETTLED, and the employee's accumulated balance becomes 0. Future extra work starts a new accumulation cycle. Regular salary payroll remains unchanged.
               </div>
 
 
@@ -1798,47 +1887,6 @@ export function BonusPayments() {
               ------------------------------------------------- */}
 
               <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-
-                {/* REJECT */}
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleReject(
-                      selectedRecord
-                    )
-                  }
-                  disabled={
-                    Boolean(
-                      payingEmployeeId ||
-                      rejectingExtraWorkId
-                    )
-                  }
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-error-200 bg-error-50 px-4 py-2.5 text-sm font-semibold text-error-700 hover:bg-error-100 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-
-                  {rejectingExtraWorkId ===
-                  selectedRecord.extraWorkId ? (
-
-                    <Loader2
-                      size={16}
-                      className="animate-spin"
-                    />
-
-                  ) : (
-
-                    <XCircle
-                      size={16}
-                    />
-
-                  )}
-
-                  Reject Record
-
-                </button>
-
-
-                {/* CANCEL */}
 
                 <button
                   type="button"
@@ -1851,13 +1899,9 @@ export function BonusPayments() {
                   }
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-navy-200 px-4 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-
                   Cancel
-
                 </button>
 
-
-                {/* PAY BONUS */}
 
                 <button
                   type="button"
