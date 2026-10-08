@@ -38,6 +38,16 @@ const API = {
         adminTest:
             "/api/auth/admin-test",
 
+        // Forgot password
+        // POST /api/auth/forgot-password
+        forgotPassword:
+            "/api/auth/forgot-password",
+
+        // Reset password
+        // POST /api/auth/reset-password
+        resetPassword:
+            "/api/auth/reset-password",
+
     },
 
 

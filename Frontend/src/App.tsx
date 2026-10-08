@@ -4,6 +4,8 @@ import { ToastProvider } from '@/context/ToastContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/pages/LoginPage';
+import { ForgotPassword } from '@/pages/ForgotPassword';
+import { ResetPassword } from '@/pages/ResetPassword';
 
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
 import { AdminEmployees } from '@/pages/admin/AdminEmployees';
@@ -51,6 +53,16 @@ function App() {
             <Route
               path="/login"
               element={<LoginPage />}
+            />
+
+            <Route
+              path="/forgot-password"
+              element={<ForgotPassword />}
+            />
+
+            <Route
+              path="/reset-password"
+              element={<ResetPassword />}
             />
 
 

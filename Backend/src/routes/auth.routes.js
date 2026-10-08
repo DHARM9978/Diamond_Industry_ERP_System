@@ -31,6 +31,33 @@ router.post(
 
 
 // ==========================================
+// Forgot Password
+// POST /api/auth/forgot-password
+// ==========================================
+// Public route.
+// No JWT authentication is required because
+// the user may not be logged in.
+
+router.post(
+    "/forgot-password",
+    asyncHandler(authController.forgotPassword)
+);
+
+
+// ==========================================
+// Reset Password
+// POST /api/auth/reset-password
+// ==========================================
+// Public route.
+// The reset token itself is used for verification.
+
+router.post(
+    "/reset-password",
+    asyncHandler(authController.resetPassword)
+);
+
+
+// ==========================================
 // Protected Test Route
 // GET /api/auth/me
 // ==========================================

@@ -46,7 +46,59 @@ const employeeLogin = async (req, res) => {
 };
 
 
+// ==========================================
+// Forgot Password
+// POST /api/auth/forgot-password
+// ==========================================
+
+const forgotPassword = async (req, res) => {
+
+    const { email } = req.body;
+
+    const result =
+        await authService.forgotPassword(
+            email
+        );
+
+    return successResponse(
+        res,
+        200,
+        result.message,
+        null
+    );
+};
+
+
+// ==========================================
+// Reset Password
+// POST /api/auth/reset-password
+// ==========================================
+
+const resetPassword = async (req, res) => {
+
+    const {
+        token,
+        newPassword
+    } = req.body;
+
+    const result =
+        await authService.resetPassword(
+            token,
+            newPassword
+        );
+
+    return successResponse(
+        res,
+        200,
+        result.message,
+        null
+    );
+};
+
+
 module.exports = {
     login,
-    employeeLogin
+    employeeLogin,
+    forgotPassword,
+    resetPassword
 };

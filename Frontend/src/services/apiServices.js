@@ -115,6 +115,72 @@ export const authService = {
         return unwrap(response);
     },
 
+
+    // --------------------------------------------------------
+    // Forgot Password
+    // POST /api/auth/forgot-password
+    // --------------------------------------------------------
+    forgotPassword: async (
+        email
+    ) => {
+
+        try {
+
+            const response =
+                await apiClient.post(
+                    API.auth.forgotPassword,
+                    {
+                        email,
+                    }
+                );
+
+            return unwrap(response);
+
+        } catch (error) {
+
+            console.error(
+                "Forgot password request failed:",
+                getApiError(error)
+            );
+
+            throw error;
+        }
+    },
+
+
+    // --------------------------------------------------------
+    // Reset Password
+    // POST /api/auth/reset-password
+    // --------------------------------------------------------
+    resetPassword: async (
+        token,
+        newPassword
+    ) => {
+
+        try {
+
+            const response =
+                await apiClient.post(
+                    API.auth.resetPassword,
+                    {
+                        token,
+                        newPassword,
+                    }
+                );
+
+            return unwrap(response);
+
+        } catch (error) {
+
+            console.error(
+                "Password reset failed:",
+                getApiError(error)
+            );
+
+            throw error;
+        }
+    },
+
 };
 
 

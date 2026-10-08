@@ -2,6 +2,21 @@
 // DIAMOND ERP - BACKEND SERVER
 // ============================================================
 
+// ------------------------------------------------------------
+// LOAD ENVIRONMENT VARIABLES FIRST
+// ------------------------------------------------------------
+// This must run before importing the application so that
+// process.env values from Backend/.env are available to all
+// services, including password reset / SMTP configuration.
+// ------------------------------------------------------------
+
+require("dotenv").config();
+
+
+// ============================================================
+// APPLICATION
+// ============================================================
+
 const app = require("./src/app");
 
 const {
@@ -49,6 +64,7 @@ const server =
             );
 
             console.log();
+
 
             // --------------------------------------------------
             // Start automatic payroll scheduler
