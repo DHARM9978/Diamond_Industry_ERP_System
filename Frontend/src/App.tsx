@@ -18,6 +18,7 @@ import { AdminPayroll } from '@/pages/admin/AdminPayroll';
 import { AdminFingerprints } from '@/pages/admin/AdminFingerprints';
 import { AdminDevices } from '@/pages/admin/AdminDevices';
 import { AdminCompany } from '@/pages/admin/AdminCompany';
+import { AdminProfile } from '@/pages/admin/AdminProfile';
 import { AdminBranches } from '@/pages/admin/AdminBranches';
 import { AdminDepartments } from '@/pages/admin/AdminDepartments';
 import { AdminReports } from '@/pages/admin/AdminReports';
@@ -251,6 +252,17 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <AdminCompany />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/profile"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminProfile />
                   </AppLayout>
                 </ProtectedRoute>
               }

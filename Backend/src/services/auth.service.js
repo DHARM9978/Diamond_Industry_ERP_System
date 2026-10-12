@@ -350,6 +350,364 @@ const loginEmployee = async (email, password) => {
 
 
 // ==========================================
+// Admin Profile
+// ==========================================
+
+const getAdminProfile = async (adminId, companyId) => {
+
+    const normalizedAdminId = Number(adminId);
+    const normalizedCompanyId = Number(companyId);
+
+    if (
+        !Number.isInteger(normalizedAdminId) ||
+        normalizedAdminId <= 0 ||
+        !Number.isInteger(normalizedCompanyId) ||
+        normalizedCompanyId <= 0
+    ) {
+        throw createAuthError(
+            "Invalid admin account",
+            400
+        );
+    }
+
+    const admin =
+        await prisma.admin.findFirst({
+            where: {
+                adminId: normalizedAdminId,
+                companyId: normalizedCompanyId
+            },
+            select: {
+                adminId: true,
+                adminName: true,
+                email: true,
+                phone: true,
+                companyId: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        });
+
+    if (!admin) {
+        throw createAuthError(
+            "Admin account not found",
+            404
+        );
+    }
+
+    return admin;
+};
+
+const updateAdminProfile = async (
+    adminId,
+    companyId,
+    profileData = {}
+) => {
+
+    const normalizedAdminId = Number(adminId);
+    const normalizedCompanyId = Number(companyId);
+
+    if (
+        !Number.isInteger(normalizedAdminId) ||
+        normalizedAdminId <= 0 ||
+        !Number.isInteger(normalizedCompanyId) ||
+        normalizedCompanyId <= 0
+    ) {
+        throw createAuthError(
+            "Invalid admin account",
+            400
+        );
+    }
+
+    if (
+        !profileData ||
+        typeof profileData !== "object" ||
+        Array.isArray(profileData)
+    ) {
+        throw createAuthError(
+            "Invalid profile data",
+            400
+        );
+    }
+
+    const admin =
+        await prisma.admin.findFirst({
+            where: {
+                adminId: normalizedAdminId,
+                companyId: normalizedCompanyId
+            },
+            select: {
+                adminId: true,
+                adminName: true,
+                email: true,
+                phone: true,
+                passwordHash: true,
+                companyId: true
+            }
+        });
+
+    if (!admin) {
+        throw createAuthError(
+            "Admin account not found",
+            404
+        );
+    }
+
+    const updateData = {};
+
+    if (profileData.adminName !== undefined) {
+        if (typeof profileData.adminName !== "string") {
+            throw createAuthError(
+                "Admin name must be a valid string",
+                400
+            );
+        }
+
+        const adminName = profileData.adminName.trim();
+
+        if (!adminName) {
+            throw createAuthError(
+                "Admin name is required",
+                400
+            );
+        }
+
+        if (adminName.length > 100) {
+            throw createAuthError(
+                "Admin name cannot exceed 100 characters",
+                400
+            );
+        }
+
+        updateData.adminName = adminName;
+    }
+
+    if (profileData.email !== undefined) {
+        if (typeof profileData.email !== "string") {
+            throw createAuthError(
+                "Email address must be a valid string",
+                400
+            );
+        }
+
+        const email = profileData.email.trim().toLowerCase();
+
+        if (
+            !email ||
+            email.length > 150 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        ) {
+            throw createAuthError(
+                "Please provide a valid email address",
+                400
+            );
+        }
+
+        if (email !== admin.email.toLowerCase()) {
+            if (
+                typeof profileData.currentPassword !== "string" ||
+                !profileData.currentPassword
+            ) {
+                throw createAuthError(
+                    "Current password is required to change the login email",
+                    400
+                );
+            }
+
+            const passwordMatches =
+                await bcrypt.compare(
+                    profileData.currentPassword,
+                    admin.passwordHash
+                );
+
+            if (!passwordMatches) {
+                throw createAuthError(
+                    "Current password is incorrect",
+                    401
+                );
+            }
+
+            const existingAdmin =
+                await prisma.admin.findUnique({
+                    where: {
+                        email
+                    },
+                    select: {
+                        adminId: true
+                    }
+                });
+
+            if (
+                existingAdmin &&
+                existingAdmin.adminId !== admin.adminId
+            ) {
+                throw createAuthError(
+                    "This email address is already in use by another admin",
+                    409
+                );
+            }
+
+            updateData.email = email;
+        }
+    }
+
+    if (profileData.phone !== undefined) {
+        if (
+            profileData.phone !== null &&
+            typeof profileData.phone !== "string"
+        ) {
+            throw createAuthError(
+                "Phone number must be a valid string",
+                400
+            );
+        }
+
+        const phone =
+            typeof profileData.phone === "string"
+                ? profileData.phone.trim()
+                : "";
+
+        if (phone.length > 20) {
+            throw createAuthError(
+                "Phone number cannot exceed 20 characters",
+                400
+            );
+        }
+
+        updateData.phone = phone || null;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+        throw createAuthError(
+            "No profile changes were provided",
+            400
+        );
+    }
+
+    try {
+        await prisma.admin.update({
+            where: {
+                adminId: admin.adminId
+            },
+            data: updateData
+        });
+    } catch (error) {
+        if (error.code === "P2002") {
+            throw createAuthError(
+                "This email address is already in use by another admin",
+                409
+            );
+        }
+
+        throw error;
+    }
+
+    return getAdminProfile(
+        admin.adminId,
+        admin.companyId
+    );
+};
+
+
+// ==========================================
+// Admin Change Password
+// ==========================================
+
+const changeAdminPassword = async (
+    adminId,
+    companyId,
+    currentPassword,
+    newPassword
+) => {
+
+    const normalizedAdminId = Number(adminId);
+    const normalizedCompanyId = Number(companyId);
+
+    if (
+        !Number.isInteger(normalizedAdminId) ||
+        normalizedAdminId <= 0 ||
+        !Number.isInteger(normalizedCompanyId) ||
+        normalizedCompanyId <= 0
+    ) {
+        throw createAuthError(
+            "Invalid admin account",
+            400
+        );
+    }
+
+    if (
+        typeof currentPassword !== "string" ||
+        !currentPassword
+    ) {
+        throw createAuthError(
+            "Current password is required",
+            400
+        );
+    }
+
+    validateNewPassword(newPassword);
+
+    if (currentPassword === newPassword) {
+        throw createAuthError(
+            "New password must be different from the current password",
+            400
+        );
+    }
+
+    const admin =
+        await prisma.admin.findFirst({
+            where: {
+                adminId: normalizedAdminId,
+                companyId: normalizedCompanyId
+            },
+            select: {
+                adminId: true,
+                passwordHash: true
+            }
+        });
+
+    if (!admin) {
+        throw createAuthError(
+            "Admin account not found",
+            404
+        );
+    }
+
+    const currentPasswordMatches =
+        await bcrypt.compare(
+            currentPassword,
+            admin.passwordHash
+        );
+
+    if (!currentPasswordMatches) {
+        throw createAuthError(
+            "Current password is incorrect",
+            401
+        );
+    }
+
+    const passwordHash =
+        await bcrypt.hash(
+            newPassword,
+            12
+        );
+
+    await prisma.admin.update({
+        where: {
+            adminId: admin.adminId
+        },
+        data: {
+            passwordHash
+        }
+    });
+
+    return {
+        success: true,
+        message: "Password changed successfully"
+    };
+};
+
+
+// ==========================================
 // Employee Change Password
 // ==========================================
 
@@ -708,6 +1066,9 @@ const resetPassword = async (
 module.exports = {
     loginAdmin,
     loginEmployee,
+    getAdminProfile,
+    updateAdminProfile,
+    changeAdminPassword,
     changeEmployeePassword,
     forgotPassword,
     resetPassword

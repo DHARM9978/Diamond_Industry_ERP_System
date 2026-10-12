@@ -98,4 +98,43 @@ router.get(
 );
 
 
+// ==========================================
+// Admin Profile
+// GET /api/auth/admin/profile
+// ==========================================
+
+router.get(
+    "/admin/profile",
+    authenticate,
+    authorizeRoles("ADMIN"),
+    asyncHandler(authController.getAdminProfile)
+);
+
+
+// ==========================================
+// Update Admin Profile
+// PUT /api/auth/admin/profile
+// ==========================================
+
+router.put(
+    "/admin/profile",
+    authenticate,
+    authorizeRoles("ADMIN"),
+    asyncHandler(authController.updateAdminProfile)
+);
+
+
+// ==========================================
+// Change Admin Password
+// PUT /api/auth/admin/change-password
+// ==========================================
+
+router.put(
+    "/admin/change-password",
+    authenticate,
+    authorizeRoles("ADMIN"),
+    asyncHandler(authController.changeAdminPassword)
+);
+
+
 module.exports = router;

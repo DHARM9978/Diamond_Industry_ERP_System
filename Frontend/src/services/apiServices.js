@@ -117,6 +117,93 @@ export const authService = {
 
 
     // --------------------------------------------------------
+    // Get Admin Profile
+    // GET /api/auth/admin/profile
+    // --------------------------------------------------------
+    getAdminProfile: async () => {
+
+        try {
+
+            const response =
+                await apiClient.get(
+                    API.auth.adminProfile
+                );
+
+            return unwrap(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin profile retrieval failed:",
+                getApiError(error)
+            );
+
+            throw error;
+        }
+    },
+
+
+    // --------------------------------------------------------
+    // Update Admin Profile
+    // PUT /api/auth/admin/profile
+    // --------------------------------------------------------
+    updateAdminProfile: async (
+        profileData
+    ) => {
+
+        try {
+
+            const response =
+                await apiClient.put(
+                    API.auth.updateAdminProfile,
+                    profileData
+                );
+
+            return unwrap(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin profile update failed:",
+                getApiError(error)
+            );
+
+            throw error;
+        }
+    },
+
+
+    // --------------------------------------------------------
+    // Change Admin Password
+    // PUT /api/auth/admin/change-password
+    // --------------------------------------------------------
+    changeAdminPassword: async (
+        passwordData
+    ) => {
+
+        try {
+
+            const response =
+                await apiClient.put(
+                    API.auth.changeAdminPassword,
+                    passwordData
+                );
+
+            return unwrap(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin password change failed:",
+                getApiError(error)
+            );
+
+            throw error;
+        }
+    },
+
+
+    // --------------------------------------------------------
     // Forgot Password
     // POST /api/auth/forgot-password
     // --------------------------------------------------------

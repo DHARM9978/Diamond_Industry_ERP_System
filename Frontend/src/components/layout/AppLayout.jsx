@@ -21,6 +21,7 @@ import {
   Pin,
   PinOff,
   Gem,
+  UserRound,
 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
@@ -66,6 +67,10 @@ const adminNav = [
   {
     section: 'Insights',
     items: [{ to: '/admin/reports', icon: FileBarChart, label: 'Reports' }],
+  },
+  {
+    section: 'Account',
+    items: [{ to: '/admin/profile', icon: UserRound, label: 'Admin Profile' }],
   },
 ];
 

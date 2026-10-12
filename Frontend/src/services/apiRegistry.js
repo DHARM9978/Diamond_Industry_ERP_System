@@ -38,6 +38,21 @@ const API = {
         adminTest:
             "/api/auth/admin-test",
 
+        // Admin profile
+        // GET /api/auth/admin/profile
+        adminProfile:
+            "/api/auth/admin/profile",
+
+        // Update admin profile
+        // PUT /api/auth/admin/profile
+        updateAdminProfile:
+            "/api/auth/admin/profile",
+
+        // Change admin password
+        // PUT /api/auth/admin/change-password
+        changeAdminPassword:
+            "/api/auth/admin/change-password",
+
         // Forgot password
         // POST /api/auth/forgot-password
         forgotPassword:
