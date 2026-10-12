@@ -7,6 +7,10 @@ import {
   Filter,
   Search,
   RotateCcw,
+  ClipboardList,
+  CircleCheck,
+  Clock3,
+  CircleX,
 } from 'lucide-react';
 
 import {
@@ -247,6 +251,80 @@ const sortNewestFirst = (records) => {
 };
 
 
+const getISTYearMonth = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+  }).formatToParts(date);
+
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+
+  return year && month ? `${year}-${month}` : null;
+};
+
+
+const getCurrentISTYearMonth = () => {
+  return getISTYearMonth(new Date());
+};
+
+
+const getPreviousYearMonth = (yearMonth) => {
+  if (!yearMonth) {
+    return null;
+  }
+
+  const [year, month] = yearMonth.split('-').map(Number);
+
+  if (!year || !month) {
+    return null;
+  }
+
+  const previousMonth = new Date(Date.UTC(year, month - 2, 15, 12));
+  const previousYear = previousMonth.getUTCFullYear();
+  const previousMonthNumber = String(
+    previousMonth.getUTCMonth() + 1
+  ).padStart(2, '0');
+
+  return `${previousYear}-${previousMonthNumber}`;
+};
+
+
+const formatYearMonthLabel = (yearMonth) => {
+  if (!yearMonth) {
+    return '';
+  }
+
+  const [year, month] = yearMonth.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, 15, 12));
+
+  return new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+};
+
+
+const isRequestInYearMonth = (leave, yearMonth) => {
+  return Boolean(
+    yearMonth &&
+    getISTYearMonth(leave?.createdAt) === yearMonth
+  );
+};
+
+
 // ============================================================
 // ADMIN LEAVE REQUESTS
 // ============================================================
@@ -292,6 +370,16 @@ export function AdminLeaves() {
   const [leaveTypeFilter, setLeaveTypeFilter] =
     useState('');
 
+  // Month/year selectors default to the current month and allow browsing
+  // any historical month, even when that month has zero requests.
+  const initialYearMonth = getCurrentISTYearMonth();
+  const [selectedMonth, setSelectedMonth] = useState(
+    initialYearMonth?.split('-')[1] || String(new Date().getMonth() + 1).padStart(2, '0')
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    initialYearMonth?.split('-')[0] || String(new Date().getFullYear())
+  );
+
   // ==========================================================
   // LOAD LEAVE REQUESTS
   // ==========================================================
@@ -307,29 +395,12 @@ export function AdminLeaves() {
       }
 
       /*
-       * The backend already supports:
-       *
-       * GET /api/leave-requests?status=PENDING
-       *
-       * The current leave request service also
-       * orders requests by createdAt DESC.
-       *
-       * We still sort the returned data on the
-       * frontend as a defensive guarantee so the
-       * newest request remains first after local
-       * approve/reject updates.
+       * Load every status so the monthly summary cards always
+       * count all requests, even when a status filter is selected.
+       * The current-month and status filters are applied locally.
        */
-      const params = {};
-
-      if (statusFilter) {
-        params.status =
-          statusFilter;
-      }
-
       const response =
-        await leaveService.requests(
-          params
-        );
+        await leaveService.requests({});
 
       let records = [];
 
@@ -377,7 +448,75 @@ export function AdminLeaves() {
 
   useEffect(() => {
     loadLeaves();
-  }, [statusFilter]);
+    // Initial load only. Status filtering is handled locally.
+  }, []);
+
+
+  // ==========================================================
+  // CURRENT MONTH DATA + SUMMARY COUNTS
+  // ==========================================================
+
+  const currentYearMonth = getCurrentISTYearMonth();
+  const previousYearMonth = getPreviousYearMonth(currentYearMonth);
+
+  const selectedYearMonth = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
+  const selectedPeriodLabel = formatYearMonthLabel(selectedYearMonth);
+
+  const monthOptions = [
+    { value: '01', label: 'January' },
+    { value: '02', label: 'February' },
+    { value: '03', label: 'March' },
+    { value: '04', label: 'April' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'June' },
+    { value: '07', label: 'July' },
+    { value: '08', label: 'August' },
+    { value: '09', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+  ];
+
+  // Include every year represented by loaded requests, plus the current year.
+  const yearOptions = useMemo(() => {
+    const years = new Set([currentYearMonth?.slice(0, 4), selectedYear]);
+    leaves.forEach((leave) => {
+      const yearMonth = getISTYearMonth(leave?.createdAt);
+      if (yearMonth) years.add(yearMonth.slice(0, 4));
+    });
+    return Array.from(years)
+      .filter(Boolean)
+      .sort((a, b) => Number(b) - Number(a));
+  }, [leaves, currentYearMonth, selectedYear]);
+
+  const periodLeaves = useMemo(() => {
+    return sortNewestFirst(
+      leaves.filter((leave) => isRequestInYearMonth(leave, selectedYearMonth))
+    );
+  }, [leaves, selectedYearMonth]);
+
+  const monthlySummary = useMemo(() => {
+    const counts = {
+      total: periodLeaves.length,
+      approved: 0,
+      pending: 0,
+      rejected: 0,
+      cancelled: 0,
+    };
+
+    periodLeaves.forEach((leave) => {
+      const status = String(leave?.status ?? '').toUpperCase();
+
+      if (status === 'APPROVED') counts.approved += 1;
+      if (status === 'PENDING') counts.pending += 1;
+      if (status === 'REJECTED') counts.rejected += 1;
+      if (status === 'CANCELLED' || status === 'CANCELED') {
+        counts.cancelled += 1;
+      }
+    });
+
+    return counts;
+  }, [periodLeaves]);
 
 
   // ==========================================================
@@ -389,7 +528,7 @@ export function AdminLeaves() {
       const map =
         new Map();
 
-      leaves.forEach(
+      periodLeaves.forEach(
         (leave) => {
           const id =
             leave?.leaveType
@@ -431,7 +570,7 @@ export function AdminLeaves() {
               b.label
             )
         );
-    }, [leaves]);
+    }, [periodLeaves]);
 
 
   // ==========================================================
@@ -445,7 +584,7 @@ export function AdminLeaves() {
         .toLowerCase();
 
     const result =
-      leaves.filter(
+      periodLeaves.filter(
         (leave) => {
           // ---------------------------------------------------
           // Status
@@ -574,7 +713,7 @@ export function AdminLeaves() {
       result
     );
   }, [
-    leaves,
+    periodLeaves,
     search,
     statusFilter,
     leaveTypeFilter,
@@ -1177,12 +1316,76 @@ export function AdminLeaves() {
 
       <PageHeader
         title="Leave Requests"
-        subtitle={`${filtered.length} ${
+        subtitle={`${selectedPeriodLabel} • ${filtered.length} visible ${
           filtered.length === 1
             ? 'request'
             : 'requests'
         }`}
       />
+
+
+      {/* ======================================================
+          SELECTED PERIOD SUMMARY CARDS
+      ====================================================== */}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+        {[
+          {
+            label: 'Total Requests',
+            value: monthlySummary.total,
+            icon: ClipboardList,
+            iconClass: 'bg-accent-50 text-accent-700',
+          },
+          {
+            label: 'Approved Requests',
+            value: monthlySummary.approved,
+            icon: CircleCheck,
+            iconClass: 'bg-success-50 text-success-700',
+          },
+          {
+            label: 'Pending Requests',
+            value: monthlySummary.pending,
+            icon: Clock3,
+            iconClass: 'bg-warning-50 text-warning-700',
+          },
+          {
+            label: 'Rejected Requests',
+            value: monthlySummary.rejected,
+            icon: CircleX,
+            iconClass: 'bg-danger-50 text-danger-700',
+          },
+          {
+            label: 'Cancelled Requests',
+            value: monthlySummary.cancelled,
+            icon: CircleX,
+            iconClass: 'bg-slate-100 text-slate-600',
+          },
+        ].map((card) => {
+          const Icon = card.icon;
+
+          return (
+            <div
+              key={card.label}
+              className="card flex items-center justify-between gap-4 p-4 sm:p-5"
+            >
+              <div>
+                <p className="text-xs font-medium text-navy-500 sm:text-sm">
+                  {card.label}
+                </p>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-navy-900">
+                  {card.value}
+                </p>
+                <p className="mt-1 text-xs text-navy-400">
+                  {selectedPeriodLabel}
+                </p>
+              </div>
+              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${card.iconClass}`}>
+                <Icon size={21} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
 
       {/* ======================================================
@@ -1221,11 +1424,51 @@ export function AdminLeaves() {
 
           {/* Main filter controls */}
 
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-end">
+          <div className="mt-4 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
+
+            {/* Month and year selectors, matching the Payroll filters UI */}
+
+            <div className="min-w-0 lg:col-span-2">
+              <label
+                htmlFor="leave-month-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Leave Month
+              </label>
+              <select
+                id="leave-month-filter"
+                value={selectedMonth}
+                onChange={(event) => setSelectedMonth(event.target.value)}
+                className="h-10 w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+                {monthOptions.map((month) => (
+                  <option key={month.value} value={month.value}>{month.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="min-w-0 lg:col-span-2">
+              <label
+                htmlFor="leave-year-filter"
+                className="mb-1.5 block text-xs font-medium text-navy-500"
+              >
+                Leave Year
+              </label>
+              <select
+                id="leave-year-filter"
+                value={selectedYear}
+                onChange={(event) => setSelectedYear(event.target.value)}
+                className="h-10 w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 outline-none transition focus:border-accent-400 focus:ring-2 focus:ring-accent-100"
+              >
+                {yearOptions.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
 
             {/* Search */}
 
-            <div className="lg:col-span-6">
+            <div className="min-w-0 lg:col-span-3">
               <label
                 htmlFor="leave-search"
                 className="mb-1.5 block text-xs font-medium text-navy-500"
@@ -1244,7 +1487,7 @@ export function AdminLeaves() {
 
             {/* Leave Type */}
 
-            <div className="lg:col-span-3">
+            <div className="min-w-0 lg:col-span-3">
               <label
                 htmlFor="leave-type-filter"
                 className="mb-1.5 block text-xs font-medium text-navy-500"
@@ -1298,7 +1541,7 @@ export function AdminLeaves() {
 
             {/* Actions */}
 
-            <div className="flex gap-2 lg:col-span-3">
+            <div className="flex min-w-0 gap-2 lg:col-span-2">
               <button
                 type="button"
                 onClick={clearFilters}
@@ -1306,15 +1549,17 @@ export function AdminLeaves() {
                 className="
                   inline-flex
                   h-10
+                  min-w-0
                   flex-1
                   items-center
                   justify-center
-                  gap-2
+                  gap-1.5
+                  whitespace-nowrap
                   rounded-lg
                   border
                   border-navy-200
                   bg-white
-                  px-3
+                  px-2
                   text-sm
                   font-medium
                   text-navy-700
@@ -1337,15 +1582,17 @@ export function AdminLeaves() {
                 className="
                   inline-flex
                   h-10
+                  min-w-0
                   flex-1
                   items-center
                   justify-center
-                  gap-2
+                  gap-1.5
+                  whitespace-nowrap
                   rounded-lg
                   border
                   border-navy-200
                   bg-white
-                  px-3
+                  px-2
                   text-sm
                   font-medium
                   text-navy-700
@@ -1459,7 +1706,7 @@ export function AdminLeaves() {
                 </strong>{' '}
                 of{' '}
                 <strong className="text-navy-700">
-                  {leaves.length}
+                  {periodLeaves.length}
                 </strong>{' '}
                 loaded requests
               </span>
@@ -1488,7 +1735,7 @@ export function AdminLeaves() {
             message={
               hasActiveFilters
                 ? 'No leave requests match the selected filters.'
-                : 'There are no leave requests to review.'
+                : `There are no leave requests submitted in ${selectedPeriodLabel}.`
             }
           />
         </div>
