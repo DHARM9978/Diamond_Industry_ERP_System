@@ -41,6 +41,24 @@ export function AdminAdvances() {
 
   const [search, setSearch] = useState('');
 
+  // Month/year filter defaults to the current month in India.
+  const getCurrentISTMonthYear = () => {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+    }).formatToParts(new Date());
+
+    const year = Number(parts.find((part) => part.type === 'year')?.value);
+    const month = Number(parts.find((part) => part.type === 'month')?.value);
+
+    return { year, month };
+  };
+
+  const initialMonthYear = getCurrentISTMonthYear();
+  const [selectedMonth, setSelectedMonth] = useState(initialMonthYear.month);
+  const [selectedYear, setSelectedYear] = useState(initialMonthYear.year);
+
   // ----------------------------------------------------------
   // Status filter
   // ----------------------------------------------------------
@@ -603,6 +621,80 @@ export function AdminAdvances() {
 
 
   // ==========================================================
+  // Month/year helpers
+  // ==========================================================
+
+  const getRequestYearMonth = (advance) => {
+    const value = advance?.createdAt ?? advance?.paymentDate;
+    if (!value) return null;
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+    }).formatToParts(date);
+
+    const year = Number(parts.find((part) => part.type === 'year')?.value);
+    const month = Number(parts.find((part) => part.type === 'month')?.value);
+
+    if (!year || !month) return null;
+    return { year, month };
+  };
+
+  const monthOptions = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' },
+  ];
+
+  const yearOptions = useMemo(() => {
+    const years = new Set([getCurrentISTMonthYear().year]);
+
+    advances.forEach((advance) => {
+      const yearMonth = getRequestYearMonth(advance);
+      if (yearMonth) years.add(yearMonth.year);
+    });
+
+    return Array.from(years).sort((a, b) => b - a);
+  }, [advances]);
+
+  const periodAdvances = useMemo(() => {
+    return advances.filter((advance) => {
+      const yearMonth = getRequestYearMonth(advance);
+      return yearMonth?.year === Number(selectedYear)
+        && yearMonth?.month === Number(selectedMonth);
+    });
+  }, [advances, selectedMonth, selectedYear]);
+
+  // Sum amounts actually paid for the selected month.
+  const totalAdvancePaid = useMemo(() => {
+    return periodAdvances.reduce((total, advance) => {
+      if (getStatus(advance) !== 'PAID') return total;
+
+      const amount = Number(
+        advance?.paidAmount ??
+        advance?.approvedAmount ??
+        advance?.amount ??
+        0
+      );
+
+      return total + (Number.isFinite(amount) ? amount : 0);
+    }, 0);
+  }, [periodAdvances]);
+
+  // ==========================================================
   // Status options
   // ==========================================================
 
@@ -637,14 +729,14 @@ export function AdminAdvances() {
   const statusCounts =
     useMemo(() => {
       const counts = {
-        '': advances.length,
+        '': periodAdvances.length,
         PENDING: 0,
         APPROVED: 0,
         REJECTED: 0,
         PAID: 0,
       };
 
-      advances.forEach(
+      periodAdvances.forEach(
         (advance) => {
           const status =
             getStatus(advance);
@@ -661,7 +753,7 @@ export function AdminAdvances() {
       );
 
       return counts;
-    }, [advances]);
+    }, [periodAdvances]);
 
 
   // ==========================================================
@@ -712,7 +804,7 @@ export function AdminAdvances() {
           .toUpperCase();
 
       const result =
-        advances.filter(
+        periodAdvances.filter(
           (advance) => {
 
             const advanceStatus =
@@ -827,7 +919,7 @@ export function AdminAdvances() {
         }
       );
     }, [
-      advances,
+      periodAdvances,
       search,
       statusFilter,
     ]);
@@ -1222,8 +1314,29 @@ export function AdminAdvances() {
           filtered.length !== 1
             ? 's'
             : ''
-        }`}
+        } • ${monthOptions.find((month) => month.value === Number(selectedMonth))?.label} ${selectedYear}`}
       />
+
+       <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-xl border border-navy-100 bg-white p-5 shadow-sm">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-navy-500">
+                Total Advance Paid
+              </p>
+              <p className="mt-2 break-words text-2xl font-bold text-navy-900">
+                {formatCurrency(totalAdvancePaid)}
+              </p>
+              <p className="mt-1 text-xs text-navy-400">
+                {monthOptions.find((month) => month.value === Number(selectedMonth))?.label} {selectedYear}
+              </p>
+            </div>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-success-50 text-success-700">
+              <Banknote size={22} />
+            </div>
+          </div>
+        </div>
+      </div>
 
 
       {/* ======================================================
@@ -1244,7 +1357,7 @@ export function AdminAdvances() {
             </h2>
 
             <p className="mt-1 text-xs text-navy-400">
-              Filter salary advance requests by status or search.
+              View salary advance requests by month, year, status, or search.
             </p>
           </div>
 
@@ -1286,23 +1399,66 @@ export function AdminAdvances() {
 
 
         {/* ------------------------------------------------------
-            Search
+            Month, year and search filters
             ------------------------------------------------------ */}
 
-        <div className="mb-5">
+        <div className="mb-5 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-12 xl:items-end">
 
-          <label
-            htmlFor="salaryAdvanceSearch"
-            className="mb-2 block text-xs font-semibold uppercase tracking-wide text-navy-500"
-          >
-            Search
-          </label>
+          <div className="min-w-0 xl:col-span-2">
+            <label
+              htmlFor="salaryAdvanceMonth"
+              className="mb-2 block text-xs font-semibold uppercase tracking-wide text-navy-500"
+            >
+              Advance Month
+            </label>
+            <select
+              id="salaryAdvanceMonth"
+              value={selectedMonth}
+              onChange={(event) => setSelectedMonth(Number(event.target.value))}
+              className="w-full min-w-0 rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-700 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+            >
+              {monthOptions.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search employee, ID, amount, reason or status..."
-          />
+          <div className="min-w-0 xl:col-span-2">
+            <label
+              htmlFor="salaryAdvanceYear"
+              className="mb-2 block text-xs font-semibold uppercase tracking-wide text-navy-500"
+            >
+              Advance Year
+            </label>
+            <select
+              id="salaryAdvanceYear"
+              value={selectedYear}
+              onChange={(event) => setSelectedYear(Number(event.target.value))}
+              className="w-full min-w-0 rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-700 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+            >
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="min-w-0 sm:col-span-2 xl:col-span-8">
+            <label
+              htmlFor="salaryAdvanceSearch"
+              className="mb-2 block text-xs font-semibold uppercase tracking-wide text-navy-500"
+            >
+              Search
+            </label>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Search employee, ID, amount, reason or status..."
+            />
+          </div>
 
         </div>
 
@@ -1422,9 +1578,9 @@ export function AdminAdvances() {
             </span>{' '}
             of{' '}
             <span className="font-semibold text-navy-800">
-              {advances.length}
+              {periodAdvances.length}
             </span>{' '}
-            loaded requests
+            requests for {monthOptions.find((month) => month.value === Number(selectedMonth))?.label} {selectedYear}
           </p>
 
           <p className="text-xs text-navy-400">
@@ -1449,7 +1605,7 @@ export function AdminAdvances() {
             search ||
             statusFilter
               ? 'No salary advances match the current filters.'
-              : 'There are no salary advance requests to review.'
+              : `There are no salary advance requests for ${monthOptions.find((month) => month.value === Number(selectedMonth))?.label} ${selectedYear}.`
           }
         />
 
