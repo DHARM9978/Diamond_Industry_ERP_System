@@ -403,6 +403,105 @@ exports.Prisma.FingerprintEnrollmentScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ExternalProcessorScalarFieldEnum = {
+  externalProcessorId: 'externalProcessorId',
+  companyId: 'companyId',
+  processorCode: 'processorCode',
+  name: 'name',
+  contactPerson: 'contactPerson',
+  phone: 'phone',
+  email: 'email',
+  address: 'address',
+  gstin: 'gstin',
+  pan: 'pan',
+  paymentTerms: 'paymentTerms',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkProcessTypeScalarFieldEnum = {
+  processTypeId: 'processTypeId',
+  companyId: 'companyId',
+  code: 'code',
+  name: 'name',
+  description: 'description',
+  chargeUnit: 'chargeUnit',
+  defaultRate: 'defaultRate',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkOrderScalarFieldEnum = {
+  jobWorkOrderId: 'jobWorkOrderId',
+  companyId: 'companyId',
+  branchId: 'branchId',
+  jobNumber: 'jobNumber',
+  externalProcessorId: 'externalProcessorId',
+  processTypeId: 'processTypeId',
+  orderDate: 'orderDate',
+  status: 'status',
+  description: 'description',
+  notes: 'notes',
+  createdByAdminId: 'createdByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkDispatchScalarFieldEnum = {
+  dispatchId: 'dispatchId',
+  jobWorkOrderId: 'jobWorkOrderId',
+  challanNumber: 'challanNumber',
+  jangadNumber: 'jangadNumber',
+  dispatchDate: 'dispatchDate',
+  expectedReturnDate: 'expectedReturnDate',
+  sentPieces: 'sentPieces',
+  sentCarats: 'sentCarats',
+  sentWeightGrams: 'sentWeightGrams',
+  notes: 'notes',
+  createdByAdminId: 'createdByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkReceiptScalarFieldEnum = {
+  receiptId: 'receiptId',
+  dispatchId: 'dispatchId',
+  receiptNumber: 'receiptNumber',
+  receivedDate: 'receivedDate',
+  receivedByAdminId: 'receivedByAdminId',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkReceiptItemScalarFieldEnum = {
+  receiptItemId: 'receiptItemId',
+  receiptId: 'receiptId',
+  returnCondition: 'returnCondition',
+  returnedPieces: 'returnedPieces',
+  returnedCarats: 'returnedCarats',
+  returnedWeightGrams: 'returnedWeightGrams',
+  remarks: 'remarks',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.JobWorkReconciliationScalarFieldEnum = {
+  reconciliationId: 'reconciliationId',
+  jobWorkOrderId: 'jobWorkOrderId',
+  reportedLossCarats: 'reportedLossCarats',
+  approvedLossCarats: 'approvedLossCarats',
+  varianceCarats: 'varianceCarats',
+  status: 'status',
+  reviewedByAdminId: 'reviewedByAdminId',
+  reviewedAt: 'reviewedAt',
+  resolutionNotes: 'resolutionNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -526,6 +625,55 @@ exports.Prisma.FingerprintEnrollmentOrderByRelevanceFieldEnum = {
   errorMessage: 'errorMessage'
 };
 
+exports.Prisma.ExternalProcessorOrderByRelevanceFieldEnum = {
+  processorCode: 'processorCode',
+  name: 'name',
+  contactPerson: 'contactPerson',
+  phone: 'phone',
+  email: 'email',
+  address: 'address',
+  gstin: 'gstin',
+  pan: 'pan',
+  paymentTerms: 'paymentTerms',
+  notes: 'notes',
+  status: 'status'
+};
+
+exports.Prisma.JobWorkProcessTypeOrderByRelevanceFieldEnum = {
+  code: 'code',
+  name: 'name',
+  description: 'description',
+  chargeUnit: 'chargeUnit'
+};
+
+exports.Prisma.JobWorkOrderOrderByRelevanceFieldEnum = {
+  jobNumber: 'jobNumber',
+  status: 'status',
+  description: 'description',
+  notes: 'notes'
+};
+
+exports.Prisma.JobWorkDispatchOrderByRelevanceFieldEnum = {
+  challanNumber: 'challanNumber',
+  jangadNumber: 'jangadNumber',
+  notes: 'notes'
+};
+
+exports.Prisma.JobWorkReceiptOrderByRelevanceFieldEnum = {
+  receiptNumber: 'receiptNumber',
+  notes: 'notes'
+};
+
+exports.Prisma.JobWorkReceiptItemOrderByRelevanceFieldEnum = {
+  returnCondition: 'returnCondition',
+  remarks: 'remarks'
+};
+
+exports.Prisma.JobWorkReconciliationOrderByRelevanceFieldEnum = {
+  status: 'status',
+  resolutionNotes: 'resolutionNotes'
+};
+
 
 exports.Prisma.ModelName = {
   Admin: 'Admin',
@@ -548,7 +696,14 @@ exports.Prisma.ModelName = {
   LeaveType: 'LeaveType',
   LeaveBalance: 'LeaveBalance',
   LeaveRequest: 'LeaveRequest',
-  FingerprintEnrollment: 'FingerprintEnrollment'
+  FingerprintEnrollment: 'FingerprintEnrollment',
+  ExternalProcessor: 'ExternalProcessor',
+  JobWorkProcessType: 'JobWorkProcessType',
+  JobWorkOrder: 'JobWorkOrder',
+  JobWorkDispatch: 'JobWorkDispatch',
+  JobWorkReceipt: 'JobWorkReceipt',
+  JobWorkReceiptItem: 'JobWorkReceiptItem',
+  JobWorkReconciliation: 'JobWorkReconciliation'
 };
 
 /**

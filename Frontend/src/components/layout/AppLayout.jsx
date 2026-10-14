@@ -1,4 +1,6 @@
+
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import { useEffect, useRef, useState } from 'react';
 
 import {
@@ -22,6 +24,7 @@ import {
   PinOff,
   Gem,
   UserRound,
+  ClipboardList,
 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
@@ -33,7 +36,13 @@ import { useAuth } from '@/context/AuthContext';
 const adminNav = [
   {
     section: 'Overview',
-    items: [{ to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' }],
+    items: [
+      {
+        to: '/admin/dashboard',
+        icon: LayoutDashboard,
+        label: 'Dashboard',
+      },
+    ],
   },
   {
     section: 'Workforce',
@@ -65,12 +74,31 @@ const adminNav = [
     ],
   },
   {
+    section: 'Diamond Job Work',
+    items: [
+      {
+        to: '/admin/job-work/processors',
+        icon: Building2,
+        label: 'External Processors',
+      },
+      {
+        to: '/admin/job-work/process-types',
+        icon: ClipboardList,
+        label: 'Processing Types',
+      },
+    ],
+  },
+  {
     section: 'Insights',
-    items: [{ to: '/admin/reports', icon: FileBarChart, label: 'Reports' }],
+    items: [
+      { to: '/admin/reports', icon: FileBarChart, label: 'Reports' },
+    ],
   },
   {
     section: 'Account',
-    items: [{ to: '/admin/profile', icon: UserRound, label: 'Admin Profile' }],
+    items: [
+      { to: '/admin/profile', icon: UserRound, label: 'Admin Profile' },
+    ],
   },
 ];
 
@@ -106,12 +134,16 @@ const employeeNav = [
 // ============================================================
 
 const ROW_HEIGHT = 44; // px - change this if your rows should be taller/shorter
+
 const LABEL_MAX_WIDTH = 160; // px - how wide a label may grow before truncating
+
 const LEAVE_DELAY = 250; // ms grace period before auto-collapsing on mouse-out
+
 const PIN_KEY = 'diamond-erp:sidebar-pinned';
 
 function readStoredPin() {
   if (typeof window === 'undefined') return false;
+
   try {
     return window.localStorage.getItem(PIN_KEY) === 'true';
   } catch {
@@ -144,7 +176,10 @@ function SidebarContent({
   const labelClass = `whitespace-nowrap overflow-hidden transition-all duration-200 ${
     showLabels ? 'opacity-100' : 'opacity-0'
   }`;
-  const labelStyle = { maxWidth: showLabels ? LABEL_MAX_WIDTH : 0 };
+
+  const labelStyle = {
+    maxWidth: showLabels ? LABEL_MAX_WIDTH : 0,
+  };
 
   return (
     <div className="flex flex-col h-full w-full bg-navy-900 overflow-hidden">
@@ -160,8 +195,13 @@ function SidebarContent({
         </div>
 
         <div className={labelClass} style={labelStyle}>
-          <h1 className="text-white font-bold text-sm leading-tight">Diamond ERP</h1>
-          <p className="text-navy-300 text-xs">{adminMode ? 'Admin Panel' : 'Employee Portal'}</p>
+          <h1 className="text-white font-bold text-sm leading-tight">
+            Diamond ERP
+          </h1>
+
+          <p className="text-navy-300 text-xs">
+            {adminMode ? 'Admin Panel' : 'Employee Portal'}
+          </p>
         </div>
 
         {showPinControl && showLabels && (
@@ -213,6 +253,7 @@ function SidebarContent({
                     } ${showLabels ? 'justify-start gap-3' : 'justify-center gap-0'}`}
                   >
                     <item.icon size={18} className="shrink-0" />
+
                     <span className={labelClass} style={labelStyle}>
                       {item.label}
                     </span>
@@ -228,7 +269,10 @@ function SidebarContent({
           USER + LOGOUT
       ================================================== */}
       <div className="border-t border-navy-800 p-3 shrink-0">
-        <div className="flex items-center gap-3" style={{ height: ROW_HEIGHT }}>
+        <div
+          className="flex items-center gap-3"
+          style={{ height: ROW_HEIGHT }}
+        >
           <div className="w-9 h-9 rounded-full bg-navy-700 flex items-center justify-center shrink-0">
             <span className="text-sm font-semibold text-white">
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -236,8 +280,13 @@ function SidebarContent({
           </div>
 
           <div className={`flex-1 ${labelClass}`} style={labelStyle}>
-            <p className="text-sm font-medium text-white truncate">{user?.name || 'User'}</p>
-            <p className="text-xs text-navy-400 truncate">{user?.email}</p>
+            <p className="text-sm font-medium text-white truncate">
+              {user?.name || 'User'}
+            </p>
+
+            <p className="text-xs text-navy-400 truncate">
+              {user?.email}
+            </p>
           </div>
         </div>
 
@@ -251,6 +300,7 @@ function SidebarContent({
           }`}
         >
           <LogOut size={18} className="shrink-0" />
+
           <span className={labelClass} style={labelStyle}>
             Sign Out
           </span>
@@ -266,13 +316,16 @@ function SidebarContent({
 
 export function AppLayout({ children, adminMode = false }) {
   const { user, logout } = useAuth();
+
   const location = useLocation();
+
   const navigate = useNavigate();
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Pinned = user explicitly locked the labels open.
   const [pinned, setPinned] = useState(readStoredPin);
+
   // Hovered = mouse (or keyboard focus) is currently on the rail/panel.
   const [hovered, setHovered] = useState(false);
 
@@ -288,13 +341,15 @@ export function AppLayout({ children, adminMode = false }) {
     try {
       window.localStorage.setItem(PIN_KEY, String(pinned));
     } catch {
-      // localStorage can be unavailable (private browsing, etc) - safe to ignore
+      // localStorage can be unavailable (private browsing, etc.) - safe to ignore.
     }
   }, [pinned]);
 
   useEffect(
     () => () => {
-      if (leaveTimer.current) clearTimeout(leaveTimer.current);
+      if (leaveTimer.current) {
+        clearTimeout(leaveTimer.current);
+      }
     },
     []
   );
@@ -304,14 +359,18 @@ export function AppLayout({ children, adminMode = false }) {
       clearTimeout(leaveTimer.current);
       leaveTimer.current = null;
     }
+
     setHovered(true);
   };
 
   const handleMouseLeave = () => {
-    leaveTimer.current = setTimeout(() => setHovered(false), LEAVE_DELAY);
+    leaveTimer.current = setTimeout(
+      () => setHovered(false),
+      LEAVE_DELAY
+    );
   };
 
-  const togglePin = () => setPinned((prev) => !prev);
+  const togglePin = () => setPinned((previous) => !previous);
 
   // ==========================================================
   // LOGOUT
@@ -400,7 +459,12 @@ export function AppLayout({ children, adminMode = false }) {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* MOBILE HEADER */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-navy-100">
-          <button type="button" onClick={() => setMobileOpen(true)} className="text-navy-600">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open navigation menu"
+            className="text-navy-600"
+          >
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
@@ -408,7 +472,10 @@ export function AppLayout({ children, adminMode = false }) {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center">
               <Gem size={14} className="text-white" />
             </div>
-            <span className="font-semibold text-navy-900 text-sm">Diamond ERP</span>
+
+            <span className="font-semibold text-navy-900 text-sm">
+              Diamond ERP
+            </span>
           </div>
 
           <div className="w-9 h-9 rounded-full bg-navy-700 flex items-center justify-center">
@@ -420,7 +487,9 @@ export function AppLayout({ children, adminMode = false }) {
 
         {/* PAGE CONTENT */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">{children}</div>
+          <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto animate-fade-in">
+            {children}
+          </div>
         </main>
       </div>
     </div>

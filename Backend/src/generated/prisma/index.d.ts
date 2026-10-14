@@ -118,6 +118,41 @@ export type LeaveRequest = $Result.DefaultSelection<Prisma.$LeaveRequestPayload>
  * 
  */
 export type FingerprintEnrollment = $Result.DefaultSelection<Prisma.$FingerprintEnrollmentPayload>
+/**
+ * Model ExternalProcessor
+ * 
+ */
+export type ExternalProcessor = $Result.DefaultSelection<Prisma.$ExternalProcessorPayload>
+/**
+ * Model JobWorkProcessType
+ * 
+ */
+export type JobWorkProcessType = $Result.DefaultSelection<Prisma.$JobWorkProcessTypePayload>
+/**
+ * Model JobWorkOrder
+ * 
+ */
+export type JobWorkOrder = $Result.DefaultSelection<Prisma.$JobWorkOrderPayload>
+/**
+ * Model JobWorkDispatch
+ * 
+ */
+export type JobWorkDispatch = $Result.DefaultSelection<Prisma.$JobWorkDispatchPayload>
+/**
+ * Model JobWorkReceipt
+ * 
+ */
+export type JobWorkReceipt = $Result.DefaultSelection<Prisma.$JobWorkReceiptPayload>
+/**
+ * Model JobWorkReceiptItem
+ * 
+ */
+export type JobWorkReceiptItem = $Result.DefaultSelection<Prisma.$JobWorkReceiptItemPayload>
+/**
+ * Model JobWorkReconciliation
+ * 
+ */
+export type JobWorkReconciliation = $Result.DefaultSelection<Prisma.$JobWorkReconciliationPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -449,6 +484,76 @@ export class PrismaClient<
     * ```
     */
   get fingerprintEnrollment(): Prisma.FingerprintEnrollmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.externalProcessor`: Exposes CRUD operations for the **ExternalProcessor** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExternalProcessors
+    * const externalProcessors = await prisma.externalProcessor.findMany()
+    * ```
+    */
+  get externalProcessor(): Prisma.ExternalProcessorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkProcessType`: Exposes CRUD operations for the **JobWorkProcessType** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkProcessTypes
+    * const jobWorkProcessTypes = await prisma.jobWorkProcessType.findMany()
+    * ```
+    */
+  get jobWorkProcessType(): Prisma.JobWorkProcessTypeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkOrder`: Exposes CRUD operations for the **JobWorkOrder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkOrders
+    * const jobWorkOrders = await prisma.jobWorkOrder.findMany()
+    * ```
+    */
+  get jobWorkOrder(): Prisma.JobWorkOrderDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkDispatch`: Exposes CRUD operations for the **JobWorkDispatch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkDispatches
+    * const jobWorkDispatches = await prisma.jobWorkDispatch.findMany()
+    * ```
+    */
+  get jobWorkDispatch(): Prisma.JobWorkDispatchDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkReceipt`: Exposes CRUD operations for the **JobWorkReceipt** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkReceipts
+    * const jobWorkReceipts = await prisma.jobWorkReceipt.findMany()
+    * ```
+    */
+  get jobWorkReceipt(): Prisma.JobWorkReceiptDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkReceiptItem`: Exposes CRUD operations for the **JobWorkReceiptItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkReceiptItems
+    * const jobWorkReceiptItems = await prisma.jobWorkReceiptItem.findMany()
+    * ```
+    */
+  get jobWorkReceiptItem(): Prisma.JobWorkReceiptItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkReconciliation`: Exposes CRUD operations for the **JobWorkReconciliation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkReconciliations
+    * const jobWorkReconciliations = await prisma.jobWorkReconciliation.findMany()
+    * ```
+    */
+  get jobWorkReconciliation(): Prisma.JobWorkReconciliationDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -916,7 +1021,14 @@ export namespace Prisma {
     LeaveType: 'LeaveType',
     LeaveBalance: 'LeaveBalance',
     LeaveRequest: 'LeaveRequest',
-    FingerprintEnrollment: 'FingerprintEnrollment'
+    FingerprintEnrollment: 'FingerprintEnrollment',
+    ExternalProcessor: 'ExternalProcessor',
+    JobWorkProcessType: 'JobWorkProcessType',
+    JobWorkOrder: 'JobWorkOrder',
+    JobWorkDispatch: 'JobWorkDispatch',
+    JobWorkReceipt: 'JobWorkReceipt',
+    JobWorkReceiptItem: 'JobWorkReceiptItem',
+    JobWorkReconciliation: 'JobWorkReconciliation'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -932,7 +1044,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "publicHoliday" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment"
+      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "publicHoliday" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment" | "externalProcessor" | "jobWorkProcessType" | "jobWorkOrder" | "jobWorkDispatch" | "jobWorkReceipt" | "jobWorkReceiptItem" | "jobWorkReconciliation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2322,6 +2434,468 @@ export namespace Prisma {
           }
         }
       }
+      ExternalProcessor: {
+        payload: Prisma.$ExternalProcessorPayload<ExtArgs>
+        fields: Prisma.ExternalProcessorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExternalProcessorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExternalProcessorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          findFirst: {
+            args: Prisma.ExternalProcessorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExternalProcessorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          findMany: {
+            args: Prisma.ExternalProcessorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>[]
+          }
+          create: {
+            args: Prisma.ExternalProcessorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          createMany: {
+            args: Prisma.ExternalProcessorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ExternalProcessorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          update: {
+            args: Prisma.ExternalProcessorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          deleteMany: {
+            args: Prisma.ExternalProcessorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExternalProcessorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ExternalProcessorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExternalProcessorPayload>
+          }
+          aggregate: {
+            args: Prisma.ExternalProcessorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExternalProcessor>
+          }
+          groupBy: {
+            args: Prisma.ExternalProcessorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExternalProcessorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExternalProcessorCountArgs<ExtArgs>
+            result: $Utils.Optional<ExternalProcessorCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkProcessType: {
+        payload: Prisma.$JobWorkProcessTypePayload<ExtArgs>
+        fields: Prisma.JobWorkProcessTypeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkProcessTypeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkProcessTypeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkProcessTypeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkProcessTypeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkProcessTypeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkProcessTypeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkProcessTypeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkProcessTypeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          update: {
+            args: Prisma.JobWorkProcessTypeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkProcessTypeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkProcessTypeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkProcessTypeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkProcessTypePayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkProcessTypeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkProcessType>
+          }
+          groupBy: {
+            args: Prisma.JobWorkProcessTypeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkProcessTypeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkProcessTypeCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkProcessTypeCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkOrder: {
+        payload: Prisma.$JobWorkOrderPayload<ExtArgs>
+        fields: Prisma.JobWorkOrderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkOrderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkOrderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkOrderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkOrderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkOrderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkOrderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkOrderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkOrderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          update: {
+            args: Prisma.JobWorkOrderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkOrderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkOrderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkOrderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkOrderPayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkOrderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkOrder>
+          }
+          groupBy: {
+            args: Prisma.JobWorkOrderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkOrderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkOrderCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkOrderCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkDispatch: {
+        payload: Prisma.$JobWorkDispatchPayload<ExtArgs>
+        fields: Prisma.JobWorkDispatchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkDispatchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkDispatchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkDispatchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkDispatchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkDispatchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkDispatchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkDispatchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkDispatchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          update: {
+            args: Prisma.JobWorkDispatchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkDispatchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkDispatchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkDispatchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkDispatchPayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkDispatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkDispatch>
+          }
+          groupBy: {
+            args: Prisma.JobWorkDispatchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkDispatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkDispatchCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkDispatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkReceipt: {
+        payload: Prisma.$JobWorkReceiptPayload<ExtArgs>
+        fields: Prisma.JobWorkReceiptFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkReceiptFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkReceiptFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkReceiptFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkReceiptFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkReceiptFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkReceiptCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkReceiptCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkReceiptDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          update: {
+            args: Prisma.JobWorkReceiptUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkReceiptDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkReceiptUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkReceiptUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptPayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkReceiptAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkReceipt>
+          }
+          groupBy: {
+            args: Prisma.JobWorkReceiptGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReceiptGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkReceiptCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReceiptCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkReceiptItem: {
+        payload: Prisma.$JobWorkReceiptItemPayload<ExtArgs>
+        fields: Prisma.JobWorkReceiptItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkReceiptItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkReceiptItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkReceiptItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkReceiptItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkReceiptItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkReceiptItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkReceiptItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkReceiptItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          update: {
+            args: Prisma.JobWorkReceiptItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkReceiptItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkReceiptItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkReceiptItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReceiptItemPayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkReceiptItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkReceiptItem>
+          }
+          groupBy: {
+            args: Prisma.JobWorkReceiptItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReceiptItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkReceiptItemCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReceiptItemCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobWorkReconciliation: {
+        payload: Prisma.$JobWorkReconciliationPayload<ExtArgs>
+        fields: Prisma.JobWorkReconciliationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkReconciliationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkReconciliationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkReconciliationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkReconciliationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkReconciliationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkReconciliationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkReconciliationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkReconciliationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          update: {
+            args: Prisma.JobWorkReconciliationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkReconciliationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkReconciliationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkReconciliationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkReconciliationPayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkReconciliationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkReconciliation>
+          }
+          groupBy: {
+            args: Prisma.JobWorkReconciliationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReconciliationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkReconciliationCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkReconciliationCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2466,6 +3040,13 @@ export namespace Prisma {
     leaveBalance?: LeaveBalanceOmit
     leaveRequest?: LeaveRequestOmit
     fingerprintEnrollment?: FingerprintEnrollmentOmit
+    externalProcessor?: ExternalProcessorOmit
+    jobWorkProcessType?: JobWorkProcessTypeOmit
+    jobWorkOrder?: JobWorkOrderOmit
+    jobWorkDispatch?: JobWorkDispatchOmit
+    jobWorkReceipt?: JobWorkReceiptOmit
+    jobWorkReceiptItem?: JobWorkReceiptItemOmit
+    jobWorkReconciliation?: JobWorkReconciliationOmit
   }
 
   /* Types for Logging */
@@ -2548,11 +3129,19 @@ export namespace Prisma {
   export type AdminCountOutputType = {
     approvedAdvances: number
     attendanceOverrides: number
+    jobWorkOrdersCreated: number
+    jobWorkDispatchesCreated: number
+    jobWorkReceiptsRecorded: number
+    jobWorkReconciliationsReviewed: number
   }
 
   export type AdminCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     approvedAdvances?: boolean | AdminCountOutputTypeCountApprovedAdvancesArgs
     attendanceOverrides?: boolean | AdminCountOutputTypeCountAttendanceOverridesArgs
+    jobWorkOrdersCreated?: boolean | AdminCountOutputTypeCountJobWorkOrdersCreatedArgs
+    jobWorkDispatchesCreated?: boolean | AdminCountOutputTypeCountJobWorkDispatchesCreatedArgs
+    jobWorkReceiptsRecorded?: boolean | AdminCountOutputTypeCountJobWorkReceiptsRecordedArgs
+    jobWorkReconciliationsReviewed?: boolean | AdminCountOutputTypeCountJobWorkReconciliationsReviewedArgs
   }
 
   // Custom InputTypes
@@ -2580,6 +3169,34 @@ export namespace Prisma {
     where?: AttendanceWhereInput
   }
 
+  /**
+   * AdminCountOutputType without action
+   */
+  export type AdminCountOutputTypeCountJobWorkOrdersCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+  }
+
+  /**
+   * AdminCountOutputType without action
+   */
+  export type AdminCountOutputTypeCountJobWorkDispatchesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkDispatchWhereInput
+  }
+
+  /**
+   * AdminCountOutputType without action
+   */
+  export type AdminCountOutputTypeCountJobWorkReceiptsRecordedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReceiptWhereInput
+  }
+
+  /**
+   * AdminCountOutputType without action
+   */
+  export type AdminCountOutputTypeCountJobWorkReconciliationsReviewedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReconciliationWhereInput
+  }
+
 
   /**
    * Count Type BranchCountOutputType
@@ -2590,6 +3207,7 @@ export namespace Prisma {
     employees: number
     devices: number
     publicHolidays: number
+    jobWorkOrders: number
   }
 
   export type BranchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2597,6 +3215,7 @@ export namespace Prisma {
     employees?: boolean | BranchCountOutputTypeCountEmployeesArgs
     devices?: boolean | BranchCountOutputTypeCountDevicesArgs
     publicHolidays?: boolean | BranchCountOutputTypeCountPublicHolidaysArgs
+    jobWorkOrders?: boolean | BranchCountOutputTypeCountJobWorkOrdersArgs
   }
 
   // Custom InputTypes
@@ -2636,6 +3255,13 @@ export namespace Prisma {
    */
   export type BranchCountOutputTypeCountPublicHolidaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PublicHolidayWhereInput
+  }
+
+  /**
+   * BranchCountOutputType without action
+   */
+  export type BranchCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
   }
 
 
@@ -2933,6 +3559,9 @@ export namespace Prisma {
     leaveTypes: number
     settings: number
     publicHolidays: number
+    externalProcessors: number
+    jobWorkProcessTypes: number
+    jobWorkOrders: number
   }
 
   export type CompaniesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2944,6 +3573,9 @@ export namespace Prisma {
     leaveTypes?: boolean | CompaniesCountOutputTypeCountLeaveTypesArgs
     settings?: boolean | CompaniesCountOutputTypeCountSettingsArgs
     publicHolidays?: boolean | CompaniesCountOutputTypeCountPublicHolidaysArgs
+    externalProcessors?: boolean | CompaniesCountOutputTypeCountExternalProcessorsArgs
+    jobWorkProcessTypes?: boolean | CompaniesCountOutputTypeCountJobWorkProcessTypesArgs
+    jobWorkOrders?: boolean | CompaniesCountOutputTypeCountJobWorkOrdersArgs
   }
 
   // Custom InputTypes
@@ -3013,6 +3645,27 @@ export namespace Prisma {
     where?: PublicHolidayWhereInput
   }
 
+  /**
+   * CompaniesCountOutputType without action
+   */
+  export type CompaniesCountOutputTypeCountExternalProcessorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExternalProcessorWhereInput
+  }
+
+  /**
+   * CompaniesCountOutputType without action
+   */
+  export type CompaniesCountOutputTypeCountJobWorkProcessTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkProcessTypeWhereInput
+  }
+
+  /**
+   * CompaniesCountOutputType without action
+   */
+  export type CompaniesCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+  }
+
 
   /**
    * Count Type LeaveTypeCountOutputType
@@ -3051,6 +3704,170 @@ export namespace Prisma {
    */
   export type LeaveTypeCountOutputTypeCountRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LeaveRequestWhereInput
+  }
+
+
+  /**
+   * Count Type ExternalProcessorCountOutputType
+   */
+
+  export type ExternalProcessorCountOutputType = {
+    jobWorkOrders: number
+  }
+
+  export type ExternalProcessorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    jobWorkOrders?: boolean | ExternalProcessorCountOutputTypeCountJobWorkOrdersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ExternalProcessorCountOutputType without action
+   */
+  export type ExternalProcessorCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessorCountOutputType
+     */
+    select?: ExternalProcessorCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ExternalProcessorCountOutputType without action
+   */
+  export type ExternalProcessorCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+  }
+
+
+  /**
+   * Count Type JobWorkProcessTypeCountOutputType
+   */
+
+  export type JobWorkProcessTypeCountOutputType = {
+    jobWorkOrders: number
+  }
+
+  export type JobWorkProcessTypeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    jobWorkOrders?: boolean | JobWorkProcessTypeCountOutputTypeCountJobWorkOrdersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobWorkProcessTypeCountOutputType without action
+   */
+  export type JobWorkProcessTypeCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessTypeCountOutputType
+     */
+    select?: JobWorkProcessTypeCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobWorkProcessTypeCountOutputType without action
+   */
+  export type JobWorkProcessTypeCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+  }
+
+
+  /**
+   * Count Type JobWorkOrderCountOutputType
+   */
+
+  export type JobWorkOrderCountOutputType = {
+    dispatches: number
+    reconciliations: number
+  }
+
+  export type JobWorkOrderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    dispatches?: boolean | JobWorkOrderCountOutputTypeCountDispatchesArgs
+    reconciliations?: boolean | JobWorkOrderCountOutputTypeCountReconciliationsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobWorkOrderCountOutputType without action
+   */
+  export type JobWorkOrderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrderCountOutputType
+     */
+    select?: JobWorkOrderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobWorkOrderCountOutputType without action
+   */
+  export type JobWorkOrderCountOutputTypeCountDispatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkDispatchWhereInput
+  }
+
+  /**
+   * JobWorkOrderCountOutputType without action
+   */
+  export type JobWorkOrderCountOutputTypeCountReconciliationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReconciliationWhereInput
+  }
+
+
+  /**
+   * Count Type JobWorkDispatchCountOutputType
+   */
+
+  export type JobWorkDispatchCountOutputType = {
+    receipts: number
+  }
+
+  export type JobWorkDispatchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receipts?: boolean | JobWorkDispatchCountOutputTypeCountReceiptsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobWorkDispatchCountOutputType without action
+   */
+  export type JobWorkDispatchCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatchCountOutputType
+     */
+    select?: JobWorkDispatchCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobWorkDispatchCountOutputType without action
+   */
+  export type JobWorkDispatchCountOutputTypeCountReceiptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReceiptWhereInput
+  }
+
+
+  /**
+   * Count Type JobWorkReceiptCountOutputType
+   */
+
+  export type JobWorkReceiptCountOutputType = {
+    items: number
+  }
+
+  export type JobWorkReceiptCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | JobWorkReceiptCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobWorkReceiptCountOutputType without action
+   */
+  export type JobWorkReceiptCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptCountOutputType
+     */
+    select?: JobWorkReceiptCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobWorkReceiptCountOutputType without action
+   */
+  export type JobWorkReceiptCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReceiptItemWhereInput
   }
 
 
@@ -3287,6 +4104,10 @@ export namespace Prisma {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     approvedAdvances?: boolean | Admin$approvedAdvancesArgs<ExtArgs>
     attendanceOverrides?: boolean | Admin$attendanceOverridesArgs<ExtArgs>
+    jobWorkOrdersCreated?: boolean | Admin$jobWorkOrdersCreatedArgs<ExtArgs>
+    jobWorkDispatchesCreated?: boolean | Admin$jobWorkDispatchesCreatedArgs<ExtArgs>
+    jobWorkReceiptsRecorded?: boolean | Admin$jobWorkReceiptsRecordedArgs<ExtArgs>
+    jobWorkReconciliationsReviewed?: boolean | Admin$jobWorkReconciliationsReviewedArgs<ExtArgs>
     _count?: boolean | AdminCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["admin"]>
 
@@ -3308,6 +4129,10 @@ export namespace Prisma {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     approvedAdvances?: boolean | Admin$approvedAdvancesArgs<ExtArgs>
     attendanceOverrides?: boolean | Admin$attendanceOverridesArgs<ExtArgs>
+    jobWorkOrdersCreated?: boolean | Admin$jobWorkOrdersCreatedArgs<ExtArgs>
+    jobWorkDispatchesCreated?: boolean | Admin$jobWorkDispatchesCreatedArgs<ExtArgs>
+    jobWorkReceiptsRecorded?: boolean | Admin$jobWorkReceiptsRecordedArgs<ExtArgs>
+    jobWorkReconciliationsReviewed?: boolean | Admin$jobWorkReconciliationsReviewedArgs<ExtArgs>
     _count?: boolean | AdminCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3317,6 +4142,10 @@ export namespace Prisma {
       company: Prisma.$companiesPayload<ExtArgs>
       approvedAdvances: Prisma.$AdvancePaymentPayload<ExtArgs>[]
       attendanceOverrides: Prisma.$AttendancePayload<ExtArgs>[]
+      jobWorkOrdersCreated: Prisma.$JobWorkOrderPayload<ExtArgs>[]
+      jobWorkDispatchesCreated: Prisma.$JobWorkDispatchPayload<ExtArgs>[]
+      jobWorkReceiptsRecorded: Prisma.$JobWorkReceiptPayload<ExtArgs>[]
+      jobWorkReconciliationsReviewed: Prisma.$JobWorkReconciliationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       adminId: number
@@ -3670,6 +4499,10 @@ export namespace Prisma {
     company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     approvedAdvances<T extends Admin$approvedAdvancesArgs<ExtArgs> = {}>(args?: Subset<T, Admin$approvedAdvancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdvancePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attendanceOverrides<T extends Admin$attendanceOverridesArgs<ExtArgs> = {}>(args?: Subset<T, Admin$attendanceOverridesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkOrdersCreated<T extends Admin$jobWorkOrdersCreatedArgs<ExtArgs> = {}>(args?: Subset<T, Admin$jobWorkOrdersCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkDispatchesCreated<T extends Admin$jobWorkDispatchesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, Admin$jobWorkDispatchesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkReceiptsRecorded<T extends Admin$jobWorkReceiptsRecordedArgs<ExtArgs> = {}>(args?: Subset<T, Admin$jobWorkReceiptsRecordedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkReconciliationsReviewed<T extends Admin$jobWorkReconciliationsReviewedArgs<ExtArgs> = {}>(args?: Subset<T, Admin$jobWorkReconciliationsReviewedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4103,6 +4936,102 @@ export namespace Prisma {
   }
 
   /**
+   * Admin.jobWorkOrdersCreated
+   */
+  export type Admin$jobWorkOrdersCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * Admin.jobWorkDispatchesCreated
+   */
+  export type Admin$jobWorkDispatchesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    where?: JobWorkDispatchWhereInput
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    cursor?: JobWorkDispatchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkDispatchScalarFieldEnum | JobWorkDispatchScalarFieldEnum[]
+  }
+
+  /**
+   * Admin.jobWorkReceiptsRecorded
+   */
+  export type Admin$jobWorkReceiptsRecordedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    where?: JobWorkReceiptWhereInput
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    cursor?: JobWorkReceiptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkReceiptScalarFieldEnum | JobWorkReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * Admin.jobWorkReconciliationsReviewed
+   */
+  export type Admin$jobWorkReconciliationsReviewedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    where?: JobWorkReconciliationWhereInput
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkReconciliationScalarFieldEnum | JobWorkReconciliationScalarFieldEnum[]
+  }
+
+  /**
    * Admin without action
    */
   export type AdminDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4336,6 +5265,7 @@ export namespace Prisma {
     employees?: boolean | Branch$employeesArgs<ExtArgs>
     devices?: boolean | Branch$devicesArgs<ExtArgs>
     publicHolidays?: boolean | Branch$publicHolidaysArgs<ExtArgs>
+    jobWorkOrders?: boolean | Branch$jobWorkOrdersArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["branch"]>
 
@@ -4357,6 +5287,7 @@ export namespace Prisma {
     employees?: boolean | Branch$employeesArgs<ExtArgs>
     devices?: boolean | Branch$devicesArgs<ExtArgs>
     publicHolidays?: boolean | Branch$publicHolidaysArgs<ExtArgs>
+    jobWorkOrders?: boolean | Branch$jobWorkOrdersArgs<ExtArgs>
     _count?: boolean | BranchCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -4368,6 +5299,7 @@ export namespace Prisma {
       employees: Prisma.$EmployeePayload<ExtArgs>[]
       devices: Prisma.$IotDevicePayload<ExtArgs>[]
       publicHolidays: Prisma.$PublicHolidayPayload<ExtArgs>[]
+      jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       branchId: number
@@ -4721,6 +5653,7 @@ export namespace Prisma {
     employees<T extends Branch$employeesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     devices<T extends Branch$devicesArgs<ExtArgs> = {}>(args?: Subset<T, Branch$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IotDevicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     publicHolidays<T extends Branch$publicHolidaysArgs<ExtArgs> = {}>(args?: Subset<T, Branch$publicHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkOrders<T extends Branch$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Branch$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5197,6 +6130,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * Branch.jobWorkOrders
+   */
+  export type Branch$jobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
   }
 
   /**
@@ -20884,6 +21841,9 @@ export namespace Prisma {
     leaveTypes?: boolean | companies$leaveTypesArgs<ExtArgs>
     settings?: boolean | companies$settingsArgs<ExtArgs>
     publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
+    externalProcessors?: boolean | companies$externalProcessorsArgs<ExtArgs>
+    jobWorkProcessTypes?: boolean | companies$jobWorkProcessTypesArgs<ExtArgs>
+    jobWorkOrders?: boolean | companies$jobWorkOrdersArgs<ExtArgs>
     _count?: boolean | CompaniesCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["companies"]>
 
@@ -20909,6 +21869,9 @@ export namespace Prisma {
     leaveTypes?: boolean | companies$leaveTypesArgs<ExtArgs>
     settings?: boolean | companies$settingsArgs<ExtArgs>
     publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
+    externalProcessors?: boolean | companies$externalProcessorsArgs<ExtArgs>
+    jobWorkProcessTypes?: boolean | companies$jobWorkProcessTypesArgs<ExtArgs>
+    jobWorkOrders?: boolean | companies$jobWorkOrdersArgs<ExtArgs>
     _count?: boolean | CompaniesCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -20923,6 +21886,9 @@ export namespace Prisma {
       leaveTypes: Prisma.$LeaveTypePayload<ExtArgs>[]
       settings: Prisma.$SettingPayload<ExtArgs>[]
       publicHolidays: Prisma.$PublicHolidayPayload<ExtArgs>[]
+      externalProcessors: Prisma.$ExternalProcessorPayload<ExtArgs>[]
+      jobWorkProcessTypes: Prisma.$JobWorkProcessTypePayload<ExtArgs>[]
+      jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       company_id: number
@@ -21280,6 +22246,9 @@ export namespace Prisma {
     leaveTypes<T extends companies$leaveTypesArgs<ExtArgs> = {}>(args?: Subset<T, companies$leaveTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LeaveTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     settings<T extends companies$settingsArgs<ExtArgs> = {}>(args?: Subset<T, companies$settingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     publicHolidays<T extends companies$publicHolidaysArgs<ExtArgs> = {}>(args?: Subset<T, companies$publicHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    externalProcessors<T extends companies$externalProcessorsArgs<ExtArgs> = {}>(args?: Subset<T, companies$externalProcessorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkProcessTypes<T extends companies$jobWorkProcessTypesArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkProcessTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkOrders<T extends companies$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21853,6 +22822,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PublicHolidayScalarFieldEnum | PublicHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * companies.externalProcessors
+   */
+  export type companies$externalProcessorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    where?: ExternalProcessorWhereInput
+    orderBy?: ExternalProcessorOrderByWithRelationInput | ExternalProcessorOrderByWithRelationInput[]
+    cursor?: ExternalProcessorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExternalProcessorScalarFieldEnum | ExternalProcessorScalarFieldEnum[]
+  }
+
+  /**
+   * companies.jobWorkProcessTypes
+   */
+  export type companies$jobWorkProcessTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    where?: JobWorkProcessTypeWhereInput
+    orderBy?: JobWorkProcessTypeOrderByWithRelationInput | JobWorkProcessTypeOrderByWithRelationInput[]
+    cursor?: JobWorkProcessTypeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkProcessTypeScalarFieldEnum | JobWorkProcessTypeScalarFieldEnum[]
+  }
+
+  /**
+   * companies.jobWorkOrders
+   */
+  export type companies$jobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
   }
 
   /**
@@ -26196,6 +27237,7633 @@ export namespace Prisma {
 
 
   /**
+   * Model ExternalProcessor
+   */
+
+  export type AggregateExternalProcessor = {
+    _count: ExternalProcessorCountAggregateOutputType | null
+    _avg: ExternalProcessorAvgAggregateOutputType | null
+    _sum: ExternalProcessorSumAggregateOutputType | null
+    _min: ExternalProcessorMinAggregateOutputType | null
+    _max: ExternalProcessorMaxAggregateOutputType | null
+  }
+
+  export type ExternalProcessorAvgAggregateOutputType = {
+    externalProcessorId: number | null
+    companyId: number | null
+  }
+
+  export type ExternalProcessorSumAggregateOutputType = {
+    externalProcessorId: number | null
+    companyId: number | null
+  }
+
+  export type ExternalProcessorMinAggregateOutputType = {
+    externalProcessorId: number | null
+    companyId: number | null
+    processorCode: string | null
+    name: string | null
+    contactPerson: string | null
+    phone: string | null
+    email: string | null
+    address: string | null
+    gstin: string | null
+    pan: string | null
+    paymentTerms: string | null
+    notes: string | null
+    status: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalProcessorMaxAggregateOutputType = {
+    externalProcessorId: number | null
+    companyId: number | null
+    processorCode: string | null
+    name: string | null
+    contactPerson: string | null
+    phone: string | null
+    email: string | null
+    address: string | null
+    gstin: string | null
+    pan: string | null
+    paymentTerms: string | null
+    notes: string | null
+    status: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExternalProcessorCountAggregateOutputType = {
+    externalProcessorId: number
+    companyId: number
+    processorCode: number
+    name: number
+    contactPerson: number
+    phone: number
+    email: number
+    address: number
+    gstin: number
+    pan: number
+    paymentTerms: number
+    notes: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExternalProcessorAvgAggregateInputType = {
+    externalProcessorId?: true
+    companyId?: true
+  }
+
+  export type ExternalProcessorSumAggregateInputType = {
+    externalProcessorId?: true
+    companyId?: true
+  }
+
+  export type ExternalProcessorMinAggregateInputType = {
+    externalProcessorId?: true
+    companyId?: true
+    processorCode?: true
+    name?: true
+    contactPerson?: true
+    phone?: true
+    email?: true
+    address?: true
+    gstin?: true
+    pan?: true
+    paymentTerms?: true
+    notes?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalProcessorMaxAggregateInputType = {
+    externalProcessorId?: true
+    companyId?: true
+    processorCode?: true
+    name?: true
+    contactPerson?: true
+    phone?: true
+    email?: true
+    address?: true
+    gstin?: true
+    pan?: true
+    paymentTerms?: true
+    notes?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExternalProcessorCountAggregateInputType = {
+    externalProcessorId?: true
+    companyId?: true
+    processorCode?: true
+    name?: true
+    contactPerson?: true
+    phone?: true
+    email?: true
+    address?: true
+    gstin?: true
+    pan?: true
+    paymentTerms?: true
+    notes?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExternalProcessorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalProcessor to aggregate.
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalProcessors to fetch.
+     */
+    orderBy?: ExternalProcessorOrderByWithRelationInput | ExternalProcessorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExternalProcessorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalProcessors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalProcessors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExternalProcessors
+    **/
+    _count?: true | ExternalProcessorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ExternalProcessorAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ExternalProcessorSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExternalProcessorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExternalProcessorMaxAggregateInputType
+  }
+
+  export type GetExternalProcessorAggregateType<T extends ExternalProcessorAggregateArgs> = {
+        [P in keyof T & keyof AggregateExternalProcessor]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExternalProcessor[P]>
+      : GetScalarType<T[P], AggregateExternalProcessor[P]>
+  }
+
+
+
+
+  export type ExternalProcessorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExternalProcessorWhereInput
+    orderBy?: ExternalProcessorOrderByWithAggregationInput | ExternalProcessorOrderByWithAggregationInput[]
+    by: ExternalProcessorScalarFieldEnum[] | ExternalProcessorScalarFieldEnum
+    having?: ExternalProcessorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExternalProcessorCountAggregateInputType | true
+    _avg?: ExternalProcessorAvgAggregateInputType
+    _sum?: ExternalProcessorSumAggregateInputType
+    _min?: ExternalProcessorMinAggregateInputType
+    _max?: ExternalProcessorMaxAggregateInputType
+  }
+
+  export type ExternalProcessorGroupByOutputType = {
+    externalProcessorId: number
+    companyId: number
+    processorCode: string
+    name: string
+    contactPerson: string | null
+    phone: string | null
+    email: string | null
+    address: string | null
+    gstin: string | null
+    pan: string | null
+    paymentTerms: string | null
+    notes: string | null
+    status: string
+    createdAt: Date
+    updatedAt: Date
+    _count: ExternalProcessorCountAggregateOutputType | null
+    _avg: ExternalProcessorAvgAggregateOutputType | null
+    _sum: ExternalProcessorSumAggregateOutputType | null
+    _min: ExternalProcessorMinAggregateOutputType | null
+    _max: ExternalProcessorMaxAggregateOutputType | null
+  }
+
+  type GetExternalProcessorGroupByPayload<T extends ExternalProcessorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExternalProcessorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExternalProcessorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExternalProcessorGroupByOutputType[P]>
+            : GetScalarType<T[P], ExternalProcessorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExternalProcessorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    externalProcessorId?: boolean
+    companyId?: boolean
+    processorCode?: boolean
+    name?: boolean
+    contactPerson?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    gstin?: boolean
+    pan?: boolean
+    paymentTerms?: boolean
+    notes?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | ExternalProcessor$jobWorkOrdersArgs<ExtArgs>
+    _count?: boolean | ExternalProcessorCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["externalProcessor"]>
+
+
+
+  export type ExternalProcessorSelectScalar = {
+    externalProcessorId?: boolean
+    companyId?: boolean
+    processorCode?: boolean
+    name?: boolean
+    contactPerson?: boolean
+    phone?: boolean
+    email?: boolean
+    address?: boolean
+    gstin?: boolean
+    pan?: boolean
+    paymentTerms?: boolean
+    notes?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExternalProcessorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"externalProcessorId" | "companyId" | "processorCode" | "name" | "contactPerson" | "phone" | "email" | "address" | "gstin" | "pan" | "paymentTerms" | "notes" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["externalProcessor"]>
+  export type ExternalProcessorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | ExternalProcessor$jobWorkOrdersArgs<ExtArgs>
+    _count?: boolean | ExternalProcessorCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ExternalProcessorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExternalProcessor"
+    objects: {
+      company: Prisma.$companiesPayload<ExtArgs>
+      jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      externalProcessorId: number
+      companyId: number
+      processorCode: string
+      name: string
+      contactPerson: string | null
+      phone: string | null
+      email: string | null
+      address: string | null
+      gstin: string | null
+      pan: string | null
+      paymentTerms: string | null
+      notes: string | null
+      status: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["externalProcessor"]>
+    composites: {}
+  }
+
+  type ExternalProcessorGetPayload<S extends boolean | null | undefined | ExternalProcessorDefaultArgs> = $Result.GetResult<Prisma.$ExternalProcessorPayload, S>
+
+  type ExternalProcessorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExternalProcessorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExternalProcessorCountAggregateInputType | true
+    }
+
+  export interface ExternalProcessorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExternalProcessor'], meta: { name: 'ExternalProcessor' } }
+    /**
+     * Find zero or one ExternalProcessor that matches the filter.
+     * @param {ExternalProcessorFindUniqueArgs} args - Arguments to find a ExternalProcessor
+     * @example
+     * // Get one ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExternalProcessorFindUniqueArgs>(args: SelectSubset<T, ExternalProcessorFindUniqueArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExternalProcessor that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExternalProcessorFindUniqueOrThrowArgs} args - Arguments to find a ExternalProcessor
+     * @example
+     * // Get one ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExternalProcessorFindUniqueOrThrowArgs>(args: SelectSubset<T, ExternalProcessorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalProcessor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorFindFirstArgs} args - Arguments to find a ExternalProcessor
+     * @example
+     * // Get one ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExternalProcessorFindFirstArgs>(args?: SelectSubset<T, ExternalProcessorFindFirstArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExternalProcessor that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorFindFirstOrThrowArgs} args - Arguments to find a ExternalProcessor
+     * @example
+     * // Get one ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExternalProcessorFindFirstOrThrowArgs>(args?: SelectSubset<T, ExternalProcessorFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExternalProcessors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExternalProcessors
+     * const externalProcessors = await prisma.externalProcessor.findMany()
+     * 
+     * // Get first 10 ExternalProcessors
+     * const externalProcessors = await prisma.externalProcessor.findMany({ take: 10 })
+     * 
+     * // Only select the `externalProcessorId`
+     * const externalProcessorWithExternalProcessorIdOnly = await prisma.externalProcessor.findMany({ select: { externalProcessorId: true } })
+     * 
+     */
+    findMany<T extends ExternalProcessorFindManyArgs>(args?: SelectSubset<T, ExternalProcessorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExternalProcessor.
+     * @param {ExternalProcessorCreateArgs} args - Arguments to create a ExternalProcessor.
+     * @example
+     * // Create one ExternalProcessor
+     * const ExternalProcessor = await prisma.externalProcessor.create({
+     *   data: {
+     *     // ... data to create a ExternalProcessor
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExternalProcessorCreateArgs>(args: SelectSubset<T, ExternalProcessorCreateArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExternalProcessors.
+     * @param {ExternalProcessorCreateManyArgs} args - Arguments to create many ExternalProcessors.
+     * @example
+     * // Create many ExternalProcessors
+     * const externalProcessor = await prisma.externalProcessor.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExternalProcessorCreateManyArgs>(args?: SelectSubset<T, ExternalProcessorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ExternalProcessor.
+     * @param {ExternalProcessorDeleteArgs} args - Arguments to delete one ExternalProcessor.
+     * @example
+     * // Delete one ExternalProcessor
+     * const ExternalProcessor = await prisma.externalProcessor.delete({
+     *   where: {
+     *     // ... filter to delete one ExternalProcessor
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExternalProcessorDeleteArgs>(args: SelectSubset<T, ExternalProcessorDeleteArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExternalProcessor.
+     * @param {ExternalProcessorUpdateArgs} args - Arguments to update one ExternalProcessor.
+     * @example
+     * // Update one ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExternalProcessorUpdateArgs>(args: SelectSubset<T, ExternalProcessorUpdateArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExternalProcessors.
+     * @param {ExternalProcessorDeleteManyArgs} args - Arguments to filter ExternalProcessors to delete.
+     * @example
+     * // Delete a few ExternalProcessors
+     * const { count } = await prisma.externalProcessor.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExternalProcessorDeleteManyArgs>(args?: SelectSubset<T, ExternalProcessorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExternalProcessors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExternalProcessors
+     * const externalProcessor = await prisma.externalProcessor.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExternalProcessorUpdateManyArgs>(args: SelectSubset<T, ExternalProcessorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ExternalProcessor.
+     * @param {ExternalProcessorUpsertArgs} args - Arguments to update or create a ExternalProcessor.
+     * @example
+     * // Update or create a ExternalProcessor
+     * const externalProcessor = await prisma.externalProcessor.upsert({
+     *   create: {
+     *     // ... data to create a ExternalProcessor
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExternalProcessor we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExternalProcessorUpsertArgs>(args: SelectSubset<T, ExternalProcessorUpsertArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExternalProcessors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorCountArgs} args - Arguments to filter ExternalProcessors to count.
+     * @example
+     * // Count the number of ExternalProcessors
+     * const count = await prisma.externalProcessor.count({
+     *   where: {
+     *     // ... the filter for the ExternalProcessors we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExternalProcessorCountArgs>(
+      args?: Subset<T, ExternalProcessorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExternalProcessorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExternalProcessor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExternalProcessorAggregateArgs>(args: Subset<T, ExternalProcessorAggregateArgs>): Prisma.PrismaPromise<GetExternalProcessorAggregateType<T>>
+
+    /**
+     * Group by ExternalProcessor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExternalProcessorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExternalProcessorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExternalProcessorGroupByArgs['orderBy'] }
+        : { orderBy?: ExternalProcessorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExternalProcessorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExternalProcessorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExternalProcessor model
+   */
+  readonly fields: ExternalProcessorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExternalProcessor.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExternalProcessorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    jobWorkOrders<T extends ExternalProcessor$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, ExternalProcessor$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExternalProcessor model
+   */
+  interface ExternalProcessorFieldRefs {
+    readonly externalProcessorId: FieldRef<"ExternalProcessor", 'Int'>
+    readonly companyId: FieldRef<"ExternalProcessor", 'Int'>
+    readonly processorCode: FieldRef<"ExternalProcessor", 'String'>
+    readonly name: FieldRef<"ExternalProcessor", 'String'>
+    readonly contactPerson: FieldRef<"ExternalProcessor", 'String'>
+    readonly phone: FieldRef<"ExternalProcessor", 'String'>
+    readonly email: FieldRef<"ExternalProcessor", 'String'>
+    readonly address: FieldRef<"ExternalProcessor", 'String'>
+    readonly gstin: FieldRef<"ExternalProcessor", 'String'>
+    readonly pan: FieldRef<"ExternalProcessor", 'String'>
+    readonly paymentTerms: FieldRef<"ExternalProcessor", 'String'>
+    readonly notes: FieldRef<"ExternalProcessor", 'String'>
+    readonly status: FieldRef<"ExternalProcessor", 'String'>
+    readonly createdAt: FieldRef<"ExternalProcessor", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExternalProcessor", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExternalProcessor findUnique
+   */
+  export type ExternalProcessorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter, which ExternalProcessor to fetch.
+     */
+    where: ExternalProcessorWhereUniqueInput
+  }
+
+  /**
+   * ExternalProcessor findUniqueOrThrow
+   */
+  export type ExternalProcessorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter, which ExternalProcessor to fetch.
+     */
+    where: ExternalProcessorWhereUniqueInput
+  }
+
+  /**
+   * ExternalProcessor findFirst
+   */
+  export type ExternalProcessorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter, which ExternalProcessor to fetch.
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalProcessors to fetch.
+     */
+    orderBy?: ExternalProcessorOrderByWithRelationInput | ExternalProcessorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalProcessors.
+     */
+    cursor?: ExternalProcessorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalProcessors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalProcessors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalProcessors.
+     */
+    distinct?: ExternalProcessorScalarFieldEnum | ExternalProcessorScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalProcessor findFirstOrThrow
+   */
+  export type ExternalProcessorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter, which ExternalProcessor to fetch.
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalProcessors to fetch.
+     */
+    orderBy?: ExternalProcessorOrderByWithRelationInput | ExternalProcessorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExternalProcessors.
+     */
+    cursor?: ExternalProcessorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalProcessors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalProcessors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalProcessors.
+     */
+    distinct?: ExternalProcessorScalarFieldEnum | ExternalProcessorScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalProcessor findMany
+   */
+  export type ExternalProcessorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter, which ExternalProcessors to fetch.
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExternalProcessors to fetch.
+     */
+    orderBy?: ExternalProcessorOrderByWithRelationInput | ExternalProcessorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExternalProcessors.
+     */
+    cursor?: ExternalProcessorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExternalProcessors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExternalProcessors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExternalProcessors.
+     */
+    distinct?: ExternalProcessorScalarFieldEnum | ExternalProcessorScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalProcessor create
+   */
+  export type ExternalProcessorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ExternalProcessor.
+     */
+    data: XOR<ExternalProcessorCreateInput, ExternalProcessorUncheckedCreateInput>
+  }
+
+  /**
+   * ExternalProcessor createMany
+   */
+  export type ExternalProcessorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExternalProcessors.
+     */
+    data: ExternalProcessorCreateManyInput | ExternalProcessorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExternalProcessor update
+   */
+  export type ExternalProcessorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ExternalProcessor.
+     */
+    data: XOR<ExternalProcessorUpdateInput, ExternalProcessorUncheckedUpdateInput>
+    /**
+     * Choose, which ExternalProcessor to update.
+     */
+    where: ExternalProcessorWhereUniqueInput
+  }
+
+  /**
+   * ExternalProcessor updateMany
+   */
+  export type ExternalProcessorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExternalProcessors.
+     */
+    data: XOR<ExternalProcessorUpdateManyMutationInput, ExternalProcessorUncheckedUpdateManyInput>
+    /**
+     * Filter which ExternalProcessors to update
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * Limit how many ExternalProcessors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalProcessor upsert
+   */
+  export type ExternalProcessorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ExternalProcessor to update in case it exists.
+     */
+    where: ExternalProcessorWhereUniqueInput
+    /**
+     * In case the ExternalProcessor found by the `where` argument doesn't exist, create a new ExternalProcessor with this data.
+     */
+    create: XOR<ExternalProcessorCreateInput, ExternalProcessorUncheckedCreateInput>
+    /**
+     * In case the ExternalProcessor was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExternalProcessorUpdateInput, ExternalProcessorUncheckedUpdateInput>
+  }
+
+  /**
+   * ExternalProcessor delete
+   */
+  export type ExternalProcessorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    /**
+     * Filter which ExternalProcessor to delete.
+     */
+    where: ExternalProcessorWhereUniqueInput
+  }
+
+  /**
+   * ExternalProcessor deleteMany
+   */
+  export type ExternalProcessorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExternalProcessors to delete
+     */
+    where?: ExternalProcessorWhereInput
+    /**
+     * Limit how many ExternalProcessors to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExternalProcessor.jobWorkOrders
+   */
+  export type ExternalProcessor$jobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * ExternalProcessor without action
+   */
+  export type ExternalProcessorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkProcessType
+   */
+
+  export type AggregateJobWorkProcessType = {
+    _count: JobWorkProcessTypeCountAggregateOutputType | null
+    _avg: JobWorkProcessTypeAvgAggregateOutputType | null
+    _sum: JobWorkProcessTypeSumAggregateOutputType | null
+    _min: JobWorkProcessTypeMinAggregateOutputType | null
+    _max: JobWorkProcessTypeMaxAggregateOutputType | null
+  }
+
+  export type JobWorkProcessTypeAvgAggregateOutputType = {
+    processTypeId: number | null
+    companyId: number | null
+    defaultRate: Decimal | null
+  }
+
+  export type JobWorkProcessTypeSumAggregateOutputType = {
+    processTypeId: number | null
+    companyId: number | null
+    defaultRate: Decimal | null
+  }
+
+  export type JobWorkProcessTypeMinAggregateOutputType = {
+    processTypeId: number | null
+    companyId: number | null
+    code: string | null
+    name: string | null
+    description: string | null
+    chargeUnit: string | null
+    defaultRate: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkProcessTypeMaxAggregateOutputType = {
+    processTypeId: number | null
+    companyId: number | null
+    code: string | null
+    name: string | null
+    description: string | null
+    chargeUnit: string | null
+    defaultRate: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkProcessTypeCountAggregateOutputType = {
+    processTypeId: number
+    companyId: number
+    code: number
+    name: number
+    description: number
+    chargeUnit: number
+    defaultRate: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkProcessTypeAvgAggregateInputType = {
+    processTypeId?: true
+    companyId?: true
+    defaultRate?: true
+  }
+
+  export type JobWorkProcessTypeSumAggregateInputType = {
+    processTypeId?: true
+    companyId?: true
+    defaultRate?: true
+  }
+
+  export type JobWorkProcessTypeMinAggregateInputType = {
+    processTypeId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    chargeUnit?: true
+    defaultRate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkProcessTypeMaxAggregateInputType = {
+    processTypeId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    chargeUnit?: true
+    defaultRate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkProcessTypeCountAggregateInputType = {
+    processTypeId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    chargeUnit?: true
+    defaultRate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkProcessTypeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkProcessType to aggregate.
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkProcessTypes to fetch.
+     */
+    orderBy?: JobWorkProcessTypeOrderByWithRelationInput | JobWorkProcessTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkProcessTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkProcessTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkProcessTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkProcessTypes
+    **/
+    _count?: true | JobWorkProcessTypeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkProcessTypeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkProcessTypeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkProcessTypeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkProcessTypeMaxAggregateInputType
+  }
+
+  export type GetJobWorkProcessTypeAggregateType<T extends JobWorkProcessTypeAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkProcessType]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkProcessType[P]>
+      : GetScalarType<T[P], AggregateJobWorkProcessType[P]>
+  }
+
+
+
+
+  export type JobWorkProcessTypeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkProcessTypeWhereInput
+    orderBy?: JobWorkProcessTypeOrderByWithAggregationInput | JobWorkProcessTypeOrderByWithAggregationInput[]
+    by: JobWorkProcessTypeScalarFieldEnum[] | JobWorkProcessTypeScalarFieldEnum
+    having?: JobWorkProcessTypeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkProcessTypeCountAggregateInputType | true
+    _avg?: JobWorkProcessTypeAvgAggregateInputType
+    _sum?: JobWorkProcessTypeSumAggregateInputType
+    _min?: JobWorkProcessTypeMinAggregateInputType
+    _max?: JobWorkProcessTypeMaxAggregateInputType
+  }
+
+  export type JobWorkProcessTypeGroupByOutputType = {
+    processTypeId: number
+    companyId: number
+    code: string
+    name: string
+    description: string | null
+    chargeUnit: string | null
+    defaultRate: Decimal | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkProcessTypeCountAggregateOutputType | null
+    _avg: JobWorkProcessTypeAvgAggregateOutputType | null
+    _sum: JobWorkProcessTypeSumAggregateOutputType | null
+    _min: JobWorkProcessTypeMinAggregateOutputType | null
+    _max: JobWorkProcessTypeMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkProcessTypeGroupByPayload<T extends JobWorkProcessTypeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkProcessTypeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkProcessTypeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkProcessTypeGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkProcessTypeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkProcessTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    processTypeId?: boolean
+    companyId?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    chargeUnit?: boolean
+    defaultRate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | JobWorkProcessType$jobWorkOrdersArgs<ExtArgs>
+    _count?: boolean | JobWorkProcessTypeCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkProcessType"]>
+
+
+
+  export type JobWorkProcessTypeSelectScalar = {
+    processTypeId?: boolean
+    companyId?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    chargeUnit?: boolean
+    defaultRate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkProcessTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"processTypeId" | "companyId" | "code" | "name" | "description" | "chargeUnit" | "defaultRate" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkProcessType"]>
+  export type JobWorkProcessTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | JobWorkProcessType$jobWorkOrdersArgs<ExtArgs>
+    _count?: boolean | JobWorkProcessTypeCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkProcessTypePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkProcessType"
+    objects: {
+      company: Prisma.$companiesPayload<ExtArgs>
+      jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      processTypeId: number
+      companyId: number
+      code: string
+      name: string
+      description: string | null
+      chargeUnit: string | null
+      defaultRate: Prisma.Decimal | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkProcessType"]>
+    composites: {}
+  }
+
+  type JobWorkProcessTypeGetPayload<S extends boolean | null | undefined | JobWorkProcessTypeDefaultArgs> = $Result.GetResult<Prisma.$JobWorkProcessTypePayload, S>
+
+  type JobWorkProcessTypeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkProcessTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkProcessTypeCountAggregateInputType | true
+    }
+
+  export interface JobWorkProcessTypeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkProcessType'], meta: { name: 'JobWorkProcessType' } }
+    /**
+     * Find zero or one JobWorkProcessType that matches the filter.
+     * @param {JobWorkProcessTypeFindUniqueArgs} args - Arguments to find a JobWorkProcessType
+     * @example
+     * // Get one JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkProcessTypeFindUniqueArgs>(args: SelectSubset<T, JobWorkProcessTypeFindUniqueArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkProcessType that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkProcessTypeFindUniqueOrThrowArgs} args - Arguments to find a JobWorkProcessType
+     * @example
+     * // Get one JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkProcessTypeFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkProcessTypeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkProcessType that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeFindFirstArgs} args - Arguments to find a JobWorkProcessType
+     * @example
+     * // Get one JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkProcessTypeFindFirstArgs>(args?: SelectSubset<T, JobWorkProcessTypeFindFirstArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkProcessType that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeFindFirstOrThrowArgs} args - Arguments to find a JobWorkProcessType
+     * @example
+     * // Get one JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkProcessTypeFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkProcessTypeFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkProcessTypes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkProcessTypes
+     * const jobWorkProcessTypes = await prisma.jobWorkProcessType.findMany()
+     * 
+     * // Get first 10 JobWorkProcessTypes
+     * const jobWorkProcessTypes = await prisma.jobWorkProcessType.findMany({ take: 10 })
+     * 
+     * // Only select the `processTypeId`
+     * const jobWorkProcessTypeWithProcessTypeIdOnly = await prisma.jobWorkProcessType.findMany({ select: { processTypeId: true } })
+     * 
+     */
+    findMany<T extends JobWorkProcessTypeFindManyArgs>(args?: SelectSubset<T, JobWorkProcessTypeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkProcessType.
+     * @param {JobWorkProcessTypeCreateArgs} args - Arguments to create a JobWorkProcessType.
+     * @example
+     * // Create one JobWorkProcessType
+     * const JobWorkProcessType = await prisma.jobWorkProcessType.create({
+     *   data: {
+     *     // ... data to create a JobWorkProcessType
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkProcessTypeCreateArgs>(args: SelectSubset<T, JobWorkProcessTypeCreateArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkProcessTypes.
+     * @param {JobWorkProcessTypeCreateManyArgs} args - Arguments to create many JobWorkProcessTypes.
+     * @example
+     * // Create many JobWorkProcessTypes
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkProcessTypeCreateManyArgs>(args?: SelectSubset<T, JobWorkProcessTypeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkProcessType.
+     * @param {JobWorkProcessTypeDeleteArgs} args - Arguments to delete one JobWorkProcessType.
+     * @example
+     * // Delete one JobWorkProcessType
+     * const JobWorkProcessType = await prisma.jobWorkProcessType.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkProcessType
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkProcessTypeDeleteArgs>(args: SelectSubset<T, JobWorkProcessTypeDeleteArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkProcessType.
+     * @param {JobWorkProcessTypeUpdateArgs} args - Arguments to update one JobWorkProcessType.
+     * @example
+     * // Update one JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkProcessTypeUpdateArgs>(args: SelectSubset<T, JobWorkProcessTypeUpdateArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkProcessTypes.
+     * @param {JobWorkProcessTypeDeleteManyArgs} args - Arguments to filter JobWorkProcessTypes to delete.
+     * @example
+     * // Delete a few JobWorkProcessTypes
+     * const { count } = await prisma.jobWorkProcessType.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkProcessTypeDeleteManyArgs>(args?: SelectSubset<T, JobWorkProcessTypeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkProcessTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkProcessTypes
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkProcessTypeUpdateManyArgs>(args: SelectSubset<T, JobWorkProcessTypeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkProcessType.
+     * @param {JobWorkProcessTypeUpsertArgs} args - Arguments to update or create a JobWorkProcessType.
+     * @example
+     * // Update or create a JobWorkProcessType
+     * const jobWorkProcessType = await prisma.jobWorkProcessType.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkProcessType
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkProcessType we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkProcessTypeUpsertArgs>(args: SelectSubset<T, JobWorkProcessTypeUpsertArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkProcessTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeCountArgs} args - Arguments to filter JobWorkProcessTypes to count.
+     * @example
+     * // Count the number of JobWorkProcessTypes
+     * const count = await prisma.jobWorkProcessType.count({
+     *   where: {
+     *     // ... the filter for the JobWorkProcessTypes we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkProcessTypeCountArgs>(
+      args?: Subset<T, JobWorkProcessTypeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkProcessTypeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkProcessType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkProcessTypeAggregateArgs>(args: Subset<T, JobWorkProcessTypeAggregateArgs>): Prisma.PrismaPromise<GetJobWorkProcessTypeAggregateType<T>>
+
+    /**
+     * Group by JobWorkProcessType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkProcessTypeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkProcessTypeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkProcessTypeGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkProcessTypeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkProcessTypeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkProcessTypeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkProcessType model
+   */
+  readonly fields: JobWorkProcessTypeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkProcessType.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkProcessTypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    jobWorkOrders<T extends JobWorkProcessType$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessType$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkProcessType model
+   */
+  interface JobWorkProcessTypeFieldRefs {
+    readonly processTypeId: FieldRef<"JobWorkProcessType", 'Int'>
+    readonly companyId: FieldRef<"JobWorkProcessType", 'Int'>
+    readonly code: FieldRef<"JobWorkProcessType", 'String'>
+    readonly name: FieldRef<"JobWorkProcessType", 'String'>
+    readonly description: FieldRef<"JobWorkProcessType", 'String'>
+    readonly chargeUnit: FieldRef<"JobWorkProcessType", 'String'>
+    readonly defaultRate: FieldRef<"JobWorkProcessType", 'Decimal'>
+    readonly isActive: FieldRef<"JobWorkProcessType", 'Boolean'>
+    readonly createdAt: FieldRef<"JobWorkProcessType", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkProcessType", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkProcessType findUnique
+   */
+  export type JobWorkProcessTypeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkProcessType to fetch.
+     */
+    where: JobWorkProcessTypeWhereUniqueInput
+  }
+
+  /**
+   * JobWorkProcessType findUniqueOrThrow
+   */
+  export type JobWorkProcessTypeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkProcessType to fetch.
+     */
+    where: JobWorkProcessTypeWhereUniqueInput
+  }
+
+  /**
+   * JobWorkProcessType findFirst
+   */
+  export type JobWorkProcessTypeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkProcessType to fetch.
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkProcessTypes to fetch.
+     */
+    orderBy?: JobWorkProcessTypeOrderByWithRelationInput | JobWorkProcessTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkProcessTypes.
+     */
+    cursor?: JobWorkProcessTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkProcessTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkProcessTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkProcessTypes.
+     */
+    distinct?: JobWorkProcessTypeScalarFieldEnum | JobWorkProcessTypeScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkProcessType findFirstOrThrow
+   */
+  export type JobWorkProcessTypeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkProcessType to fetch.
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkProcessTypes to fetch.
+     */
+    orderBy?: JobWorkProcessTypeOrderByWithRelationInput | JobWorkProcessTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkProcessTypes.
+     */
+    cursor?: JobWorkProcessTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkProcessTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkProcessTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkProcessTypes.
+     */
+    distinct?: JobWorkProcessTypeScalarFieldEnum | JobWorkProcessTypeScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkProcessType findMany
+   */
+  export type JobWorkProcessTypeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkProcessTypes to fetch.
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkProcessTypes to fetch.
+     */
+    orderBy?: JobWorkProcessTypeOrderByWithRelationInput | JobWorkProcessTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkProcessTypes.
+     */
+    cursor?: JobWorkProcessTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkProcessTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkProcessTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkProcessTypes.
+     */
+    distinct?: JobWorkProcessTypeScalarFieldEnum | JobWorkProcessTypeScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkProcessType create
+   */
+  export type JobWorkProcessTypeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkProcessType.
+     */
+    data: XOR<JobWorkProcessTypeCreateInput, JobWorkProcessTypeUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkProcessType createMany
+   */
+  export type JobWorkProcessTypeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkProcessTypes.
+     */
+    data: JobWorkProcessTypeCreateManyInput | JobWorkProcessTypeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkProcessType update
+   */
+  export type JobWorkProcessTypeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkProcessType.
+     */
+    data: XOR<JobWorkProcessTypeUpdateInput, JobWorkProcessTypeUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkProcessType to update.
+     */
+    where: JobWorkProcessTypeWhereUniqueInput
+  }
+
+  /**
+   * JobWorkProcessType updateMany
+   */
+  export type JobWorkProcessTypeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkProcessTypes.
+     */
+    data: XOR<JobWorkProcessTypeUpdateManyMutationInput, JobWorkProcessTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkProcessTypes to update
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * Limit how many JobWorkProcessTypes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkProcessType upsert
+   */
+  export type JobWorkProcessTypeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkProcessType to update in case it exists.
+     */
+    where: JobWorkProcessTypeWhereUniqueInput
+    /**
+     * In case the JobWorkProcessType found by the `where` argument doesn't exist, create a new JobWorkProcessType with this data.
+     */
+    create: XOR<JobWorkProcessTypeCreateInput, JobWorkProcessTypeUncheckedCreateInput>
+    /**
+     * In case the JobWorkProcessType was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkProcessTypeUpdateInput, JobWorkProcessTypeUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkProcessType delete
+   */
+  export type JobWorkProcessTypeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkProcessType to delete.
+     */
+    where: JobWorkProcessTypeWhereUniqueInput
+  }
+
+  /**
+   * JobWorkProcessType deleteMany
+   */
+  export type JobWorkProcessTypeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkProcessTypes to delete
+     */
+    where?: JobWorkProcessTypeWhereInput
+    /**
+     * Limit how many JobWorkProcessTypes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkProcessType.jobWorkOrders
+   */
+  export type JobWorkProcessType$jobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkProcessType without action
+   */
+  export type JobWorkProcessTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessType
+     */
+    select?: JobWorkProcessTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessType
+     */
+    omit?: JobWorkProcessTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessTypeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkOrder
+   */
+
+  export type AggregateJobWorkOrder = {
+    _count: JobWorkOrderCountAggregateOutputType | null
+    _avg: JobWorkOrderAvgAggregateOutputType | null
+    _sum: JobWorkOrderSumAggregateOutputType | null
+    _min: JobWorkOrderMinAggregateOutputType | null
+    _max: JobWorkOrderMaxAggregateOutputType | null
+  }
+
+  export type JobWorkOrderAvgAggregateOutputType = {
+    jobWorkOrderId: number | null
+    companyId: number | null
+    branchId: number | null
+    externalProcessorId: number | null
+    processTypeId: number | null
+    createdByAdminId: number | null
+  }
+
+  export type JobWorkOrderSumAggregateOutputType = {
+    jobWorkOrderId: number | null
+    companyId: number | null
+    branchId: number | null
+    externalProcessorId: number | null
+    processTypeId: number | null
+    createdByAdminId: number | null
+  }
+
+  export type JobWorkOrderMinAggregateOutputType = {
+    jobWorkOrderId: number | null
+    companyId: number | null
+    branchId: number | null
+    jobNumber: string | null
+    externalProcessorId: number | null
+    processTypeId: number | null
+    orderDate: Date | null
+    status: string | null
+    description: string | null
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkOrderMaxAggregateOutputType = {
+    jobWorkOrderId: number | null
+    companyId: number | null
+    branchId: number | null
+    jobNumber: string | null
+    externalProcessorId: number | null
+    processTypeId: number | null
+    orderDate: Date | null
+    status: string | null
+    description: string | null
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkOrderCountAggregateOutputType = {
+    jobWorkOrderId: number
+    companyId: number
+    branchId: number
+    jobNumber: number
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: number
+    status: number
+    description: number
+    notes: number
+    createdByAdminId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkOrderAvgAggregateInputType = {
+    jobWorkOrderId?: true
+    companyId?: true
+    branchId?: true
+    externalProcessorId?: true
+    processTypeId?: true
+    createdByAdminId?: true
+  }
+
+  export type JobWorkOrderSumAggregateInputType = {
+    jobWorkOrderId?: true
+    companyId?: true
+    branchId?: true
+    externalProcessorId?: true
+    processTypeId?: true
+    createdByAdminId?: true
+  }
+
+  export type JobWorkOrderMinAggregateInputType = {
+    jobWorkOrderId?: true
+    companyId?: true
+    branchId?: true
+    jobNumber?: true
+    externalProcessorId?: true
+    processTypeId?: true
+    orderDate?: true
+    status?: true
+    description?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkOrderMaxAggregateInputType = {
+    jobWorkOrderId?: true
+    companyId?: true
+    branchId?: true
+    jobNumber?: true
+    externalProcessorId?: true
+    processTypeId?: true
+    orderDate?: true
+    status?: true
+    description?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkOrderCountAggregateInputType = {
+    jobWorkOrderId?: true
+    companyId?: true
+    branchId?: true
+    jobNumber?: true
+    externalProcessorId?: true
+    processTypeId?: true
+    orderDate?: true
+    status?: true
+    description?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkOrderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkOrder to aggregate.
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkOrders to fetch.
+     */
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkOrders
+    **/
+    _count?: true | JobWorkOrderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkOrderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkOrderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkOrderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkOrderMaxAggregateInputType
+  }
+
+  export type GetJobWorkOrderAggregateType<T extends JobWorkOrderAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkOrder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkOrder[P]>
+      : GetScalarType<T[P], AggregateJobWorkOrder[P]>
+  }
+
+
+
+
+  export type JobWorkOrderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithAggregationInput | JobWorkOrderOrderByWithAggregationInput[]
+    by: JobWorkOrderScalarFieldEnum[] | JobWorkOrderScalarFieldEnum
+    having?: JobWorkOrderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkOrderCountAggregateInputType | true
+    _avg?: JobWorkOrderAvgAggregateInputType
+    _sum?: JobWorkOrderSumAggregateInputType
+    _min?: JobWorkOrderMinAggregateInputType
+    _max?: JobWorkOrderMaxAggregateInputType
+  }
+
+  export type JobWorkOrderGroupByOutputType = {
+    jobWorkOrderId: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date
+    status: string
+    description: string | null
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkOrderCountAggregateOutputType | null
+    _avg: JobWorkOrderAvgAggregateOutputType | null
+    _sum: JobWorkOrderSumAggregateOutputType | null
+    _min: JobWorkOrderMinAggregateOutputType | null
+    _max: JobWorkOrderMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkOrderGroupByPayload<T extends JobWorkOrderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkOrderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkOrderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkOrderGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkOrderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkOrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    jobWorkOrderId?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    jobNumber?: boolean
+    externalProcessorId?: boolean
+    processTypeId?: boolean
+    orderDate?: boolean
+    status?: boolean
+    description?: boolean
+    notes?: boolean
+    createdByAdminId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    externalProcessor?: boolean | ExternalProcessorDefaultArgs<ExtArgs>
+    processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
+    createdByAdmin?: boolean | JobWorkOrder$createdByAdminArgs<ExtArgs>
+    dispatches?: boolean | JobWorkOrder$dispatchesArgs<ExtArgs>
+    reconciliations?: boolean | JobWorkOrder$reconciliationsArgs<ExtArgs>
+    _count?: boolean | JobWorkOrderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkOrder"]>
+
+
+
+  export type JobWorkOrderSelectScalar = {
+    jobWorkOrderId?: boolean
+    companyId?: boolean
+    branchId?: boolean
+    jobNumber?: boolean
+    externalProcessorId?: boolean
+    processTypeId?: boolean
+    orderDate?: boolean
+    status?: boolean
+    description?: boolean
+    notes?: boolean
+    createdByAdminId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"jobWorkOrderId" | "companyId" | "branchId" | "jobNumber" | "externalProcessorId" | "processTypeId" | "orderDate" | "status" | "description" | "notes" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkOrder"]>
+  export type JobWorkOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    branch?: boolean | BranchDefaultArgs<ExtArgs>
+    externalProcessor?: boolean | ExternalProcessorDefaultArgs<ExtArgs>
+    processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
+    createdByAdmin?: boolean | JobWorkOrder$createdByAdminArgs<ExtArgs>
+    dispatches?: boolean | JobWorkOrder$dispatchesArgs<ExtArgs>
+    reconciliations?: boolean | JobWorkOrder$reconciliationsArgs<ExtArgs>
+    _count?: boolean | JobWorkOrderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkOrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkOrder"
+    objects: {
+      company: Prisma.$companiesPayload<ExtArgs>
+      branch: Prisma.$BranchPayload<ExtArgs>
+      externalProcessor: Prisma.$ExternalProcessorPayload<ExtArgs>
+      processType: Prisma.$JobWorkProcessTypePayload<ExtArgs>
+      createdByAdmin: Prisma.$AdminPayload<ExtArgs> | null
+      dispatches: Prisma.$JobWorkDispatchPayload<ExtArgs>[]
+      reconciliations: Prisma.$JobWorkReconciliationPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      jobWorkOrderId: number
+      companyId: number
+      branchId: number
+      jobNumber: string
+      externalProcessorId: number
+      processTypeId: number
+      orderDate: Date
+      status: string
+      description: string | null
+      notes: string | null
+      createdByAdminId: number | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkOrder"]>
+    composites: {}
+  }
+
+  type JobWorkOrderGetPayload<S extends boolean | null | undefined | JobWorkOrderDefaultArgs> = $Result.GetResult<Prisma.$JobWorkOrderPayload, S>
+
+  type JobWorkOrderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkOrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkOrderCountAggregateInputType | true
+    }
+
+  export interface JobWorkOrderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkOrder'], meta: { name: 'JobWorkOrder' } }
+    /**
+     * Find zero or one JobWorkOrder that matches the filter.
+     * @param {JobWorkOrderFindUniqueArgs} args - Arguments to find a JobWorkOrder
+     * @example
+     * // Get one JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkOrderFindUniqueArgs>(args: SelectSubset<T, JobWorkOrderFindUniqueArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkOrder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkOrderFindUniqueOrThrowArgs} args - Arguments to find a JobWorkOrder
+     * @example
+     * // Get one JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkOrderFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkOrderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkOrder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderFindFirstArgs} args - Arguments to find a JobWorkOrder
+     * @example
+     * // Get one JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkOrderFindFirstArgs>(args?: SelectSubset<T, JobWorkOrderFindFirstArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkOrder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderFindFirstOrThrowArgs} args - Arguments to find a JobWorkOrder
+     * @example
+     * // Get one JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkOrderFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkOrderFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkOrders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkOrders
+     * const jobWorkOrders = await prisma.jobWorkOrder.findMany()
+     * 
+     * // Get first 10 JobWorkOrders
+     * const jobWorkOrders = await prisma.jobWorkOrder.findMany({ take: 10 })
+     * 
+     * // Only select the `jobWorkOrderId`
+     * const jobWorkOrderWithJobWorkOrderIdOnly = await prisma.jobWorkOrder.findMany({ select: { jobWorkOrderId: true } })
+     * 
+     */
+    findMany<T extends JobWorkOrderFindManyArgs>(args?: SelectSubset<T, JobWorkOrderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkOrder.
+     * @param {JobWorkOrderCreateArgs} args - Arguments to create a JobWorkOrder.
+     * @example
+     * // Create one JobWorkOrder
+     * const JobWorkOrder = await prisma.jobWorkOrder.create({
+     *   data: {
+     *     // ... data to create a JobWorkOrder
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkOrderCreateArgs>(args: SelectSubset<T, JobWorkOrderCreateArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkOrders.
+     * @param {JobWorkOrderCreateManyArgs} args - Arguments to create many JobWorkOrders.
+     * @example
+     * // Create many JobWorkOrders
+     * const jobWorkOrder = await prisma.jobWorkOrder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkOrderCreateManyArgs>(args?: SelectSubset<T, JobWorkOrderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkOrder.
+     * @param {JobWorkOrderDeleteArgs} args - Arguments to delete one JobWorkOrder.
+     * @example
+     * // Delete one JobWorkOrder
+     * const JobWorkOrder = await prisma.jobWorkOrder.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkOrder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkOrderDeleteArgs>(args: SelectSubset<T, JobWorkOrderDeleteArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkOrder.
+     * @param {JobWorkOrderUpdateArgs} args - Arguments to update one JobWorkOrder.
+     * @example
+     * // Update one JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkOrderUpdateArgs>(args: SelectSubset<T, JobWorkOrderUpdateArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkOrders.
+     * @param {JobWorkOrderDeleteManyArgs} args - Arguments to filter JobWorkOrders to delete.
+     * @example
+     * // Delete a few JobWorkOrders
+     * const { count } = await prisma.jobWorkOrder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkOrderDeleteManyArgs>(args?: SelectSubset<T, JobWorkOrderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkOrders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkOrders
+     * const jobWorkOrder = await prisma.jobWorkOrder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkOrderUpdateManyArgs>(args: SelectSubset<T, JobWorkOrderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkOrder.
+     * @param {JobWorkOrderUpsertArgs} args - Arguments to update or create a JobWorkOrder.
+     * @example
+     * // Update or create a JobWorkOrder
+     * const jobWorkOrder = await prisma.jobWorkOrder.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkOrder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkOrder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkOrderUpsertArgs>(args: SelectSubset<T, JobWorkOrderUpsertArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkOrders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderCountArgs} args - Arguments to filter JobWorkOrders to count.
+     * @example
+     * // Count the number of JobWorkOrders
+     * const count = await prisma.jobWorkOrder.count({
+     *   where: {
+     *     // ... the filter for the JobWorkOrders we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkOrderCountArgs>(
+      args?: Subset<T, JobWorkOrderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkOrderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkOrder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkOrderAggregateArgs>(args: Subset<T, JobWorkOrderAggregateArgs>): Prisma.PrismaPromise<GetJobWorkOrderAggregateType<T>>
+
+    /**
+     * Group by JobWorkOrder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkOrderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkOrderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkOrderGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkOrderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkOrderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkOrderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkOrder model
+   */
+  readonly fields: JobWorkOrderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkOrder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkOrderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    externalProcessor<T extends ExternalProcessorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ExternalProcessorDefaultArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    processType<T extends JobWorkProcessTypeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessTypeDefaultArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    createdByAdmin<T extends JobWorkOrder$createdByAdminArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$createdByAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    dispatches<T extends JobWorkOrder$dispatchesArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$dispatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reconciliations<T extends JobWorkOrder$reconciliationsArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$reconciliationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkOrder model
+   */
+  interface JobWorkOrderFieldRefs {
+    readonly jobWorkOrderId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly companyId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly branchId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly jobNumber: FieldRef<"JobWorkOrder", 'String'>
+    readonly externalProcessorId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly processTypeId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly orderDate: FieldRef<"JobWorkOrder", 'DateTime'>
+    readonly status: FieldRef<"JobWorkOrder", 'String'>
+    readonly description: FieldRef<"JobWorkOrder", 'String'>
+    readonly notes: FieldRef<"JobWorkOrder", 'String'>
+    readonly createdByAdminId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly createdAt: FieldRef<"JobWorkOrder", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkOrder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkOrder findUnique
+   */
+  export type JobWorkOrderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkOrder to fetch.
+     */
+    where: JobWorkOrderWhereUniqueInput
+  }
+
+  /**
+   * JobWorkOrder findUniqueOrThrow
+   */
+  export type JobWorkOrderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkOrder to fetch.
+     */
+    where: JobWorkOrderWhereUniqueInput
+  }
+
+  /**
+   * JobWorkOrder findFirst
+   */
+  export type JobWorkOrderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkOrder to fetch.
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkOrders to fetch.
+     */
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkOrders.
+     */
+    cursor?: JobWorkOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkOrders.
+     */
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkOrder findFirstOrThrow
+   */
+  export type JobWorkOrderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkOrder to fetch.
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkOrders to fetch.
+     */
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkOrders.
+     */
+    cursor?: JobWorkOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkOrders.
+     */
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkOrder findMany
+   */
+  export type JobWorkOrderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkOrders to fetch.
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkOrders to fetch.
+     */
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkOrders.
+     */
+    cursor?: JobWorkOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkOrders.
+     */
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkOrder create
+   */
+  export type JobWorkOrderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkOrder.
+     */
+    data: XOR<JobWorkOrderCreateInput, JobWorkOrderUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkOrder createMany
+   */
+  export type JobWorkOrderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkOrders.
+     */
+    data: JobWorkOrderCreateManyInput | JobWorkOrderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkOrder update
+   */
+  export type JobWorkOrderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkOrder.
+     */
+    data: XOR<JobWorkOrderUpdateInput, JobWorkOrderUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkOrder to update.
+     */
+    where: JobWorkOrderWhereUniqueInput
+  }
+
+  /**
+   * JobWorkOrder updateMany
+   */
+  export type JobWorkOrderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkOrders.
+     */
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkOrders to update
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * Limit how many JobWorkOrders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkOrder upsert
+   */
+  export type JobWorkOrderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkOrder to update in case it exists.
+     */
+    where: JobWorkOrderWhereUniqueInput
+    /**
+     * In case the JobWorkOrder found by the `where` argument doesn't exist, create a new JobWorkOrder with this data.
+     */
+    create: XOR<JobWorkOrderCreateInput, JobWorkOrderUncheckedCreateInput>
+    /**
+     * In case the JobWorkOrder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkOrderUpdateInput, JobWorkOrderUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkOrder delete
+   */
+  export type JobWorkOrderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkOrder to delete.
+     */
+    where: JobWorkOrderWhereUniqueInput
+  }
+
+  /**
+   * JobWorkOrder deleteMany
+   */
+  export type JobWorkOrderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkOrders to delete
+     */
+    where?: JobWorkOrderWhereInput
+    /**
+     * Limit how many JobWorkOrders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkOrder.createdByAdmin
+   */
+  export type JobWorkOrder$createdByAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Admin
+     */
+    select?: AdminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Admin
+     */
+    omit?: AdminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminInclude<ExtArgs> | null
+    where?: AdminWhereInput
+  }
+
+  /**
+   * JobWorkOrder.dispatches
+   */
+  export type JobWorkOrder$dispatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    where?: JobWorkDispatchWhereInput
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    cursor?: JobWorkDispatchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkDispatchScalarFieldEnum | JobWorkDispatchScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkOrder.reconciliations
+   */
+  export type JobWorkOrder$reconciliationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    where?: JobWorkReconciliationWhereInput
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkReconciliationScalarFieldEnum | JobWorkReconciliationScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkOrder without action
+   */
+  export type JobWorkOrderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkDispatch
+   */
+
+  export type AggregateJobWorkDispatch = {
+    _count: JobWorkDispatchCountAggregateOutputType | null
+    _avg: JobWorkDispatchAvgAggregateOutputType | null
+    _sum: JobWorkDispatchSumAggregateOutputType | null
+    _min: JobWorkDispatchMinAggregateOutputType | null
+    _max: JobWorkDispatchMaxAggregateOutputType | null
+  }
+
+  export type JobWorkDispatchAvgAggregateOutputType = {
+    dispatchId: number | null
+    jobWorkOrderId: number | null
+    sentPieces: number | null
+    sentCarats: Decimal | null
+    sentWeightGrams: Decimal | null
+    createdByAdminId: number | null
+  }
+
+  export type JobWorkDispatchSumAggregateOutputType = {
+    dispatchId: number | null
+    jobWorkOrderId: number | null
+    sentPieces: number | null
+    sentCarats: Decimal | null
+    sentWeightGrams: Decimal | null
+    createdByAdminId: number | null
+  }
+
+  export type JobWorkDispatchMinAggregateOutputType = {
+    dispatchId: number | null
+    jobWorkOrderId: number | null
+    challanNumber: string | null
+    jangadNumber: string | null
+    dispatchDate: Date | null
+    expectedReturnDate: Date | null
+    sentPieces: number | null
+    sentCarats: Decimal | null
+    sentWeightGrams: Decimal | null
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkDispatchMaxAggregateOutputType = {
+    dispatchId: number | null
+    jobWorkOrderId: number | null
+    challanNumber: string | null
+    jangadNumber: string | null
+    dispatchDate: Date | null
+    expectedReturnDate: Date | null
+    sentPieces: number | null
+    sentCarats: Decimal | null
+    sentWeightGrams: Decimal | null
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkDispatchCountAggregateOutputType = {
+    dispatchId: number
+    jobWorkOrderId: number
+    challanNumber: number
+    jangadNumber: number
+    dispatchDate: number
+    expectedReturnDate: number
+    sentPieces: number
+    sentCarats: number
+    sentWeightGrams: number
+    notes: number
+    createdByAdminId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkDispatchAvgAggregateInputType = {
+    dispatchId?: true
+    jobWorkOrderId?: true
+    sentPieces?: true
+    sentCarats?: true
+    sentWeightGrams?: true
+    createdByAdminId?: true
+  }
+
+  export type JobWorkDispatchSumAggregateInputType = {
+    dispatchId?: true
+    jobWorkOrderId?: true
+    sentPieces?: true
+    sentCarats?: true
+    sentWeightGrams?: true
+    createdByAdminId?: true
+  }
+
+  export type JobWorkDispatchMinAggregateInputType = {
+    dispatchId?: true
+    jobWorkOrderId?: true
+    challanNumber?: true
+    jangadNumber?: true
+    dispatchDate?: true
+    expectedReturnDate?: true
+    sentPieces?: true
+    sentCarats?: true
+    sentWeightGrams?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkDispatchMaxAggregateInputType = {
+    dispatchId?: true
+    jobWorkOrderId?: true
+    challanNumber?: true
+    jangadNumber?: true
+    dispatchDate?: true
+    expectedReturnDate?: true
+    sentPieces?: true
+    sentCarats?: true
+    sentWeightGrams?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkDispatchCountAggregateInputType = {
+    dispatchId?: true
+    jobWorkOrderId?: true
+    challanNumber?: true
+    jangadNumber?: true
+    dispatchDate?: true
+    expectedReturnDate?: true
+    sentPieces?: true
+    sentCarats?: true
+    sentWeightGrams?: true
+    notes?: true
+    createdByAdminId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkDispatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkDispatch to aggregate.
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkDispatches to fetch.
+     */
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkDispatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkDispatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkDispatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkDispatches
+    **/
+    _count?: true | JobWorkDispatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkDispatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkDispatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkDispatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkDispatchMaxAggregateInputType
+  }
+
+  export type GetJobWorkDispatchAggregateType<T extends JobWorkDispatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkDispatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkDispatch[P]>
+      : GetScalarType<T[P], AggregateJobWorkDispatch[P]>
+  }
+
+
+
+
+  export type JobWorkDispatchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkDispatchWhereInput
+    orderBy?: JobWorkDispatchOrderByWithAggregationInput | JobWorkDispatchOrderByWithAggregationInput[]
+    by: JobWorkDispatchScalarFieldEnum[] | JobWorkDispatchScalarFieldEnum
+    having?: JobWorkDispatchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkDispatchCountAggregateInputType | true
+    _avg?: JobWorkDispatchAvgAggregateInputType
+    _sum?: JobWorkDispatchSumAggregateInputType
+    _min?: JobWorkDispatchMinAggregateInputType
+    _max?: JobWorkDispatchMaxAggregateInputType
+  }
+
+  export type JobWorkDispatchGroupByOutputType = {
+    dispatchId: number
+    jobWorkOrderId: number
+    challanNumber: string | null
+    jangadNumber: string | null
+    dispatchDate: Date
+    expectedReturnDate: Date | null
+    sentPieces: number
+    sentCarats: Decimal
+    sentWeightGrams: Decimal
+    notes: string | null
+    createdByAdminId: number | null
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkDispatchCountAggregateOutputType | null
+    _avg: JobWorkDispatchAvgAggregateOutputType | null
+    _sum: JobWorkDispatchSumAggregateOutputType | null
+    _min: JobWorkDispatchMinAggregateOutputType | null
+    _max: JobWorkDispatchMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkDispatchGroupByPayload<T extends JobWorkDispatchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkDispatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkDispatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkDispatchGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkDispatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkDispatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    dispatchId?: boolean
+    jobWorkOrderId?: boolean
+    challanNumber?: boolean
+    jangadNumber?: boolean
+    dispatchDate?: boolean
+    expectedReturnDate?: boolean
+    sentPieces?: boolean
+    sentCarats?: boolean
+    sentWeightGrams?: boolean
+    notes?: boolean
+    createdByAdminId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    jobWorkOrder?: boolean | JobWorkOrderDefaultArgs<ExtArgs>
+    createdByAdmin?: boolean | JobWorkDispatch$createdByAdminArgs<ExtArgs>
+    receipts?: boolean | JobWorkDispatch$receiptsArgs<ExtArgs>
+    _count?: boolean | JobWorkDispatchCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkDispatch"]>
+
+
+
+  export type JobWorkDispatchSelectScalar = {
+    dispatchId?: boolean
+    jobWorkOrderId?: boolean
+    challanNumber?: boolean
+    jangadNumber?: boolean
+    dispatchDate?: boolean
+    expectedReturnDate?: boolean
+    sentPieces?: boolean
+    sentCarats?: boolean
+    sentWeightGrams?: boolean
+    notes?: boolean
+    createdByAdminId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkDispatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"dispatchId" | "jobWorkOrderId" | "challanNumber" | "jangadNumber" | "dispatchDate" | "expectedReturnDate" | "sentPieces" | "sentCarats" | "sentWeightGrams" | "notes" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkDispatch"]>
+  export type JobWorkDispatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    jobWorkOrder?: boolean | JobWorkOrderDefaultArgs<ExtArgs>
+    createdByAdmin?: boolean | JobWorkDispatch$createdByAdminArgs<ExtArgs>
+    receipts?: boolean | JobWorkDispatch$receiptsArgs<ExtArgs>
+    _count?: boolean | JobWorkDispatchCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkDispatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkDispatch"
+    objects: {
+      jobWorkOrder: Prisma.$JobWorkOrderPayload<ExtArgs>
+      createdByAdmin: Prisma.$AdminPayload<ExtArgs> | null
+      receipts: Prisma.$JobWorkReceiptPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      dispatchId: number
+      jobWorkOrderId: number
+      challanNumber: string | null
+      jangadNumber: string | null
+      dispatchDate: Date
+      expectedReturnDate: Date | null
+      sentPieces: number
+      sentCarats: Prisma.Decimal
+      sentWeightGrams: Prisma.Decimal
+      notes: string | null
+      createdByAdminId: number | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkDispatch"]>
+    composites: {}
+  }
+
+  type JobWorkDispatchGetPayload<S extends boolean | null | undefined | JobWorkDispatchDefaultArgs> = $Result.GetResult<Prisma.$JobWorkDispatchPayload, S>
+
+  type JobWorkDispatchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkDispatchFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkDispatchCountAggregateInputType | true
+    }
+
+  export interface JobWorkDispatchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkDispatch'], meta: { name: 'JobWorkDispatch' } }
+    /**
+     * Find zero or one JobWorkDispatch that matches the filter.
+     * @param {JobWorkDispatchFindUniqueArgs} args - Arguments to find a JobWorkDispatch
+     * @example
+     * // Get one JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkDispatchFindUniqueArgs>(args: SelectSubset<T, JobWorkDispatchFindUniqueArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkDispatch that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkDispatchFindUniqueOrThrowArgs} args - Arguments to find a JobWorkDispatch
+     * @example
+     * // Get one JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkDispatchFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkDispatchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkDispatch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchFindFirstArgs} args - Arguments to find a JobWorkDispatch
+     * @example
+     * // Get one JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkDispatchFindFirstArgs>(args?: SelectSubset<T, JobWorkDispatchFindFirstArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkDispatch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchFindFirstOrThrowArgs} args - Arguments to find a JobWorkDispatch
+     * @example
+     * // Get one JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkDispatchFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkDispatchFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkDispatches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkDispatches
+     * const jobWorkDispatches = await prisma.jobWorkDispatch.findMany()
+     * 
+     * // Get first 10 JobWorkDispatches
+     * const jobWorkDispatches = await prisma.jobWorkDispatch.findMany({ take: 10 })
+     * 
+     * // Only select the `dispatchId`
+     * const jobWorkDispatchWithDispatchIdOnly = await prisma.jobWorkDispatch.findMany({ select: { dispatchId: true } })
+     * 
+     */
+    findMany<T extends JobWorkDispatchFindManyArgs>(args?: SelectSubset<T, JobWorkDispatchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkDispatch.
+     * @param {JobWorkDispatchCreateArgs} args - Arguments to create a JobWorkDispatch.
+     * @example
+     * // Create one JobWorkDispatch
+     * const JobWorkDispatch = await prisma.jobWorkDispatch.create({
+     *   data: {
+     *     // ... data to create a JobWorkDispatch
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkDispatchCreateArgs>(args: SelectSubset<T, JobWorkDispatchCreateArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkDispatches.
+     * @param {JobWorkDispatchCreateManyArgs} args - Arguments to create many JobWorkDispatches.
+     * @example
+     * // Create many JobWorkDispatches
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkDispatchCreateManyArgs>(args?: SelectSubset<T, JobWorkDispatchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkDispatch.
+     * @param {JobWorkDispatchDeleteArgs} args - Arguments to delete one JobWorkDispatch.
+     * @example
+     * // Delete one JobWorkDispatch
+     * const JobWorkDispatch = await prisma.jobWorkDispatch.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkDispatch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkDispatchDeleteArgs>(args: SelectSubset<T, JobWorkDispatchDeleteArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkDispatch.
+     * @param {JobWorkDispatchUpdateArgs} args - Arguments to update one JobWorkDispatch.
+     * @example
+     * // Update one JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkDispatchUpdateArgs>(args: SelectSubset<T, JobWorkDispatchUpdateArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkDispatches.
+     * @param {JobWorkDispatchDeleteManyArgs} args - Arguments to filter JobWorkDispatches to delete.
+     * @example
+     * // Delete a few JobWorkDispatches
+     * const { count } = await prisma.jobWorkDispatch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkDispatchDeleteManyArgs>(args?: SelectSubset<T, JobWorkDispatchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkDispatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkDispatches
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkDispatchUpdateManyArgs>(args: SelectSubset<T, JobWorkDispatchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkDispatch.
+     * @param {JobWorkDispatchUpsertArgs} args - Arguments to update or create a JobWorkDispatch.
+     * @example
+     * // Update or create a JobWorkDispatch
+     * const jobWorkDispatch = await prisma.jobWorkDispatch.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkDispatch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkDispatch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkDispatchUpsertArgs>(args: SelectSubset<T, JobWorkDispatchUpsertArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkDispatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchCountArgs} args - Arguments to filter JobWorkDispatches to count.
+     * @example
+     * // Count the number of JobWorkDispatches
+     * const count = await prisma.jobWorkDispatch.count({
+     *   where: {
+     *     // ... the filter for the JobWorkDispatches we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkDispatchCountArgs>(
+      args?: Subset<T, JobWorkDispatchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkDispatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkDispatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkDispatchAggregateArgs>(args: Subset<T, JobWorkDispatchAggregateArgs>): Prisma.PrismaPromise<GetJobWorkDispatchAggregateType<T>>
+
+    /**
+     * Group by JobWorkDispatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkDispatchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkDispatchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkDispatchGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkDispatchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkDispatchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkDispatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkDispatch model
+   */
+  readonly fields: JobWorkDispatchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkDispatch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkDispatchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    jobWorkOrder<T extends JobWorkOrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrderDefaultArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    createdByAdmin<T extends JobWorkDispatch$createdByAdminArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkDispatch$createdByAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    receipts<T extends JobWorkDispatch$receiptsArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkDispatch$receiptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkDispatch model
+   */
+  interface JobWorkDispatchFieldRefs {
+    readonly dispatchId: FieldRef<"JobWorkDispatch", 'Int'>
+    readonly jobWorkOrderId: FieldRef<"JobWorkDispatch", 'Int'>
+    readonly challanNumber: FieldRef<"JobWorkDispatch", 'String'>
+    readonly jangadNumber: FieldRef<"JobWorkDispatch", 'String'>
+    readonly dispatchDate: FieldRef<"JobWorkDispatch", 'DateTime'>
+    readonly expectedReturnDate: FieldRef<"JobWorkDispatch", 'DateTime'>
+    readonly sentPieces: FieldRef<"JobWorkDispatch", 'Int'>
+    readonly sentCarats: FieldRef<"JobWorkDispatch", 'Decimal'>
+    readonly sentWeightGrams: FieldRef<"JobWorkDispatch", 'Decimal'>
+    readonly notes: FieldRef<"JobWorkDispatch", 'String'>
+    readonly createdByAdminId: FieldRef<"JobWorkDispatch", 'Int'>
+    readonly createdAt: FieldRef<"JobWorkDispatch", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkDispatch", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkDispatch findUnique
+   */
+  export type JobWorkDispatchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkDispatch to fetch.
+     */
+    where: JobWorkDispatchWhereUniqueInput
+  }
+
+  /**
+   * JobWorkDispatch findUniqueOrThrow
+   */
+  export type JobWorkDispatchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkDispatch to fetch.
+     */
+    where: JobWorkDispatchWhereUniqueInput
+  }
+
+  /**
+   * JobWorkDispatch findFirst
+   */
+  export type JobWorkDispatchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkDispatch to fetch.
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkDispatches to fetch.
+     */
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkDispatches.
+     */
+    cursor?: JobWorkDispatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkDispatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkDispatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkDispatches.
+     */
+    distinct?: JobWorkDispatchScalarFieldEnum | JobWorkDispatchScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkDispatch findFirstOrThrow
+   */
+  export type JobWorkDispatchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkDispatch to fetch.
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkDispatches to fetch.
+     */
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkDispatches.
+     */
+    cursor?: JobWorkDispatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkDispatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkDispatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkDispatches.
+     */
+    distinct?: JobWorkDispatchScalarFieldEnum | JobWorkDispatchScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkDispatch findMany
+   */
+  export type JobWorkDispatchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkDispatches to fetch.
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkDispatches to fetch.
+     */
+    orderBy?: JobWorkDispatchOrderByWithRelationInput | JobWorkDispatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkDispatches.
+     */
+    cursor?: JobWorkDispatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkDispatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkDispatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkDispatches.
+     */
+    distinct?: JobWorkDispatchScalarFieldEnum | JobWorkDispatchScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkDispatch create
+   */
+  export type JobWorkDispatchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkDispatch.
+     */
+    data: XOR<JobWorkDispatchCreateInput, JobWorkDispatchUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkDispatch createMany
+   */
+  export type JobWorkDispatchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkDispatches.
+     */
+    data: JobWorkDispatchCreateManyInput | JobWorkDispatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkDispatch update
+   */
+  export type JobWorkDispatchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkDispatch.
+     */
+    data: XOR<JobWorkDispatchUpdateInput, JobWorkDispatchUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkDispatch to update.
+     */
+    where: JobWorkDispatchWhereUniqueInput
+  }
+
+  /**
+   * JobWorkDispatch updateMany
+   */
+  export type JobWorkDispatchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkDispatches.
+     */
+    data: XOR<JobWorkDispatchUpdateManyMutationInput, JobWorkDispatchUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkDispatches to update
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * Limit how many JobWorkDispatches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkDispatch upsert
+   */
+  export type JobWorkDispatchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkDispatch to update in case it exists.
+     */
+    where: JobWorkDispatchWhereUniqueInput
+    /**
+     * In case the JobWorkDispatch found by the `where` argument doesn't exist, create a new JobWorkDispatch with this data.
+     */
+    create: XOR<JobWorkDispatchCreateInput, JobWorkDispatchUncheckedCreateInput>
+    /**
+     * In case the JobWorkDispatch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkDispatchUpdateInput, JobWorkDispatchUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkDispatch delete
+   */
+  export type JobWorkDispatchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkDispatch to delete.
+     */
+    where: JobWorkDispatchWhereUniqueInput
+  }
+
+  /**
+   * JobWorkDispatch deleteMany
+   */
+  export type JobWorkDispatchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkDispatches to delete
+     */
+    where?: JobWorkDispatchWhereInput
+    /**
+     * Limit how many JobWorkDispatches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkDispatch.createdByAdmin
+   */
+  export type JobWorkDispatch$createdByAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Admin
+     */
+    select?: AdminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Admin
+     */
+    omit?: AdminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminInclude<ExtArgs> | null
+    where?: AdminWhereInput
+  }
+
+  /**
+   * JobWorkDispatch.receipts
+   */
+  export type JobWorkDispatch$receiptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    where?: JobWorkReceiptWhereInput
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    cursor?: JobWorkReceiptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkReceiptScalarFieldEnum | JobWorkReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkDispatch without action
+   */
+  export type JobWorkDispatchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkDispatch
+     */
+    select?: JobWorkDispatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkDispatch
+     */
+    omit?: JobWorkDispatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkDispatchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkReceipt
+   */
+
+  export type AggregateJobWorkReceipt = {
+    _count: JobWorkReceiptCountAggregateOutputType | null
+    _avg: JobWorkReceiptAvgAggregateOutputType | null
+    _sum: JobWorkReceiptSumAggregateOutputType | null
+    _min: JobWorkReceiptMinAggregateOutputType | null
+    _max: JobWorkReceiptMaxAggregateOutputType | null
+  }
+
+  export type JobWorkReceiptAvgAggregateOutputType = {
+    receiptId: number | null
+    dispatchId: number | null
+    receivedByAdminId: number | null
+  }
+
+  export type JobWorkReceiptSumAggregateOutputType = {
+    receiptId: number | null
+    dispatchId: number | null
+    receivedByAdminId: number | null
+  }
+
+  export type JobWorkReceiptMinAggregateOutputType = {
+    receiptId: number | null
+    dispatchId: number | null
+    receiptNumber: string | null
+    receivedDate: Date | null
+    receivedByAdminId: number | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkReceiptMaxAggregateOutputType = {
+    receiptId: number | null
+    dispatchId: number | null
+    receiptNumber: string | null
+    receivedDate: Date | null
+    receivedByAdminId: number | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkReceiptCountAggregateOutputType = {
+    receiptId: number
+    dispatchId: number
+    receiptNumber: number
+    receivedDate: number
+    receivedByAdminId: number
+    notes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkReceiptAvgAggregateInputType = {
+    receiptId?: true
+    dispatchId?: true
+    receivedByAdminId?: true
+  }
+
+  export type JobWorkReceiptSumAggregateInputType = {
+    receiptId?: true
+    dispatchId?: true
+    receivedByAdminId?: true
+  }
+
+  export type JobWorkReceiptMinAggregateInputType = {
+    receiptId?: true
+    dispatchId?: true
+    receiptNumber?: true
+    receivedDate?: true
+    receivedByAdminId?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkReceiptMaxAggregateInputType = {
+    receiptId?: true
+    dispatchId?: true
+    receiptNumber?: true
+    receivedDate?: true
+    receivedByAdminId?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkReceiptCountAggregateInputType = {
+    receiptId?: true
+    dispatchId?: true
+    receiptNumber?: true
+    receivedDate?: true
+    receivedByAdminId?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkReceiptAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReceipt to aggregate.
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceipts to fetch.
+     */
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkReceipts
+    **/
+    _count?: true | JobWorkReceiptCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkReceiptAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkReceiptSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkReceiptMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkReceiptMaxAggregateInputType
+  }
+
+  export type GetJobWorkReceiptAggregateType<T extends JobWorkReceiptAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkReceipt]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkReceipt[P]>
+      : GetScalarType<T[P], AggregateJobWorkReceipt[P]>
+  }
+
+
+
+
+  export type JobWorkReceiptGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReceiptWhereInput
+    orderBy?: JobWorkReceiptOrderByWithAggregationInput | JobWorkReceiptOrderByWithAggregationInput[]
+    by: JobWorkReceiptScalarFieldEnum[] | JobWorkReceiptScalarFieldEnum
+    having?: JobWorkReceiptScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkReceiptCountAggregateInputType | true
+    _avg?: JobWorkReceiptAvgAggregateInputType
+    _sum?: JobWorkReceiptSumAggregateInputType
+    _min?: JobWorkReceiptMinAggregateInputType
+    _max?: JobWorkReceiptMaxAggregateInputType
+  }
+
+  export type JobWorkReceiptGroupByOutputType = {
+    receiptId: number
+    dispatchId: number
+    receiptNumber: string | null
+    receivedDate: Date
+    receivedByAdminId: number | null
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkReceiptCountAggregateOutputType | null
+    _avg: JobWorkReceiptAvgAggregateOutputType | null
+    _sum: JobWorkReceiptSumAggregateOutputType | null
+    _min: JobWorkReceiptMinAggregateOutputType | null
+    _max: JobWorkReceiptMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkReceiptGroupByPayload<T extends JobWorkReceiptGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkReceiptGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkReceiptGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkReceiptGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkReceiptGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkReceiptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    receiptId?: boolean
+    dispatchId?: boolean
+    receiptNumber?: boolean
+    receivedDate?: boolean
+    receivedByAdminId?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    dispatch?: boolean | JobWorkDispatchDefaultArgs<ExtArgs>
+    receivedByAdmin?: boolean | JobWorkReceipt$receivedByAdminArgs<ExtArgs>
+    items?: boolean | JobWorkReceipt$itemsArgs<ExtArgs>
+    _count?: boolean | JobWorkReceiptCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkReceipt"]>
+
+
+
+  export type JobWorkReceiptSelectScalar = {
+    receiptId?: boolean
+    dispatchId?: boolean
+    receiptNumber?: boolean
+    receivedDate?: boolean
+    receivedByAdminId?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"receiptId" | "dispatchId" | "receiptNumber" | "receivedDate" | "receivedByAdminId" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkReceipt"]>
+  export type JobWorkReceiptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    dispatch?: boolean | JobWorkDispatchDefaultArgs<ExtArgs>
+    receivedByAdmin?: boolean | JobWorkReceipt$receivedByAdminArgs<ExtArgs>
+    items?: boolean | JobWorkReceipt$itemsArgs<ExtArgs>
+    _count?: boolean | JobWorkReceiptCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkReceiptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkReceipt"
+    objects: {
+      dispatch: Prisma.$JobWorkDispatchPayload<ExtArgs>
+      receivedByAdmin: Prisma.$AdminPayload<ExtArgs> | null
+      items: Prisma.$JobWorkReceiptItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      receiptId: number
+      dispatchId: number
+      receiptNumber: string | null
+      receivedDate: Date
+      receivedByAdminId: number | null
+      notes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkReceipt"]>
+    composites: {}
+  }
+
+  type JobWorkReceiptGetPayload<S extends boolean | null | undefined | JobWorkReceiptDefaultArgs> = $Result.GetResult<Prisma.$JobWorkReceiptPayload, S>
+
+  type JobWorkReceiptCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkReceiptFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkReceiptCountAggregateInputType | true
+    }
+
+  export interface JobWorkReceiptDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkReceipt'], meta: { name: 'JobWorkReceipt' } }
+    /**
+     * Find zero or one JobWorkReceipt that matches the filter.
+     * @param {JobWorkReceiptFindUniqueArgs} args - Arguments to find a JobWorkReceipt
+     * @example
+     * // Get one JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkReceiptFindUniqueArgs>(args: SelectSubset<T, JobWorkReceiptFindUniqueArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkReceipt that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkReceiptFindUniqueOrThrowArgs} args - Arguments to find a JobWorkReceipt
+     * @example
+     * // Get one JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkReceiptFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkReceiptFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReceipt that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptFindFirstArgs} args - Arguments to find a JobWorkReceipt
+     * @example
+     * // Get one JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkReceiptFindFirstArgs>(args?: SelectSubset<T, JobWorkReceiptFindFirstArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReceipt that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptFindFirstOrThrowArgs} args - Arguments to find a JobWorkReceipt
+     * @example
+     * // Get one JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkReceiptFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkReceiptFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkReceipts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkReceipts
+     * const jobWorkReceipts = await prisma.jobWorkReceipt.findMany()
+     * 
+     * // Get first 10 JobWorkReceipts
+     * const jobWorkReceipts = await prisma.jobWorkReceipt.findMany({ take: 10 })
+     * 
+     * // Only select the `receiptId`
+     * const jobWorkReceiptWithReceiptIdOnly = await prisma.jobWorkReceipt.findMany({ select: { receiptId: true } })
+     * 
+     */
+    findMany<T extends JobWorkReceiptFindManyArgs>(args?: SelectSubset<T, JobWorkReceiptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkReceipt.
+     * @param {JobWorkReceiptCreateArgs} args - Arguments to create a JobWorkReceipt.
+     * @example
+     * // Create one JobWorkReceipt
+     * const JobWorkReceipt = await prisma.jobWorkReceipt.create({
+     *   data: {
+     *     // ... data to create a JobWorkReceipt
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkReceiptCreateArgs>(args: SelectSubset<T, JobWorkReceiptCreateArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkReceipts.
+     * @param {JobWorkReceiptCreateManyArgs} args - Arguments to create many JobWorkReceipts.
+     * @example
+     * // Create many JobWorkReceipts
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkReceiptCreateManyArgs>(args?: SelectSubset<T, JobWorkReceiptCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkReceipt.
+     * @param {JobWorkReceiptDeleteArgs} args - Arguments to delete one JobWorkReceipt.
+     * @example
+     * // Delete one JobWorkReceipt
+     * const JobWorkReceipt = await prisma.jobWorkReceipt.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkReceipt
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkReceiptDeleteArgs>(args: SelectSubset<T, JobWorkReceiptDeleteArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkReceipt.
+     * @param {JobWorkReceiptUpdateArgs} args - Arguments to update one JobWorkReceipt.
+     * @example
+     * // Update one JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkReceiptUpdateArgs>(args: SelectSubset<T, JobWorkReceiptUpdateArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkReceipts.
+     * @param {JobWorkReceiptDeleteManyArgs} args - Arguments to filter JobWorkReceipts to delete.
+     * @example
+     * // Delete a few JobWorkReceipts
+     * const { count } = await prisma.jobWorkReceipt.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkReceiptDeleteManyArgs>(args?: SelectSubset<T, JobWorkReceiptDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkReceipts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkReceipts
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkReceiptUpdateManyArgs>(args: SelectSubset<T, JobWorkReceiptUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkReceipt.
+     * @param {JobWorkReceiptUpsertArgs} args - Arguments to update or create a JobWorkReceipt.
+     * @example
+     * // Update or create a JobWorkReceipt
+     * const jobWorkReceipt = await prisma.jobWorkReceipt.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkReceipt
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkReceipt we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkReceiptUpsertArgs>(args: SelectSubset<T, JobWorkReceiptUpsertArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkReceipts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptCountArgs} args - Arguments to filter JobWorkReceipts to count.
+     * @example
+     * // Count the number of JobWorkReceipts
+     * const count = await prisma.jobWorkReceipt.count({
+     *   where: {
+     *     // ... the filter for the JobWorkReceipts we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkReceiptCountArgs>(
+      args?: Subset<T, JobWorkReceiptCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkReceiptCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkReceipt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkReceiptAggregateArgs>(args: Subset<T, JobWorkReceiptAggregateArgs>): Prisma.PrismaPromise<GetJobWorkReceiptAggregateType<T>>
+
+    /**
+     * Group by JobWorkReceipt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkReceiptGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkReceiptGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkReceiptGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkReceiptGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkReceiptGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkReceipt model
+   */
+  readonly fields: JobWorkReceiptFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkReceipt.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkReceiptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    dispatch<T extends JobWorkDispatchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkDispatchDefaultArgs<ExtArgs>>): Prisma__JobWorkDispatchClient<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    receivedByAdmin<T extends JobWorkReceipt$receivedByAdminArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkReceipt$receivedByAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    items<T extends JobWorkReceipt$itemsArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkReceipt$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkReceipt model
+   */
+  interface JobWorkReceiptFieldRefs {
+    readonly receiptId: FieldRef<"JobWorkReceipt", 'Int'>
+    readonly dispatchId: FieldRef<"JobWorkReceipt", 'Int'>
+    readonly receiptNumber: FieldRef<"JobWorkReceipt", 'String'>
+    readonly receivedDate: FieldRef<"JobWorkReceipt", 'DateTime'>
+    readonly receivedByAdminId: FieldRef<"JobWorkReceipt", 'Int'>
+    readonly notes: FieldRef<"JobWorkReceipt", 'String'>
+    readonly createdAt: FieldRef<"JobWorkReceipt", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkReceipt", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkReceipt findUnique
+   */
+  export type JobWorkReceiptFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceipt to fetch.
+     */
+    where: JobWorkReceiptWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceipt findUniqueOrThrow
+   */
+  export type JobWorkReceiptFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceipt to fetch.
+     */
+    where: JobWorkReceiptWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceipt findFirst
+   */
+  export type JobWorkReceiptFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceipt to fetch.
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceipts to fetch.
+     */
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReceipts.
+     */
+    cursor?: JobWorkReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceipts.
+     */
+    distinct?: JobWorkReceiptScalarFieldEnum | JobWorkReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceipt findFirstOrThrow
+   */
+  export type JobWorkReceiptFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceipt to fetch.
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceipts to fetch.
+     */
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReceipts.
+     */
+    cursor?: JobWorkReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceipts.
+     */
+    distinct?: JobWorkReceiptScalarFieldEnum | JobWorkReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceipt findMany
+   */
+  export type JobWorkReceiptFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceipts to fetch.
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceipts to fetch.
+     */
+    orderBy?: JobWorkReceiptOrderByWithRelationInput | JobWorkReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkReceipts.
+     */
+    cursor?: JobWorkReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceipts.
+     */
+    distinct?: JobWorkReceiptScalarFieldEnum | JobWorkReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceipt create
+   */
+  export type JobWorkReceiptCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkReceipt.
+     */
+    data: XOR<JobWorkReceiptCreateInput, JobWorkReceiptUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkReceipt createMany
+   */
+  export type JobWorkReceiptCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkReceipts.
+     */
+    data: JobWorkReceiptCreateManyInput | JobWorkReceiptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkReceipt update
+   */
+  export type JobWorkReceiptUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkReceipt.
+     */
+    data: XOR<JobWorkReceiptUpdateInput, JobWorkReceiptUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkReceipt to update.
+     */
+    where: JobWorkReceiptWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceipt updateMany
+   */
+  export type JobWorkReceiptUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkReceipts.
+     */
+    data: XOR<JobWorkReceiptUpdateManyMutationInput, JobWorkReceiptUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkReceipts to update
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * Limit how many JobWorkReceipts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReceipt upsert
+   */
+  export type JobWorkReceiptUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkReceipt to update in case it exists.
+     */
+    where: JobWorkReceiptWhereUniqueInput
+    /**
+     * In case the JobWorkReceipt found by the `where` argument doesn't exist, create a new JobWorkReceipt with this data.
+     */
+    create: XOR<JobWorkReceiptCreateInput, JobWorkReceiptUncheckedCreateInput>
+    /**
+     * In case the JobWorkReceipt was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkReceiptUpdateInput, JobWorkReceiptUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkReceipt delete
+   */
+  export type JobWorkReceiptDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkReceipt to delete.
+     */
+    where: JobWorkReceiptWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceipt deleteMany
+   */
+  export type JobWorkReceiptDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReceipts to delete
+     */
+    where?: JobWorkReceiptWhereInput
+    /**
+     * Limit how many JobWorkReceipts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReceipt.receivedByAdmin
+   */
+  export type JobWorkReceipt$receivedByAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Admin
+     */
+    select?: AdminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Admin
+     */
+    omit?: AdminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminInclude<ExtArgs> | null
+    where?: AdminWhereInput
+  }
+
+  /**
+   * JobWorkReceipt.items
+   */
+  export type JobWorkReceipt$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    where?: JobWorkReceiptItemWhereInput
+    orderBy?: JobWorkReceiptItemOrderByWithRelationInput | JobWorkReceiptItemOrderByWithRelationInput[]
+    cursor?: JobWorkReceiptItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkReceiptItemScalarFieldEnum | JobWorkReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceipt without action
+   */
+  export type JobWorkReceiptDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceipt
+     */
+    select?: JobWorkReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceipt
+     */
+    omit?: JobWorkReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkReceiptItem
+   */
+
+  export type AggregateJobWorkReceiptItem = {
+    _count: JobWorkReceiptItemCountAggregateOutputType | null
+    _avg: JobWorkReceiptItemAvgAggregateOutputType | null
+    _sum: JobWorkReceiptItemSumAggregateOutputType | null
+    _min: JobWorkReceiptItemMinAggregateOutputType | null
+    _max: JobWorkReceiptItemMaxAggregateOutputType | null
+  }
+
+  export type JobWorkReceiptItemAvgAggregateOutputType = {
+    receiptItemId: number | null
+    receiptId: number | null
+    returnedPieces: number | null
+    returnedCarats: Decimal | null
+    returnedWeightGrams: Decimal | null
+  }
+
+  export type JobWorkReceiptItemSumAggregateOutputType = {
+    receiptItemId: number | null
+    receiptId: number | null
+    returnedPieces: number | null
+    returnedCarats: Decimal | null
+    returnedWeightGrams: Decimal | null
+  }
+
+  export type JobWorkReceiptItemMinAggregateOutputType = {
+    receiptItemId: number | null
+    receiptId: number | null
+    returnCondition: string | null
+    returnedPieces: number | null
+    returnedCarats: Decimal | null
+    returnedWeightGrams: Decimal | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type JobWorkReceiptItemMaxAggregateOutputType = {
+    receiptItemId: number | null
+    receiptId: number | null
+    returnCondition: string | null
+    returnedPieces: number | null
+    returnedCarats: Decimal | null
+    returnedWeightGrams: Decimal | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type JobWorkReceiptItemCountAggregateOutputType = {
+    receiptItemId: number
+    receiptId: number
+    returnCondition: number
+    returnedPieces: number
+    returnedCarats: number
+    returnedWeightGrams: number
+    remarks: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type JobWorkReceiptItemAvgAggregateInputType = {
+    receiptItemId?: true
+    receiptId?: true
+    returnedPieces?: true
+    returnedCarats?: true
+    returnedWeightGrams?: true
+  }
+
+  export type JobWorkReceiptItemSumAggregateInputType = {
+    receiptItemId?: true
+    receiptId?: true
+    returnedPieces?: true
+    returnedCarats?: true
+    returnedWeightGrams?: true
+  }
+
+  export type JobWorkReceiptItemMinAggregateInputType = {
+    receiptItemId?: true
+    receiptId?: true
+    returnCondition?: true
+    returnedPieces?: true
+    returnedCarats?: true
+    returnedWeightGrams?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type JobWorkReceiptItemMaxAggregateInputType = {
+    receiptItemId?: true
+    receiptId?: true
+    returnCondition?: true
+    returnedPieces?: true
+    returnedCarats?: true
+    returnedWeightGrams?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type JobWorkReceiptItemCountAggregateInputType = {
+    receiptItemId?: true
+    receiptId?: true
+    returnCondition?: true
+    returnedPieces?: true
+    returnedCarats?: true
+    returnedWeightGrams?: true
+    remarks?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type JobWorkReceiptItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReceiptItem to aggregate.
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceiptItems to fetch.
+     */
+    orderBy?: JobWorkReceiptItemOrderByWithRelationInput | JobWorkReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkReceiptItems
+    **/
+    _count?: true | JobWorkReceiptItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkReceiptItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkReceiptItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkReceiptItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkReceiptItemMaxAggregateInputType
+  }
+
+  export type GetJobWorkReceiptItemAggregateType<T extends JobWorkReceiptItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkReceiptItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkReceiptItem[P]>
+      : GetScalarType<T[P], AggregateJobWorkReceiptItem[P]>
+  }
+
+
+
+
+  export type JobWorkReceiptItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReceiptItemWhereInput
+    orderBy?: JobWorkReceiptItemOrderByWithAggregationInput | JobWorkReceiptItemOrderByWithAggregationInput[]
+    by: JobWorkReceiptItemScalarFieldEnum[] | JobWorkReceiptItemScalarFieldEnum
+    having?: JobWorkReceiptItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkReceiptItemCountAggregateInputType | true
+    _avg?: JobWorkReceiptItemAvgAggregateInputType
+    _sum?: JobWorkReceiptItemSumAggregateInputType
+    _min?: JobWorkReceiptItemMinAggregateInputType
+    _max?: JobWorkReceiptItemMaxAggregateInputType
+  }
+
+  export type JobWorkReceiptItemGroupByOutputType = {
+    receiptItemId: number
+    receiptId: number
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal
+    returnedWeightGrams: Decimal
+    remarks: string | null
+    createdAt: Date
+    _count: JobWorkReceiptItemCountAggregateOutputType | null
+    _avg: JobWorkReceiptItemAvgAggregateOutputType | null
+    _sum: JobWorkReceiptItemSumAggregateOutputType | null
+    _min: JobWorkReceiptItemMinAggregateOutputType | null
+    _max: JobWorkReceiptItemMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkReceiptItemGroupByPayload<T extends JobWorkReceiptItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkReceiptItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkReceiptItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkReceiptItemGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkReceiptItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkReceiptItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    receiptItemId?: boolean
+    receiptId?: boolean
+    returnCondition?: boolean
+    returnedPieces?: boolean
+    returnedCarats?: boolean
+    returnedWeightGrams?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    receipt?: boolean | JobWorkReceiptDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkReceiptItem"]>
+
+
+
+  export type JobWorkReceiptItemSelectScalar = {
+    receiptItemId?: boolean
+    receiptId?: boolean
+    returnCondition?: boolean
+    returnedPieces?: boolean
+    returnedCarats?: boolean
+    returnedWeightGrams?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+  }
+
+  export type JobWorkReceiptItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"receiptItemId" | "receiptId" | "returnCondition" | "returnedPieces" | "returnedCarats" | "returnedWeightGrams" | "remarks" | "createdAt", ExtArgs["result"]["jobWorkReceiptItem"]>
+  export type JobWorkReceiptItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receipt?: boolean | JobWorkReceiptDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkReceiptItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkReceiptItem"
+    objects: {
+      receipt: Prisma.$JobWorkReceiptPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      receiptItemId: number
+      receiptId: number
+      returnCondition: string
+      returnedPieces: number
+      returnedCarats: Prisma.Decimal
+      returnedWeightGrams: Prisma.Decimal
+      remarks: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["jobWorkReceiptItem"]>
+    composites: {}
+  }
+
+  type JobWorkReceiptItemGetPayload<S extends boolean | null | undefined | JobWorkReceiptItemDefaultArgs> = $Result.GetResult<Prisma.$JobWorkReceiptItemPayload, S>
+
+  type JobWorkReceiptItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkReceiptItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkReceiptItemCountAggregateInputType | true
+    }
+
+  export interface JobWorkReceiptItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkReceiptItem'], meta: { name: 'JobWorkReceiptItem' } }
+    /**
+     * Find zero or one JobWorkReceiptItem that matches the filter.
+     * @param {JobWorkReceiptItemFindUniqueArgs} args - Arguments to find a JobWorkReceiptItem
+     * @example
+     * // Get one JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkReceiptItemFindUniqueArgs>(args: SelectSubset<T, JobWorkReceiptItemFindUniqueArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkReceiptItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkReceiptItemFindUniqueOrThrowArgs} args - Arguments to find a JobWorkReceiptItem
+     * @example
+     * // Get one JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkReceiptItemFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkReceiptItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReceiptItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemFindFirstArgs} args - Arguments to find a JobWorkReceiptItem
+     * @example
+     * // Get one JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkReceiptItemFindFirstArgs>(args?: SelectSubset<T, JobWorkReceiptItemFindFirstArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReceiptItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemFindFirstOrThrowArgs} args - Arguments to find a JobWorkReceiptItem
+     * @example
+     * // Get one JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkReceiptItemFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkReceiptItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkReceiptItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkReceiptItems
+     * const jobWorkReceiptItems = await prisma.jobWorkReceiptItem.findMany()
+     * 
+     * // Get first 10 JobWorkReceiptItems
+     * const jobWorkReceiptItems = await prisma.jobWorkReceiptItem.findMany({ take: 10 })
+     * 
+     * // Only select the `receiptItemId`
+     * const jobWorkReceiptItemWithReceiptItemIdOnly = await prisma.jobWorkReceiptItem.findMany({ select: { receiptItemId: true } })
+     * 
+     */
+    findMany<T extends JobWorkReceiptItemFindManyArgs>(args?: SelectSubset<T, JobWorkReceiptItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkReceiptItem.
+     * @param {JobWorkReceiptItemCreateArgs} args - Arguments to create a JobWorkReceiptItem.
+     * @example
+     * // Create one JobWorkReceiptItem
+     * const JobWorkReceiptItem = await prisma.jobWorkReceiptItem.create({
+     *   data: {
+     *     // ... data to create a JobWorkReceiptItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkReceiptItemCreateArgs>(args: SelectSubset<T, JobWorkReceiptItemCreateArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkReceiptItems.
+     * @param {JobWorkReceiptItemCreateManyArgs} args - Arguments to create many JobWorkReceiptItems.
+     * @example
+     * // Create many JobWorkReceiptItems
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkReceiptItemCreateManyArgs>(args?: SelectSubset<T, JobWorkReceiptItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkReceiptItem.
+     * @param {JobWorkReceiptItemDeleteArgs} args - Arguments to delete one JobWorkReceiptItem.
+     * @example
+     * // Delete one JobWorkReceiptItem
+     * const JobWorkReceiptItem = await prisma.jobWorkReceiptItem.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkReceiptItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkReceiptItemDeleteArgs>(args: SelectSubset<T, JobWorkReceiptItemDeleteArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkReceiptItem.
+     * @param {JobWorkReceiptItemUpdateArgs} args - Arguments to update one JobWorkReceiptItem.
+     * @example
+     * // Update one JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkReceiptItemUpdateArgs>(args: SelectSubset<T, JobWorkReceiptItemUpdateArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkReceiptItems.
+     * @param {JobWorkReceiptItemDeleteManyArgs} args - Arguments to filter JobWorkReceiptItems to delete.
+     * @example
+     * // Delete a few JobWorkReceiptItems
+     * const { count } = await prisma.jobWorkReceiptItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkReceiptItemDeleteManyArgs>(args?: SelectSubset<T, JobWorkReceiptItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkReceiptItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkReceiptItems
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkReceiptItemUpdateManyArgs>(args: SelectSubset<T, JobWorkReceiptItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkReceiptItem.
+     * @param {JobWorkReceiptItemUpsertArgs} args - Arguments to update or create a JobWorkReceiptItem.
+     * @example
+     * // Update or create a JobWorkReceiptItem
+     * const jobWorkReceiptItem = await prisma.jobWorkReceiptItem.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkReceiptItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkReceiptItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkReceiptItemUpsertArgs>(args: SelectSubset<T, JobWorkReceiptItemUpsertArgs<ExtArgs>>): Prisma__JobWorkReceiptItemClient<$Result.GetResult<Prisma.$JobWorkReceiptItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkReceiptItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemCountArgs} args - Arguments to filter JobWorkReceiptItems to count.
+     * @example
+     * // Count the number of JobWorkReceiptItems
+     * const count = await prisma.jobWorkReceiptItem.count({
+     *   where: {
+     *     // ... the filter for the JobWorkReceiptItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkReceiptItemCountArgs>(
+      args?: Subset<T, JobWorkReceiptItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkReceiptItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkReceiptItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkReceiptItemAggregateArgs>(args: Subset<T, JobWorkReceiptItemAggregateArgs>): Prisma.PrismaPromise<GetJobWorkReceiptItemAggregateType<T>>
+
+    /**
+     * Group by JobWorkReceiptItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReceiptItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkReceiptItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkReceiptItemGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkReceiptItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkReceiptItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkReceiptItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkReceiptItem model
+   */
+  readonly fields: JobWorkReceiptItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkReceiptItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkReceiptItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    receipt<T extends JobWorkReceiptDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkReceiptDefaultArgs<ExtArgs>>): Prisma__JobWorkReceiptClient<$Result.GetResult<Prisma.$JobWorkReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkReceiptItem model
+   */
+  interface JobWorkReceiptItemFieldRefs {
+    readonly receiptItemId: FieldRef<"JobWorkReceiptItem", 'Int'>
+    readonly receiptId: FieldRef<"JobWorkReceiptItem", 'Int'>
+    readonly returnCondition: FieldRef<"JobWorkReceiptItem", 'String'>
+    readonly returnedPieces: FieldRef<"JobWorkReceiptItem", 'Int'>
+    readonly returnedCarats: FieldRef<"JobWorkReceiptItem", 'Decimal'>
+    readonly returnedWeightGrams: FieldRef<"JobWorkReceiptItem", 'Decimal'>
+    readonly remarks: FieldRef<"JobWorkReceiptItem", 'String'>
+    readonly createdAt: FieldRef<"JobWorkReceiptItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkReceiptItem findUnique
+   */
+  export type JobWorkReceiptItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceiptItem to fetch.
+     */
+    where: JobWorkReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceiptItem findUniqueOrThrow
+   */
+  export type JobWorkReceiptItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceiptItem to fetch.
+     */
+    where: JobWorkReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceiptItem findFirst
+   */
+  export type JobWorkReceiptItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceiptItem to fetch.
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceiptItems to fetch.
+     */
+    orderBy?: JobWorkReceiptItemOrderByWithRelationInput | JobWorkReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReceiptItems.
+     */
+    cursor?: JobWorkReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceiptItems.
+     */
+    distinct?: JobWorkReceiptItemScalarFieldEnum | JobWorkReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceiptItem findFirstOrThrow
+   */
+  export type JobWorkReceiptItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceiptItem to fetch.
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceiptItems to fetch.
+     */
+    orderBy?: JobWorkReceiptItemOrderByWithRelationInput | JobWorkReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReceiptItems.
+     */
+    cursor?: JobWorkReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceiptItems.
+     */
+    distinct?: JobWorkReceiptItemScalarFieldEnum | JobWorkReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceiptItem findMany
+   */
+  export type JobWorkReceiptItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReceiptItems to fetch.
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReceiptItems to fetch.
+     */
+    orderBy?: JobWorkReceiptItemOrderByWithRelationInput | JobWorkReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkReceiptItems.
+     */
+    cursor?: JobWorkReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReceiptItems.
+     */
+    distinct?: JobWorkReceiptItemScalarFieldEnum | JobWorkReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReceiptItem create
+   */
+  export type JobWorkReceiptItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkReceiptItem.
+     */
+    data: XOR<JobWorkReceiptItemCreateInput, JobWorkReceiptItemUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkReceiptItem createMany
+   */
+  export type JobWorkReceiptItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkReceiptItems.
+     */
+    data: JobWorkReceiptItemCreateManyInput | JobWorkReceiptItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkReceiptItem update
+   */
+  export type JobWorkReceiptItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkReceiptItem.
+     */
+    data: XOR<JobWorkReceiptItemUpdateInput, JobWorkReceiptItemUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkReceiptItem to update.
+     */
+    where: JobWorkReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceiptItem updateMany
+   */
+  export type JobWorkReceiptItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkReceiptItems.
+     */
+    data: XOR<JobWorkReceiptItemUpdateManyMutationInput, JobWorkReceiptItemUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkReceiptItems to update
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * Limit how many JobWorkReceiptItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReceiptItem upsert
+   */
+  export type JobWorkReceiptItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkReceiptItem to update in case it exists.
+     */
+    where: JobWorkReceiptItemWhereUniqueInput
+    /**
+     * In case the JobWorkReceiptItem found by the `where` argument doesn't exist, create a new JobWorkReceiptItem with this data.
+     */
+    create: XOR<JobWorkReceiptItemCreateInput, JobWorkReceiptItemUncheckedCreateInput>
+    /**
+     * In case the JobWorkReceiptItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkReceiptItemUpdateInput, JobWorkReceiptItemUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkReceiptItem delete
+   */
+  export type JobWorkReceiptItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkReceiptItem to delete.
+     */
+    where: JobWorkReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReceiptItem deleteMany
+   */
+  export type JobWorkReceiptItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReceiptItems to delete
+     */
+    where?: JobWorkReceiptItemWhereInput
+    /**
+     * Limit how many JobWorkReceiptItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReceiptItem without action
+   */
+  export type JobWorkReceiptItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReceiptItem
+     */
+    select?: JobWorkReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReceiptItem
+     */
+    omit?: JobWorkReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReceiptItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkReconciliation
+   */
+
+  export type AggregateJobWorkReconciliation = {
+    _count: JobWorkReconciliationCountAggregateOutputType | null
+    _avg: JobWorkReconciliationAvgAggregateOutputType | null
+    _sum: JobWorkReconciliationSumAggregateOutputType | null
+    _min: JobWorkReconciliationMinAggregateOutputType | null
+    _max: JobWorkReconciliationMaxAggregateOutputType | null
+  }
+
+  export type JobWorkReconciliationAvgAggregateOutputType = {
+    reconciliationId: number | null
+    jobWorkOrderId: number | null
+    reportedLossCarats: Decimal | null
+    approvedLossCarats: Decimal | null
+    varianceCarats: Decimal | null
+    reviewedByAdminId: number | null
+  }
+
+  export type JobWorkReconciliationSumAggregateOutputType = {
+    reconciliationId: number | null
+    jobWorkOrderId: number | null
+    reportedLossCarats: Decimal | null
+    approvedLossCarats: Decimal | null
+    varianceCarats: Decimal | null
+    reviewedByAdminId: number | null
+  }
+
+  export type JobWorkReconciliationMinAggregateOutputType = {
+    reconciliationId: number | null
+    jobWorkOrderId: number | null
+    reportedLossCarats: Decimal | null
+    approvedLossCarats: Decimal | null
+    varianceCarats: Decimal | null
+    status: string | null
+    reviewedByAdminId: number | null
+    reviewedAt: Date | null
+    resolutionNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkReconciliationMaxAggregateOutputType = {
+    reconciliationId: number | null
+    jobWorkOrderId: number | null
+    reportedLossCarats: Decimal | null
+    approvedLossCarats: Decimal | null
+    varianceCarats: Decimal | null
+    status: string | null
+    reviewedByAdminId: number | null
+    reviewedAt: Date | null
+    resolutionNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkReconciliationCountAggregateOutputType = {
+    reconciliationId: number
+    jobWorkOrderId: number
+    reportedLossCarats: number
+    approvedLossCarats: number
+    varianceCarats: number
+    status: number
+    reviewedByAdminId: number
+    reviewedAt: number
+    resolutionNotes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkReconciliationAvgAggregateInputType = {
+    reconciliationId?: true
+    jobWorkOrderId?: true
+    reportedLossCarats?: true
+    approvedLossCarats?: true
+    varianceCarats?: true
+    reviewedByAdminId?: true
+  }
+
+  export type JobWorkReconciliationSumAggregateInputType = {
+    reconciliationId?: true
+    jobWorkOrderId?: true
+    reportedLossCarats?: true
+    approvedLossCarats?: true
+    varianceCarats?: true
+    reviewedByAdminId?: true
+  }
+
+  export type JobWorkReconciliationMinAggregateInputType = {
+    reconciliationId?: true
+    jobWorkOrderId?: true
+    reportedLossCarats?: true
+    approvedLossCarats?: true
+    varianceCarats?: true
+    status?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    resolutionNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkReconciliationMaxAggregateInputType = {
+    reconciliationId?: true
+    jobWorkOrderId?: true
+    reportedLossCarats?: true
+    approvedLossCarats?: true
+    varianceCarats?: true
+    status?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    resolutionNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkReconciliationCountAggregateInputType = {
+    reconciliationId?: true
+    jobWorkOrderId?: true
+    reportedLossCarats?: true
+    approvedLossCarats?: true
+    varianceCarats?: true
+    status?: true
+    reviewedByAdminId?: true
+    reviewedAt?: true
+    resolutionNotes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkReconciliationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReconciliation to aggregate.
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReconciliations to fetch.
+     */
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReconciliations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReconciliations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkReconciliations
+    **/
+    _count?: true | JobWorkReconciliationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkReconciliationAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkReconciliationSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkReconciliationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkReconciliationMaxAggregateInputType
+  }
+
+  export type GetJobWorkReconciliationAggregateType<T extends JobWorkReconciliationAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkReconciliation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkReconciliation[P]>
+      : GetScalarType<T[P], AggregateJobWorkReconciliation[P]>
+  }
+
+
+
+
+  export type JobWorkReconciliationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkReconciliationWhereInput
+    orderBy?: JobWorkReconciliationOrderByWithAggregationInput | JobWorkReconciliationOrderByWithAggregationInput[]
+    by: JobWorkReconciliationScalarFieldEnum[] | JobWorkReconciliationScalarFieldEnum
+    having?: JobWorkReconciliationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkReconciliationCountAggregateInputType | true
+    _avg?: JobWorkReconciliationAvgAggregateInputType
+    _sum?: JobWorkReconciliationSumAggregateInputType
+    _min?: JobWorkReconciliationMinAggregateInputType
+    _max?: JobWorkReconciliationMaxAggregateInputType
+  }
+
+  export type JobWorkReconciliationGroupByOutputType = {
+    reconciliationId: number
+    jobWorkOrderId: number
+    reportedLossCarats: Decimal | null
+    approvedLossCarats: Decimal | null
+    varianceCarats: Decimal | null
+    status: string
+    reviewedByAdminId: number | null
+    reviewedAt: Date | null
+    resolutionNotes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkReconciliationCountAggregateOutputType | null
+    _avg: JobWorkReconciliationAvgAggregateOutputType | null
+    _sum: JobWorkReconciliationSumAggregateOutputType | null
+    _min: JobWorkReconciliationMinAggregateOutputType | null
+    _max: JobWorkReconciliationMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkReconciliationGroupByPayload<T extends JobWorkReconciliationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkReconciliationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkReconciliationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkReconciliationGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkReconciliationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkReconciliationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    reconciliationId?: boolean
+    jobWorkOrderId?: boolean
+    reportedLossCarats?: boolean
+    approvedLossCarats?: boolean
+    varianceCarats?: boolean
+    status?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    resolutionNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    jobWorkOrder?: boolean | JobWorkOrderDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | JobWorkReconciliation$reviewedByAdminArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkReconciliation"]>
+
+
+
+  export type JobWorkReconciliationSelectScalar = {
+    reconciliationId?: boolean
+    jobWorkOrderId?: boolean
+    reportedLossCarats?: boolean
+    approvedLossCarats?: boolean
+    varianceCarats?: boolean
+    status?: boolean
+    reviewedByAdminId?: boolean
+    reviewedAt?: boolean
+    resolutionNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkReconciliationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"reconciliationId" | "jobWorkOrderId" | "reportedLossCarats" | "approvedLossCarats" | "varianceCarats" | "status" | "reviewedByAdminId" | "reviewedAt" | "resolutionNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkReconciliation"]>
+  export type JobWorkReconciliationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    jobWorkOrder?: boolean | JobWorkOrderDefaultArgs<ExtArgs>
+    reviewedByAdmin?: boolean | JobWorkReconciliation$reviewedByAdminArgs<ExtArgs>
+  }
+
+  export type $JobWorkReconciliationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkReconciliation"
+    objects: {
+      jobWorkOrder: Prisma.$JobWorkOrderPayload<ExtArgs>
+      reviewedByAdmin: Prisma.$AdminPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      reconciliationId: number
+      jobWorkOrderId: number
+      reportedLossCarats: Prisma.Decimal | null
+      approvedLossCarats: Prisma.Decimal | null
+      varianceCarats: Prisma.Decimal | null
+      status: string
+      reviewedByAdminId: number | null
+      reviewedAt: Date | null
+      resolutionNotes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkReconciliation"]>
+    composites: {}
+  }
+
+  type JobWorkReconciliationGetPayload<S extends boolean | null | undefined | JobWorkReconciliationDefaultArgs> = $Result.GetResult<Prisma.$JobWorkReconciliationPayload, S>
+
+  type JobWorkReconciliationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkReconciliationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkReconciliationCountAggregateInputType | true
+    }
+
+  export interface JobWorkReconciliationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkReconciliation'], meta: { name: 'JobWorkReconciliation' } }
+    /**
+     * Find zero or one JobWorkReconciliation that matches the filter.
+     * @param {JobWorkReconciliationFindUniqueArgs} args - Arguments to find a JobWorkReconciliation
+     * @example
+     * // Get one JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkReconciliationFindUniqueArgs>(args: SelectSubset<T, JobWorkReconciliationFindUniqueArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkReconciliation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkReconciliationFindUniqueOrThrowArgs} args - Arguments to find a JobWorkReconciliation
+     * @example
+     * // Get one JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkReconciliationFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkReconciliationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReconciliation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationFindFirstArgs} args - Arguments to find a JobWorkReconciliation
+     * @example
+     * // Get one JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkReconciliationFindFirstArgs>(args?: SelectSubset<T, JobWorkReconciliationFindFirstArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkReconciliation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationFindFirstOrThrowArgs} args - Arguments to find a JobWorkReconciliation
+     * @example
+     * // Get one JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkReconciliationFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkReconciliationFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkReconciliations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkReconciliations
+     * const jobWorkReconciliations = await prisma.jobWorkReconciliation.findMany()
+     * 
+     * // Get first 10 JobWorkReconciliations
+     * const jobWorkReconciliations = await prisma.jobWorkReconciliation.findMany({ take: 10 })
+     * 
+     * // Only select the `reconciliationId`
+     * const jobWorkReconciliationWithReconciliationIdOnly = await prisma.jobWorkReconciliation.findMany({ select: { reconciliationId: true } })
+     * 
+     */
+    findMany<T extends JobWorkReconciliationFindManyArgs>(args?: SelectSubset<T, JobWorkReconciliationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkReconciliation.
+     * @param {JobWorkReconciliationCreateArgs} args - Arguments to create a JobWorkReconciliation.
+     * @example
+     * // Create one JobWorkReconciliation
+     * const JobWorkReconciliation = await prisma.jobWorkReconciliation.create({
+     *   data: {
+     *     // ... data to create a JobWorkReconciliation
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkReconciliationCreateArgs>(args: SelectSubset<T, JobWorkReconciliationCreateArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkReconciliations.
+     * @param {JobWorkReconciliationCreateManyArgs} args - Arguments to create many JobWorkReconciliations.
+     * @example
+     * // Create many JobWorkReconciliations
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkReconciliationCreateManyArgs>(args?: SelectSubset<T, JobWorkReconciliationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkReconciliation.
+     * @param {JobWorkReconciliationDeleteArgs} args - Arguments to delete one JobWorkReconciliation.
+     * @example
+     * // Delete one JobWorkReconciliation
+     * const JobWorkReconciliation = await prisma.jobWorkReconciliation.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkReconciliation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkReconciliationDeleteArgs>(args: SelectSubset<T, JobWorkReconciliationDeleteArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkReconciliation.
+     * @param {JobWorkReconciliationUpdateArgs} args - Arguments to update one JobWorkReconciliation.
+     * @example
+     * // Update one JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkReconciliationUpdateArgs>(args: SelectSubset<T, JobWorkReconciliationUpdateArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkReconciliations.
+     * @param {JobWorkReconciliationDeleteManyArgs} args - Arguments to filter JobWorkReconciliations to delete.
+     * @example
+     * // Delete a few JobWorkReconciliations
+     * const { count } = await prisma.jobWorkReconciliation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkReconciliationDeleteManyArgs>(args?: SelectSubset<T, JobWorkReconciliationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkReconciliations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkReconciliations
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkReconciliationUpdateManyArgs>(args: SelectSubset<T, JobWorkReconciliationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkReconciliation.
+     * @param {JobWorkReconciliationUpsertArgs} args - Arguments to update or create a JobWorkReconciliation.
+     * @example
+     * // Update or create a JobWorkReconciliation
+     * const jobWorkReconciliation = await prisma.jobWorkReconciliation.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkReconciliation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkReconciliation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkReconciliationUpsertArgs>(args: SelectSubset<T, JobWorkReconciliationUpsertArgs<ExtArgs>>): Prisma__JobWorkReconciliationClient<$Result.GetResult<Prisma.$JobWorkReconciliationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkReconciliations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationCountArgs} args - Arguments to filter JobWorkReconciliations to count.
+     * @example
+     * // Count the number of JobWorkReconciliations
+     * const count = await prisma.jobWorkReconciliation.count({
+     *   where: {
+     *     // ... the filter for the JobWorkReconciliations we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkReconciliationCountArgs>(
+      args?: Subset<T, JobWorkReconciliationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkReconciliationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkReconciliation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkReconciliationAggregateArgs>(args: Subset<T, JobWorkReconciliationAggregateArgs>): Prisma.PrismaPromise<GetJobWorkReconciliationAggregateType<T>>
+
+    /**
+     * Group by JobWorkReconciliation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkReconciliationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkReconciliationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkReconciliationGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkReconciliationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkReconciliationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkReconciliationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkReconciliation model
+   */
+  readonly fields: JobWorkReconciliationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkReconciliation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkReconciliationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    jobWorkOrder<T extends JobWorkOrderDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrderDefaultArgs<ExtArgs>>): Prisma__JobWorkOrderClient<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    reviewedByAdmin<T extends JobWorkReconciliation$reviewedByAdminArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkReconciliation$reviewedByAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkReconciliation model
+   */
+  interface JobWorkReconciliationFieldRefs {
+    readonly reconciliationId: FieldRef<"JobWorkReconciliation", 'Int'>
+    readonly jobWorkOrderId: FieldRef<"JobWorkReconciliation", 'Int'>
+    readonly reportedLossCarats: FieldRef<"JobWorkReconciliation", 'Decimal'>
+    readonly approvedLossCarats: FieldRef<"JobWorkReconciliation", 'Decimal'>
+    readonly varianceCarats: FieldRef<"JobWorkReconciliation", 'Decimal'>
+    readonly status: FieldRef<"JobWorkReconciliation", 'String'>
+    readonly reviewedByAdminId: FieldRef<"JobWorkReconciliation", 'Int'>
+    readonly reviewedAt: FieldRef<"JobWorkReconciliation", 'DateTime'>
+    readonly resolutionNotes: FieldRef<"JobWorkReconciliation", 'String'>
+    readonly createdAt: FieldRef<"JobWorkReconciliation", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkReconciliation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkReconciliation findUnique
+   */
+  export type JobWorkReconciliationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReconciliation to fetch.
+     */
+    where: JobWorkReconciliationWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReconciliation findUniqueOrThrow
+   */
+  export type JobWorkReconciliationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReconciliation to fetch.
+     */
+    where: JobWorkReconciliationWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReconciliation findFirst
+   */
+  export type JobWorkReconciliationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReconciliation to fetch.
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReconciliations to fetch.
+     */
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReconciliations.
+     */
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReconciliations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReconciliations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReconciliations.
+     */
+    distinct?: JobWorkReconciliationScalarFieldEnum | JobWorkReconciliationScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReconciliation findFirstOrThrow
+   */
+  export type JobWorkReconciliationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReconciliation to fetch.
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReconciliations to fetch.
+     */
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkReconciliations.
+     */
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReconciliations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReconciliations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReconciliations.
+     */
+    distinct?: JobWorkReconciliationScalarFieldEnum | JobWorkReconciliationScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReconciliation findMany
+   */
+  export type JobWorkReconciliationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkReconciliations to fetch.
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkReconciliations to fetch.
+     */
+    orderBy?: JobWorkReconciliationOrderByWithRelationInput | JobWorkReconciliationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkReconciliations.
+     */
+    cursor?: JobWorkReconciliationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkReconciliations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkReconciliations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkReconciliations.
+     */
+    distinct?: JobWorkReconciliationScalarFieldEnum | JobWorkReconciliationScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkReconciliation create
+   */
+  export type JobWorkReconciliationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkReconciliation.
+     */
+    data: XOR<JobWorkReconciliationCreateInput, JobWorkReconciliationUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkReconciliation createMany
+   */
+  export type JobWorkReconciliationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkReconciliations.
+     */
+    data: JobWorkReconciliationCreateManyInput | JobWorkReconciliationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkReconciliation update
+   */
+  export type JobWorkReconciliationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkReconciliation.
+     */
+    data: XOR<JobWorkReconciliationUpdateInput, JobWorkReconciliationUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkReconciliation to update.
+     */
+    where: JobWorkReconciliationWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReconciliation updateMany
+   */
+  export type JobWorkReconciliationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkReconciliations.
+     */
+    data: XOR<JobWorkReconciliationUpdateManyMutationInput, JobWorkReconciliationUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkReconciliations to update
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * Limit how many JobWorkReconciliations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReconciliation upsert
+   */
+  export type JobWorkReconciliationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkReconciliation to update in case it exists.
+     */
+    where: JobWorkReconciliationWhereUniqueInput
+    /**
+     * In case the JobWorkReconciliation found by the `where` argument doesn't exist, create a new JobWorkReconciliation with this data.
+     */
+    create: XOR<JobWorkReconciliationCreateInput, JobWorkReconciliationUncheckedCreateInput>
+    /**
+     * In case the JobWorkReconciliation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkReconciliationUpdateInput, JobWorkReconciliationUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkReconciliation delete
+   */
+  export type JobWorkReconciliationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkReconciliation to delete.
+     */
+    where: JobWorkReconciliationWhereUniqueInput
+  }
+
+  /**
+   * JobWorkReconciliation deleteMany
+   */
+  export type JobWorkReconciliationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkReconciliations to delete
+     */
+    where?: JobWorkReconciliationWhereInput
+    /**
+     * Limit how many JobWorkReconciliations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkReconciliation.reviewedByAdmin
+   */
+  export type JobWorkReconciliation$reviewedByAdminArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Admin
+     */
+    select?: AdminSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Admin
+     */
+    omit?: AdminOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminInclude<ExtArgs> | null
+    where?: AdminWhereInput
+  }
+
+  /**
+   * JobWorkReconciliation without action
+   */
+  export type JobWorkReconciliationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkReconciliation
+     */
+    select?: JobWorkReconciliationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkReconciliation
+     */
+    omit?: JobWorkReconciliationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkReconciliationInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -26555,6 +35223,126 @@ export namespace Prisma {
   export type FingerprintEnrollmentScalarFieldEnum = (typeof FingerprintEnrollmentScalarFieldEnum)[keyof typeof FingerprintEnrollmentScalarFieldEnum]
 
 
+  export const ExternalProcessorScalarFieldEnum: {
+    externalProcessorId: 'externalProcessorId',
+    companyId: 'companyId',
+    processorCode: 'processorCode',
+    name: 'name',
+    contactPerson: 'contactPerson',
+    phone: 'phone',
+    email: 'email',
+    address: 'address',
+    gstin: 'gstin',
+    pan: 'pan',
+    paymentTerms: 'paymentTerms',
+    notes: 'notes',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExternalProcessorScalarFieldEnum = (typeof ExternalProcessorScalarFieldEnum)[keyof typeof ExternalProcessorScalarFieldEnum]
+
+
+  export const JobWorkProcessTypeScalarFieldEnum: {
+    processTypeId: 'processTypeId',
+    companyId: 'companyId',
+    code: 'code',
+    name: 'name',
+    description: 'description',
+    chargeUnit: 'chargeUnit',
+    defaultRate: 'defaultRate',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkProcessTypeScalarFieldEnum = (typeof JobWorkProcessTypeScalarFieldEnum)[keyof typeof JobWorkProcessTypeScalarFieldEnum]
+
+
+  export const JobWorkOrderScalarFieldEnum: {
+    jobWorkOrderId: 'jobWorkOrderId',
+    companyId: 'companyId',
+    branchId: 'branchId',
+    jobNumber: 'jobNumber',
+    externalProcessorId: 'externalProcessorId',
+    processTypeId: 'processTypeId',
+    orderDate: 'orderDate',
+    status: 'status',
+    description: 'description',
+    notes: 'notes',
+    createdByAdminId: 'createdByAdminId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkOrderScalarFieldEnum = (typeof JobWorkOrderScalarFieldEnum)[keyof typeof JobWorkOrderScalarFieldEnum]
+
+
+  export const JobWorkDispatchScalarFieldEnum: {
+    dispatchId: 'dispatchId',
+    jobWorkOrderId: 'jobWorkOrderId',
+    challanNumber: 'challanNumber',
+    jangadNumber: 'jangadNumber',
+    dispatchDate: 'dispatchDate',
+    expectedReturnDate: 'expectedReturnDate',
+    sentPieces: 'sentPieces',
+    sentCarats: 'sentCarats',
+    sentWeightGrams: 'sentWeightGrams',
+    notes: 'notes',
+    createdByAdminId: 'createdByAdminId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkDispatchScalarFieldEnum = (typeof JobWorkDispatchScalarFieldEnum)[keyof typeof JobWorkDispatchScalarFieldEnum]
+
+
+  export const JobWorkReceiptScalarFieldEnum: {
+    receiptId: 'receiptId',
+    dispatchId: 'dispatchId',
+    receiptNumber: 'receiptNumber',
+    receivedDate: 'receivedDate',
+    receivedByAdminId: 'receivedByAdminId',
+    notes: 'notes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkReceiptScalarFieldEnum = (typeof JobWorkReceiptScalarFieldEnum)[keyof typeof JobWorkReceiptScalarFieldEnum]
+
+
+  export const JobWorkReceiptItemScalarFieldEnum: {
+    receiptItemId: 'receiptItemId',
+    receiptId: 'receiptId',
+    returnCondition: 'returnCondition',
+    returnedPieces: 'returnedPieces',
+    returnedCarats: 'returnedCarats',
+    returnedWeightGrams: 'returnedWeightGrams',
+    remarks: 'remarks',
+    createdAt: 'createdAt'
+  };
+
+  export type JobWorkReceiptItemScalarFieldEnum = (typeof JobWorkReceiptItemScalarFieldEnum)[keyof typeof JobWorkReceiptItemScalarFieldEnum]
+
+
+  export const JobWorkReconciliationScalarFieldEnum: {
+    reconciliationId: 'reconciliationId',
+    jobWorkOrderId: 'jobWorkOrderId',
+    reportedLossCarats: 'reportedLossCarats',
+    approvedLossCarats: 'approvedLossCarats',
+    varianceCarats: 'varianceCarats',
+    status: 'status',
+    reviewedByAdminId: 'reviewedByAdminId',
+    reviewedAt: 'reviewedAt',
+    resolutionNotes: 'resolutionNotes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkReconciliationScalarFieldEnum = (typeof JobWorkReconciliationScalarFieldEnum)[keyof typeof JobWorkReconciliationScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -26741,6 +35529,76 @@ export namespace Prisma {
   export type FingerprintEnrollmentOrderByRelevanceFieldEnum = (typeof FingerprintEnrollmentOrderByRelevanceFieldEnum)[keyof typeof FingerprintEnrollmentOrderByRelevanceFieldEnum]
 
 
+  export const ExternalProcessorOrderByRelevanceFieldEnum: {
+    processorCode: 'processorCode',
+    name: 'name',
+    contactPerson: 'contactPerson',
+    phone: 'phone',
+    email: 'email',
+    address: 'address',
+    gstin: 'gstin',
+    pan: 'pan',
+    paymentTerms: 'paymentTerms',
+    notes: 'notes',
+    status: 'status'
+  };
+
+  export type ExternalProcessorOrderByRelevanceFieldEnum = (typeof ExternalProcessorOrderByRelevanceFieldEnum)[keyof typeof ExternalProcessorOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkProcessTypeOrderByRelevanceFieldEnum: {
+    code: 'code',
+    name: 'name',
+    description: 'description',
+    chargeUnit: 'chargeUnit'
+  };
+
+  export type JobWorkProcessTypeOrderByRelevanceFieldEnum = (typeof JobWorkProcessTypeOrderByRelevanceFieldEnum)[keyof typeof JobWorkProcessTypeOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkOrderOrderByRelevanceFieldEnum: {
+    jobNumber: 'jobNumber',
+    status: 'status',
+    description: 'description',
+    notes: 'notes'
+  };
+
+  export type JobWorkOrderOrderByRelevanceFieldEnum = (typeof JobWorkOrderOrderByRelevanceFieldEnum)[keyof typeof JobWorkOrderOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkDispatchOrderByRelevanceFieldEnum: {
+    challanNumber: 'challanNumber',
+    jangadNumber: 'jangadNumber',
+    notes: 'notes'
+  };
+
+  export type JobWorkDispatchOrderByRelevanceFieldEnum = (typeof JobWorkDispatchOrderByRelevanceFieldEnum)[keyof typeof JobWorkDispatchOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkReceiptOrderByRelevanceFieldEnum: {
+    receiptNumber: 'receiptNumber',
+    notes: 'notes'
+  };
+
+  export type JobWorkReceiptOrderByRelevanceFieldEnum = (typeof JobWorkReceiptOrderByRelevanceFieldEnum)[keyof typeof JobWorkReceiptOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkReceiptItemOrderByRelevanceFieldEnum: {
+    returnCondition: 'returnCondition',
+    remarks: 'remarks'
+  };
+
+  export type JobWorkReceiptItemOrderByRelevanceFieldEnum = (typeof JobWorkReceiptItemOrderByRelevanceFieldEnum)[keyof typeof JobWorkReceiptItemOrderByRelevanceFieldEnum]
+
+
+  export const JobWorkReconciliationOrderByRelevanceFieldEnum: {
+    status: 'status',
+    resolutionNotes: 'resolutionNotes'
+  };
+
+  export type JobWorkReconciliationOrderByRelevanceFieldEnum = (typeof JobWorkReconciliationOrderByRelevanceFieldEnum)[keyof typeof JobWorkReconciliationOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references
    */
@@ -26813,6 +35671,10 @@ export namespace Prisma {
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     approvedAdvances?: AdvancePaymentListRelationFilter
     attendanceOverrides?: AttendanceListRelationFilter
+    jobWorkOrdersCreated?: JobWorkOrderListRelationFilter
+    jobWorkDispatchesCreated?: JobWorkDispatchListRelationFilter
+    jobWorkReceiptsRecorded?: JobWorkReceiptListRelationFilter
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationListRelationFilter
   }
 
   export type AdminOrderByWithRelationInput = {
@@ -26827,6 +35689,10 @@ export namespace Prisma {
     company?: companiesOrderByWithRelationInput
     approvedAdvances?: AdvancePaymentOrderByRelationAggregateInput
     attendanceOverrides?: AttendanceOrderByRelationAggregateInput
+    jobWorkOrdersCreated?: JobWorkOrderOrderByRelationAggregateInput
+    jobWorkDispatchesCreated?: JobWorkDispatchOrderByRelationAggregateInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptOrderByRelationAggregateInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationOrderByRelationAggregateInput
     _relevance?: AdminOrderByRelevanceInput
   }
 
@@ -26845,6 +35711,10 @@ export namespace Prisma {
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     approvedAdvances?: AdvancePaymentListRelationFilter
     attendanceOverrides?: AttendanceListRelationFilter
+    jobWorkOrdersCreated?: JobWorkOrderListRelationFilter
+    jobWorkDispatchesCreated?: JobWorkDispatchListRelationFilter
+    jobWorkReceiptsRecorded?: JobWorkReceiptListRelationFilter
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationListRelationFilter
   }, "adminId" | "email">
 
   export type AdminOrderByWithAggregationInput = {
@@ -26892,6 +35762,7 @@ export namespace Prisma {
     employees?: EmployeeListRelationFilter
     devices?: IotDeviceListRelationFilter
     publicHolidays?: PublicHolidayListRelationFilter
+    jobWorkOrders?: JobWorkOrderListRelationFilter
   }
 
   export type BranchOrderByWithRelationInput = {
@@ -26906,6 +35777,7 @@ export namespace Prisma {
     employees?: EmployeeOrderByRelationAggregateInput
     devices?: IotDeviceOrderByRelationAggregateInput
     publicHolidays?: PublicHolidayOrderByRelationAggregateInput
+    jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
     _relevance?: BranchOrderByRelevanceInput
   }
 
@@ -26924,6 +35796,7 @@ export namespace Prisma {
     employees?: EmployeeListRelationFilter
     devices?: IotDeviceListRelationFilter
     publicHolidays?: PublicHolidayListRelationFilter
+    jobWorkOrders?: JobWorkOrderListRelationFilter
   }, "branchId">
 
   export type BranchOrderByWithAggregationInput = {
@@ -28288,6 +37161,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeListRelationFilter
     settings?: SettingListRelationFilter
     publicHolidays?: PublicHolidayListRelationFilter
+    externalProcessors?: ExternalProcessorListRelationFilter
+    jobWorkProcessTypes?: JobWorkProcessTypeListRelationFilter
+    jobWorkOrders?: JobWorkOrderListRelationFilter
   }
 
   export type companiesOrderByWithRelationInput = {
@@ -28306,6 +37182,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeOrderByRelationAggregateInput
     settings?: SettingOrderByRelationAggregateInput
     publicHolidays?: PublicHolidayOrderByRelationAggregateInput
+    externalProcessors?: ExternalProcessorOrderByRelationAggregateInput
+    jobWorkProcessTypes?: JobWorkProcessTypeOrderByRelationAggregateInput
+    jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
     _relevance?: companiesOrderByRelevanceInput
   }
 
@@ -28328,6 +37207,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeListRelationFilter
     settings?: SettingListRelationFilter
     publicHolidays?: PublicHolidayListRelationFilter
+    externalProcessors?: ExternalProcessorListRelationFilter
+    jobWorkProcessTypes?: JobWorkProcessTypeListRelationFilter
+    jobWorkOrders?: JobWorkOrderListRelationFilter
   }, "company_id">
 
   export type companiesOrderByWithAggregationInput = {
@@ -28749,6 +37631,670 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"FingerprintEnrollment"> | Date | string
   }
 
+  export type ExternalProcessorWhereInput = {
+    AND?: ExternalProcessorWhereInput | ExternalProcessorWhereInput[]
+    OR?: ExternalProcessorWhereInput[]
+    NOT?: ExternalProcessorWhereInput | ExternalProcessorWhereInput[]
+    externalProcessorId?: IntFilter<"ExternalProcessor"> | number
+    companyId?: IntFilter<"ExternalProcessor"> | number
+    processorCode?: StringFilter<"ExternalProcessor"> | string
+    name?: StringFilter<"ExternalProcessor"> | string
+    contactPerson?: StringNullableFilter<"ExternalProcessor"> | string | null
+    phone?: StringNullableFilter<"ExternalProcessor"> | string | null
+    email?: StringNullableFilter<"ExternalProcessor"> | string | null
+    address?: StringNullableFilter<"ExternalProcessor"> | string | null
+    gstin?: StringNullableFilter<"ExternalProcessor"> | string | null
+    pan?: StringNullableFilter<"ExternalProcessor"> | string | null
+    paymentTerms?: StringNullableFilter<"ExternalProcessor"> | string | null
+    notes?: StringNullableFilter<"ExternalProcessor"> | string | null
+    status?: StringFilter<"ExternalProcessor"> | string
+    createdAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+  }
+
+  export type ExternalProcessorOrderByWithRelationInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+    processorCode?: SortOrder
+    name?: SortOrder
+    contactPerson?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    gstin?: SortOrderInput | SortOrder
+    pan?: SortOrderInput | SortOrder
+    paymentTerms?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: companiesOrderByWithRelationInput
+    jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
+    _relevance?: ExternalProcessorOrderByRelevanceInput
+  }
+
+  export type ExternalProcessorWhereUniqueInput = Prisma.AtLeast<{
+    externalProcessorId?: number
+    companyId_processorCode?: ExternalProcessorCompanyIdProcessorCodeCompoundUniqueInput
+    AND?: ExternalProcessorWhereInput | ExternalProcessorWhereInput[]
+    OR?: ExternalProcessorWhereInput[]
+    NOT?: ExternalProcessorWhereInput | ExternalProcessorWhereInput[]
+    companyId?: IntFilter<"ExternalProcessor"> | number
+    processorCode?: StringFilter<"ExternalProcessor"> | string
+    name?: StringFilter<"ExternalProcessor"> | string
+    contactPerson?: StringNullableFilter<"ExternalProcessor"> | string | null
+    phone?: StringNullableFilter<"ExternalProcessor"> | string | null
+    email?: StringNullableFilter<"ExternalProcessor"> | string | null
+    address?: StringNullableFilter<"ExternalProcessor"> | string | null
+    gstin?: StringNullableFilter<"ExternalProcessor"> | string | null
+    pan?: StringNullableFilter<"ExternalProcessor"> | string | null
+    paymentTerms?: StringNullableFilter<"ExternalProcessor"> | string | null
+    notes?: StringNullableFilter<"ExternalProcessor"> | string | null
+    status?: StringFilter<"ExternalProcessor"> | string
+    createdAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+  }, "externalProcessorId" | "companyId_processorCode">
+
+  export type ExternalProcessorOrderByWithAggregationInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+    processorCode?: SortOrder
+    name?: SortOrder
+    contactPerson?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    gstin?: SortOrderInput | SortOrder
+    pan?: SortOrderInput | SortOrder
+    paymentTerms?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExternalProcessorCountOrderByAggregateInput
+    _avg?: ExternalProcessorAvgOrderByAggregateInput
+    _max?: ExternalProcessorMaxOrderByAggregateInput
+    _min?: ExternalProcessorMinOrderByAggregateInput
+    _sum?: ExternalProcessorSumOrderByAggregateInput
+  }
+
+  export type ExternalProcessorScalarWhereWithAggregatesInput = {
+    AND?: ExternalProcessorScalarWhereWithAggregatesInput | ExternalProcessorScalarWhereWithAggregatesInput[]
+    OR?: ExternalProcessorScalarWhereWithAggregatesInput[]
+    NOT?: ExternalProcessorScalarWhereWithAggregatesInput | ExternalProcessorScalarWhereWithAggregatesInput[]
+    externalProcessorId?: IntWithAggregatesFilter<"ExternalProcessor"> | number
+    companyId?: IntWithAggregatesFilter<"ExternalProcessor"> | number
+    processorCode?: StringWithAggregatesFilter<"ExternalProcessor"> | string
+    name?: StringWithAggregatesFilter<"ExternalProcessor"> | string
+    contactPerson?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    email?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    address?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    gstin?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    pan?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    paymentTerms?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"ExternalProcessor"> | string | null
+    status?: StringWithAggregatesFilter<"ExternalProcessor"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"ExternalProcessor"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExternalProcessor"> | Date | string
+  }
+
+  export type JobWorkProcessTypeWhereInput = {
+    AND?: JobWorkProcessTypeWhereInput | JobWorkProcessTypeWhereInput[]
+    OR?: JobWorkProcessTypeWhereInput[]
+    NOT?: JobWorkProcessTypeWhereInput | JobWorkProcessTypeWhereInput[]
+    processTypeId?: IntFilter<"JobWorkProcessType"> | number
+    companyId?: IntFilter<"JobWorkProcessType"> | number
+    code?: StringFilter<"JobWorkProcessType"> | string
+    name?: StringFilter<"JobWorkProcessType"> | string
+    description?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    chargeUnit?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    defaultRate?: DecimalNullableFilter<"JobWorkProcessType"> | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFilter<"JobWorkProcessType"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+  }
+
+  export type JobWorkProcessTypeOrderByWithRelationInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    chargeUnit?: SortOrderInput | SortOrder
+    defaultRate?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: companiesOrderByWithRelationInput
+    jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
+    _relevance?: JobWorkProcessTypeOrderByRelevanceInput
+  }
+
+  export type JobWorkProcessTypeWhereUniqueInput = Prisma.AtLeast<{
+    processTypeId?: number
+    companyId_code?: JobWorkProcessTypeCompanyIdCodeCompoundUniqueInput
+    companyId_name?: JobWorkProcessTypeCompanyIdNameCompoundUniqueInput
+    AND?: JobWorkProcessTypeWhereInput | JobWorkProcessTypeWhereInput[]
+    OR?: JobWorkProcessTypeWhereInput[]
+    NOT?: JobWorkProcessTypeWhereInput | JobWorkProcessTypeWhereInput[]
+    companyId?: IntFilter<"JobWorkProcessType"> | number
+    code?: StringFilter<"JobWorkProcessType"> | string
+    name?: StringFilter<"JobWorkProcessType"> | string
+    description?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    chargeUnit?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    defaultRate?: DecimalNullableFilter<"JobWorkProcessType"> | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFilter<"JobWorkProcessType"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+  }, "processTypeId" | "companyId_code" | "companyId_name">
+
+  export type JobWorkProcessTypeOrderByWithAggregationInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    chargeUnit?: SortOrderInput | SortOrder
+    defaultRate?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkProcessTypeCountOrderByAggregateInput
+    _avg?: JobWorkProcessTypeAvgOrderByAggregateInput
+    _max?: JobWorkProcessTypeMaxOrderByAggregateInput
+    _min?: JobWorkProcessTypeMinOrderByAggregateInput
+    _sum?: JobWorkProcessTypeSumOrderByAggregateInput
+  }
+
+  export type JobWorkProcessTypeScalarWhereWithAggregatesInput = {
+    AND?: JobWorkProcessTypeScalarWhereWithAggregatesInput | JobWorkProcessTypeScalarWhereWithAggregatesInput[]
+    OR?: JobWorkProcessTypeScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkProcessTypeScalarWhereWithAggregatesInput | JobWorkProcessTypeScalarWhereWithAggregatesInput[]
+    processTypeId?: IntWithAggregatesFilter<"JobWorkProcessType"> | number
+    companyId?: IntWithAggregatesFilter<"JobWorkProcessType"> | number
+    code?: StringWithAggregatesFilter<"JobWorkProcessType"> | string
+    name?: StringWithAggregatesFilter<"JobWorkProcessType"> | string
+    description?: StringNullableWithAggregatesFilter<"JobWorkProcessType"> | string | null
+    chargeUnit?: StringNullableWithAggregatesFilter<"JobWorkProcessType"> | string | null
+    defaultRate?: DecimalNullableWithAggregatesFilter<"JobWorkProcessType"> | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolWithAggregatesFilter<"JobWorkProcessType"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkProcessType"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkProcessType"> | Date | string
+  }
+
+  export type JobWorkOrderWhereInput = {
+    AND?: JobWorkOrderWhereInput | JobWorkOrderWhereInput[]
+    OR?: JobWorkOrderWhereInput[]
+    NOT?: JobWorkOrderWhereInput | JobWorkOrderWhereInput[]
+    jobWorkOrderId?: IntFilter<"JobWorkOrder"> | number
+    companyId?: IntFilter<"JobWorkOrder"> | number
+    branchId?: IntFilter<"JobWorkOrder"> | number
+    jobNumber?: StringFilter<"JobWorkOrder"> | string
+    externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    processTypeId?: IntFilter<"JobWorkOrder"> | number
+    orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    status?: StringFilter<"JobWorkOrder"> | string
+    description?: StringNullableFilter<"JobWorkOrder"> | string | null
+    notes?: StringNullableFilter<"JobWorkOrder"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkOrder"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    externalProcessor?: XOR<ExternalProcessorScalarRelationFilter, ExternalProcessorWhereInput>
+    processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
+    createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    dispatches?: JobWorkDispatchListRelationFilter
+    reconciliations?: JobWorkReconciliationListRelationFilter
+  }
+
+  export type JobWorkOrderOrderByWithRelationInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    jobNumber?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    orderDate?: SortOrder
+    status?: SortOrder
+    description?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdByAdminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: companiesOrderByWithRelationInput
+    branch?: BranchOrderByWithRelationInput
+    externalProcessor?: ExternalProcessorOrderByWithRelationInput
+    processType?: JobWorkProcessTypeOrderByWithRelationInput
+    createdByAdmin?: AdminOrderByWithRelationInput
+    dispatches?: JobWorkDispatchOrderByRelationAggregateInput
+    reconciliations?: JobWorkReconciliationOrderByRelationAggregateInput
+    _relevance?: JobWorkOrderOrderByRelevanceInput
+  }
+
+  export type JobWorkOrderWhereUniqueInput = Prisma.AtLeast<{
+    jobWorkOrderId?: number
+    companyId_jobNumber?: JobWorkOrderCompanyIdJobNumberCompoundUniqueInput
+    AND?: JobWorkOrderWhereInput | JobWorkOrderWhereInput[]
+    OR?: JobWorkOrderWhereInput[]
+    NOT?: JobWorkOrderWhereInput | JobWorkOrderWhereInput[]
+    companyId?: IntFilter<"JobWorkOrder"> | number
+    branchId?: IntFilter<"JobWorkOrder"> | number
+    jobNumber?: StringFilter<"JobWorkOrder"> | string
+    externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    processTypeId?: IntFilter<"JobWorkOrder"> | number
+    orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    status?: StringFilter<"JobWorkOrder"> | string
+    description?: StringNullableFilter<"JobWorkOrder"> | string | null
+    notes?: StringNullableFilter<"JobWorkOrder"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkOrder"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
+    externalProcessor?: XOR<ExternalProcessorScalarRelationFilter, ExternalProcessorWhereInput>
+    processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
+    createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    dispatches?: JobWorkDispatchListRelationFilter
+    reconciliations?: JobWorkReconciliationListRelationFilter
+  }, "jobWorkOrderId" | "companyId_jobNumber">
+
+  export type JobWorkOrderOrderByWithAggregationInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    jobNumber?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    orderDate?: SortOrder
+    status?: SortOrder
+    description?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdByAdminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkOrderCountOrderByAggregateInput
+    _avg?: JobWorkOrderAvgOrderByAggregateInput
+    _max?: JobWorkOrderMaxOrderByAggregateInput
+    _min?: JobWorkOrderMinOrderByAggregateInput
+    _sum?: JobWorkOrderSumOrderByAggregateInput
+  }
+
+  export type JobWorkOrderScalarWhereWithAggregatesInput = {
+    AND?: JobWorkOrderScalarWhereWithAggregatesInput | JobWorkOrderScalarWhereWithAggregatesInput[]
+    OR?: JobWorkOrderScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkOrderScalarWhereWithAggregatesInput | JobWorkOrderScalarWhereWithAggregatesInput[]
+    jobWorkOrderId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    companyId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    branchId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    jobNumber?: StringWithAggregatesFilter<"JobWorkOrder"> | string
+    externalProcessorId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    processTypeId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    orderDate?: DateTimeWithAggregatesFilter<"JobWorkOrder"> | Date | string
+    status?: StringWithAggregatesFilter<"JobWorkOrder"> | string
+    description?: StringNullableWithAggregatesFilter<"JobWorkOrder"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"JobWorkOrder"> | string | null
+    createdByAdminId?: IntNullableWithAggregatesFilter<"JobWorkOrder"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkOrder"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkOrder"> | Date | string
+  }
+
+  export type JobWorkDispatchWhereInput = {
+    AND?: JobWorkDispatchWhereInput | JobWorkDispatchWhereInput[]
+    OR?: JobWorkDispatchWhereInput[]
+    NOT?: JobWorkDispatchWhereInput | JobWorkDispatchWhereInput[]
+    dispatchId?: IntFilter<"JobWorkDispatch"> | number
+    jobWorkOrderId?: IntFilter<"JobWorkDispatch"> | number
+    challanNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    jangadNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    dispatchDate?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    expectedReturnDate?: DateTimeNullableFilter<"JobWorkDispatch"> | Date | string | null
+    sentPieces?: IntFilter<"JobWorkDispatch"> | number
+    sentCarats?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    notes?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkDispatch"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    jobWorkOrder?: XOR<JobWorkOrderScalarRelationFilter, JobWorkOrderWhereInput>
+    createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    receipts?: JobWorkReceiptListRelationFilter
+  }
+
+  export type JobWorkDispatchOrderByWithRelationInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    challanNumber?: SortOrderInput | SortOrder
+    jangadNumber?: SortOrderInput | SortOrder
+    dispatchDate?: SortOrder
+    expectedReturnDate?: SortOrderInput | SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdByAdminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    jobWorkOrder?: JobWorkOrderOrderByWithRelationInput
+    createdByAdmin?: AdminOrderByWithRelationInput
+    receipts?: JobWorkReceiptOrderByRelationAggregateInput
+    _relevance?: JobWorkDispatchOrderByRelevanceInput
+  }
+
+  export type JobWorkDispatchWhereUniqueInput = Prisma.AtLeast<{
+    dispatchId?: number
+    AND?: JobWorkDispatchWhereInput | JobWorkDispatchWhereInput[]
+    OR?: JobWorkDispatchWhereInput[]
+    NOT?: JobWorkDispatchWhereInput | JobWorkDispatchWhereInput[]
+    jobWorkOrderId?: IntFilter<"JobWorkDispatch"> | number
+    challanNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    jangadNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    dispatchDate?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    expectedReturnDate?: DateTimeNullableFilter<"JobWorkDispatch"> | Date | string | null
+    sentPieces?: IntFilter<"JobWorkDispatch"> | number
+    sentCarats?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    notes?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkDispatch"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    jobWorkOrder?: XOR<JobWorkOrderScalarRelationFilter, JobWorkOrderWhereInput>
+    createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    receipts?: JobWorkReceiptListRelationFilter
+  }, "dispatchId">
+
+  export type JobWorkDispatchOrderByWithAggregationInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    challanNumber?: SortOrderInput | SortOrder
+    jangadNumber?: SortOrderInput | SortOrder
+    dispatchDate?: SortOrder
+    expectedReturnDate?: SortOrderInput | SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdByAdminId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkDispatchCountOrderByAggregateInput
+    _avg?: JobWorkDispatchAvgOrderByAggregateInput
+    _max?: JobWorkDispatchMaxOrderByAggregateInput
+    _min?: JobWorkDispatchMinOrderByAggregateInput
+    _sum?: JobWorkDispatchSumOrderByAggregateInput
+  }
+
+  export type JobWorkDispatchScalarWhereWithAggregatesInput = {
+    AND?: JobWorkDispatchScalarWhereWithAggregatesInput | JobWorkDispatchScalarWhereWithAggregatesInput[]
+    OR?: JobWorkDispatchScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkDispatchScalarWhereWithAggregatesInput | JobWorkDispatchScalarWhereWithAggregatesInput[]
+    dispatchId?: IntWithAggregatesFilter<"JobWorkDispatch"> | number
+    jobWorkOrderId?: IntWithAggregatesFilter<"JobWorkDispatch"> | number
+    challanNumber?: StringNullableWithAggregatesFilter<"JobWorkDispatch"> | string | null
+    jangadNumber?: StringNullableWithAggregatesFilter<"JobWorkDispatch"> | string | null
+    dispatchDate?: DateTimeWithAggregatesFilter<"JobWorkDispatch"> | Date | string
+    expectedReturnDate?: DateTimeNullableWithAggregatesFilter<"JobWorkDispatch"> | Date | string | null
+    sentPieces?: IntWithAggregatesFilter<"JobWorkDispatch"> | number
+    sentCarats?: DecimalWithAggregatesFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalWithAggregatesFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    notes?: StringNullableWithAggregatesFilter<"JobWorkDispatch"> | string | null
+    createdByAdminId?: IntNullableWithAggregatesFilter<"JobWorkDispatch"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkDispatch"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkDispatch"> | Date | string
+  }
+
+  export type JobWorkReceiptWhereInput = {
+    AND?: JobWorkReceiptWhereInput | JobWorkReceiptWhereInput[]
+    OR?: JobWorkReceiptWhereInput[]
+    NOT?: JobWorkReceiptWhereInput | JobWorkReceiptWhereInput[]
+    receiptId?: IntFilter<"JobWorkReceipt"> | number
+    dispatchId?: IntFilter<"JobWorkReceipt"> | number
+    receiptNumber?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    receivedDate?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    receivedByAdminId?: IntNullableFilter<"JobWorkReceipt"> | number | null
+    notes?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    dispatch?: XOR<JobWorkDispatchScalarRelationFilter, JobWorkDispatchWhereInput>
+    receivedByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    items?: JobWorkReceiptItemListRelationFilter
+  }
+
+  export type JobWorkReceiptOrderByWithRelationInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receiptNumber?: SortOrderInput | SortOrder
+    receivedDate?: SortOrder
+    receivedByAdminId?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    dispatch?: JobWorkDispatchOrderByWithRelationInput
+    receivedByAdmin?: AdminOrderByWithRelationInput
+    items?: JobWorkReceiptItemOrderByRelationAggregateInput
+    _relevance?: JobWorkReceiptOrderByRelevanceInput
+  }
+
+  export type JobWorkReceiptWhereUniqueInput = Prisma.AtLeast<{
+    receiptId?: number
+    AND?: JobWorkReceiptWhereInput | JobWorkReceiptWhereInput[]
+    OR?: JobWorkReceiptWhereInput[]
+    NOT?: JobWorkReceiptWhereInput | JobWorkReceiptWhereInput[]
+    dispatchId?: IntFilter<"JobWorkReceipt"> | number
+    receiptNumber?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    receivedDate?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    receivedByAdminId?: IntNullableFilter<"JobWorkReceipt"> | number | null
+    notes?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    dispatch?: XOR<JobWorkDispatchScalarRelationFilter, JobWorkDispatchWhereInput>
+    receivedByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+    items?: JobWorkReceiptItemListRelationFilter
+  }, "receiptId">
+
+  export type JobWorkReceiptOrderByWithAggregationInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receiptNumber?: SortOrderInput | SortOrder
+    receivedDate?: SortOrder
+    receivedByAdminId?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkReceiptCountOrderByAggregateInput
+    _avg?: JobWorkReceiptAvgOrderByAggregateInput
+    _max?: JobWorkReceiptMaxOrderByAggregateInput
+    _min?: JobWorkReceiptMinOrderByAggregateInput
+    _sum?: JobWorkReceiptSumOrderByAggregateInput
+  }
+
+  export type JobWorkReceiptScalarWhereWithAggregatesInput = {
+    AND?: JobWorkReceiptScalarWhereWithAggregatesInput | JobWorkReceiptScalarWhereWithAggregatesInput[]
+    OR?: JobWorkReceiptScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkReceiptScalarWhereWithAggregatesInput | JobWorkReceiptScalarWhereWithAggregatesInput[]
+    receiptId?: IntWithAggregatesFilter<"JobWorkReceipt"> | number
+    dispatchId?: IntWithAggregatesFilter<"JobWorkReceipt"> | number
+    receiptNumber?: StringNullableWithAggregatesFilter<"JobWorkReceipt"> | string | null
+    receivedDate?: DateTimeWithAggregatesFilter<"JobWorkReceipt"> | Date | string
+    receivedByAdminId?: IntNullableWithAggregatesFilter<"JobWorkReceipt"> | number | null
+    notes?: StringNullableWithAggregatesFilter<"JobWorkReceipt"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkReceipt"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkReceipt"> | Date | string
+  }
+
+  export type JobWorkReceiptItemWhereInput = {
+    AND?: JobWorkReceiptItemWhereInput | JobWorkReceiptItemWhereInput[]
+    OR?: JobWorkReceiptItemWhereInput[]
+    NOT?: JobWorkReceiptItemWhereInput | JobWorkReceiptItemWhereInput[]
+    receiptItemId?: IntFilter<"JobWorkReceiptItem"> | number
+    receiptId?: IntFilter<"JobWorkReceiptItem"> | number
+    returnCondition?: StringFilter<"JobWorkReceiptItem"> | string
+    returnedPieces?: IntFilter<"JobWorkReceiptItem"> | number
+    returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    remarks?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceiptItem"> | Date | string
+    receipt?: XOR<JobWorkReceiptScalarRelationFilter, JobWorkReceiptWhereInput>
+  }
+
+  export type JobWorkReceiptItemOrderByWithRelationInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnCondition?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    receipt?: JobWorkReceiptOrderByWithRelationInput
+    _relevance?: JobWorkReceiptItemOrderByRelevanceInput
+  }
+
+  export type JobWorkReceiptItemWhereUniqueInput = Prisma.AtLeast<{
+    receiptItemId?: number
+    AND?: JobWorkReceiptItemWhereInput | JobWorkReceiptItemWhereInput[]
+    OR?: JobWorkReceiptItemWhereInput[]
+    NOT?: JobWorkReceiptItemWhereInput | JobWorkReceiptItemWhereInput[]
+    receiptId?: IntFilter<"JobWorkReceiptItem"> | number
+    returnCondition?: StringFilter<"JobWorkReceiptItem"> | string
+    returnedPieces?: IntFilter<"JobWorkReceiptItem"> | number
+    returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    remarks?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceiptItem"> | Date | string
+    receipt?: XOR<JobWorkReceiptScalarRelationFilter, JobWorkReceiptWhereInput>
+  }, "receiptItemId">
+
+  export type JobWorkReceiptItemOrderByWithAggregationInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnCondition?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: JobWorkReceiptItemCountOrderByAggregateInput
+    _avg?: JobWorkReceiptItemAvgOrderByAggregateInput
+    _max?: JobWorkReceiptItemMaxOrderByAggregateInput
+    _min?: JobWorkReceiptItemMinOrderByAggregateInput
+    _sum?: JobWorkReceiptItemSumOrderByAggregateInput
+  }
+
+  export type JobWorkReceiptItemScalarWhereWithAggregatesInput = {
+    AND?: JobWorkReceiptItemScalarWhereWithAggregatesInput | JobWorkReceiptItemScalarWhereWithAggregatesInput[]
+    OR?: JobWorkReceiptItemScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkReceiptItemScalarWhereWithAggregatesInput | JobWorkReceiptItemScalarWhereWithAggregatesInput[]
+    receiptItemId?: IntWithAggregatesFilter<"JobWorkReceiptItem"> | number
+    receiptId?: IntWithAggregatesFilter<"JobWorkReceiptItem"> | number
+    returnCondition?: StringWithAggregatesFilter<"JobWorkReceiptItem"> | string
+    returnedPieces?: IntWithAggregatesFilter<"JobWorkReceiptItem"> | number
+    returnedCarats?: DecimalWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    remarks?: StringNullableWithAggregatesFilter<"JobWorkReceiptItem"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkReceiptItem"> | Date | string
+  }
+
+  export type JobWorkReconciliationWhereInput = {
+    AND?: JobWorkReconciliationWhereInput | JobWorkReconciliationWhereInput[]
+    OR?: JobWorkReconciliationWhereInput[]
+    NOT?: JobWorkReconciliationWhereInput | JobWorkReconciliationWhereInput[]
+    reconciliationId?: IntFilter<"JobWorkReconciliation"> | number
+    jobWorkOrderId?: IntFilter<"JobWorkReconciliation"> | number
+    reportedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    status?: StringFilter<"JobWorkReconciliation"> | string
+    reviewedByAdminId?: IntNullableFilter<"JobWorkReconciliation"> | number | null
+    reviewedAt?: DateTimeNullableFilter<"JobWorkReconciliation"> | Date | string | null
+    resolutionNotes?: StringNullableFilter<"JobWorkReconciliation"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+    jobWorkOrder?: XOR<JobWorkOrderScalarRelationFilter, JobWorkOrderWhereInput>
+    reviewedByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+  }
+
+  export type JobWorkReconciliationOrderByWithRelationInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrderInput | SortOrder
+    approvedLossCarats?: SortOrderInput | SortOrder
+    varianceCarats?: SortOrderInput | SortOrder
+    status?: SortOrder
+    reviewedByAdminId?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    jobWorkOrder?: JobWorkOrderOrderByWithRelationInput
+    reviewedByAdmin?: AdminOrderByWithRelationInput
+    _relevance?: JobWorkReconciliationOrderByRelevanceInput
+  }
+
+  export type JobWorkReconciliationWhereUniqueInput = Prisma.AtLeast<{
+    reconciliationId?: number
+    AND?: JobWorkReconciliationWhereInput | JobWorkReconciliationWhereInput[]
+    OR?: JobWorkReconciliationWhereInput[]
+    NOT?: JobWorkReconciliationWhereInput | JobWorkReconciliationWhereInput[]
+    jobWorkOrderId?: IntFilter<"JobWorkReconciliation"> | number
+    reportedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    status?: StringFilter<"JobWorkReconciliation"> | string
+    reviewedByAdminId?: IntNullableFilter<"JobWorkReconciliation"> | number | null
+    reviewedAt?: DateTimeNullableFilter<"JobWorkReconciliation"> | Date | string | null
+    resolutionNotes?: StringNullableFilter<"JobWorkReconciliation"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+    jobWorkOrder?: XOR<JobWorkOrderScalarRelationFilter, JobWorkOrderWhereInput>
+    reviewedByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
+  }, "reconciliationId">
+
+  export type JobWorkReconciliationOrderByWithAggregationInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrderInput | SortOrder
+    approvedLossCarats?: SortOrderInput | SortOrder
+    varianceCarats?: SortOrderInput | SortOrder
+    status?: SortOrder
+    reviewedByAdminId?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkReconciliationCountOrderByAggregateInput
+    _avg?: JobWorkReconciliationAvgOrderByAggregateInput
+    _max?: JobWorkReconciliationMaxOrderByAggregateInput
+    _min?: JobWorkReconciliationMinOrderByAggregateInput
+    _sum?: JobWorkReconciliationSumOrderByAggregateInput
+  }
+
+  export type JobWorkReconciliationScalarWhereWithAggregatesInput = {
+    AND?: JobWorkReconciliationScalarWhereWithAggregatesInput | JobWorkReconciliationScalarWhereWithAggregatesInput[]
+    OR?: JobWorkReconciliationScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkReconciliationScalarWhereWithAggregatesInput | JobWorkReconciliationScalarWhereWithAggregatesInput[]
+    reconciliationId?: IntWithAggregatesFilter<"JobWorkReconciliation"> | number
+    jobWorkOrderId?: IntWithAggregatesFilter<"JobWorkReconciliation"> | number
+    reportedLossCarats?: DecimalNullableWithAggregatesFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: DecimalNullableWithAggregatesFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: DecimalNullableWithAggregatesFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    status?: StringWithAggregatesFilter<"JobWorkReconciliation"> | string
+    reviewedByAdminId?: IntNullableWithAggregatesFilter<"JobWorkReconciliation"> | number | null
+    reviewedAt?: DateTimeNullableWithAggregatesFilter<"JobWorkReconciliation"> | Date | string | null
+    resolutionNotes?: StringNullableWithAggregatesFilter<"JobWorkReconciliation"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkReconciliation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkReconciliation"> | Date | string
+  }
+
   export type AdminCreateInput = {
     adminName: string
     email: string
@@ -28759,6 +38305,10 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutAdminsInput
     approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
     attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminUncheckedCreateInput = {
@@ -28772,6 +38322,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
     attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminUpdateInput = {
@@ -28784,6 +38338,10 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
     approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
     attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminUncheckedUpdateInput = {
@@ -28797,6 +38355,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
     attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminCreateManyInput = {
@@ -28840,6 +38402,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateInput = {
@@ -28853,6 +38416,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUpdateInput = {
@@ -28865,6 +38429,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateInput = {
@@ -28878,6 +38443,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchCreateManyInput = {
@@ -30283,6 +39849,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateInput = {
@@ -30301,6 +39870,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUpdateInput = {
@@ -30318,6 +39890,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateInput = {
@@ -30336,6 +39911,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesCreateManyInput = {
@@ -30784,6 +40362,688 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ExternalProcessorCreateInput = {
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutExternalProcessorsInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorUncheckedCreateInput = {
+    externalProcessorId?: number
+    companyId: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorUpdateInput = {
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type ExternalProcessorUncheckedUpdateInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type ExternalProcessorCreateManyInput = {
+    externalProcessorId?: number
+    companyId: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalProcessorUpdateManyMutationInput = {
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExternalProcessorUncheckedUpdateManyInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessTypeCreateInput = {
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkProcessTypesInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutProcessTypeInput
+  }
+
+  export type JobWorkProcessTypeUncheckedCreateInput = {
+    processTypeId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutProcessTypeInput
+  }
+
+  export type JobWorkProcessTypeUpdateInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkProcessTypesNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutProcessTypeNestedInput
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateInput = {
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutProcessTypeNestedInput
+  }
+
+  export type JobWorkProcessTypeCreateManyInput = {
+    processTypeId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessTypeUpdateManyMutationInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateManyInput = {
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderCreateInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUpdateInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderCreateManyInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderUpdateManyMutationInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkDispatchCreateInput = {
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrder: JobWorkOrderCreateNestedOneWithoutDispatchesInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkDispatchesCreatedInput
+    receipts?: JobWorkReceiptCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchUncheckedCreateInput = {
+    dispatchId?: number
+    jobWorkOrderId: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receipts?: JobWorkReceiptUncheckedCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchUpdateInput = {
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrder?: JobWorkOrderUpdateOneRequiredWithoutDispatchesNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkDispatchesCreatedNestedInput
+    receipts?: JobWorkReceiptUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipts?: JobWorkReceiptUncheckedUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchCreateManyInput = {
+    dispatchId?: number
+    jobWorkOrderId: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkDispatchUpdateManyMutationInput = {
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkDispatchUncheckedUpdateManyInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptCreateInput = {
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatch: JobWorkDispatchCreateNestedOneWithoutReceiptsInput
+    receivedByAdmin?: AdminCreateNestedOneWithoutJobWorkReceiptsRecordedInput
+    items?: JobWorkReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptUncheckedCreateInput = {
+    receiptId?: number
+    dispatchId: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    receivedByAdminId?: number | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: JobWorkReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptUpdateInput = {
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatch?: JobWorkDispatchUpdateOneRequiredWithoutReceiptsNestedInput
+    receivedByAdmin?: AdminUpdateOneWithoutJobWorkReceiptsRecordedNestedInput
+    items?: JobWorkReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptCreateManyInput = {
+    receiptId?: number
+    dispatchId: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    receivedByAdminId?: number | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReceiptUpdateManyMutationInput = {
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptUncheckedUpdateManyInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemCreateInput = {
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+    receipt: JobWorkReceiptCreateNestedOneWithoutItemsInput
+  }
+
+  export type JobWorkReceiptItemUncheckedCreateInput = {
+    receiptItemId?: number
+    receiptId: number
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type JobWorkReceiptItemUpdateInput = {
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipt?: JobWorkReceiptUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type JobWorkReceiptItemUncheckedUpdateInput = {
+    receiptItemId?: IntFieldUpdateOperationsInput | number
+    receiptId?: IntFieldUpdateOperationsInput | number
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemCreateManyInput = {
+    receiptItemId?: number
+    receiptId: number
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type JobWorkReceiptItemUpdateManyMutationInput = {
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemUncheckedUpdateManyInput = {
+    receiptItemId?: IntFieldUpdateOperationsInput | number
+    receiptId?: IntFieldUpdateOperationsInput | number
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationCreateInput = {
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrder: JobWorkOrderCreateNestedOneWithoutReconciliationsInput
+    reviewedByAdmin?: AdminCreateNestedOneWithoutJobWorkReconciliationsReviewedInput
+  }
+
+  export type JobWorkReconciliationUncheckedCreateInput = {
+    reconciliationId?: number
+    jobWorkOrderId: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedByAdminId?: number | null
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationUpdateInput = {
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrder?: JobWorkOrderUpdateOneRequiredWithoutReconciliationsNestedInput
+    reviewedByAdmin?: AdminUpdateOneWithoutJobWorkReconciliationsReviewedNestedInput
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationCreateManyInput = {
+    reconciliationId?: number
+    jobWorkOrderId: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedByAdminId?: number | null
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationUpdateManyMutationInput = {
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateManyInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -30853,6 +41113,30 @@ export namespace Prisma {
     none?: AttendanceWhereInput
   }
 
+  export type JobWorkOrderListRelationFilter = {
+    every?: JobWorkOrderWhereInput
+    some?: JobWorkOrderWhereInput
+    none?: JobWorkOrderWhereInput
+  }
+
+  export type JobWorkDispatchListRelationFilter = {
+    every?: JobWorkDispatchWhereInput
+    some?: JobWorkDispatchWhereInput
+    none?: JobWorkDispatchWhereInput
+  }
+
+  export type JobWorkReceiptListRelationFilter = {
+    every?: JobWorkReceiptWhereInput
+    some?: JobWorkReceiptWhereInput
+    none?: JobWorkReceiptWhereInput
+  }
+
+  export type JobWorkReconciliationListRelationFilter = {
+    every?: JobWorkReconciliationWhereInput
+    some?: JobWorkReconciliationWhereInput
+    none?: JobWorkReconciliationWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -30863,6 +41147,22 @@ export namespace Prisma {
   }
 
   export type AttendanceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkOrderOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkDispatchOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkReceiptOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkReconciliationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -32280,6 +42580,18 @@ export namespace Prisma {
     none?: SettingWhereInput
   }
 
+  export type ExternalProcessorListRelationFilter = {
+    every?: ExternalProcessorWhereInput
+    some?: ExternalProcessorWhereInput
+    none?: ExternalProcessorWhereInput
+  }
+
+  export type JobWorkProcessTypeListRelationFilter = {
+    every?: JobWorkProcessTypeWhereInput
+    some?: JobWorkProcessTypeWhereInput
+    none?: JobWorkProcessTypeWhereInput
+  }
+
   export type AdminOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -32293,6 +42605,14 @@ export namespace Prisma {
   }
 
   export type SettingOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ExternalProcessorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkProcessTypeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -32626,6 +42946,504 @@ export namespace Prisma {
     confidence?: SortOrder
   }
 
+  export type ExternalProcessorOrderByRelevanceInput = {
+    fields: ExternalProcessorOrderByRelevanceFieldEnum | ExternalProcessorOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ExternalProcessorCompanyIdProcessorCodeCompoundUniqueInput = {
+    companyId: number
+    processorCode: string
+  }
+
+  export type ExternalProcessorCountOrderByAggregateInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+    processorCode?: SortOrder
+    name?: SortOrder
+    contactPerson?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    gstin?: SortOrder
+    pan?: SortOrder
+    paymentTerms?: SortOrder
+    notes?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalProcessorAvgOrderByAggregateInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+  }
+
+  export type ExternalProcessorMaxOrderByAggregateInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+    processorCode?: SortOrder
+    name?: SortOrder
+    contactPerson?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    gstin?: SortOrder
+    pan?: SortOrder
+    paymentTerms?: SortOrder
+    notes?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalProcessorMinOrderByAggregateInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+    processorCode?: SortOrder
+    name?: SortOrder
+    contactPerson?: SortOrder
+    phone?: SortOrder
+    email?: SortOrder
+    address?: SortOrder
+    gstin?: SortOrder
+    pan?: SortOrder
+    paymentTerms?: SortOrder
+    notes?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExternalProcessorSumOrderByAggregateInput = {
+    externalProcessorId?: SortOrder
+    companyId?: SortOrder
+  }
+
+  export type JobWorkProcessTypeOrderByRelevanceInput = {
+    fields: JobWorkProcessTypeOrderByRelevanceFieldEnum | JobWorkProcessTypeOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkProcessTypeCompanyIdCodeCompoundUniqueInput = {
+    companyId: number
+    code: string
+  }
+
+  export type JobWorkProcessTypeCompanyIdNameCompoundUniqueInput = {
+    companyId: number
+    name: string
+  }
+
+  export type JobWorkProcessTypeCountOrderByAggregateInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    chargeUnit?: SortOrder
+    defaultRate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkProcessTypeAvgOrderByAggregateInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    defaultRate?: SortOrder
+  }
+
+  export type JobWorkProcessTypeMaxOrderByAggregateInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    chargeUnit?: SortOrder
+    defaultRate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkProcessTypeMinOrderByAggregateInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    chargeUnit?: SortOrder
+    defaultRate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkProcessTypeSumOrderByAggregateInput = {
+    processTypeId?: SortOrder
+    companyId?: SortOrder
+    defaultRate?: SortOrder
+  }
+
+  export type ExternalProcessorScalarRelationFilter = {
+    is?: ExternalProcessorWhereInput
+    isNot?: ExternalProcessorWhereInput
+  }
+
+  export type JobWorkProcessTypeScalarRelationFilter = {
+    is?: JobWorkProcessTypeWhereInput
+    isNot?: JobWorkProcessTypeWhereInput
+  }
+
+  export type JobWorkOrderOrderByRelevanceInput = {
+    fields: JobWorkOrderOrderByRelevanceFieldEnum | JobWorkOrderOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkOrderCompanyIdJobNumberCompoundUniqueInput = {
+    companyId: number
+    jobNumber: string
+  }
+
+  export type JobWorkOrderCountOrderByAggregateInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    jobNumber?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    orderDate?: SortOrder
+    status?: SortOrder
+    description?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkOrderAvgOrderByAggregateInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    createdByAdminId?: SortOrder
+  }
+
+  export type JobWorkOrderMaxOrderByAggregateInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    jobNumber?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    orderDate?: SortOrder
+    status?: SortOrder
+    description?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkOrderMinOrderByAggregateInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    jobNumber?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    orderDate?: SortOrder
+    status?: SortOrder
+    description?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkOrderSumOrderByAggregateInput = {
+    jobWorkOrderId?: SortOrder
+    companyId?: SortOrder
+    branchId?: SortOrder
+    externalProcessorId?: SortOrder
+    processTypeId?: SortOrder
+    createdByAdminId?: SortOrder
+  }
+
+  export type JobWorkOrderScalarRelationFilter = {
+    is?: JobWorkOrderWhereInput
+    isNot?: JobWorkOrderWhereInput
+  }
+
+  export type JobWorkDispatchOrderByRelevanceInput = {
+    fields: JobWorkDispatchOrderByRelevanceFieldEnum | JobWorkDispatchOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkDispatchCountOrderByAggregateInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    challanNumber?: SortOrder
+    jangadNumber?: SortOrder
+    dispatchDate?: SortOrder
+    expectedReturnDate?: SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkDispatchAvgOrderByAggregateInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    createdByAdminId?: SortOrder
+  }
+
+  export type JobWorkDispatchMaxOrderByAggregateInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    challanNumber?: SortOrder
+    jangadNumber?: SortOrder
+    dispatchDate?: SortOrder
+    expectedReturnDate?: SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkDispatchMinOrderByAggregateInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    challanNumber?: SortOrder
+    jangadNumber?: SortOrder
+    dispatchDate?: SortOrder
+    expectedReturnDate?: SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    notes?: SortOrder
+    createdByAdminId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkDispatchSumOrderByAggregateInput = {
+    dispatchId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    sentPieces?: SortOrder
+    sentCarats?: SortOrder
+    sentWeightGrams?: SortOrder
+    createdByAdminId?: SortOrder
+  }
+
+  export type JobWorkDispatchScalarRelationFilter = {
+    is?: JobWorkDispatchWhereInput
+    isNot?: JobWorkDispatchWhereInput
+  }
+
+  export type JobWorkReceiptItemListRelationFilter = {
+    every?: JobWorkReceiptItemWhereInput
+    some?: JobWorkReceiptItemWhereInput
+    none?: JobWorkReceiptItemWhereInput
+  }
+
+  export type JobWorkReceiptItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkReceiptOrderByRelevanceInput = {
+    fields: JobWorkReceiptOrderByRelevanceFieldEnum | JobWorkReceiptOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkReceiptCountOrderByAggregateInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receiptNumber?: SortOrder
+    receivedDate?: SortOrder
+    receivedByAdminId?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReceiptAvgOrderByAggregateInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receivedByAdminId?: SortOrder
+  }
+
+  export type JobWorkReceiptMaxOrderByAggregateInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receiptNumber?: SortOrder
+    receivedDate?: SortOrder
+    receivedByAdminId?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReceiptMinOrderByAggregateInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receiptNumber?: SortOrder
+    receivedDate?: SortOrder
+    receivedByAdminId?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReceiptSumOrderByAggregateInput = {
+    receiptId?: SortOrder
+    dispatchId?: SortOrder
+    receivedByAdminId?: SortOrder
+  }
+
+  export type JobWorkReceiptScalarRelationFilter = {
+    is?: JobWorkReceiptWhereInput
+    isNot?: JobWorkReceiptWhereInput
+  }
+
+  export type JobWorkReceiptItemOrderByRelevanceInput = {
+    fields: JobWorkReceiptItemOrderByRelevanceFieldEnum | JobWorkReceiptItemOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkReceiptItemCountOrderByAggregateInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnCondition?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type JobWorkReceiptItemAvgOrderByAggregateInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+  }
+
+  export type JobWorkReceiptItemMaxOrderByAggregateInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnCondition?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type JobWorkReceiptItemMinOrderByAggregateInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnCondition?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type JobWorkReceiptItemSumOrderByAggregateInput = {
+    receiptItemId?: SortOrder
+    receiptId?: SortOrder
+    returnedPieces?: SortOrder
+    returnedCarats?: SortOrder
+    returnedWeightGrams?: SortOrder
+  }
+
+  export type JobWorkReconciliationOrderByRelevanceInput = {
+    fields: JobWorkReconciliationOrderByRelevanceFieldEnum | JobWorkReconciliationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkReconciliationCountOrderByAggregateInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrder
+    approvedLossCarats?: SortOrder
+    varianceCarats?: SortOrder
+    status?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    resolutionNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReconciliationAvgOrderByAggregateInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrder
+    approvedLossCarats?: SortOrder
+    varianceCarats?: SortOrder
+    reviewedByAdminId?: SortOrder
+  }
+
+  export type JobWorkReconciliationMaxOrderByAggregateInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrder
+    approvedLossCarats?: SortOrder
+    varianceCarats?: SortOrder
+    status?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    resolutionNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReconciliationMinOrderByAggregateInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrder
+    approvedLossCarats?: SortOrder
+    varianceCarats?: SortOrder
+    status?: SortOrder
+    reviewedByAdminId?: SortOrder
+    reviewedAt?: SortOrder
+    resolutionNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkReconciliationSumOrderByAggregateInput = {
+    reconciliationId?: SortOrder
+    jobWorkOrderId?: SortOrder
+    reportedLossCarats?: SortOrder
+    approvedLossCarats?: SortOrder
+    varianceCarats?: SortOrder
+    reviewedByAdminId?: SortOrder
+  }
+
   export type companiesCreateNestedOneWithoutAdminsInput = {
     create?: XOR<companiesCreateWithoutAdminsInput, companiesUncheckedCreateWithoutAdminsInput>
     connectOrCreate?: companiesCreateOrConnectWithoutAdminsInput
@@ -32646,6 +43464,34 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
+  export type JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput> | JobWorkOrderCreateWithoutCreatedByAdminInput[] | JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput | JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput[]
+    createMany?: JobWorkOrderCreateManyCreatedByAdminInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput> | JobWorkDispatchCreateWithoutCreatedByAdminInput[] | JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput | JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput[]
+    createMany?: JobWorkDispatchCreateManyCreatedByAdminInputEnvelope
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+  }
+
+  export type JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput> | JobWorkReceiptCreateWithoutReceivedByAdminInput[] | JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput | JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput[]
+    createMany?: JobWorkReceiptCreateManyReceivedByAdminInputEnvelope
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+  }
+
+  export type JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput> | JobWorkReconciliationCreateWithoutReviewedByAdminInput[] | JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput | JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput[]
+    createMany?: JobWorkReconciliationCreateManyReviewedByAdminInputEnvelope
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+  }
+
   export type AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput = {
     create?: XOR<AdvancePaymentCreateWithoutApproverInput, AdvancePaymentUncheckedCreateWithoutApproverInput> | AdvancePaymentCreateWithoutApproverInput[] | AdvancePaymentUncheckedCreateWithoutApproverInput[]
     connectOrCreate?: AdvancePaymentCreateOrConnectWithoutApproverInput | AdvancePaymentCreateOrConnectWithoutApproverInput[]
@@ -32658,6 +43504,34 @@ export namespace Prisma {
     connectOrCreate?: AttendanceCreateOrConnectWithoutManualOverrideAdminInput | AttendanceCreateOrConnectWithoutManualOverrideAdminInput[]
     createMany?: AttendanceCreateManyManualOverrideAdminInputEnvelope
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput> | JobWorkOrderCreateWithoutCreatedByAdminInput[] | JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput | JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput[]
+    createMany?: JobWorkOrderCreateManyCreatedByAdminInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput> | JobWorkDispatchCreateWithoutCreatedByAdminInput[] | JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput | JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput[]
+    createMany?: JobWorkDispatchCreateManyCreatedByAdminInputEnvelope
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+  }
+
+  export type JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput> | JobWorkReceiptCreateWithoutReceivedByAdminInput[] | JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput | JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput[]
+    createMany?: JobWorkReceiptCreateManyReceivedByAdminInputEnvelope
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+  }
+
+  export type JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput> | JobWorkReconciliationCreateWithoutReviewedByAdminInput[] | JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput | JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput[]
+    createMany?: JobWorkReconciliationCreateManyReviewedByAdminInputEnvelope
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -32708,6 +43582,62 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
+  export type JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput> | JobWorkOrderCreateWithoutCreatedByAdminInput[] | JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput | JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutCreatedByAdminInput | JobWorkOrderUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+    createMany?: JobWorkOrderCreateManyCreatedByAdminInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutCreatedByAdminInput | JobWorkOrderUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutCreatedByAdminInput | JobWorkOrderUpdateManyWithWhereWithoutCreatedByAdminInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput> | JobWorkDispatchCreateWithoutCreatedByAdminInput[] | JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput | JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput[]
+    upsert?: JobWorkDispatchUpsertWithWhereUniqueWithoutCreatedByAdminInput | JobWorkDispatchUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+    createMany?: JobWorkDispatchCreateManyCreatedByAdminInputEnvelope
+    set?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    disconnect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    delete?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    update?: JobWorkDispatchUpdateWithWhereUniqueWithoutCreatedByAdminInput | JobWorkDispatchUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+    updateMany?: JobWorkDispatchUpdateManyWithWhereWithoutCreatedByAdminInput | JobWorkDispatchUpdateManyWithWhereWithoutCreatedByAdminInput[]
+    deleteMany?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+  }
+
+  export type JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput> | JobWorkReceiptCreateWithoutReceivedByAdminInput[] | JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput | JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput[]
+    upsert?: JobWorkReceiptUpsertWithWhereUniqueWithoutReceivedByAdminInput | JobWorkReceiptUpsertWithWhereUniqueWithoutReceivedByAdminInput[]
+    createMany?: JobWorkReceiptCreateManyReceivedByAdminInputEnvelope
+    set?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    disconnect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    delete?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    update?: JobWorkReceiptUpdateWithWhereUniqueWithoutReceivedByAdminInput | JobWorkReceiptUpdateWithWhereUniqueWithoutReceivedByAdminInput[]
+    updateMany?: JobWorkReceiptUpdateManyWithWhereWithoutReceivedByAdminInput | JobWorkReceiptUpdateManyWithWhereWithoutReceivedByAdminInput[]
+    deleteMany?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+  }
+
+  export type JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput> | JobWorkReconciliationCreateWithoutReviewedByAdminInput[] | JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput | JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput[]
+    upsert?: JobWorkReconciliationUpsertWithWhereUniqueWithoutReviewedByAdminInput | JobWorkReconciliationUpsertWithWhereUniqueWithoutReviewedByAdminInput[]
+    createMany?: JobWorkReconciliationCreateManyReviewedByAdminInputEnvelope
+    set?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    disconnect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    delete?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    update?: JobWorkReconciliationUpdateWithWhereUniqueWithoutReviewedByAdminInput | JobWorkReconciliationUpdateWithWhereUniqueWithoutReviewedByAdminInput[]
+    updateMany?: JobWorkReconciliationUpdateManyWithWhereWithoutReviewedByAdminInput | JobWorkReconciliationUpdateManyWithWhereWithoutReviewedByAdminInput[]
+    deleteMany?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -32744,6 +43674,62 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
+  export type JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput> | JobWorkOrderCreateWithoutCreatedByAdminInput[] | JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput | JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutCreatedByAdminInput | JobWorkOrderUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+    createMany?: JobWorkOrderCreateManyCreatedByAdminInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutCreatedByAdminInput | JobWorkOrderUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutCreatedByAdminInput | JobWorkOrderUpdateManyWithWhereWithoutCreatedByAdminInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput> | JobWorkDispatchCreateWithoutCreatedByAdminInput[] | JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput | JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput[]
+    upsert?: JobWorkDispatchUpsertWithWhereUniqueWithoutCreatedByAdminInput | JobWorkDispatchUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+    createMany?: JobWorkDispatchCreateManyCreatedByAdminInputEnvelope
+    set?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    disconnect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    delete?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    update?: JobWorkDispatchUpdateWithWhereUniqueWithoutCreatedByAdminInput | JobWorkDispatchUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+    updateMany?: JobWorkDispatchUpdateManyWithWhereWithoutCreatedByAdminInput | JobWorkDispatchUpdateManyWithWhereWithoutCreatedByAdminInput[]
+    deleteMany?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+  }
+
+  export type JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput> | JobWorkReceiptCreateWithoutReceivedByAdminInput[] | JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput | JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput[]
+    upsert?: JobWorkReceiptUpsertWithWhereUniqueWithoutReceivedByAdminInput | JobWorkReceiptUpsertWithWhereUniqueWithoutReceivedByAdminInput[]
+    createMany?: JobWorkReceiptCreateManyReceivedByAdminInputEnvelope
+    set?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    disconnect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    delete?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    update?: JobWorkReceiptUpdateWithWhereUniqueWithoutReceivedByAdminInput | JobWorkReceiptUpdateWithWhereUniqueWithoutReceivedByAdminInput[]
+    updateMany?: JobWorkReceiptUpdateManyWithWhereWithoutReceivedByAdminInput | JobWorkReceiptUpdateManyWithWhereWithoutReceivedByAdminInput[]
+    deleteMany?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput> | JobWorkReconciliationCreateWithoutReviewedByAdminInput[] | JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput | JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput[]
+    upsert?: JobWorkReconciliationUpsertWithWhereUniqueWithoutReviewedByAdminInput | JobWorkReconciliationUpsertWithWhereUniqueWithoutReviewedByAdminInput[]
+    createMany?: JobWorkReconciliationCreateManyReviewedByAdminInputEnvelope
+    set?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    disconnect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    delete?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    update?: JobWorkReconciliationUpdateWithWhereUniqueWithoutReviewedByAdminInput | JobWorkReconciliationUpdateWithWhereUniqueWithoutReviewedByAdminInput[]
+    updateMany?: JobWorkReconciliationUpdateManyWithWhereWithoutReviewedByAdminInput | JobWorkReconciliationUpdateManyWithWhereWithoutReviewedByAdminInput[]
+    deleteMany?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+  }
+
   export type companiesCreateNestedOneWithoutBranchesInput = {
     create?: XOR<companiesCreateWithoutBranchesInput, companiesUncheckedCreateWithoutBranchesInput>
     connectOrCreate?: companiesCreateOrConnectWithoutBranchesInput
@@ -32778,6 +43764,13 @@ export namespace Prisma {
     connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
   }
 
+  export type JobWorkOrderCreateNestedManyWithoutBranchInput = {
+    create?: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput> | JobWorkOrderCreateWithoutBranchInput[] | JobWorkOrderUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutBranchInput | JobWorkOrderCreateOrConnectWithoutBranchInput[]
+    createMany?: JobWorkOrderCreateManyBranchInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
   export type DepartmentUncheckedCreateNestedManyWithoutBranchInput = {
     create?: XOR<DepartmentCreateWithoutBranchInput, DepartmentUncheckedCreateWithoutBranchInput> | DepartmentCreateWithoutBranchInput[] | DepartmentUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: DepartmentCreateOrConnectWithoutBranchInput | DepartmentCreateOrConnectWithoutBranchInput[]
@@ -32804,6 +43797,13 @@ export namespace Prisma {
     connectOrCreate?: PublicHolidayCreateOrConnectWithoutBranchInput | PublicHolidayCreateOrConnectWithoutBranchInput[]
     createMany?: PublicHolidayCreateManyBranchInputEnvelope
     connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput = {
+    create?: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput> | JobWorkOrderCreateWithoutBranchInput[] | JobWorkOrderUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutBranchInput | JobWorkOrderCreateOrConnectWithoutBranchInput[]
+    createMany?: JobWorkOrderCreateManyBranchInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
   }
 
   export type companiesUpdateOneRequiredWithoutBranchesNestedInput = {
@@ -32870,6 +43870,20 @@ export namespace Prisma {
     deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
   }
 
+  export type JobWorkOrderUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput> | JobWorkOrderCreateWithoutBranchInput[] | JobWorkOrderUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutBranchInput | JobWorkOrderCreateOrConnectWithoutBranchInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutBranchInput | JobWorkOrderUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: JobWorkOrderCreateManyBranchInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutBranchInput | JobWorkOrderUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutBranchInput | JobWorkOrderUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
   export type DepartmentUncheckedUpdateManyWithoutBranchNestedInput = {
     create?: XOR<DepartmentCreateWithoutBranchInput, DepartmentUncheckedCreateWithoutBranchInput> | DepartmentCreateWithoutBranchInput[] | DepartmentUncheckedCreateWithoutBranchInput[]
     connectOrCreate?: DepartmentCreateOrConnectWithoutBranchInput | DepartmentCreateOrConnectWithoutBranchInput[]
@@ -32924,6 +43938,20 @@ export namespace Prisma {
     update?: PublicHolidayUpdateWithWhereUniqueWithoutBranchInput | PublicHolidayUpdateWithWhereUniqueWithoutBranchInput[]
     updateMany?: PublicHolidayUpdateManyWithWhereWithoutBranchInput | PublicHolidayUpdateManyWithWhereWithoutBranchInput[]
     deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput> | JobWorkOrderCreateWithoutBranchInput[] | JobWorkOrderUncheckedCreateWithoutBranchInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutBranchInput | JobWorkOrderCreateOrConnectWithoutBranchInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutBranchInput | JobWorkOrderUpsertWithWhereUniqueWithoutBranchInput[]
+    createMany?: JobWorkOrderCreateManyBranchInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutBranchInput | JobWorkOrderUpdateWithWhereUniqueWithoutBranchInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutBranchInput | JobWorkOrderUpdateManyWithWhereWithoutBranchInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
   }
 
   export type BranchCreateNestedOneWithoutDepartmentsInput = {
@@ -34262,6 +45290,27 @@ export namespace Prisma {
     connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
   }
 
+  export type ExternalProcessorCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput> | ExternalProcessorCreateWithoutCompanyInput[] | ExternalProcessorUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutCompanyInput | ExternalProcessorCreateOrConnectWithoutCompanyInput[]
+    createMany?: ExternalProcessorCreateManyCompanyInputEnvelope
+    connect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+  }
+
+  export type JobWorkProcessTypeCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput> | JobWorkProcessTypeCreateWithoutCompanyInput[] | JobWorkProcessTypeUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutCompanyInput | JobWorkProcessTypeCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkProcessTypeCreateManyCompanyInputEnvelope
+    connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput> | JobWorkOrderCreateWithoutCompanyInput[] | JobWorkOrderUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCompanyInput | JobWorkOrderCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkOrderCreateManyCompanyInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
   export type AdminUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<AdminCreateWithoutCompanyInput, AdminUncheckedCreateWithoutCompanyInput> | AdminCreateWithoutCompanyInput[] | AdminUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: AdminCreateOrConnectWithoutCompanyInput | AdminCreateOrConnectWithoutCompanyInput[]
@@ -34316,6 +45365,27 @@ export namespace Prisma {
     connectOrCreate?: PublicHolidayCreateOrConnectWithoutCompanyInput | PublicHolidayCreateOrConnectWithoutCompanyInput[]
     createMany?: PublicHolidayCreateManyCompanyInputEnvelope
     connect?: PublicHolidayWhereUniqueInput | PublicHolidayWhereUniqueInput[]
+  }
+
+  export type ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput> | ExternalProcessorCreateWithoutCompanyInput[] | ExternalProcessorUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutCompanyInput | ExternalProcessorCreateOrConnectWithoutCompanyInput[]
+    createMany?: ExternalProcessorCreateManyCompanyInputEnvelope
+    connect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+  }
+
+  export type JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput> | JobWorkProcessTypeCreateWithoutCompanyInput[] | JobWorkProcessTypeUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutCompanyInput | JobWorkProcessTypeCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkProcessTypeCreateManyCompanyInputEnvelope
+    connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput> | JobWorkOrderCreateWithoutCompanyInput[] | JobWorkOrderUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCompanyInput | JobWorkOrderCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkOrderCreateManyCompanyInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
   }
 
   export type AdminUpdateManyWithoutCompanyNestedInput = {
@@ -34430,6 +45500,48 @@ export namespace Prisma {
     deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
   }
 
+  export type ExternalProcessorUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput> | ExternalProcessorCreateWithoutCompanyInput[] | ExternalProcessorUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutCompanyInput | ExternalProcessorCreateOrConnectWithoutCompanyInput[]
+    upsert?: ExternalProcessorUpsertWithWhereUniqueWithoutCompanyInput | ExternalProcessorUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: ExternalProcessorCreateManyCompanyInputEnvelope
+    set?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    disconnect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    delete?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    connect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    update?: ExternalProcessorUpdateWithWhereUniqueWithoutCompanyInput | ExternalProcessorUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: ExternalProcessorUpdateManyWithWhereWithoutCompanyInput | ExternalProcessorUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: ExternalProcessorScalarWhereInput | ExternalProcessorScalarWhereInput[]
+  }
+
+  export type JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput> | JobWorkProcessTypeCreateWithoutCompanyInput[] | JobWorkProcessTypeUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutCompanyInput | JobWorkProcessTypeCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkProcessTypeUpsertWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkProcessTypeCreateManyCompanyInputEnvelope
+    set?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    disconnect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    delete?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    update?: JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput | JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput> | JobWorkOrderCreateWithoutCompanyInput[] | JobWorkOrderUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCompanyInput | JobWorkOrderCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput | JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkOrderCreateManyCompanyInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutCompanyInput | JobWorkOrderUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutCompanyInput | JobWorkOrderUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
   export type AdminUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<AdminCreateWithoutCompanyInput, AdminUncheckedCreateWithoutCompanyInput> | AdminCreateWithoutCompanyInput[] | AdminUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: AdminCreateOrConnectWithoutCompanyInput | AdminCreateOrConnectWithoutCompanyInput[]
@@ -34540,6 +45652,48 @@ export namespace Prisma {
     update?: PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput | PublicHolidayUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: PublicHolidayUpdateManyWithWhereWithoutCompanyInput | PublicHolidayUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: PublicHolidayScalarWhereInput | PublicHolidayScalarWhereInput[]
+  }
+
+  export type ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput> | ExternalProcessorCreateWithoutCompanyInput[] | ExternalProcessorUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutCompanyInput | ExternalProcessorCreateOrConnectWithoutCompanyInput[]
+    upsert?: ExternalProcessorUpsertWithWhereUniqueWithoutCompanyInput | ExternalProcessorUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: ExternalProcessorCreateManyCompanyInputEnvelope
+    set?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    disconnect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    delete?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    connect?: ExternalProcessorWhereUniqueInput | ExternalProcessorWhereUniqueInput[]
+    update?: ExternalProcessorUpdateWithWhereUniqueWithoutCompanyInput | ExternalProcessorUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: ExternalProcessorUpdateManyWithWhereWithoutCompanyInput | ExternalProcessorUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: ExternalProcessorScalarWhereInput | ExternalProcessorScalarWhereInput[]
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput> | JobWorkProcessTypeCreateWithoutCompanyInput[] | JobWorkProcessTypeUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutCompanyInput | JobWorkProcessTypeCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkProcessTypeUpsertWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkProcessTypeCreateManyCompanyInputEnvelope
+    set?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    disconnect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    delete?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+    update?: JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput | JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput> | JobWorkOrderCreateWithoutCompanyInput[] | JobWorkOrderUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCompanyInput | JobWorkOrderCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput | JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkOrderCreateManyCompanyInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutCompanyInput | JobWorkOrderUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutCompanyInput | JobWorkOrderUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
   }
 
   export type LeaveBalanceCreateNestedManyWithoutLeaveTypeInput = {
@@ -34708,6 +45862,462 @@ export namespace Prisma {
     upsert?: EmployeeUpsertWithoutFingerprintEnrollmentsInput
     connect?: EmployeeWhereUniqueInput
     update?: XOR<XOR<EmployeeUpdateToOneWithWhereWithoutFingerprintEnrollmentsInput, EmployeeUpdateWithoutFingerprintEnrollmentsInput>, EmployeeUncheckedUpdateWithoutFingerprintEnrollmentsInput>
+  }
+
+  export type companiesCreateNestedOneWithoutExternalProcessorsInput = {
+    create?: XOR<companiesCreateWithoutExternalProcessorsInput, companiesUncheckedCreateWithoutExternalProcessorsInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutExternalProcessorsInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type JobWorkOrderCreateNestedManyWithoutExternalProcessorInput = {
+    create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
+    createMany?: JobWorkOrderCreateManyExternalProcessorInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput = {
+    create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
+    createMany?: JobWorkOrderCreateManyExternalProcessorInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput = {
+    create?: XOR<companiesCreateWithoutExternalProcessorsInput, companiesUncheckedCreateWithoutExternalProcessorsInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutExternalProcessorsInput
+    upsert?: companiesUpsertWithoutExternalProcessorsInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutExternalProcessorsInput, companiesUpdateWithoutExternalProcessorsInput>, companiesUncheckedUpdateWithoutExternalProcessorsInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutExternalProcessorInput | JobWorkOrderUpsertWithWhereUniqueWithoutExternalProcessorInput[]
+    createMany?: JobWorkOrderCreateManyExternalProcessorInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput | JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput | JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutExternalProcessorInput | JobWorkOrderUpsertWithWhereUniqueWithoutExternalProcessorInput[]
+    createMany?: JobWorkOrderCreateManyExternalProcessorInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput | JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput | JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type companiesCreateNestedOneWithoutJobWorkProcessTypesInput = {
+    create?: XOR<companiesCreateWithoutJobWorkProcessTypesInput, companiesUncheckedCreateWithoutJobWorkProcessTypesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkProcessTypesInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type JobWorkOrderCreateNestedManyWithoutProcessTypeInput = {
+    create?: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput> | JobWorkOrderCreateWithoutProcessTypeInput[] | JobWorkOrderUncheckedCreateWithoutProcessTypeInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutProcessTypeInput | JobWorkOrderCreateOrConnectWithoutProcessTypeInput[]
+    createMany?: JobWorkOrderCreateManyProcessTypeInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutProcessTypeInput = {
+    create?: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput> | JobWorkOrderCreateWithoutProcessTypeInput[] | JobWorkOrderUncheckedCreateWithoutProcessTypeInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutProcessTypeInput | JobWorkOrderCreateOrConnectWithoutProcessTypeInput[]
+    createMany?: JobWorkOrderCreateManyProcessTypeInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type companiesUpdateOneRequiredWithoutJobWorkProcessTypesNestedInput = {
+    create?: XOR<companiesCreateWithoutJobWorkProcessTypesInput, companiesUncheckedCreateWithoutJobWorkProcessTypesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkProcessTypesInput
+    upsert?: companiesUpsertWithoutJobWorkProcessTypesInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutJobWorkProcessTypesInput, companiesUpdateWithoutJobWorkProcessTypesInput>, companiesUncheckedUpdateWithoutJobWorkProcessTypesInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithoutProcessTypeNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput> | JobWorkOrderCreateWithoutProcessTypeInput[] | JobWorkOrderUncheckedCreateWithoutProcessTypeInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutProcessTypeInput | JobWorkOrderCreateOrConnectWithoutProcessTypeInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutProcessTypeInput | JobWorkOrderUpsertWithWhereUniqueWithoutProcessTypeInput[]
+    createMany?: JobWorkOrderCreateManyProcessTypeInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutProcessTypeInput | JobWorkOrderUpdateWithWhereUniqueWithoutProcessTypeInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutProcessTypeInput | JobWorkOrderUpdateManyWithWhereWithoutProcessTypeInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutProcessTypeNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput> | JobWorkOrderCreateWithoutProcessTypeInput[] | JobWorkOrderUncheckedCreateWithoutProcessTypeInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutProcessTypeInput | JobWorkOrderCreateOrConnectWithoutProcessTypeInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutProcessTypeInput | JobWorkOrderUpsertWithWhereUniqueWithoutProcessTypeInput[]
+    createMany?: JobWorkOrderCreateManyProcessTypeInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutProcessTypeInput | JobWorkOrderUpdateWithWhereUniqueWithoutProcessTypeInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutProcessTypeInput | JobWorkOrderUpdateManyWithWhereWithoutProcessTypeInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type companiesCreateNestedOneWithoutJobWorkOrdersInput = {
+    create?: XOR<companiesCreateWithoutJobWorkOrdersInput, companiesUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkOrdersInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type BranchCreateNestedOneWithoutJobWorkOrdersInput = {
+    create?: XOR<BranchCreateWithoutJobWorkOrdersInput, BranchUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutJobWorkOrdersInput
+    connect?: BranchWhereUniqueInput
+  }
+
+  export type ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput = {
+    create?: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutJobWorkOrdersInput
+    connect?: ExternalProcessorWhereUniqueInput
+  }
+
+  export type JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutJobWorkOrdersInput
+    connect?: JobWorkProcessTypeWhereUniqueInput
+  }
+
+  export type AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkOrdersCreatedInput, AdminUncheckedCreateWithoutJobWorkOrdersCreatedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkOrdersCreatedInput
+    connect?: AdminWhereUniqueInput
+  }
+
+  export type JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput> | JobWorkDispatchCreateWithoutJobWorkOrderInput[] | JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput | JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput[]
+    createMany?: JobWorkDispatchCreateManyJobWorkOrderInputEnvelope
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+  }
+
+  export type JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput> | JobWorkReconciliationCreateWithoutJobWorkOrderInput[] | JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput | JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput[]
+    createMany?: JobWorkReconciliationCreateManyJobWorkOrderInputEnvelope
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+  }
+
+  export type JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput> | JobWorkDispatchCreateWithoutJobWorkOrderInput[] | JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput | JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput[]
+    createMany?: JobWorkDispatchCreateManyJobWorkOrderInputEnvelope
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+  }
+
+  export type JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput> | JobWorkReconciliationCreateWithoutJobWorkOrderInput[] | JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput | JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput[]
+    createMany?: JobWorkReconciliationCreateManyJobWorkOrderInputEnvelope
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+  }
+
+  export type companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput = {
+    create?: XOR<companiesCreateWithoutJobWorkOrdersInput, companiesUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkOrdersInput
+    upsert?: companiesUpsertWithoutJobWorkOrdersInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutJobWorkOrdersInput, companiesUpdateWithoutJobWorkOrdersInput>, companiesUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput = {
+    create?: XOR<BranchCreateWithoutJobWorkOrdersInput, BranchUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: BranchCreateOrConnectWithoutJobWorkOrdersInput
+    upsert?: BranchUpsertWithoutJobWorkOrdersInput
+    connect?: BranchWhereUniqueInput
+    update?: XOR<XOR<BranchUpdateToOneWithWhereWithoutJobWorkOrdersInput, BranchUpdateWithoutJobWorkOrdersInput>, BranchUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput = {
+    create?: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutJobWorkOrdersInput
+    upsert?: ExternalProcessorUpsertWithoutJobWorkOrdersInput
+    connect?: ExternalProcessorWhereUniqueInput
+    update?: XOR<XOR<ExternalProcessorUpdateToOneWithWhereWithoutJobWorkOrdersInput, ExternalProcessorUpdateWithoutJobWorkOrdersInput>, ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput = {
+    create?: XOR<JobWorkProcessTypeCreateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutJobWorkOrdersInput
+    upsert?: JobWorkProcessTypeUpsertWithoutJobWorkOrdersInput
+    connect?: JobWorkProcessTypeWhereUniqueInput
+    update?: XOR<XOR<JobWorkProcessTypeUpdateToOneWithWhereWithoutJobWorkOrdersInput, JobWorkProcessTypeUpdateWithoutJobWorkOrdersInput>, JobWorkProcessTypeUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkOrdersCreatedInput, AdminUncheckedCreateWithoutJobWorkOrdersCreatedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkOrdersCreatedInput
+    upsert?: AdminUpsertWithoutJobWorkOrdersCreatedInput
+    disconnect?: AdminWhereInput | boolean
+    delete?: AdminWhereInput | boolean
+    connect?: AdminWhereUniqueInput
+    update?: XOR<XOR<AdminUpdateToOneWithWhereWithoutJobWorkOrdersCreatedInput, AdminUpdateWithoutJobWorkOrdersCreatedInput>, AdminUncheckedUpdateWithoutJobWorkOrdersCreatedInput>
+  }
+
+  export type JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput> | JobWorkDispatchCreateWithoutJobWorkOrderInput[] | JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput | JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput[]
+    upsert?: JobWorkDispatchUpsertWithWhereUniqueWithoutJobWorkOrderInput | JobWorkDispatchUpsertWithWhereUniqueWithoutJobWorkOrderInput[]
+    createMany?: JobWorkDispatchCreateManyJobWorkOrderInputEnvelope
+    set?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    disconnect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    delete?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    update?: JobWorkDispatchUpdateWithWhereUniqueWithoutJobWorkOrderInput | JobWorkDispatchUpdateWithWhereUniqueWithoutJobWorkOrderInput[]
+    updateMany?: JobWorkDispatchUpdateManyWithWhereWithoutJobWorkOrderInput | JobWorkDispatchUpdateManyWithWhereWithoutJobWorkOrderInput[]
+    deleteMany?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+  }
+
+  export type JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput> | JobWorkReconciliationCreateWithoutJobWorkOrderInput[] | JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput | JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput[]
+    upsert?: JobWorkReconciliationUpsertWithWhereUniqueWithoutJobWorkOrderInput | JobWorkReconciliationUpsertWithWhereUniqueWithoutJobWorkOrderInput[]
+    createMany?: JobWorkReconciliationCreateManyJobWorkOrderInputEnvelope
+    set?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    disconnect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    delete?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    update?: JobWorkReconciliationUpdateWithWhereUniqueWithoutJobWorkOrderInput | JobWorkReconciliationUpdateWithWhereUniqueWithoutJobWorkOrderInput[]
+    updateMany?: JobWorkReconciliationUpdateManyWithWhereWithoutJobWorkOrderInput | JobWorkReconciliationUpdateManyWithWhereWithoutJobWorkOrderInput[]
+    deleteMany?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+  }
+
+  export type JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput> | JobWorkDispatchCreateWithoutJobWorkOrderInput[] | JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput | JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput[]
+    upsert?: JobWorkDispatchUpsertWithWhereUniqueWithoutJobWorkOrderInput | JobWorkDispatchUpsertWithWhereUniqueWithoutJobWorkOrderInput[]
+    createMany?: JobWorkDispatchCreateManyJobWorkOrderInputEnvelope
+    set?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    disconnect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    delete?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    connect?: JobWorkDispatchWhereUniqueInput | JobWorkDispatchWhereUniqueInput[]
+    update?: JobWorkDispatchUpdateWithWhereUniqueWithoutJobWorkOrderInput | JobWorkDispatchUpdateWithWhereUniqueWithoutJobWorkOrderInput[]
+    updateMany?: JobWorkDispatchUpdateManyWithWhereWithoutJobWorkOrderInput | JobWorkDispatchUpdateManyWithWhereWithoutJobWorkOrderInput[]
+    deleteMany?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput = {
+    create?: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput> | JobWorkReconciliationCreateWithoutJobWorkOrderInput[] | JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput[]
+    connectOrCreate?: JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput | JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput[]
+    upsert?: JobWorkReconciliationUpsertWithWhereUniqueWithoutJobWorkOrderInput | JobWorkReconciliationUpsertWithWhereUniqueWithoutJobWorkOrderInput[]
+    createMany?: JobWorkReconciliationCreateManyJobWorkOrderInputEnvelope
+    set?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    disconnect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    delete?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    connect?: JobWorkReconciliationWhereUniqueInput | JobWorkReconciliationWhereUniqueInput[]
+    update?: JobWorkReconciliationUpdateWithWhereUniqueWithoutJobWorkOrderInput | JobWorkReconciliationUpdateWithWhereUniqueWithoutJobWorkOrderInput[]
+    updateMany?: JobWorkReconciliationUpdateManyWithWhereWithoutJobWorkOrderInput | JobWorkReconciliationUpdateManyWithWhereWithoutJobWorkOrderInput[]
+    deleteMany?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+  }
+
+  export type JobWorkOrderCreateNestedOneWithoutDispatchesInput = {
+    create?: XOR<JobWorkOrderCreateWithoutDispatchesInput, JobWorkOrderUncheckedCreateWithoutDispatchesInput>
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutDispatchesInput
+    connect?: JobWorkOrderWhereUniqueInput
+  }
+
+  export type AdminCreateNestedOneWithoutJobWorkDispatchesCreatedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedCreateWithoutJobWorkDispatchesCreatedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkDispatchesCreatedInput
+    connect?: AdminWhereUniqueInput
+  }
+
+  export type JobWorkReceiptCreateNestedManyWithoutDispatchInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput> | JobWorkReceiptCreateWithoutDispatchInput[] | JobWorkReceiptUncheckedCreateWithoutDispatchInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutDispatchInput | JobWorkReceiptCreateOrConnectWithoutDispatchInput[]
+    createMany?: JobWorkReceiptCreateManyDispatchInputEnvelope
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+  }
+
+  export type JobWorkReceiptUncheckedCreateNestedManyWithoutDispatchInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput> | JobWorkReceiptCreateWithoutDispatchInput[] | JobWorkReceiptUncheckedCreateWithoutDispatchInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutDispatchInput | JobWorkReceiptCreateOrConnectWithoutDispatchInput[]
+    createMany?: JobWorkReceiptCreateManyDispatchInputEnvelope
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUpdateOneRequiredWithoutDispatchesNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutDispatchesInput, JobWorkOrderUncheckedCreateWithoutDispatchesInput>
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutDispatchesInput
+    upsert?: JobWorkOrderUpsertWithoutDispatchesInput
+    connect?: JobWorkOrderWhereUniqueInput
+    update?: XOR<XOR<JobWorkOrderUpdateToOneWithWhereWithoutDispatchesInput, JobWorkOrderUpdateWithoutDispatchesInput>, JobWorkOrderUncheckedUpdateWithoutDispatchesInput>
+  }
+
+  export type AdminUpdateOneWithoutJobWorkDispatchesCreatedNestedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedCreateWithoutJobWorkDispatchesCreatedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkDispatchesCreatedInput
+    upsert?: AdminUpsertWithoutJobWorkDispatchesCreatedInput
+    disconnect?: AdminWhereInput | boolean
+    delete?: AdminWhereInput | boolean
+    connect?: AdminWhereUniqueInput
+    update?: XOR<XOR<AdminUpdateToOneWithWhereWithoutJobWorkDispatchesCreatedInput, AdminUpdateWithoutJobWorkDispatchesCreatedInput>, AdminUncheckedUpdateWithoutJobWorkDispatchesCreatedInput>
+  }
+
+  export type JobWorkReceiptUpdateManyWithoutDispatchNestedInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput> | JobWorkReceiptCreateWithoutDispatchInput[] | JobWorkReceiptUncheckedCreateWithoutDispatchInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutDispatchInput | JobWorkReceiptCreateOrConnectWithoutDispatchInput[]
+    upsert?: JobWorkReceiptUpsertWithWhereUniqueWithoutDispatchInput | JobWorkReceiptUpsertWithWhereUniqueWithoutDispatchInput[]
+    createMany?: JobWorkReceiptCreateManyDispatchInputEnvelope
+    set?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    disconnect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    delete?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    update?: JobWorkReceiptUpdateWithWhereUniqueWithoutDispatchInput | JobWorkReceiptUpdateWithWhereUniqueWithoutDispatchInput[]
+    updateMany?: JobWorkReceiptUpdateManyWithWhereWithoutDispatchInput | JobWorkReceiptUpdateManyWithWhereWithoutDispatchInput[]
+    deleteMany?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+  }
+
+  export type JobWorkReceiptUncheckedUpdateManyWithoutDispatchNestedInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput> | JobWorkReceiptCreateWithoutDispatchInput[] | JobWorkReceiptUncheckedCreateWithoutDispatchInput[]
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutDispatchInput | JobWorkReceiptCreateOrConnectWithoutDispatchInput[]
+    upsert?: JobWorkReceiptUpsertWithWhereUniqueWithoutDispatchInput | JobWorkReceiptUpsertWithWhereUniqueWithoutDispatchInput[]
+    createMany?: JobWorkReceiptCreateManyDispatchInputEnvelope
+    set?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    disconnect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    delete?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    connect?: JobWorkReceiptWhereUniqueInput | JobWorkReceiptWhereUniqueInput[]
+    update?: JobWorkReceiptUpdateWithWhereUniqueWithoutDispatchInput | JobWorkReceiptUpdateWithWhereUniqueWithoutDispatchInput[]
+    updateMany?: JobWorkReceiptUpdateManyWithWhereWithoutDispatchInput | JobWorkReceiptUpdateManyWithWhereWithoutDispatchInput[]
+    deleteMany?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+  }
+
+  export type JobWorkDispatchCreateNestedOneWithoutReceiptsInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutReceiptsInput, JobWorkDispatchUncheckedCreateWithoutReceiptsInput>
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutReceiptsInput
+    connect?: JobWorkDispatchWhereUniqueInput
+  }
+
+  export type AdminCreateNestedOneWithoutJobWorkReceiptsRecordedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedCreateWithoutJobWorkReceiptsRecordedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkReceiptsRecordedInput
+    connect?: AdminWhereUniqueInput
+  }
+
+  export type JobWorkReceiptItemCreateNestedManyWithoutReceiptInput = {
+    create?: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput> | JobWorkReceiptItemCreateWithoutReceiptInput[] | JobWorkReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: JobWorkReceiptItemCreateOrConnectWithoutReceiptInput | JobWorkReceiptItemCreateOrConnectWithoutReceiptInput[]
+    createMany?: JobWorkReceiptItemCreateManyReceiptInputEnvelope
+    connect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+  }
+
+  export type JobWorkReceiptItemUncheckedCreateNestedManyWithoutReceiptInput = {
+    create?: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput> | JobWorkReceiptItemCreateWithoutReceiptInput[] | JobWorkReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: JobWorkReceiptItemCreateOrConnectWithoutReceiptInput | JobWorkReceiptItemCreateOrConnectWithoutReceiptInput[]
+    createMany?: JobWorkReceiptItemCreateManyReceiptInputEnvelope
+    connect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+  }
+
+  export type JobWorkDispatchUpdateOneRequiredWithoutReceiptsNestedInput = {
+    create?: XOR<JobWorkDispatchCreateWithoutReceiptsInput, JobWorkDispatchUncheckedCreateWithoutReceiptsInput>
+    connectOrCreate?: JobWorkDispatchCreateOrConnectWithoutReceiptsInput
+    upsert?: JobWorkDispatchUpsertWithoutReceiptsInput
+    connect?: JobWorkDispatchWhereUniqueInput
+    update?: XOR<XOR<JobWorkDispatchUpdateToOneWithWhereWithoutReceiptsInput, JobWorkDispatchUpdateWithoutReceiptsInput>, JobWorkDispatchUncheckedUpdateWithoutReceiptsInput>
+  }
+
+  export type AdminUpdateOneWithoutJobWorkReceiptsRecordedNestedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedCreateWithoutJobWorkReceiptsRecordedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkReceiptsRecordedInput
+    upsert?: AdminUpsertWithoutJobWorkReceiptsRecordedInput
+    disconnect?: AdminWhereInput | boolean
+    delete?: AdminWhereInput | boolean
+    connect?: AdminWhereUniqueInput
+    update?: XOR<XOR<AdminUpdateToOneWithWhereWithoutJobWorkReceiptsRecordedInput, AdminUpdateWithoutJobWorkReceiptsRecordedInput>, AdminUncheckedUpdateWithoutJobWorkReceiptsRecordedInput>
+  }
+
+  export type JobWorkReceiptItemUpdateManyWithoutReceiptNestedInput = {
+    create?: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput> | JobWorkReceiptItemCreateWithoutReceiptInput[] | JobWorkReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: JobWorkReceiptItemCreateOrConnectWithoutReceiptInput | JobWorkReceiptItemCreateOrConnectWithoutReceiptInput[]
+    upsert?: JobWorkReceiptItemUpsertWithWhereUniqueWithoutReceiptInput | JobWorkReceiptItemUpsertWithWhereUniqueWithoutReceiptInput[]
+    createMany?: JobWorkReceiptItemCreateManyReceiptInputEnvelope
+    set?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    disconnect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    delete?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    connect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    update?: JobWorkReceiptItemUpdateWithWhereUniqueWithoutReceiptInput | JobWorkReceiptItemUpdateWithWhereUniqueWithoutReceiptInput[]
+    updateMany?: JobWorkReceiptItemUpdateManyWithWhereWithoutReceiptInput | JobWorkReceiptItemUpdateManyWithWhereWithoutReceiptInput[]
+    deleteMany?: JobWorkReceiptItemScalarWhereInput | JobWorkReceiptItemScalarWhereInput[]
+  }
+
+  export type JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput = {
+    create?: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput> | JobWorkReceiptItemCreateWithoutReceiptInput[] | JobWorkReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: JobWorkReceiptItemCreateOrConnectWithoutReceiptInput | JobWorkReceiptItemCreateOrConnectWithoutReceiptInput[]
+    upsert?: JobWorkReceiptItemUpsertWithWhereUniqueWithoutReceiptInput | JobWorkReceiptItemUpsertWithWhereUniqueWithoutReceiptInput[]
+    createMany?: JobWorkReceiptItemCreateManyReceiptInputEnvelope
+    set?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    disconnect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    delete?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    connect?: JobWorkReceiptItemWhereUniqueInput | JobWorkReceiptItemWhereUniqueInput[]
+    update?: JobWorkReceiptItemUpdateWithWhereUniqueWithoutReceiptInput | JobWorkReceiptItemUpdateWithWhereUniqueWithoutReceiptInput[]
+    updateMany?: JobWorkReceiptItemUpdateManyWithWhereWithoutReceiptInput | JobWorkReceiptItemUpdateManyWithWhereWithoutReceiptInput[]
+    deleteMany?: JobWorkReceiptItemScalarWhereInput | JobWorkReceiptItemScalarWhereInput[]
+  }
+
+  export type JobWorkReceiptCreateNestedOneWithoutItemsInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutItemsInput, JobWorkReceiptUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutItemsInput
+    connect?: JobWorkReceiptWhereUniqueInput
+  }
+
+  export type JobWorkReceiptUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<JobWorkReceiptCreateWithoutItemsInput, JobWorkReceiptUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: JobWorkReceiptCreateOrConnectWithoutItemsInput
+    upsert?: JobWorkReceiptUpsertWithoutItemsInput
+    connect?: JobWorkReceiptWhereUniqueInput
+    update?: XOR<XOR<JobWorkReceiptUpdateToOneWithWhereWithoutItemsInput, JobWorkReceiptUpdateWithoutItemsInput>, JobWorkReceiptUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type JobWorkOrderCreateNestedOneWithoutReconciliationsInput = {
+    create?: XOR<JobWorkOrderCreateWithoutReconciliationsInput, JobWorkOrderUncheckedCreateWithoutReconciliationsInput>
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutReconciliationsInput
+    connect?: JobWorkOrderWhereUniqueInput
+  }
+
+  export type AdminCreateNestedOneWithoutJobWorkReconciliationsReviewedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedCreateWithoutJobWorkReconciliationsReviewedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkReconciliationsReviewedInput
+    connect?: AdminWhereUniqueInput
+  }
+
+  export type JobWorkOrderUpdateOneRequiredWithoutReconciliationsNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutReconciliationsInput, JobWorkOrderUncheckedCreateWithoutReconciliationsInput>
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutReconciliationsInput
+    upsert?: JobWorkOrderUpsertWithoutReconciliationsInput
+    connect?: JobWorkOrderWhereUniqueInput
+    update?: XOR<XOR<JobWorkOrderUpdateToOneWithWhereWithoutReconciliationsInput, JobWorkOrderUpdateWithoutReconciliationsInput>, JobWorkOrderUncheckedUpdateWithoutReconciliationsInput>
+  }
+
+  export type AdminUpdateOneWithoutJobWorkReconciliationsReviewedNestedInput = {
+    create?: XOR<AdminCreateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedCreateWithoutJobWorkReconciliationsReviewedInput>
+    connectOrCreate?: AdminCreateOrConnectWithoutJobWorkReconciliationsReviewedInput
+    upsert?: AdminUpsertWithoutJobWorkReconciliationsReviewedInput
+    disconnect?: AdminWhereInput | boolean
+    delete?: AdminWhereInput | boolean
+    connect?: AdminWhereUniqueInput
+    update?: XOR<XOR<AdminUpdateToOneWithWhereWithoutJobWorkReconciliationsReviewedInput, AdminUpdateWithoutJobWorkReconciliationsReviewedInput>, AdminUncheckedUpdateWithoutJobWorkReconciliationsReviewedInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -35010,6 +46620,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutAdminsInput = {
@@ -35027,6 +46640,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutAdminsInput = {
@@ -35112,6 +46728,156 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JobWorkOrderCreateWithoutCreatedByAdminInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutCreatedByAdminInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkOrderCreateManyCreatedByAdminInputEnvelope = {
+    data: JobWorkOrderCreateManyCreatedByAdminInput | JobWorkOrderCreateManyCreatedByAdminInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkDispatchCreateWithoutCreatedByAdminInput = {
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrder: JobWorkOrderCreateNestedOneWithoutDispatchesInput
+    receipts?: JobWorkReceiptCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput = {
+    dispatchId?: number
+    jobWorkOrderId: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receipts?: JobWorkReceiptUncheckedCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchCreateOrConnectWithoutCreatedByAdminInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    create: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkDispatchCreateManyCreatedByAdminInputEnvelope = {
+    data: JobWorkDispatchCreateManyCreatedByAdminInput | JobWorkDispatchCreateManyCreatedByAdminInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkReceiptCreateWithoutReceivedByAdminInput = {
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatch: JobWorkDispatchCreateNestedOneWithoutReceiptsInput
+    items?: JobWorkReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput = {
+    receiptId?: number
+    dispatchId: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: JobWorkReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptCreateOrConnectWithoutReceivedByAdminInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    create: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput>
+  }
+
+  export type JobWorkReceiptCreateManyReceivedByAdminInputEnvelope = {
+    data: JobWorkReceiptCreateManyReceivedByAdminInput | JobWorkReceiptCreateManyReceivedByAdminInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkReconciliationCreateWithoutReviewedByAdminInput = {
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrder: JobWorkOrderCreateNestedOneWithoutReconciliationsInput
+  }
+
+  export type JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput = {
+    reconciliationId?: number
+    jobWorkOrderId: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationCreateOrConnectWithoutReviewedByAdminInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    create: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput>
+  }
+
+  export type JobWorkReconciliationCreateManyReviewedByAdminInputEnvelope = {
+    data: JobWorkReconciliationCreateManyReviewedByAdminInput | JobWorkReconciliationCreateManyReviewedByAdminInput[]
+    skipDuplicates?: boolean
+  }
+
   export type companiesUpsertWithoutAdminsInput = {
     update: XOR<companiesUpdateWithoutAdminsInput, companiesUncheckedUpdateWithoutAdminsInput>
     create: XOR<companiesCreateWithoutAdminsInput, companiesUncheckedCreateWithoutAdminsInput>
@@ -35137,6 +46903,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutAdminsInput = {
@@ -35154,6 +46923,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type AdvancePaymentUpsertWithWhereUniqueWithoutApproverInput = {
@@ -35226,6 +46998,139 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
   }
 
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutCreatedByAdminInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutCreatedByAdminInput, JobWorkOrderUncheckedUpdateWithoutCreatedByAdminInput>
+    create: XOR<JobWorkOrderCreateWithoutCreatedByAdminInput, JobWorkOrderUncheckedCreateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutCreatedByAdminInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutCreatedByAdminInput, JobWorkOrderUncheckedUpdateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutCreatedByAdminInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkOrderScalarWhereInput = {
+    AND?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+    OR?: JobWorkOrderScalarWhereInput[]
+    NOT?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+    jobWorkOrderId?: IntFilter<"JobWorkOrder"> | number
+    companyId?: IntFilter<"JobWorkOrder"> | number
+    branchId?: IntFilter<"JobWorkOrder"> | number
+    jobNumber?: StringFilter<"JobWorkOrder"> | string
+    externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    processTypeId?: IntFilter<"JobWorkOrder"> | number
+    orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    status?: StringFilter<"JobWorkOrder"> | string
+    description?: StringNullableFilter<"JobWorkOrder"> | string | null
+    notes?: StringNullableFilter<"JobWorkOrder"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkOrder"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkOrder"> | Date | string
+  }
+
+  export type JobWorkDispatchUpsertWithWhereUniqueWithoutCreatedByAdminInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    update: XOR<JobWorkDispatchUpdateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedUpdateWithoutCreatedByAdminInput>
+    create: XOR<JobWorkDispatchCreateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedCreateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkDispatchUpdateWithWhereUniqueWithoutCreatedByAdminInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    data: XOR<JobWorkDispatchUpdateWithoutCreatedByAdminInput, JobWorkDispatchUncheckedUpdateWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkDispatchUpdateManyWithWhereWithoutCreatedByAdminInput = {
+    where: JobWorkDispatchScalarWhereInput
+    data: XOR<JobWorkDispatchUpdateManyMutationInput, JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminInput>
+  }
+
+  export type JobWorkDispatchScalarWhereInput = {
+    AND?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+    OR?: JobWorkDispatchScalarWhereInput[]
+    NOT?: JobWorkDispatchScalarWhereInput | JobWorkDispatchScalarWhereInput[]
+    dispatchId?: IntFilter<"JobWorkDispatch"> | number
+    jobWorkOrderId?: IntFilter<"JobWorkDispatch"> | number
+    challanNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    jangadNumber?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    dispatchDate?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    expectedReturnDate?: DateTimeNullableFilter<"JobWorkDispatch"> | Date | string | null
+    sentPieces?: IntFilter<"JobWorkDispatch"> | number
+    sentCarats?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFilter<"JobWorkDispatch"> | Decimal | DecimalJsLike | number | string
+    notes?: StringNullableFilter<"JobWorkDispatch"> | string | null
+    createdByAdminId?: IntNullableFilter<"JobWorkDispatch"> | number | null
+    createdAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkDispatch"> | Date | string
+  }
+
+  export type JobWorkReceiptUpsertWithWhereUniqueWithoutReceivedByAdminInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    update: XOR<JobWorkReceiptUpdateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedUpdateWithoutReceivedByAdminInput>
+    create: XOR<JobWorkReceiptCreateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedCreateWithoutReceivedByAdminInput>
+  }
+
+  export type JobWorkReceiptUpdateWithWhereUniqueWithoutReceivedByAdminInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    data: XOR<JobWorkReceiptUpdateWithoutReceivedByAdminInput, JobWorkReceiptUncheckedUpdateWithoutReceivedByAdminInput>
+  }
+
+  export type JobWorkReceiptUpdateManyWithWhereWithoutReceivedByAdminInput = {
+    where: JobWorkReceiptScalarWhereInput
+    data: XOR<JobWorkReceiptUpdateManyMutationInput, JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminInput>
+  }
+
+  export type JobWorkReceiptScalarWhereInput = {
+    AND?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+    OR?: JobWorkReceiptScalarWhereInput[]
+    NOT?: JobWorkReceiptScalarWhereInput | JobWorkReceiptScalarWhereInput[]
+    receiptId?: IntFilter<"JobWorkReceipt"> | number
+    dispatchId?: IntFilter<"JobWorkReceipt"> | number
+    receiptNumber?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    receivedDate?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    receivedByAdminId?: IntNullableFilter<"JobWorkReceipt"> | number | null
+    notes?: StringNullableFilter<"JobWorkReceipt"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReceipt"> | Date | string
+  }
+
+  export type JobWorkReconciliationUpsertWithWhereUniqueWithoutReviewedByAdminInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    update: XOR<JobWorkReconciliationUpdateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedUpdateWithoutReviewedByAdminInput>
+    create: XOR<JobWorkReconciliationCreateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedCreateWithoutReviewedByAdminInput>
+  }
+
+  export type JobWorkReconciliationUpdateWithWhereUniqueWithoutReviewedByAdminInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    data: XOR<JobWorkReconciliationUpdateWithoutReviewedByAdminInput, JobWorkReconciliationUncheckedUpdateWithoutReviewedByAdminInput>
+  }
+
+  export type JobWorkReconciliationUpdateManyWithWhereWithoutReviewedByAdminInput = {
+    where: JobWorkReconciliationScalarWhereInput
+    data: XOR<JobWorkReconciliationUpdateManyMutationInput, JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminInput>
+  }
+
+  export type JobWorkReconciliationScalarWhereInput = {
+    AND?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+    OR?: JobWorkReconciliationScalarWhereInput[]
+    NOT?: JobWorkReconciliationScalarWhereInput | JobWorkReconciliationScalarWhereInput[]
+    reconciliationId?: IntFilter<"JobWorkReconciliation"> | number
+    jobWorkOrderId?: IntFilter<"JobWorkReconciliation"> | number
+    reportedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: DecimalNullableFilter<"JobWorkReconciliation"> | Decimal | DecimalJsLike | number | string | null
+    status?: StringFilter<"JobWorkReconciliation"> | string
+    reviewedByAdminId?: IntNullableFilter<"JobWorkReconciliation"> | number | null
+    reviewedAt?: DateTimeNullableFilter<"JobWorkReconciliation"> | Date | string | null
+    resolutionNotes?: StringNullableFilter<"JobWorkReconciliation"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkReconciliation"> | Date | string
+  }
+
   export type companiesCreateWithoutBranchesInput = {
     company_name: string
     address?: string | null
@@ -35240,6 +47145,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutBranchesInput = {
@@ -35257,6 +47165,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutBranchesInput = {
@@ -35456,6 +47367,49 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JobWorkOrderCreateWithoutBranchInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutBranchInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutBranchInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput>
+  }
+
+  export type JobWorkOrderCreateManyBranchInputEnvelope = {
+    data: JobWorkOrderCreateManyBranchInput | JobWorkOrderCreateManyBranchInput[]
+    skipDuplicates?: boolean
+  }
+
   export type companiesUpsertWithoutBranchesInput = {
     update: XOR<companiesUpdateWithoutBranchesInput, companiesUncheckedUpdateWithoutBranchesInput>
     create: XOR<companiesCreateWithoutBranchesInput, companiesUncheckedCreateWithoutBranchesInput>
@@ -35481,6 +47435,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutBranchesInput = {
@@ -35498,6 +47455,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type DepartmentUpsertWithWhereUniqueWithoutBranchInput = {
@@ -35642,6 +47602,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"PublicHoliday"> | Date | string
   }
 
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutBranchInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutBranchInput, JobWorkOrderUncheckedUpdateWithoutBranchInput>
+    create: XOR<JobWorkOrderCreateWithoutBranchInput, JobWorkOrderUncheckedCreateWithoutBranchInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutBranchInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutBranchInput, JobWorkOrderUncheckedUpdateWithoutBranchInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutBranchInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutBranchInput>
+  }
+
   export type BranchCreateWithoutDepartmentsInput = {
     branchName: string
     location: string
@@ -35651,6 +47627,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDepartmentsInput = {
@@ -35663,6 +47640,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDepartmentsInput = {
@@ -35684,6 +47662,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutDepartmentsInput = {
@@ -35701,6 +47682,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutDepartmentsInput = {
@@ -35877,6 +47861,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDepartmentsInput = {
@@ -35889,6 +47874,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutDepartmentsInput = {
@@ -35916,6 +47902,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutDepartmentsInput = {
@@ -35933,6 +47922,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeUpsertWithoutManagedDepartmentsInput = {
@@ -36460,6 +48452,7 @@ export namespace Prisma {
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutEmployeesInput = {
@@ -36472,6 +48465,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutEmployeesInput = {
@@ -36493,6 +48487,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutEmployeesInput = {
@@ -36510,6 +48507,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutEmployeesInput = {
@@ -37050,6 +49050,7 @@ export namespace Prisma {
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutEmployeesInput = {
@@ -37062,6 +49063,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutEmployeesInput = {
@@ -37089,6 +49091,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutEmployeesInput = {
@@ -37106,6 +49111,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type DepartmentUpsertWithoutEmployeesInput = {
@@ -37295,6 +49303,7 @@ export namespace Prisma {
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutDevicesInput = {
@@ -37307,6 +49316,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutDevicesInput = {
@@ -37328,6 +49338,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutDevicesInput = {
@@ -37345,6 +49358,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutDevicesInput = {
@@ -37415,6 +49431,7 @@ export namespace Prisma {
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutDevicesInput = {
@@ -37427,6 +49444,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type companiesUpsertWithoutDevicesInput = {
@@ -37454,6 +49472,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutDevicesInput = {
@@ -37471,6 +49492,9 @@ export namespace Prisma {
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeCreateWithoutFingerprintTemplatesInput = {
@@ -37960,6 +49984,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutAdminsInput
     approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminUncheckedCreateWithoutAttendanceOverridesInput = {
@@ -37972,6 +50000,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminCreateOrConnectWithoutAttendanceOverridesInput = {
@@ -38077,6 +50109,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
     approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminUncheckedUpdateWithoutAttendanceOverridesInput = {
@@ -38089,6 +50125,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type IotDeviceCreateWithoutDeviceLogsInput = {
@@ -38206,6 +50246,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutAdminsInput
     attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminUncheckedCreateWithoutApprovedAdvancesInput = {
@@ -38218,6 +50262,10 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminCreateOrConnectWithoutApprovedAdvancesInput = {
@@ -38375,6 +50423,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
     attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminUncheckedUpdateWithoutApprovedAdvancesInput = {
@@ -38387,6 +50439,10 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type PayrollUpsertWithoutAdvanceDeductionRecordInput = {
@@ -39508,6 +51564,9 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutPublicHolidaysInput = {
@@ -39525,6 +51584,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutPublicHolidaysInput = {
@@ -39541,6 +51603,7 @@ export namespace Prisma {
     departments?: DepartmentCreateNestedManyWithoutBranchInput
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutPublicHolidaysInput = {
@@ -39553,6 +51616,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutPublicHolidaysInput = {
@@ -39585,6 +51649,9 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutPublicHolidaysInput = {
@@ -39602,6 +51669,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type BranchUpsertWithoutPublicHolidaysInput = {
@@ -39624,6 +51694,7 @@ export namespace Prisma {
     departments?: DepartmentUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutPublicHolidaysInput = {
@@ -39636,6 +51707,7 @@ export namespace Prisma {
     departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type EmployeeCreateWithoutActivityLogsInput = {
@@ -39802,6 +51874,9 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutSettingsInput = {
@@ -39819,6 +51894,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutSettingsInput = {
@@ -39851,6 +51929,9 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutSettingsInput = {
@@ -39868,6 +51949,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type AdminCreateWithoutCompanyInput = {
@@ -39879,6 +51963,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
     attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminUncheckedCreateWithoutCompanyInput = {
@@ -39891,6 +51979,10 @@ export namespace Prisma {
     updatedAt?: Date | string
     approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
     attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
   }
 
   export type AdminCreateOrConnectWithoutCompanyInput = {
@@ -39912,6 +52004,7 @@ export namespace Prisma {
     employees?: EmployeeCreateNestedManyWithoutBranchInput
     devices?: IotDeviceCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutBranchInput
   }
 
   export type BranchUncheckedCreateWithoutCompanyInput = {
@@ -39924,6 +52017,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
     devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutBranchInput
   }
 
   export type BranchCreateOrConnectWithoutCompanyInput = {
@@ -40198,6 +52292,129 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ExternalProcessorCreateWithoutCompanyInput = {
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorUncheckedCreateWithoutCompanyInput = {
+    externalProcessorId?: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorCreateOrConnectWithoutCompanyInput = {
+    where: ExternalProcessorWhereUniqueInput
+    create: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type ExternalProcessorCreateManyCompanyInputEnvelope = {
+    data: ExternalProcessorCreateManyCompanyInput | ExternalProcessorCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkProcessTypeCreateWithoutCompanyInput = {
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutProcessTypeInput
+  }
+
+  export type JobWorkProcessTypeUncheckedCreateWithoutCompanyInput = {
+    processTypeId?: number
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutProcessTypeInput
+  }
+
+  export type JobWorkProcessTypeCreateOrConnectWithoutCompanyInput = {
+    where: JobWorkProcessTypeWhereUniqueInput
+    create: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkProcessTypeCreateManyCompanyInputEnvelope = {
+    data: JobWorkProcessTypeCreateManyCompanyInput | JobWorkProcessTypeCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkOrderCreateWithoutCompanyInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutCompanyInput = {
+    jobWorkOrderId?: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutCompanyInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkOrderCreateManyCompanyInputEnvelope = {
+    data: JobWorkOrderCreateManyCompanyInput | JobWorkOrderCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AdminUpsertWithWhereUniqueWithoutCompanyInput = {
     where: AdminWhereUniqueInput
     update: XOR<AdminUpdateWithoutCompanyInput, AdminUncheckedUpdateWithoutCompanyInput>
@@ -40384,6 +52601,91 @@ export namespace Prisma {
     data: XOR<PublicHolidayUpdateManyMutationInput, PublicHolidayUncheckedUpdateManyWithoutCompanyInput>
   }
 
+  export type ExternalProcessorUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: ExternalProcessorWhereUniqueInput
+    update: XOR<ExternalProcessorUpdateWithoutCompanyInput, ExternalProcessorUncheckedUpdateWithoutCompanyInput>
+    create: XOR<ExternalProcessorCreateWithoutCompanyInput, ExternalProcessorUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type ExternalProcessorUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: ExternalProcessorWhereUniqueInput
+    data: XOR<ExternalProcessorUpdateWithoutCompanyInput, ExternalProcessorUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type ExternalProcessorUpdateManyWithWhereWithoutCompanyInput = {
+    where: ExternalProcessorScalarWhereInput
+    data: XOR<ExternalProcessorUpdateManyMutationInput, ExternalProcessorUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type ExternalProcessorScalarWhereInput = {
+    AND?: ExternalProcessorScalarWhereInput | ExternalProcessorScalarWhereInput[]
+    OR?: ExternalProcessorScalarWhereInput[]
+    NOT?: ExternalProcessorScalarWhereInput | ExternalProcessorScalarWhereInput[]
+    externalProcessorId?: IntFilter<"ExternalProcessor"> | number
+    companyId?: IntFilter<"ExternalProcessor"> | number
+    processorCode?: StringFilter<"ExternalProcessor"> | string
+    name?: StringFilter<"ExternalProcessor"> | string
+    contactPerson?: StringNullableFilter<"ExternalProcessor"> | string | null
+    phone?: StringNullableFilter<"ExternalProcessor"> | string | null
+    email?: StringNullableFilter<"ExternalProcessor"> | string | null
+    address?: StringNullableFilter<"ExternalProcessor"> | string | null
+    gstin?: StringNullableFilter<"ExternalProcessor"> | string | null
+    pan?: StringNullableFilter<"ExternalProcessor"> | string | null
+    paymentTerms?: StringNullableFilter<"ExternalProcessor"> | string | null
+    notes?: StringNullableFilter<"ExternalProcessor"> | string | null
+    status?: StringFilter<"ExternalProcessor"> | string
+    createdAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+    updatedAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
+  }
+
+  export type JobWorkProcessTypeUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkProcessTypeWhereUniqueInput
+    update: XOR<JobWorkProcessTypeUpdateWithoutCompanyInput, JobWorkProcessTypeUncheckedUpdateWithoutCompanyInput>
+    create: XOR<JobWorkProcessTypeCreateWithoutCompanyInput, JobWorkProcessTypeUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkProcessTypeWhereUniqueInput
+    data: XOR<JobWorkProcessTypeUpdateWithoutCompanyInput, JobWorkProcessTypeUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput = {
+    where: JobWorkProcessTypeScalarWhereInput
+    data: XOR<JobWorkProcessTypeUpdateManyMutationInput, JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type JobWorkProcessTypeScalarWhereInput = {
+    AND?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+    OR?: JobWorkProcessTypeScalarWhereInput[]
+    NOT?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+    processTypeId?: IntFilter<"JobWorkProcessType"> | number
+    companyId?: IntFilter<"JobWorkProcessType"> | number
+    code?: StringFilter<"JobWorkProcessType"> | string
+    name?: StringFilter<"JobWorkProcessType"> | string
+    description?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    chargeUnit?: StringNullableFilter<"JobWorkProcessType"> | string | null
+    defaultRate?: DecimalNullableFilter<"JobWorkProcessType"> | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFilter<"JobWorkProcessType"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
+  }
+
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutCompanyInput, JobWorkOrderUncheckedUpdateWithoutCompanyInput>
+    create: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutCompanyInput, JobWorkOrderUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutCompanyInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutCompanyInput>
+  }
+
   export type LeaveBalanceCreateWithoutLeaveTypeInput = {
     year: number
     allocated?: Decimal | DecimalJsLike | number | string
@@ -40474,6 +52776,9 @@ export namespace Prisma {
     devices?: IotDeviceCreateNestedManyWithoutCompanyInput
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesUncheckedCreateWithoutLeaveTypesInput = {
@@ -40491,6 +52796,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type companiesCreateOrConnectWithoutLeaveTypesInput = {
@@ -40555,6 +52863,9 @@ export namespace Prisma {
     devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
   }
 
   export type companiesUncheckedUpdateWithoutLeaveTypesInput = {
@@ -40572,6 +52883,9 @@ export namespace Prisma {
     devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmployeeCreateWithoutLeaveBalancesInput = {
@@ -41196,6 +53510,1450 @@ export namespace Prisma {
     subordinates?: EmployeeUncheckedUpdateManyWithoutManagerNestedInput
   }
 
+  export type companiesCreateWithoutExternalProcessorsInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutExternalProcessorsInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutExternalProcessorsInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutExternalProcessorsInput, companiesUncheckedCreateWithoutExternalProcessorsInput>
+  }
+
+  export type JobWorkOrderCreateWithoutExternalProcessorInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutExternalProcessorInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutExternalProcessorInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkOrderCreateManyExternalProcessorInputEnvelope = {
+    data: JobWorkOrderCreateManyExternalProcessorInput | JobWorkOrderCreateManyExternalProcessorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type companiesUpsertWithoutExternalProcessorsInput = {
+    update: XOR<companiesUpdateWithoutExternalProcessorsInput, companiesUncheckedUpdateWithoutExternalProcessorsInput>
+    create: XOR<companiesCreateWithoutExternalProcessorsInput, companiesUncheckedCreateWithoutExternalProcessorsInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutExternalProcessorsInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutExternalProcessorsInput, companiesUncheckedUpdateWithoutExternalProcessorsInput>
+  }
+
+  export type companiesUpdateWithoutExternalProcessorsInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutExternalProcessorsInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutExternalProcessorInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutExternalProcessorInput, JobWorkOrderUncheckedUpdateWithoutExternalProcessorInput>
+    create: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutExternalProcessorInput, JobWorkOrderUncheckedUpdateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorInput>
+  }
+
+  export type companiesCreateWithoutJobWorkProcessTypesInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutJobWorkProcessTypesInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutJobWorkProcessTypesInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutJobWorkProcessTypesInput, companiesUncheckedCreateWithoutJobWorkProcessTypesInput>
+  }
+
+  export type JobWorkOrderCreateWithoutProcessTypeInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutProcessTypeInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutProcessTypeInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput>
+  }
+
+  export type JobWorkOrderCreateManyProcessTypeInputEnvelope = {
+    data: JobWorkOrderCreateManyProcessTypeInput | JobWorkOrderCreateManyProcessTypeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type companiesUpsertWithoutJobWorkProcessTypesInput = {
+    update: XOR<companiesUpdateWithoutJobWorkProcessTypesInput, companiesUncheckedUpdateWithoutJobWorkProcessTypesInput>
+    create: XOR<companiesCreateWithoutJobWorkProcessTypesInput, companiesUncheckedCreateWithoutJobWorkProcessTypesInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutJobWorkProcessTypesInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutJobWorkProcessTypesInput, companiesUncheckedUpdateWithoutJobWorkProcessTypesInput>
+  }
+
+  export type companiesUpdateWithoutJobWorkProcessTypesInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutJobWorkProcessTypesInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutProcessTypeInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutProcessTypeInput, JobWorkOrderUncheckedUpdateWithoutProcessTypeInput>
+    create: XOR<JobWorkOrderCreateWithoutProcessTypeInput, JobWorkOrderUncheckedCreateWithoutProcessTypeInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutProcessTypeInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutProcessTypeInput, JobWorkOrderUncheckedUpdateWithoutProcessTypeInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutProcessTypeInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutProcessTypeInput>
+  }
+
+  export type companiesCreateWithoutJobWorkOrdersInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutJobWorkOrdersInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutJobWorkOrdersInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutJobWorkOrdersInput, companiesUncheckedCreateWithoutJobWorkOrdersInput>
+  }
+
+  export type BranchCreateWithoutJobWorkOrdersInput = {
+    branchName: string
+    location: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutBranchesInput
+    departments?: DepartmentCreateNestedManyWithoutBranchInput
+    employees?: EmployeeCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchUncheckedCreateWithoutJobWorkOrdersInput = {
+    branchId?: number
+    branchName: string
+    location: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    departments?: DepartmentUncheckedCreateNestedManyWithoutBranchInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutBranchInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutBranchInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutBranchInput
+  }
+
+  export type BranchCreateOrConnectWithoutJobWorkOrdersInput = {
+    where: BranchWhereUniqueInput
+    create: XOR<BranchCreateWithoutJobWorkOrdersInput, BranchUncheckedCreateWithoutJobWorkOrdersInput>
+  }
+
+  export type ExternalProcessorCreateWithoutJobWorkOrdersInput = {
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutExternalProcessorsInput
+  }
+
+  export type ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput = {
+    externalProcessorId?: number
+    companyId: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExternalProcessorCreateOrConnectWithoutJobWorkOrdersInput = {
+    where: ExternalProcessorWhereUniqueInput
+    create: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkProcessTypeCreateWithoutJobWorkOrdersInput = {
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkProcessTypesInput
+  }
+
+  export type JobWorkProcessTypeUncheckedCreateWithoutJobWorkOrdersInput = {
+    processTypeId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessTypeCreateOrConnectWithoutJobWorkOrdersInput = {
+    where: JobWorkProcessTypeWhereUniqueInput
+    create: XOR<JobWorkProcessTypeCreateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedCreateWithoutJobWorkOrdersInput>
+  }
+
+  export type AdminCreateWithoutJobWorkOrdersCreatedInput = {
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutAdminsInput
+    approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminUncheckedCreateWithoutJobWorkOrdersCreatedInput = {
+    adminId?: number
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminCreateOrConnectWithoutJobWorkOrdersCreatedInput = {
+    where: AdminWhereUniqueInput
+    create: XOR<AdminCreateWithoutJobWorkOrdersCreatedInput, AdminUncheckedCreateWithoutJobWorkOrdersCreatedInput>
+  }
+
+  export type JobWorkDispatchCreateWithoutJobWorkOrderInput = {
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkDispatchesCreatedInput
+    receipts?: JobWorkReceiptCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput = {
+    dispatchId?: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receipts?: JobWorkReceiptUncheckedCreateNestedManyWithoutDispatchInput
+  }
+
+  export type JobWorkDispatchCreateOrConnectWithoutJobWorkOrderInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    create: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkDispatchCreateManyJobWorkOrderInputEnvelope = {
+    data: JobWorkDispatchCreateManyJobWorkOrderInput | JobWorkDispatchCreateManyJobWorkOrderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkReconciliationCreateWithoutJobWorkOrderInput = {
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reviewedByAdmin?: AdminCreateNestedOneWithoutJobWorkReconciliationsReviewedInput
+  }
+
+  export type JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput = {
+    reconciliationId?: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedByAdminId?: number | null
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationCreateOrConnectWithoutJobWorkOrderInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    create: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkReconciliationCreateManyJobWorkOrderInputEnvelope = {
+    data: JobWorkReconciliationCreateManyJobWorkOrderInput | JobWorkReconciliationCreateManyJobWorkOrderInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type companiesUpsertWithoutJobWorkOrdersInput = {
+    update: XOR<companiesUpdateWithoutJobWorkOrdersInput, companiesUncheckedUpdateWithoutJobWorkOrdersInput>
+    create: XOR<companiesCreateWithoutJobWorkOrdersInput, companiesUncheckedCreateWithoutJobWorkOrdersInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutJobWorkOrdersInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutJobWorkOrdersInput, companiesUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type companiesUpdateWithoutJobWorkOrdersInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutJobWorkOrdersInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type BranchUpsertWithoutJobWorkOrdersInput = {
+    update: XOR<BranchUpdateWithoutJobWorkOrdersInput, BranchUncheckedUpdateWithoutJobWorkOrdersInput>
+    create: XOR<BranchCreateWithoutJobWorkOrdersInput, BranchUncheckedCreateWithoutJobWorkOrdersInput>
+    where?: BranchWhereInput
+  }
+
+  export type BranchUpdateToOneWithWhereWithoutJobWorkOrdersInput = {
+    where?: BranchWhereInput
+    data: XOR<BranchUpdateWithoutJobWorkOrdersInput, BranchUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type BranchUpdateWithoutJobWorkOrdersInput = {
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutBranchesNestedInput
+    departments?: DepartmentUpdateManyWithoutBranchNestedInput
+    employees?: EmployeeUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+  }
+
+  export type BranchUncheckedUpdateWithoutJobWorkOrdersInput = {
+    branchId?: IntFieldUpdateOperationsInput | number
+    branchName?: StringFieldUpdateOperationsInput | string
+    location?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    departments?: DepartmentUncheckedUpdateManyWithoutBranchNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+  }
+
+  export type ExternalProcessorUpsertWithoutJobWorkOrdersInput = {
+    update: XOR<ExternalProcessorUpdateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput>
+    create: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
+    where?: ExternalProcessorWhereInput
+  }
+
+  export type ExternalProcessorUpdateToOneWithWhereWithoutJobWorkOrdersInput = {
+    where?: ExternalProcessorWhereInput
+    data: XOR<ExternalProcessorUpdateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type ExternalProcessorUpdateWithoutJobWorkOrdersInput = {
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput
+  }
+
+  export type ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessTypeUpsertWithoutJobWorkOrdersInput = {
+    update: XOR<JobWorkProcessTypeUpdateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedUpdateWithoutJobWorkOrdersInput>
+    create: XOR<JobWorkProcessTypeCreateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedCreateWithoutJobWorkOrdersInput>
+    where?: JobWorkProcessTypeWhereInput
+  }
+
+  export type JobWorkProcessTypeUpdateToOneWithWhereWithoutJobWorkOrdersInput = {
+    where?: JobWorkProcessTypeWhereInput
+    data: XOR<JobWorkProcessTypeUpdateWithoutJobWorkOrdersInput, JobWorkProcessTypeUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkProcessTypeUpdateWithoutJobWorkOrdersInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkProcessTypesNestedInput
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateWithoutJobWorkOrdersInput = {
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminUpsertWithoutJobWorkOrdersCreatedInput = {
+    update: XOR<AdminUpdateWithoutJobWorkOrdersCreatedInput, AdminUncheckedUpdateWithoutJobWorkOrdersCreatedInput>
+    create: XOR<AdminCreateWithoutJobWorkOrdersCreatedInput, AdminUncheckedCreateWithoutJobWorkOrdersCreatedInput>
+    where?: AdminWhereInput
+  }
+
+  export type AdminUpdateToOneWithWhereWithoutJobWorkOrdersCreatedInput = {
+    where?: AdminWhereInput
+    data: XOR<AdminUpdateWithoutJobWorkOrdersCreatedInput, AdminUncheckedUpdateWithoutJobWorkOrdersCreatedInput>
+  }
+
+  export type AdminUpdateWithoutJobWorkOrdersCreatedInput = {
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type AdminUncheckedUpdateWithoutJobWorkOrdersCreatedInput = {
+    adminId?: IntFieldUpdateOperationsInput | number
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type JobWorkDispatchUpsertWithWhereUniqueWithoutJobWorkOrderInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    update: XOR<JobWorkDispatchUpdateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedUpdateWithoutJobWorkOrderInput>
+    create: XOR<JobWorkDispatchCreateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedCreateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkDispatchUpdateWithWhereUniqueWithoutJobWorkOrderInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    data: XOR<JobWorkDispatchUpdateWithoutJobWorkOrderInput, JobWorkDispatchUncheckedUpdateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkDispatchUpdateManyWithWhereWithoutJobWorkOrderInput = {
+    where: JobWorkDispatchScalarWhereInput
+    data: XOR<JobWorkDispatchUpdateManyMutationInput, JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkReconciliationUpsertWithWhereUniqueWithoutJobWorkOrderInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    update: XOR<JobWorkReconciliationUpdateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedUpdateWithoutJobWorkOrderInput>
+    create: XOR<JobWorkReconciliationCreateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedCreateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkReconciliationUpdateWithWhereUniqueWithoutJobWorkOrderInput = {
+    where: JobWorkReconciliationWhereUniqueInput
+    data: XOR<JobWorkReconciliationUpdateWithoutJobWorkOrderInput, JobWorkReconciliationUncheckedUpdateWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkReconciliationUpdateManyWithWhereWithoutJobWorkOrderInput = {
+    where: JobWorkReconciliationScalarWhereInput
+    data: XOR<JobWorkReconciliationUpdateManyMutationInput, JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderInput>
+  }
+
+  export type JobWorkOrderCreateWithoutDispatchesInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutDispatchesInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutDispatchesInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutDispatchesInput, JobWorkOrderUncheckedCreateWithoutDispatchesInput>
+  }
+
+  export type AdminCreateWithoutJobWorkDispatchesCreatedInput = {
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutAdminsInput
+    approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminUncheckedCreateWithoutJobWorkDispatchesCreatedInput = {
+    adminId?: number
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminCreateOrConnectWithoutJobWorkDispatchesCreatedInput = {
+    where: AdminWhereUniqueInput
+    create: XOR<AdminCreateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedCreateWithoutJobWorkDispatchesCreatedInput>
+  }
+
+  export type JobWorkReceiptCreateWithoutDispatchInput = {
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receivedByAdmin?: AdminCreateNestedOneWithoutJobWorkReceiptsRecordedInput
+    items?: JobWorkReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptUncheckedCreateWithoutDispatchInput = {
+    receiptId?: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    receivedByAdminId?: number | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: JobWorkReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type JobWorkReceiptCreateOrConnectWithoutDispatchInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    create: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput>
+  }
+
+  export type JobWorkReceiptCreateManyDispatchInputEnvelope = {
+    data: JobWorkReceiptCreateManyDispatchInput | JobWorkReceiptCreateManyDispatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkOrderUpsertWithoutDispatchesInput = {
+    update: XOR<JobWorkOrderUpdateWithoutDispatchesInput, JobWorkOrderUncheckedUpdateWithoutDispatchesInput>
+    create: XOR<JobWorkOrderCreateWithoutDispatchesInput, JobWorkOrderUncheckedCreateWithoutDispatchesInput>
+    where?: JobWorkOrderWhereInput
+  }
+
+  export type JobWorkOrderUpdateToOneWithWhereWithoutDispatchesInput = {
+    where?: JobWorkOrderWhereInput
+    data: XOR<JobWorkOrderUpdateWithoutDispatchesInput, JobWorkOrderUncheckedUpdateWithoutDispatchesInput>
+  }
+
+  export type JobWorkOrderUpdateWithoutDispatchesInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutDispatchesInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type AdminUpsertWithoutJobWorkDispatchesCreatedInput = {
+    update: XOR<AdminUpdateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedUpdateWithoutJobWorkDispatchesCreatedInput>
+    create: XOR<AdminCreateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedCreateWithoutJobWorkDispatchesCreatedInput>
+    where?: AdminWhereInput
+  }
+
+  export type AdminUpdateToOneWithWhereWithoutJobWorkDispatchesCreatedInput = {
+    where?: AdminWhereInput
+    data: XOR<AdminUpdateWithoutJobWorkDispatchesCreatedInput, AdminUncheckedUpdateWithoutJobWorkDispatchesCreatedInput>
+  }
+
+  export type AdminUpdateWithoutJobWorkDispatchesCreatedInput = {
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type AdminUncheckedUpdateWithoutJobWorkDispatchesCreatedInput = {
+    adminId?: IntFieldUpdateOperationsInput | number
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type JobWorkReceiptUpsertWithWhereUniqueWithoutDispatchInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    update: XOR<JobWorkReceiptUpdateWithoutDispatchInput, JobWorkReceiptUncheckedUpdateWithoutDispatchInput>
+    create: XOR<JobWorkReceiptCreateWithoutDispatchInput, JobWorkReceiptUncheckedCreateWithoutDispatchInput>
+  }
+
+  export type JobWorkReceiptUpdateWithWhereUniqueWithoutDispatchInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    data: XOR<JobWorkReceiptUpdateWithoutDispatchInput, JobWorkReceiptUncheckedUpdateWithoutDispatchInput>
+  }
+
+  export type JobWorkReceiptUpdateManyWithWhereWithoutDispatchInput = {
+    where: JobWorkReceiptScalarWhereInput
+    data: XOR<JobWorkReceiptUpdateManyMutationInput, JobWorkReceiptUncheckedUpdateManyWithoutDispatchInput>
+  }
+
+  export type JobWorkDispatchCreateWithoutReceiptsInput = {
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrder: JobWorkOrderCreateNestedOneWithoutDispatchesInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkDispatchesCreatedInput
+  }
+
+  export type JobWorkDispatchUncheckedCreateWithoutReceiptsInput = {
+    dispatchId?: number
+    jobWorkOrderId: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkDispatchCreateOrConnectWithoutReceiptsInput = {
+    where: JobWorkDispatchWhereUniqueInput
+    create: XOR<JobWorkDispatchCreateWithoutReceiptsInput, JobWorkDispatchUncheckedCreateWithoutReceiptsInput>
+  }
+
+  export type AdminCreateWithoutJobWorkReceiptsRecordedInput = {
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutAdminsInput
+    approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminUncheckedCreateWithoutJobWorkReceiptsRecordedInput = {
+    adminId?: number
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedCreateNestedManyWithoutReviewedByAdminInput
+  }
+
+  export type AdminCreateOrConnectWithoutJobWorkReceiptsRecordedInput = {
+    where: AdminWhereUniqueInput
+    create: XOR<AdminCreateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedCreateWithoutJobWorkReceiptsRecordedInput>
+  }
+
+  export type JobWorkReceiptItemCreateWithoutReceiptInput = {
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type JobWorkReceiptItemUncheckedCreateWithoutReceiptInput = {
+    receiptItemId?: number
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type JobWorkReceiptItemCreateOrConnectWithoutReceiptInput = {
+    where: JobWorkReceiptItemWhereUniqueInput
+    create: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput>
+  }
+
+  export type JobWorkReceiptItemCreateManyReceiptInputEnvelope = {
+    data: JobWorkReceiptItemCreateManyReceiptInput | JobWorkReceiptItemCreateManyReceiptInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkDispatchUpsertWithoutReceiptsInput = {
+    update: XOR<JobWorkDispatchUpdateWithoutReceiptsInput, JobWorkDispatchUncheckedUpdateWithoutReceiptsInput>
+    create: XOR<JobWorkDispatchCreateWithoutReceiptsInput, JobWorkDispatchUncheckedCreateWithoutReceiptsInput>
+    where?: JobWorkDispatchWhereInput
+  }
+
+  export type JobWorkDispatchUpdateToOneWithWhereWithoutReceiptsInput = {
+    where?: JobWorkDispatchWhereInput
+    data: XOR<JobWorkDispatchUpdateWithoutReceiptsInput, JobWorkDispatchUncheckedUpdateWithoutReceiptsInput>
+  }
+
+  export type JobWorkDispatchUpdateWithoutReceiptsInput = {
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrder?: JobWorkOrderUpdateOneRequiredWithoutDispatchesNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkDispatchesCreatedNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateWithoutReceiptsInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminUpsertWithoutJobWorkReceiptsRecordedInput = {
+    update: XOR<AdminUpdateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedUpdateWithoutJobWorkReceiptsRecordedInput>
+    create: XOR<AdminCreateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedCreateWithoutJobWorkReceiptsRecordedInput>
+    where?: AdminWhereInput
+  }
+
+  export type AdminUpdateToOneWithWhereWithoutJobWorkReceiptsRecordedInput = {
+    where?: AdminWhereInput
+    data: XOR<AdminUpdateWithoutJobWorkReceiptsRecordedInput, AdminUncheckedUpdateWithoutJobWorkReceiptsRecordedInput>
+  }
+
+  export type AdminUpdateWithoutJobWorkReceiptsRecordedInput = {
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type AdminUncheckedUpdateWithoutJobWorkReceiptsRecordedInput = {
+    adminId?: IntFieldUpdateOperationsInput | number
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
+  }
+
+  export type JobWorkReceiptItemUpsertWithWhereUniqueWithoutReceiptInput = {
+    where: JobWorkReceiptItemWhereUniqueInput
+    update: XOR<JobWorkReceiptItemUpdateWithoutReceiptInput, JobWorkReceiptItemUncheckedUpdateWithoutReceiptInput>
+    create: XOR<JobWorkReceiptItemCreateWithoutReceiptInput, JobWorkReceiptItemUncheckedCreateWithoutReceiptInput>
+  }
+
+  export type JobWorkReceiptItemUpdateWithWhereUniqueWithoutReceiptInput = {
+    where: JobWorkReceiptItemWhereUniqueInput
+    data: XOR<JobWorkReceiptItemUpdateWithoutReceiptInput, JobWorkReceiptItemUncheckedUpdateWithoutReceiptInput>
+  }
+
+  export type JobWorkReceiptItemUpdateManyWithWhereWithoutReceiptInput = {
+    where: JobWorkReceiptItemScalarWhereInput
+    data: XOR<JobWorkReceiptItemUpdateManyMutationInput, JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptInput>
+  }
+
+  export type JobWorkReceiptItemScalarWhereInput = {
+    AND?: JobWorkReceiptItemScalarWhereInput | JobWorkReceiptItemScalarWhereInput[]
+    OR?: JobWorkReceiptItemScalarWhereInput[]
+    NOT?: JobWorkReceiptItemScalarWhereInput | JobWorkReceiptItemScalarWhereInput[]
+    receiptItemId?: IntFilter<"JobWorkReceiptItem"> | number
+    receiptId?: IntFilter<"JobWorkReceiptItem"> | number
+    returnCondition?: StringFilter<"JobWorkReceiptItem"> | string
+    returnedPieces?: IntFilter<"JobWorkReceiptItem"> | number
+    returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
+    remarks?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"JobWorkReceiptItem"> | Date | string
+  }
+
+  export type JobWorkReceiptCreateWithoutItemsInput = {
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatch: JobWorkDispatchCreateNestedOneWithoutReceiptsInput
+    receivedByAdmin?: AdminCreateNestedOneWithoutJobWorkReceiptsRecordedInput
+  }
+
+  export type JobWorkReceiptUncheckedCreateWithoutItemsInput = {
+    receiptId?: number
+    dispatchId: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    receivedByAdminId?: number | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReceiptCreateOrConnectWithoutItemsInput = {
+    where: JobWorkReceiptWhereUniqueInput
+    create: XOR<JobWorkReceiptCreateWithoutItemsInput, JobWorkReceiptUncheckedCreateWithoutItemsInput>
+  }
+
+  export type JobWorkReceiptUpsertWithoutItemsInput = {
+    update: XOR<JobWorkReceiptUpdateWithoutItemsInput, JobWorkReceiptUncheckedUpdateWithoutItemsInput>
+    create: XOR<JobWorkReceiptCreateWithoutItemsInput, JobWorkReceiptUncheckedCreateWithoutItemsInput>
+    where?: JobWorkReceiptWhereInput
+  }
+
+  export type JobWorkReceiptUpdateToOneWithWhereWithoutItemsInput = {
+    where?: JobWorkReceiptWhereInput
+    data: XOR<JobWorkReceiptUpdateWithoutItemsInput, JobWorkReceiptUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type JobWorkReceiptUpdateWithoutItemsInput = {
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatch?: JobWorkDispatchUpdateOneRequiredWithoutReceiptsNestedInput
+    receivedByAdmin?: AdminUpdateOneWithoutJobWorkReceiptsRecordedNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateWithoutItemsInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderCreateWithoutReconciliationsInput = {
+    jobNumber: string
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutReconciliationsInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutReconciliationsInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutReconciliationsInput, JobWorkOrderUncheckedCreateWithoutReconciliationsInput>
+  }
+
+  export type AdminCreateWithoutJobWorkReconciliationsReviewedInput = {
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutAdminsInput
+    approvedAdvances?: AdvancePaymentCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptCreateNestedManyWithoutReceivedByAdminInput
+  }
+
+  export type AdminUncheckedCreateWithoutJobWorkReconciliationsReviewedInput = {
+    adminId?: number
+    adminName: string
+    email: string
+    phone?: string | null
+    passwordHash: string
+    companyId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    approvedAdvances?: AdvancePaymentUncheckedCreateNestedManyWithoutApproverInput
+    attendanceOverrides?: AttendanceUncheckedCreateNestedManyWithoutManualOverrideAdminInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedCreateNestedManyWithoutCreatedByAdminInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedCreateNestedManyWithoutReceivedByAdminInput
+  }
+
+  export type AdminCreateOrConnectWithoutJobWorkReconciliationsReviewedInput = {
+    where: AdminWhereUniqueInput
+    create: XOR<AdminCreateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedCreateWithoutJobWorkReconciliationsReviewedInput>
+  }
+
+  export type JobWorkOrderUpsertWithoutReconciliationsInput = {
+    update: XOR<JobWorkOrderUpdateWithoutReconciliationsInput, JobWorkOrderUncheckedUpdateWithoutReconciliationsInput>
+    create: XOR<JobWorkOrderCreateWithoutReconciliationsInput, JobWorkOrderUncheckedCreateWithoutReconciliationsInput>
+    where?: JobWorkOrderWhereInput
+  }
+
+  export type JobWorkOrderUpdateToOneWithWhereWithoutReconciliationsInput = {
+    where?: JobWorkOrderWhereInput
+    data: XOR<JobWorkOrderUpdateWithoutReconciliationsInput, JobWorkOrderUncheckedUpdateWithoutReconciliationsInput>
+  }
+
+  export type JobWorkOrderUpdateWithoutReconciliationsInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutReconciliationsInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type AdminUpsertWithoutJobWorkReconciliationsReviewedInput = {
+    update: XOR<AdminUpdateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedUpdateWithoutJobWorkReconciliationsReviewedInput>
+    create: XOR<AdminCreateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedCreateWithoutJobWorkReconciliationsReviewedInput>
+    where?: AdminWhereInput
+  }
+
+  export type AdminUpdateToOneWithWhereWithoutJobWorkReconciliationsReviewedInput = {
+    where?: AdminWhereInput
+    data: XOR<AdminUpdateWithoutJobWorkReconciliationsReviewedInput, AdminUncheckedUpdateWithoutJobWorkReconciliationsReviewedInput>
+  }
+
+  export type AdminUpdateWithoutJobWorkReconciliationsReviewedInput = {
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutAdminsNestedInput
+    approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+  }
+
+  export type AdminUncheckedUpdateWithoutJobWorkReconciliationsReviewedInput = {
+    adminId?: IntFieldUpdateOperationsInput | number
+    adminName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    companyId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
+    attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+  }
+
   export type AdvancePaymentCreateManyApproverInput = {
     advanceId?: number
     employeeId: number
@@ -41222,6 +54980,59 @@ export namespace Prisma {
     resolutionSource?: string | null
     manualOverride?: boolean
     manualOverrideAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderCreateManyCreatedByAdminInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkDispatchCreateManyCreatedByAdminInput = {
+    dispatchId?: number
+    jobWorkOrderId: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReceiptCreateManyReceivedByAdminInput = {
+    receiptId?: number
+    dispatchId: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationCreateManyReviewedByAdminInput = {
+    reconciliationId?: number
+    jobWorkOrderId: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41314,6 +55125,169 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type JobWorkOrderUpdateWithoutCreatedByAdminInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutCreatedByAdminInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkDispatchUpdateWithoutCreatedByAdminInput = {
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrder?: JobWorkOrderUpdateOneRequiredWithoutDispatchesNestedInput
+    receipts?: JobWorkReceiptUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateWithoutCreatedByAdminInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipts?: JobWorkReceiptUncheckedUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptUpdateWithoutReceivedByAdminInput = {
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatch?: JobWorkDispatchUpdateOneRequiredWithoutReceiptsNestedInput
+    items?: JobWorkReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateWithoutReceivedByAdminInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationUpdateWithoutReviewedByAdminInput = {
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrder?: JobWorkOrderUpdateOneRequiredWithoutReconciliationsNestedInput
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateWithoutReviewedByAdminInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type DepartmentCreateManyBranchInput = {
     departmentId?: number
     departmentName: string
@@ -41372,6 +55346,21 @@ export namespace Prisma {
     holidayName: string
     dailyWorkingHours?: Decimal | DecimalJsLike | number | string
     isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderCreateManyBranchInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41586,6 +55575,54 @@ export namespace Prisma {
     holidayName?: StringFieldUpdateOperationsInput | string
     dailyWorkingHours?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderUpdateWithoutBranchInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutBranchInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutBranchInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -42703,6 +56740,50 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ExternalProcessorCreateManyCompanyInput = {
+    externalProcessorId?: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessTypeCreateManyCompanyInput = {
+    processTypeId?: number
+    code: string
+    name: string
+    description?: string | null
+    chargeUnit?: string | null
+    defaultRate?: Decimal | DecimalJsLike | number | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderCreateManyCompanyInput = {
+    jobWorkOrderId?: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AdminUpdateWithoutCompanyInput = {
     adminName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -42712,6 +56793,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUpdateManyWithoutApproverNestedInput
     attendanceOverrides?: AttendanceUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminUncheckedUpdateWithoutCompanyInput = {
@@ -42724,6 +56809,10 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     approvedAdvances?: AdvancePaymentUncheckedUpdateManyWithoutApproverNestedInput
     attendanceOverrides?: AttendanceUncheckedUpdateManyWithoutManualOverrideAdminNestedInput
+    jobWorkOrdersCreated?: JobWorkOrderUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkDispatchesCreated?: JobWorkDispatchUncheckedUpdateManyWithoutCreatedByAdminNestedInput
+    jobWorkReceiptsRecorded?: JobWorkReceiptUncheckedUpdateManyWithoutReceivedByAdminNestedInput
+    jobWorkReconciliationsReviewed?: JobWorkReconciliationUncheckedUpdateManyWithoutReviewedByAdminNestedInput
   }
 
   export type AdminUncheckedUpdateManyWithoutCompanyInput = {
@@ -42745,6 +56834,7 @@ export namespace Prisma {
     employees?: EmployeeUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateWithoutCompanyInput = {
@@ -42757,6 +56847,7 @@ export namespace Prisma {
     employees?: EmployeeUncheckedUpdateManyWithoutBranchNestedInput
     devices?: IotDeviceUncheckedUpdateManyWithoutBranchNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutBranchNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutBranchNestedInput
   }
 
   export type BranchUncheckedUpdateManyWithoutCompanyInput = {
@@ -43055,6 +57146,143 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ExternalProcessorUpdateWithoutCompanyInput = {
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type ExternalProcessorUncheckedUpdateWithoutCompanyInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type ExternalProcessorUncheckedUpdateManyWithoutCompanyInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessTypeUpdateWithoutCompanyInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutProcessTypeNestedInput
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateWithoutCompanyInput = {
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutProcessTypeNestedInput
+  }
+
+  export type JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyInput = {
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    chargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defaultRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderUpdateWithoutCompanyInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutCompanyInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutCompanyInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type LeaveBalanceCreateManyLeaveTypeInput = {
     leaveBalanceId?: number
     employeeId: number
@@ -43167,6 +57395,324 @@ export namespace Prisma {
     rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderCreateManyExternalProcessorInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    processTypeId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderUpdateWithoutExternalProcessorInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutExternalProcessorInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderCreateManyProcessTypeInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    orderDate: Date | string
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderUpdateWithoutProcessTypeInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutProcessTypeInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutProcessTypeInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkDispatchCreateManyJobWorkOrderInput = {
+    dispatchId?: number
+    challanNumber?: string | null
+    jangadNumber?: string | null
+    dispatchDate: Date | string
+    expectedReturnDate?: Date | string | null
+    sentPieces: number
+    sentCarats: Decimal | DecimalJsLike | number | string
+    sentWeightGrams: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReconciliationCreateManyJobWorkOrderInput = {
+    reconciliationId?: number
+    reportedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: Decimal | DecimalJsLike | number | string | null
+    status?: string
+    reviewedByAdminId?: number | null
+    reviewedAt?: Date | string | null
+    resolutionNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkDispatchUpdateWithoutJobWorkOrderInput = {
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkDispatchesCreatedNestedInput
+    receipts?: JobWorkReceiptUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateWithoutJobWorkOrderInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipts?: JobWorkReceiptUncheckedUpdateManyWithoutDispatchNestedInput
+  }
+
+  export type JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderInput = {
+    dispatchId?: IntFieldUpdateOperationsInput | number
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    jangadNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    dispatchDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    expectedReturnDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentPieces?: IntFieldUpdateOperationsInput | number
+    sentCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sentWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationUpdateWithoutJobWorkOrderInput = {
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedByAdmin?: AdminUpdateOneWithoutJobWorkReconciliationsReviewedNestedInput
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateWithoutJobWorkOrderInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderInput = {
+    reconciliationId?: IntFieldUpdateOperationsInput | number
+    reportedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    approvedLossCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    varianceCarats?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    reviewedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptCreateManyDispatchInput = {
+    receiptId?: number
+    receiptNumber?: string | null
+    receivedDate: Date | string
+    receivedByAdminId?: number | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkReceiptUpdateWithoutDispatchInput = {
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdmin?: AdminUpdateOneWithoutJobWorkReceiptsRecordedNestedInput
+    items?: JobWorkReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateWithoutDispatchInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type JobWorkReceiptUncheckedUpdateManyWithoutDispatchInput = {
+    receiptId?: IntFieldUpdateOperationsInput | number
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemCreateManyReceiptInput = {
+    receiptItemId?: number
+    returnCondition: string
+    returnedPieces: number
+    returnedCarats: Decimal | DecimalJsLike | number | string
+    returnedWeightGrams: Decimal | DecimalJsLike | number | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type JobWorkReceiptItemUpdateWithoutReceiptInput = {
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemUncheckedUpdateWithoutReceiptInput = {
+    receiptItemId?: IntFieldUpdateOperationsInput | number
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkReceiptItemUncheckedUpdateManyWithoutReceiptInput = {
+    receiptItemId?: IntFieldUpdateOperationsInput | number
+    returnCondition?: StringFieldUpdateOperationsInput | string
+    returnedPieces?: IntFieldUpdateOperationsInput | number
+    returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

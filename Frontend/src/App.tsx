@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/context/ToastContext';
@@ -21,6 +22,8 @@ import { AdminCompany } from '@/pages/admin/AdminCompany';
 import { AdminProfile } from '@/pages/admin/AdminProfile';
 import { AdminBranches } from '@/pages/admin/AdminBranches';
 import { AdminDepartments } from '@/pages/admin/AdminDepartments';
+import { AdminExternalProcessors } from '@/pages/admin/AdminExternalProcessors';
+import { AdminJobWorkProcessTypes } from '@/pages/admin/AdminJobWorkProcessTypes';
 import { AdminReports } from '@/pages/admin/AdminReports';
 import { BonusPayments } from '@/pages/admin/BonusPayments';
 import { AdminPublicHolidays } from '@/pages/admin/AdminPublicHolidays';
@@ -287,6 +290,35 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <AdminDepartments />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+
+            {/* ==================================================
+                DIAMOND JOB WORK
+            ================================================== */}
+
+            <Route
+              path="/admin/job-work/processors"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminExternalProcessors />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+             {/* Processing Type Master */}
+
+            <Route
+              path="/admin/job-work/process-types"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminJobWorkProcessTypes />
                   </AppLayout>
                 </ProtectedRoute>
               }

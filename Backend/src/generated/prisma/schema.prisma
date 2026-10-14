@@ -25,6 +25,12 @@ model Admin {
   approvedAdvances    AdvancePayment[] @relation("ApprovedAdvances")
   attendanceOverrides Attendance[]     @relation("AttendanceManualOverride")
 
+  // Diamond Job Work module audit relationships
+  jobWorkOrdersCreated           JobWorkOrder[]          @relation("JobWorkOrderCreatedBy")
+  jobWorkDispatchesCreated       JobWorkDispatch[]       @relation("JobWorkDispatchCreatedBy")
+  jobWorkReceiptsRecorded        JobWorkReceipt[]        @relation("JobWorkReceiptRecordedBy")
+  jobWorkReconciliationsReviewed JobWorkReconciliation[] @relation("JobWorkReconciliationReviewedBy")
+
   @@index([companyId])
   @@map("admin")
 }
@@ -46,6 +52,7 @@ model Branch {
   employees      Employee[]
   devices        IotDevice[]
   publicHolidays PublicHoliday[]
+  jobWorkOrders  JobWorkOrder[]
 
   @@index([companyId])
   @@map("branches")
@@ -553,8 +560,8 @@ model ExtraWork {
 //
 // Example:
 //
-// September extra = 25
-// October   extra = 15
+// September extra = 25 hours
+// October   extra = 15 hours
 // -----------------
 // Settled hours   = 40
 // Incentive       = ₹2,000
@@ -757,6 +764,11 @@ model companies {
   leaveTypes     LeaveType[]
   settings       Setting[]
   publicHolidays PublicHoliday[]
+
+  // Diamond Job Work module relations
+  externalProcessors  ExternalProcessor[]
+  jobWorkProcessTypes JobWorkProcessType[]
+  jobWorkOrders       JobWorkOrder[]
 }
 
 // ======================================================
@@ -893,4 +905,216 @@ model FingerprintEnrollment {
   @@index([sensorSlot])
   @@index([createdAt])
   @@map("fingerprint_enrollments")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - EXTERNAL PROCESSOR
+// ======================================================
+
+// External companies that perform processing work for an internal company.
+model ExternalProcessor {
+  externalProcessorId Int      @id @default(autoincrement()) @map("external_processor_id")
+  companyId           Int      @map("company_id")
+  processorCode       String   @map("processor_code") @db.VarChar(30)
+  name                String   @db.VarChar(150)
+  contactPerson       String?  @map("contact_person") @db.VarChar(100)
+  phone               String?  @db.VarChar(20)
+  email               String?  @db.VarChar(150)
+  address             String?  @db.Text
+  gstin               String?  @db.VarChar(20)
+  pan                 String?  @db.VarChar(10)
+  paymentTerms        String?  @map("payment_terms") @db.VarChar(100)
+  notes               String?  @db.Text
+  status              String   @default("ACTIVE") @db.VarChar(20)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  company       companies      @relation(fields: [companyId], references: [company_id])
+  jobWorkOrders JobWorkOrder[]
+
+  @@unique([companyId, processorCode])
+  @@index([companyId])
+  @@index([name])
+  @@index([status])
+  @@map("external_processors")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - PROCESS TYPE MASTER
+// ======================================================
+
+// Admin-configured processing types, such as polishing, cutting, and bruting.
+model JobWorkProcessType {
+  processTypeId Int      @id @default(autoincrement()) @map("process_type_id")
+  companyId     Int      @map("company_id")
+  code          String   @db.VarChar(30)
+  name          String   @db.VarChar(100)
+  description   String?  @db.Text
+  chargeUnit    String?  @map("charge_unit") @db.VarChar(20)
+  defaultRate   Decimal? @map("default_rate") @db.Decimal(12, 2)
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  company       companies      @relation(fields: [companyId], references: [company_id])
+  jobWorkOrders JobWorkOrder[]
+
+  @@unique([companyId, code])
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([isActive])
+  @@map("job_work_process_types")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - JOB ORDER
+// ======================================================
+
+// One job links an internal branch, external processor, and process type.
+// This module records job dispatch/receipt history only. It does not
+// maintain inventory balances, packet locations, or inventory movements.
+model JobWorkOrder {
+  jobWorkOrderId      Int      @id @default(autoincrement()) @map("job_work_order_id")
+  companyId           Int      @map("company_id")
+  branchId            Int      @map("branch_id")
+  jobNumber           String   @map("job_number") @db.VarChar(40)
+  externalProcessorId Int      @map("external_processor_id")
+  processTypeId       Int      @map("process_type_id")
+  orderDate           DateTime @map("order_date") @db.Date
+  status              String   @default("OPEN") @db.VarChar(30)
+  description         String?  @db.Text
+  notes               String?  @db.Text
+  createdByAdminId    Int?     @map("created_by_admin_id")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  company           companies               @relation(fields: [companyId], references: [company_id])
+  branch            Branch                  @relation(fields: [branchId], references: [branchId])
+  externalProcessor ExternalProcessor       @relation(fields: [externalProcessorId], references: [externalProcessorId])
+  processType       JobWorkProcessType      @relation(fields: [processTypeId], references: [processTypeId])
+  createdByAdmin    Admin?                  @relation("JobWorkOrderCreatedBy", fields: [createdByAdminId], references: [adminId])
+  dispatches        JobWorkDispatch[]
+  reconciliations   JobWorkReconciliation[]
+
+  @@unique([companyId, jobNumber])
+  @@index([companyId])
+  @@index([branchId])
+  @@index([externalProcessorId])
+  @@index([processTypeId])
+  @@index([status])
+  @@index([orderDate])
+  @@index([createdByAdminId])
+  @@map("job_work_orders")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - DISPATCH
+// ======================================================
+
+// Stores quantities sent for a job. Carats and grams are both stored
+// as separate values. No conversion is defined in the Prisma schema.
+model JobWorkDispatch {
+  dispatchId         Int       @id @default(autoincrement()) @map("dispatch_id")
+  jobWorkOrderId     Int       @map("job_work_order_id")
+  challanNumber      String?   @map("challan_number") @db.VarChar(50)
+  jangadNumber       String?   @map("jangad_number") @db.VarChar(50)
+  dispatchDate       DateTime  @map("dispatch_date") @db.Date
+  expectedReturnDate DateTime? @map("expected_return_date") @db.Date
+  sentPieces         Int       @map("sent_pieces")
+  sentCarats         Decimal   @map("sent_carats") @db.Decimal(12, 4)
+  sentWeightGrams    Decimal   @map("sent_weight_grams") @db.Decimal(12, 6)
+  notes              String?   @db.Text
+  createdByAdminId   Int?      @map("created_by_admin_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  jobWorkOrder   JobWorkOrder     @relation(fields: [jobWorkOrderId], references: [jobWorkOrderId])
+  createdByAdmin Admin?           @relation("JobWorkDispatchCreatedBy", fields: [createdByAdminId], references: [adminId])
+  receipts       JobWorkReceipt[]
+
+  @@index([jobWorkOrderId])
+  @@index([dispatchDate])
+  @@index([expectedReturnDate])
+  @@index([challanNumber])
+  @@index([jangadNumber])
+  @@index([createdByAdminId])
+  @@map("job_work_dispatches")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - RECEIPT
+// ======================================================
+
+// A dispatch may have multiple partial receipts.
+model JobWorkReceipt {
+  receiptId         Int      @id @default(autoincrement()) @map("receipt_id")
+  dispatchId        Int      @map("dispatch_id")
+  receiptNumber     String?  @map("receipt_number") @db.VarChar(50)
+  receivedDate      DateTime @map("received_date") @db.Date
+  receivedByAdminId Int?     @map("received_by_admin_id")
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  dispatch        JobWorkDispatch      @relation(fields: [dispatchId], references: [dispatchId])
+  receivedByAdmin Admin?               @relation("JobWorkReceiptRecordedBy", fields: [receivedByAdminId], references: [adminId])
+  items           JobWorkReceiptItem[]
+
+  @@index([dispatchId])
+  @@index([receivedDate])
+  @@index([receiptNumber])
+  @@index([receivedByAdminId])
+  @@map("job_work_receipts")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - RECEIPT ITEM
+// ======================================================
+
+// Stores quantities returned under a receipt. Carats and grams are stored
+// independently. This is job-level return history, not stock tracking.
+model JobWorkReceiptItem {
+  receiptItemId       Int      @id @default(autoincrement()) @map("receipt_item_id")
+  receiptId           Int      @map("receipt_id")
+  returnCondition     String   @map("return_condition") @db.VarChar(30)
+  returnedPieces      Int      @map("returned_pieces")
+  returnedCarats      Decimal  @map("returned_carats") @db.Decimal(12, 4)
+  returnedWeightGrams Decimal  @map("returned_weight_grams") @db.Decimal(12, 6)
+  remarks             String?  @db.Text
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  receipt JobWorkReceipt @relation(fields: [receiptId], references: [receiptId])
+
+  @@index([receiptId])
+  @@index([returnCondition])
+  @@map("job_work_receipt_items")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - RECONCILIATION
+// ======================================================
+
+// Records job-level processing loss and discrepancy reviews.
+// This is not an inventory balance table.
+model JobWorkReconciliation {
+  reconciliationId   Int       @id @default(autoincrement()) @map("reconciliation_id")
+  jobWorkOrderId     Int       @map("job_work_order_id")
+  reportedLossCarats Decimal?  @map("reported_loss_carats") @db.Decimal(12, 4)
+  approvedLossCarats Decimal?  @map("approved_loss_carats") @db.Decimal(12, 4)
+  varianceCarats     Decimal?  @map("variance_carats") @db.Decimal(12, 4)
+  status             String    @default("PENDING") @db.VarChar(20)
+  reviewedByAdminId  Int?      @map("reviewed_by_admin_id")
+  reviewedAt         DateTime? @map("reviewed_at")
+  resolutionNotes    String?   @map("resolution_notes") @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  jobWorkOrder    JobWorkOrder @relation(fields: [jobWorkOrderId], references: [jobWorkOrderId])
+  reviewedByAdmin Admin?       @relation("JobWorkReconciliationReviewedBy", fields: [reviewedByAdminId], references: [adminId])
+
+  @@index([jobWorkOrderId])
+  @@index([status])
+  @@index([reviewedByAdminId])
+  @@index([createdAt])
+  @@map("job_work_reconciliations")
 }
