@@ -25,6 +25,7 @@ import {
   Gem,
   UserRound,
   ClipboardList,
+  CircleDollarSign
 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
@@ -73,7 +74,7 @@ const adminNav = [
       { to: '/admin/departments', icon: Network, label: 'Departments' },
     ],
   },
-  {
+    {
     section: 'Diamond Job Work',
     items: [
       {
@@ -85,6 +86,11 @@ const adminNav = [
         to: '/admin/job-work/process-types',
         icon: ClipboardList,
         label: 'Processing Types',
+      },
+      {
+        to: '/admin/job-work/process-rates',
+        icon: CircleDollarSign,
+        label: 'Monthly Processing Rates',
       },
     ],
   },

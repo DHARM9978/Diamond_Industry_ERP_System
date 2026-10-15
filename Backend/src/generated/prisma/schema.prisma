@@ -30,6 +30,7 @@ model Admin {
   jobWorkDispatchesCreated       JobWorkDispatch[]       @relation("JobWorkDispatchCreatedBy")
   jobWorkReceiptsRecorded        JobWorkReceipt[]        @relation("JobWorkReceiptRecordedBy")
   jobWorkReconciliationsReviewed JobWorkReconciliation[] @relation("JobWorkReconciliationReviewedBy")
+  jobWorkPaymentsRecorded        JobWorkPayment[]        @relation("JobWorkPaymentRecordedBy")
 
   @@index([companyId])
   @@map("admin")
@@ -160,14 +161,7 @@ model IotDevice {
   updatedAt        DateTime  @updatedAt @map("updated_at")
   deviceSecretHash String?   @map("device_secret_hash") @db.VarChar(255)
 
-  // ------------------------------------------------------
   // Remote Wi-Fi configuration state
-  // ------------------------------------------------------
-  // The encrypted payload contains the configured
-  // Primary and Secondary Wi-Fi credentials.
-  //
-  // Plaintext Wi-Fi passwords are never returned
-  // through the device/admin API.
   wifiConfigEncrypted      String?   @map("wifi_config_encrypted") @db.Text
   wifiConfigVersion        Int       @default(0) @map("wifi_config_version")
   wifiConfigStatus         String    @default("NOT_CONFIGURED") @map("wifi_config_status") @db.VarChar(30)
@@ -176,10 +170,9 @@ model IotDevice {
   wifiActiveNetwork        String?   @map("wifi_active_network") @db.VarChar(20)
 
   // SSID of the Wi-Fi network currently connected to the ESP32.
-  // This is runtime information only; Wi-Fi passwords are never stored here.
+  // Wi-Fi passwords are never stored here.
   wifiActiveSsid String? @map("wifi_active_ssid") @db.VarChar(100)
-
-  wifiLastError String? @map("wifi_last_error") @db.Text
+  wifiLastError  String? @map("wifi_last_error") @db.Text
 
   attendancePunches AttendancePunch[]
   deviceLogs        DeviceLog[]
@@ -254,10 +247,9 @@ model Attendance {
   totalHours   Decimal?  @map("total_hours") @db.Decimal(5, 2)
   status       String    @db.VarChar(20)
 
-  // How the ERP attendance result was resolved.
-  // DEVICE     = real device OUT exists
-  // AUTO_CLOSE = final open session resolved using office close time
-  // ADMIN      = explicit administrator correction
+  // DEVICE = real device OUT exists
+  // AUTO_CLOSE = session resolved using office close time
+  // ADMIN = explicit administrator correction
   resolutionSource String? @map("resolution_source") @db.VarChar(20)
 
   // Protect an explicit administrator correction from automatic recalculation.
@@ -347,126 +339,40 @@ model Payroll {
   payPeriodStart DateTime @map("pay_period_start") @db.Date
   payPeriodEnd   DateTime @map("pay_period_end") @db.Date
 
-  // ====================================================
-  // HISTORICAL SALARY SNAPSHOT
-  // ====================================================
-
+  // Historical salary snapshot
   baseSalary           Decimal? @map("base_salary") @db.Decimal(12, 2)
   monthlyExpectedHours Decimal? @map("monthly_expected_hours") @db.Decimal(8, 2)
   salaryRatePerHour    Decimal? @map("salary_rate_per_hour") @db.Decimal(10, 2)
 
-  // ====================================================
-  // ATTENDANCE CALCULATION
-  // ====================================================
-
-  // Total actual attendance hours in this payroll period.
-  //
-  // These are actual fingerprint/attendance hours only.
-  totalWorkingHours Decimal @map("total_working_hours") @db.Decimal(8, 2)
-
-  // Hours that are payable at the normal salary rate.
-  // Cannot exceed monthlyExpectedHours.
+  // Attendance calculation
+  totalWorkingHours   Decimal @map("total_working_hours") @db.Decimal(8, 2)
   regularWorkingHours Decimal @default(0.00) @map("regular_working_hours") @db.Decimal(8, 2)
+  shortageHours       Decimal @default(0.00) @map("shortage_hours") @db.Decimal(8, 2)
+  shortageDeduction   Decimal @default(0.00) @map("shortage_deduction") @db.Decimal(12, 2)
+  extraHours          Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
 
-  // Hours below the expected monthly hours.
-  shortageHours Decimal @default(0.00) @map("shortage_hours") @db.Decimal(8, 2)
-
-  // Monetary deduction caused by shortage hours.
-  shortageDeduction Decimal @default(0.00) @map("shortage_deduction") @db.Decimal(12, 2)
-
-  // Hours above the expected monthly hours.
-  // These are stored separately and accumulated across payroll periods.
-  extraHours Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
-
-  // ====================================================
-  // PUBLIC HOLIDAY HOURS
-  // ====================================================
-
-  // Total paid public-holiday hours included in this
-  // payroll period.
-  //
-  // These are NOT fingerprint attendance hours.
-  //
-  // They represent paid public-holiday entitlement for
-  // the employee's branch.
+  // Paid public-holiday hours
   paidHolidayHours Decimal @default(0.00) @map("paid_holiday_hours") @db.Decimal(8, 2)
 
-  // ====================================================
-  // SALARY
-  // ====================================================
-
-  // Regular salary after applying shortage calculation.
-  basicSalary Decimal @map("basic_salary") @db.Decimal(12, 2)
-
-  // Incentive paid when accumulated extra work is settled.
-  //
-  // This field is retained for payroll compatibility/history.
-  // Independent variable payments are recorded in
-  // ExtraWorkSettlement.
-  incentiveAmount Decimal @default(0.00) @map("incentive_amount") @db.Decimal(12, 2)
-
-  // Total advance deduction for the finalized payroll
+  // Salary
+  basicSalary      Decimal @map("basic_salary") @db.Decimal(12, 2)
+  incentiveAmount  Decimal @default(0.00) @map("incentive_amount") @db.Decimal(12, 2)
   advanceDeduction Decimal @default(0.00) @map("advance_deduction") @db.Decimal(12, 2)
+  netSalary        Decimal @map("net_salary") @db.Decimal(12, 2)
 
-  // Final amount payable
-  netSalary Decimal @map("net_salary") @db.Decimal(12, 2)
-
-  // ====================================================
-  // PAYMENT
-  // ====================================================
-
-  // Date from which admin is allowed to pay this payroll.
-  //
-  // This applies ONLY to normal salary payroll payment.
+  // Normal salary payment
   scheduledPaymentDate DateTime? @map("scheduled_payment_date") @db.Date
-
-  // Actual date on which admin completed the normal payroll payment.
-  paymentDate DateTime? @map("payment_date") @db.Date
-
-  // UNPAID -> PAID
-  status String @default("UNPAID") @db.VarChar(20)
+  paymentDate          DateTime? @map("payment_date") @db.Date
+  status               String    @default("UNPAID") @db.VarChar(20)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  // ====================================================
-  // RELATIONS
-  // ====================================================
-
   advanceDeductionRecord AdvancePayment? @relation("AdvancePayroll")
+  employee               Employee        @relation(fields: [employeeId], references: [employeeId])
 
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
-
-  // ----------------------------------------------------
-  // EXTRA WORK
-  // ----------------------------------------------------
-
-  // A payroll can have multiple ExtraWork records.
-  //
-  // This is intentional because an employee can:
-  //
-  //   accumulate overtime
-  //       ->
-  //   settle it
-  //       ->
-  //   accumulate overtime again
-  //       ->
-  //   settle it again
-  //
-  // Historical ExtraWork records are preserved.
-
-  extraWorkRecords ExtraWork[]
-
-  // ----------------------------------------------------
-  // EXTRA WORK SETTLEMENTS
-  // ----------------------------------------------------
-
-  // A payroll may have zero or more historical settlement
-  // references.
-  //
-  // Variable/overtime payment does NOT require normal
-  // payroll payment.
-
+  // Extra-work and settlement history
+  extraWorkRecords     ExtraWork[]
   extraWorkSettlements ExtraWorkSettlement[]
 
   @@index([employeeId])
@@ -479,69 +385,22 @@ model Payroll {
 // ======================================================
 // EXTRA WORK
 // ======================================================
-//
-// Stores extra hours generated by payroll periods.
-//
-// Example:
-//
-// September -> 25 hours
-// October   -> 15 hours
-//
-// Current accumulated balance = 40 hours.
-//
-// These records are NOT deleted when an incentive is paid.
-// They are linked to a settlement for historical tracking.
-//
-// Lifecycle:
-//
-// ACCUMULATED -> SETTLED
-//
-// ACCUMULATED -> REJECTED
-//
-// A new accumulation record can be created after a previous
-// record has been settled.
-// ======================================================
 
 model ExtraWork {
   extraWorkId Int @id @default(autoincrement()) @map("extra_work_id")
+  employeeId  Int
+  payrollId   Int @map("payroll_id")
 
-  employeeId Int
-
-  // ----------------------------------------------------
-  // PAYROLL SOURCE
-  // ----------------------------------------------------
-
-  // The payroll period that generated these extra hours.
-  //
-  // IMPORTANT:
-  // This field is intentionally NOT unique.
-  //
-  // The same payroll period can have multiple ExtraWork
-  // accumulation records over time.
-
-  payrollId Int @map("payroll_id")
-
-  // Number of extra hours generated during this
-  // accumulation cycle.
-  extraHours Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
-
-  // ACCUMULATED -> SETTLED
-  // ACCUMULATED -> REJECTED
-  status String @default("ACCUMULATED") @db.VarChar(20)
-
-  // NULL while these hours are still accumulated.
-  //
-  // Set when the hours are included in an
-  // ExtraWorkSettlement.
-  settlementId Int? @map("settlement_id")
+  // The same payroll period may have multiple accumulation records.
+  extraHours   Decimal @default(0.00) @map("extra_hours") @db.Decimal(8, 2)
+  status       String  @default("ACCUMULATED") @db.VarChar(20)
+  settlementId Int?    @map("settlement_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
-
-  payroll Payroll @relation(fields: [payrollId], references: [payrollId])
-
+  employee   Employee             @relation(fields: [employeeId], references: [employeeId])
+  payroll    Payroll              @relation(fields: [payrollId], references: [payrollId])
   settlement ExtraWorkSettlement? @relation(fields: [settlementId], references: [settlementId])
 
   @@index([employeeId])
@@ -555,76 +414,21 @@ model ExtraWork {
 // ======================================================
 // EXTRA WORK SETTLEMENT
 // ======================================================
-//
-// Historical record of a variable/overtime payment.
-//
-// Example:
-//
-// September extra = 25 hours
-// October   extra = 15 hours
-// -----------------
-// Settled hours   = 40
-// Incentive       = ₹2,000
-//
-// The settlement record remains permanently.
-//
-// The ExtraWork records are marked SETTLED.
-//
-// A new accumulation cycle can then begin.
-//
-// IMPORTANT:
-//
-// This settlement is independent from normal payroll
-// payment.
-//
-// Therefore payrollId is OPTIONAL.
-//
-// A variable payment can happen before the normal payroll
-// scheduled payment date.
-// ======================================================
 
 model ExtraWorkSettlement {
-  settlementId Int @id @default(autoincrement()) @map("settlement_id")
+  settlementId Int  @id @default(autoincrement()) @map("settlement_id")
+  employeeId   Int
+  payrollId    Int? @map("payroll_id")
 
-  employeeId Int
-
-  // ----------------------------------------------------
-  // OPTIONAL PAYROLL REFERENCE
-  // ----------------------------------------------------
-
-  // A settlement may optionally be associated with the
-  // payroll period that generated the overtime.
-  //
-  // It is NOT required because variable payment is an
-  // independent payment event.
-  //
-  // It is also NOT unique because multiple settlement
-  // records can exist for the same payroll period.
-
-  payrollId Int? @map("payroll_id")
-
-  // Total accumulated extra hours settled.
-  settledHours Decimal @map("settled_hours") @db.Decimal(8, 2)
-
-  // Incentive amount decided by admin.
-  incentiveAmount Decimal @map("incentive_amount") @db.Decimal(12, 2)
-
-  // Explicitly supplied by the application when settlement occurs.
-  //
-  // No database CURRENT_TIMESTAMP default is used here because
-  // MySQL can reject CURRENT_TIMESTAMP as a DATE default.
-  settlementDate DateTime @map("settlement_date") @db.Date
+  settledHours    Decimal  @map("settled_hours") @db.Decimal(8, 2)
+  incentiveAmount Decimal  @map("incentive_amount") @db.Decimal(12, 2)
+  settlementDate  DateTime @map("settlement_date") @db.Date
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt
 
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
-
-  // Optional because variable payment does not require
-  // normal payroll to be paid.
-  payroll Payroll? @relation(fields: [payrollId], references: [payrollId])
-
-  // All ExtraWork records included in this settlement.
+  employee         Employee    @relation(fields: [employeeId], references: [employeeId])
+  payroll          Payroll?    @relation(fields: [payrollId], references: [payrollId])
   extraWorkRecords ExtraWork[]
 
   @@index([employeeId])
@@ -636,59 +440,16 @@ model ExtraWorkSettlement {
 // ======================================================
 // PUBLIC HOLIDAY
 // ======================================================
-//
-// Public holidays are branch-specific.
-//
-// One database record represents one branch holiday
-// on one specific date.
-//
-// For a multi-day holiday, the application creates
-// one PublicHoliday record for each date.
-//
-// Example:
-//
-// 2026-10-02 -> Gandhi Jayanti
-// 2026-10-03 -> Company Holiday
-//
-// This allows individual dates to be edited or deleted.
-//
-// Paid holiday:
-//   isPaid = true
-//   dailyWorkingHours contributes to payroll.
-//
-// Unpaid holiday:
-//   isPaid = false
-//   contributes 0 hours to payroll.
-//
-// The holiday does NOT create an Attendance record.
-// Fingerprint attendance remains actual attendance.
-// ======================================================
 
 model PublicHoliday {
   publicHolidayId Int @id @default(autoincrement()) @map("public_holiday_id")
+  companyId       Int
+  branchId        Int
 
-  // Company that owns this public holiday.
-  companyId Int
-
-  // Branch to which this public holiday applies.
-  branchId Int
-
-  // Specific holiday date.
-  holidayDate DateTime @map("holiday_date") @db.Date
-
-  // Display name of the public holiday.
-  holidayName String @map("holiday_name") @db.VarChar(150)
-
-  // Working hours credited for a paid public holiday.
-  //
-  // Example:
-  // 8.00 = eight paid hours
-  // 7.50 = seven and a half paid hours
-  dailyWorkingHours Decimal @default(0.00) @map("daily_working_hours") @db.Decimal(5, 2)
-
-  // true  = paid public holiday
-  // false = unpaid public holiday
-  isPaid Boolean @default(true) @map("is_paid")
+  holidayDate       DateTime @map("holiday_date") @db.Date
+  holidayName       String   @map("holiday_name") @db.VarChar(150)
+  dailyWorkingHours Decimal  @default(0.00) @map("daily_working_hours") @db.Decimal(5, 2)
+  isPaid            Boolean  @default(true) @map("is_paid")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -696,8 +457,6 @@ model PublicHoliday {
   company companies @relation(fields: [companyId], references: [company_id])
   branch  Branch    @relation(fields: [branchId], references: [branchId])
 
-  // A branch cannot have two public-holiday records
-  // for the same date.
   @@unique([branchId, holidayDate])
   @@index([companyId])
   @@index([branchId])
@@ -765,10 +524,12 @@ model companies {
   settings       Setting[]
   publicHolidays PublicHoliday[]
 
-  // Diamond Job Work module relations
+  // Diamond Job Work relationships
   externalProcessors  ExternalProcessor[]
   jobWorkProcessTypes JobWorkProcessType[]
   jobWorkOrders       JobWorkOrder[]
+  jobWorkProcessRates JobWorkProcessRate[]
+  jobWorkPayments     JobWorkPayment[]
 }
 
 // ======================================================
@@ -783,12 +544,7 @@ model LeaveType {
   description String?  @db.Text
   annualQuota Decimal? @map("annual_quota") @db.Decimal(6, 2)
 
-  // System-provided fallback leave type.
-  //
-  // true  -> this is the built-in Casual Leave fallback and
-  //           does not use an annual quota.
-  // false -> this is a leave type configured by the client admin
-  //           and its annualQuota is enforced.
+  // Built-in fallback leave type.
   isSystemDefault Boolean @default(false) @map("is_system_default")
 
   isPaid            Boolean  @default(true) @map("is_paid")
@@ -845,27 +601,20 @@ model LeaveRequest {
   employeeId     Int @map("employee_id")
   leaveTypeId    Int @map("leave_type_id")
 
-  // Original requested leave dates
   startDate DateTime @map("start_date") @db.Date
   endDate   DateTime @map("end_date") @db.Date
   totalDays Decimal  @map("total_days") @db.Decimal(6, 2)
 
-  // Employee reason
   reason String? @db.Text
+  status String  @default("PENDING") @db.VarChar(20)
 
-  // Request status
-  status String @default("PENDING") @db.VarChar(20)
-
-  // Approval information
   approvedBy Int?      @map("approved_by")
   approvedAt DateTime? @map("approved_at")
 
-  // Approved leave period
   approvedStartDate DateTime? @map("approved_start_date") @db.Date
   approvedEndDate   DateTime? @map("approved_end_date") @db.Date
   approvedDays      Decimal?  @map("approved_days") @db.Decimal(6, 2)
 
-  // Rejection information
   rejectionReason String? @map("rejection_reason") @db.Text
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -911,7 +660,6 @@ model FingerprintEnrollment {
 // DIAMOND JOB WORK - EXTERNAL PROCESSOR
 // ======================================================
 
-// External companies that perform processing work for an internal company.
 model ExternalProcessor {
   externalProcessorId Int      @id @default(autoincrement()) @map("external_processor_id")
   companyId           Int      @map("company_id")
@@ -943,7 +691,6 @@ model ExternalProcessor {
 // DIAMOND JOB WORK - PROCESS TYPE MASTER
 // ======================================================
 
-// Admin-configured processing types, such as polishing, cutting, and bruting.
 model JobWorkProcessType {
   processTypeId Int      @id @default(autoincrement()) @map("process_type_id")
   companyId     Int      @map("company_id")
@@ -956,8 +703,9 @@ model JobWorkProcessType {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  company       companies      @relation(fields: [companyId], references: [company_id])
+  company       companies            @relation(fields: [companyId], references: [company_id])
   jobWorkOrders JobWorkOrder[]
+  monthlyRates  JobWorkProcessRate[]
 
   @@unique([companyId, code])
   @@unique([companyId, name])
@@ -967,12 +715,37 @@ model JobWorkProcessType {
 }
 
 // ======================================================
+// DIAMOND JOB WORK - MONTHLY PROCESSING RATE
+// ======================================================
+
+// One rate is configured for each company, processing type, and calendar month.
+// Store rateMonth as the first day of the month, e.g. 2026-11-01.
+// The receipt service selects the rate for the receipt's month.
+model JobWorkProcessRate {
+  processRateId Int @id @default(autoincrement()) @map("process_rate_id")
+
+  companyId     Int      @map("company_id")
+  processTypeId Int      @map("process_type_id")
+  rateMonth     DateTime @map("rate_month") @db.Date
+  chargeUnit    String   @map("charge_unit") @db.VarChar(20)
+  rate          Decimal  @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company     companies          @relation(fields: [companyId], references: [company_id])
+  processType JobWorkProcessType @relation(fields: [processTypeId], references: [processTypeId])
+
+  @@unique([companyId, processTypeId, rateMonth])
+  @@index([companyId, rateMonth])
+  @@index([processTypeId, rateMonth])
+  @@map("job_work_process_rates")
+}
+
+// ======================================================
 // DIAMOND JOB WORK - JOB ORDER
 // ======================================================
 
-// One job links an internal branch, external processor, and process type.
-// This module records job dispatch/receipt history only. It does not
-// maintain inventory balances, packet locations, or inventory movements.
 model JobWorkOrder {
   jobWorkOrderId      Int      @id @default(autoincrement()) @map("job_work_order_id")
   companyId           Int      @map("company_id")
@@ -981,12 +754,19 @@ model JobWorkOrder {
   externalProcessorId Int      @map("external_processor_id")
   processTypeId       Int      @map("process_type_id")
   orderDate           DateTime @map("order_date") @db.Date
-  status              String   @default("OPEN") @db.VarChar(30)
-  description         String?  @db.Text
-  notes               String?  @db.Text
-  createdByAdminId    Int?     @map("created_by_admin_id")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Initial quotation/reference rate when the order begins.
+  // Actual charge is based on each receipt's month.
+  quotedRate       Decimal?  @map("quoted_rate") @db.Decimal(12, 2)
+  quotedChargeUnit String?   @map("quoted_charge_unit") @db.VarChar(20)
+  quotedRateMonth  DateTime? @map("quoted_rate_month") @db.Date
+
+  status           String   @default("OPEN") @db.VarChar(30)
+  description      String?  @db.Text
+  notes            String?  @db.Text
+  createdByAdminId Int?     @map("created_by_admin_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   company           companies               @relation(fields: [companyId], references: [company_id])
   branch            Branch                  @relation(fields: [branchId], references: [branchId])
@@ -995,6 +775,7 @@ model JobWorkOrder {
   createdByAdmin    Admin?                  @relation("JobWorkOrderCreatedBy", fields: [createdByAdminId], references: [adminId])
   dispatches        JobWorkDispatch[]
   reconciliations   JobWorkReconciliation[]
+  payments          JobWorkPayment[]
 
   @@unique([companyId, jobNumber])
   @@index([companyId])
@@ -1008,11 +789,39 @@ model JobWorkOrder {
 }
 
 // ======================================================
+// DIAMOND JOB WORK - PAYMENT
+// ======================================================
+
+// Records payments toward job-work charges. Outstanding balances will be
+// calculated by the service from priced receipt items minus payments.
+model JobWorkPayment {
+  paymentId         Int      @id @default(autoincrement()) @map("payment_id")
+  companyId         Int      @map("company_id")
+  jobWorkOrderId    Int      @map("job_work_order_id")
+  paymentDate       DateTime @map("payment_date") @db.Date
+  amount            Decimal  @db.Decimal(12, 2)
+  paymentMethod     String?  @map("payment_method") @db.VarChar(30)
+  referenceNumber   String?  @map("reference_number") @db.VarChar(100)
+  notes             String?  @db.Text
+  recordedByAdminId Int?     @map("recorded_by_admin_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  company         companies    @relation(fields: [companyId], references: [company_id])
+  jobWorkOrder    JobWorkOrder @relation(fields: [jobWorkOrderId], references: [jobWorkOrderId])
+  recordedByAdmin Admin?       @relation("JobWorkPaymentRecordedBy", fields: [recordedByAdminId], references: [adminId])
+
+  @@index([companyId])
+  @@index([jobWorkOrderId])
+  @@index([paymentDate])
+  @@index([recordedByAdminId])
+  @@map("job_work_payments")
+}
+
+// ======================================================
 // DIAMOND JOB WORK - DISPATCH
 // ======================================================
 
-// Stores quantities sent for a job. Carats and grams are both stored
-// as separate values. No conversion is defined in the Prisma schema.
 model JobWorkDispatch {
   dispatchId         Int       @id @default(autoincrement()) @map("dispatch_id")
   jobWorkOrderId     Int       @map("job_work_order_id")
@@ -1071,17 +880,25 @@ model JobWorkReceipt {
 // DIAMOND JOB WORK - RECEIPT ITEM
 // ======================================================
 
-// Stores quantities returned under a receipt. Carats and grams are stored
-// independently. This is job-level return history, not stock tracking.
+// Carats and grams remain separate measurements. There is no conversion.
 model JobWorkReceiptItem {
-  receiptItemId       Int      @id @default(autoincrement()) @map("receipt_item_id")
-  receiptId           Int      @map("receipt_id")
-  returnCondition     String   @map("return_condition") @db.VarChar(30)
-  returnedPieces      Int      @map("returned_pieces")
-  returnedCarats      Decimal  @map("returned_carats") @db.Decimal(12, 4)
-  returnedWeightGrams Decimal  @map("returned_weight_grams") @db.Decimal(12, 6)
-  remarks             String?  @db.Text
-  createdAt           DateTime @default(now()) @map("created_at")
+  receiptItemId       Int     @id @default(autoincrement()) @map("receipt_item_id")
+  receiptId           Int     @map("receipt_id")
+  returnCondition     String  @map("return_condition") @db.VarChar(30)
+  returnedPieces      Int     @map("returned_pieces")
+  returnedCarats      Decimal @map("returned_carats") @db.Decimal(12, 4)
+  returnedWeightGrams Decimal @map("returned_weight_grams") @db.Decimal(12, 6)
+
+  // Historical price snapshot for the receipt.
+  // rateMonth is the first day of the receipt's calendar month.
+  rateMonth         DateTime? @map("rate_month") @db.Date
+  appliedChargeUnit String?   @map("applied_charge_unit") @db.VarChar(20)
+  appliedRate       Decimal?  @map("applied_rate") @db.Decimal(12, 2)
+  billableQuantity  Decimal?  @map("billable_quantity") @db.Decimal(12, 6)
+  processingCharge  Decimal?  @map("processing_charge") @db.Decimal(12, 2)
+
+  remarks   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
 
   receipt JobWorkReceipt @relation(fields: [receiptId], references: [receiptId])
 
@@ -1094,8 +911,6 @@ model JobWorkReceiptItem {
 // DIAMOND JOB WORK - RECONCILIATION
 // ======================================================
 
-// Records job-level processing loss and discrepancy reviews.
-// This is not an inventory balance table.
 model JobWorkReconciliation {
   reconciliationId   Int       @id @default(autoincrement()) @map("reconciliation_id")
   jobWorkOrderId     Int       @map("job_work_order_id")

@@ -434,6 +434,17 @@ exports.Prisma.JobWorkProcessTypeScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.JobWorkProcessRateScalarFieldEnum = {
+  processRateId: 'processRateId',
+  companyId: 'companyId',
+  processTypeId: 'processTypeId',
+  rateMonth: 'rateMonth',
+  chargeUnit: 'chargeUnit',
+  rate: 'rate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.JobWorkOrderScalarFieldEnum = {
   jobWorkOrderId: 'jobWorkOrderId',
   companyId: 'companyId',
@@ -442,10 +453,27 @@ exports.Prisma.JobWorkOrderScalarFieldEnum = {
   externalProcessorId: 'externalProcessorId',
   processTypeId: 'processTypeId',
   orderDate: 'orderDate',
+  quotedRate: 'quotedRate',
+  quotedChargeUnit: 'quotedChargeUnit',
+  quotedRateMonth: 'quotedRateMonth',
   status: 'status',
   description: 'description',
   notes: 'notes',
   createdByAdminId: 'createdByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.JobWorkPaymentScalarFieldEnum = {
+  paymentId: 'paymentId',
+  companyId: 'companyId',
+  jobWorkOrderId: 'jobWorkOrderId',
+  paymentDate: 'paymentDate',
+  amount: 'amount',
+  paymentMethod: 'paymentMethod',
+  referenceNumber: 'referenceNumber',
+  notes: 'notes',
+  recordedByAdminId: 'recordedByAdminId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -484,6 +512,11 @@ exports.Prisma.JobWorkReceiptItemScalarFieldEnum = {
   returnedPieces: 'returnedPieces',
   returnedCarats: 'returnedCarats',
   returnedWeightGrams: 'returnedWeightGrams',
+  rateMonth: 'rateMonth',
+  appliedChargeUnit: 'appliedChargeUnit',
+  appliedRate: 'appliedRate',
+  billableQuantity: 'billableQuantity',
+  processingCharge: 'processingCharge',
   remarks: 'remarks',
   createdAt: 'createdAt'
 };
@@ -646,10 +679,21 @@ exports.Prisma.JobWorkProcessTypeOrderByRelevanceFieldEnum = {
   chargeUnit: 'chargeUnit'
 };
 
+exports.Prisma.JobWorkProcessRateOrderByRelevanceFieldEnum = {
+  chargeUnit: 'chargeUnit'
+};
+
 exports.Prisma.JobWorkOrderOrderByRelevanceFieldEnum = {
   jobNumber: 'jobNumber',
+  quotedChargeUnit: 'quotedChargeUnit',
   status: 'status',
   description: 'description',
+  notes: 'notes'
+};
+
+exports.Prisma.JobWorkPaymentOrderByRelevanceFieldEnum = {
+  paymentMethod: 'paymentMethod',
+  referenceNumber: 'referenceNumber',
   notes: 'notes'
 };
 
@@ -666,6 +710,7 @@ exports.Prisma.JobWorkReceiptOrderByRelevanceFieldEnum = {
 
 exports.Prisma.JobWorkReceiptItemOrderByRelevanceFieldEnum = {
   returnCondition: 'returnCondition',
+  appliedChargeUnit: 'appliedChargeUnit',
   remarks: 'remarks'
 };
 
@@ -699,7 +744,9 @@ exports.Prisma.ModelName = {
   FingerprintEnrollment: 'FingerprintEnrollment',
   ExternalProcessor: 'ExternalProcessor',
   JobWorkProcessType: 'JobWorkProcessType',
+  JobWorkProcessRate: 'JobWorkProcessRate',
   JobWorkOrder: 'JobWorkOrder',
+  JobWorkPayment: 'JobWorkPayment',
   JobWorkDispatch: 'JobWorkDispatch',
   JobWorkReceipt: 'JobWorkReceipt',
   JobWorkReceiptItem: 'JobWorkReceiptItem',
