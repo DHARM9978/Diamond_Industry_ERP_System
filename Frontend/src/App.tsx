@@ -25,6 +25,7 @@ import { AdminDepartments } from '@/pages/admin/AdminDepartments';
 import { AdminExternalProcessors } from '@/pages/admin/AdminExternalProcessors';
 import { AdminJobWorkProcessTypes } from '@/pages/admin/AdminJobWorkProcessTypes';
 import { AdminJobWorkProcessRates } from '@/pages/admin/AdminJobWorkProcessRates';
+import { AdminJobWorkOrders } from '@/pages/admin/AdminJobWorkOrders';
 import { AdminReports } from '@/pages/admin/AdminReports';
 import { BonusPayments } from '@/pages/admin/BonusPayments';
 import { AdminPublicHolidays } from '@/pages/admin/AdminPublicHolidays';
@@ -331,6 +332,17 @@ function App() {
                 <ProtectedRoute adminOnly>
                   <AppLayout adminMode>
                     <AdminJobWorkProcessRates />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/job-work/orders"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminJobWorkOrders />
                   </AppLayout>
                 </ProtectedRoute>
               }

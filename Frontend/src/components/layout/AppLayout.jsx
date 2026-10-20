@@ -92,6 +92,11 @@ const adminNav = [
         icon: CircleDollarSign,
         label: 'Monthly Processing Rates',
       },
+      {
+        to: '/admin/job-work/orders',
+        icon: ClipboardList,
+        label: 'Job Work Orders',
+      },
     ],
   },
   {
