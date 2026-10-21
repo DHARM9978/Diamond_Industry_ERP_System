@@ -527,6 +527,7 @@ model companies {
   // Diamond Job Work relationships
   externalProcessors  ExternalProcessor[]
   jobWorkProcessTypes JobWorkProcessType[]
+  jobWorkMachines     JobWorkMachine[]
   jobWorkOrders       JobWorkOrder[]
   jobWorkProcessRates JobWorkProcessRate[]
   jobWorkPayments     JobWorkPayment[]
@@ -677,14 +678,42 @@ model ExternalProcessor {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  company       companies      @relation(fields: [companyId], references: [company_id])
+  company       companies            @relation(fields: [companyId], references: [company_id])
   jobWorkOrders JobWorkOrder[]
+  monthlyRates  JobWorkProcessRate[]
 
   @@unique([companyId, processorCode])
   @@index([companyId])
   @@index([name])
   @@index([status])
   @@map("external_processors")
+}
+
+// ======================================================
+// DIAMOND JOB WORK - MACHINE MASTER
+// ======================================================
+
+// Machines are company-scoped. Deactivate machines instead of deleting them
+// so existing job orders and rate history remain intact.
+model JobWorkMachine {
+  machineId   Int      @id @default(autoincrement()) @map("machine_id")
+  companyId   Int      @map("company_id")
+  code        String   @db.VarChar(30)
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  company       companies            @relation(fields: [companyId], references: [company_id])
+  jobWorkOrders JobWorkOrder[]
+  monthlyRates  JobWorkProcessRate[]
+
+  @@unique([companyId, code])
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([isActive])
+  @@map("job_work_machines")
 }
 
 // ======================================================
@@ -718,26 +747,36 @@ model JobWorkProcessType {
 // DIAMOND JOB WORK - MONTHLY PROCESSING RATE
 // ======================================================
 
-// One rate is configured for each company, processing type, and calendar month.
-// Store rateMonth as the first day of the month, e.g. 2026-11-01.
-// The receipt service selects the rate for the receipt's month.
+// One rate is configured for each internal company, external processor, machine,
+// processing type, and calendar month. Store rateMonth as the first day of the
+// month, e.g. 2026-11-01.
+//
+// externalProcessorId and machineId are nullable during the transition so existing rate
+// rows can be retained and backfilled safely. New rate writes must supply both.
+// The service must select the latest applicable rate on or before the receipt
+// month when an exact-month rate does not exist.
 model JobWorkProcessRate {
   processRateId Int @id @default(autoincrement()) @map("process_rate_id")
 
-  companyId     Int      @map("company_id")
-  processTypeId Int      @map("process_type_id")
-  rateMonth     DateTime @map("rate_month") @db.Date
-  chargeUnit    String   @map("charge_unit") @db.VarChar(20)
-  rate          Decimal  @db.Decimal(12, 2)
+  companyId           Int      @map("company_id")
+  externalProcessorId Int?     @map("external_processor_id")
+  machineId           Int?     @map("machine_id")
+  processTypeId       Int      @map("process_type_id")
+  rateMonth           DateTime @map("rate_month") @db.Date
+  chargeUnit          String   @map("charge_unit") @db.VarChar(20)
+  rate                Decimal  @db.Decimal(12, 2)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  company     companies          @relation(fields: [companyId], references: [company_id])
-  processType JobWorkProcessType @relation(fields: [processTypeId], references: [processTypeId])
+  company           companies          @relation(fields: [companyId], references: [company_id])
+  externalProcessor ExternalProcessor? @relation(fields: [externalProcessorId], references: [externalProcessorId])
+  machine           JobWorkMachine?    @relation(fields: [machineId], references: [machineId])
+  processType       JobWorkProcessType @relation(fields: [processTypeId], references: [processTypeId])
 
-  @@unique([companyId, processTypeId, rateMonth])
+  @@unique([companyId, externalProcessorId, machineId, processTypeId, rateMonth])
   @@index([companyId, rateMonth])
+  @@index([externalProcessorId, machineId, processTypeId, rateMonth])
   @@index([processTypeId, rateMonth])
   @@map("job_work_process_rates")
 }
@@ -752,6 +791,7 @@ model JobWorkOrder {
   branchId            Int      @map("branch_id")
   jobNumber           String   @map("job_number") @db.VarChar(40)
   externalProcessorId Int      @map("external_processor_id")
+  machineId           Int?     @map("machine_id")
   processTypeId       Int      @map("process_type_id")
   orderDate           DateTime @map("order_date") @db.Date
 
@@ -771,6 +811,7 @@ model JobWorkOrder {
   company           companies               @relation(fields: [companyId], references: [company_id])
   branch            Branch                  @relation(fields: [branchId], references: [branchId])
   externalProcessor ExternalProcessor       @relation(fields: [externalProcessorId], references: [externalProcessorId])
+  machine           JobWorkMachine?         @relation(fields: [machineId], references: [machineId])
   processType       JobWorkProcessType      @relation(fields: [processTypeId], references: [processTypeId])
   createdByAdmin    Admin?                  @relation("JobWorkOrderCreatedBy", fields: [createdByAdminId], references: [adminId])
   dispatches        JobWorkDispatch[]
@@ -781,6 +822,7 @@ model JobWorkOrder {
   @@index([companyId])
   @@index([branchId])
   @@index([externalProcessorId])
+  @@index([machineId])
   @@index([processTypeId])
   @@index([status])
   @@index([orderDate])
@@ -889,9 +931,13 @@ model JobWorkReceiptItem {
   returnedCarats      Decimal @map("returned_carats") @db.Decimal(12, 4)
   returnedWeightGrams Decimal @map("returned_weight_grams") @db.Decimal(12, 6)
 
-  // Historical price snapshot for the receipt.
-  // rateMonth is the first day of the receipt's calendar month.
+  // Historical price snapshot for the receipt. rateMonth is the receipt's
+  // calendar month; appliedRateMonth identifies the month from which the rate
+  // was sourced. A different month makes carry-forward pricing auditable.
+  // rateSource may be EXACT_MONTH, CARRIED_FORWARD, or MANUAL_OVERRIDE.
   rateMonth         DateTime? @map("rate_month") @db.Date
+  appliedRateMonth  DateTime? @map("applied_rate_month") @db.Date
+  rateSource        String?   @map("rate_source") @db.VarChar(30)
   appliedChargeUnit String?   @map("applied_charge_unit") @db.VarChar(20)
   appliedRate       Decimal?  @map("applied_rate") @db.Decimal(12, 2)
   billableQuantity  Decimal?  @map("billable_quantity") @db.Decimal(12, 6)

@@ -124,6 +124,11 @@ export type FingerprintEnrollment = $Result.DefaultSelection<Prisma.$Fingerprint
  */
 export type ExternalProcessor = $Result.DefaultSelection<Prisma.$ExternalProcessorPayload>
 /**
+ * Model JobWorkMachine
+ * 
+ */
+export type JobWorkMachine = $Result.DefaultSelection<Prisma.$JobWorkMachinePayload>
+/**
  * Model JobWorkProcessType
  * 
  */
@@ -504,6 +509,16 @@ export class PrismaClient<
     * ```
     */
   get externalProcessor(): Prisma.ExternalProcessorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobWorkMachine`: Exposes CRUD operations for the **JobWorkMachine** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobWorkMachines
+    * const jobWorkMachines = await prisma.jobWorkMachine.findMany()
+    * ```
+    */
+  get jobWorkMachine(): Prisma.JobWorkMachineDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.jobWorkProcessType`: Exposes CRUD operations for the **JobWorkProcessType** model.
@@ -1053,6 +1068,7 @@ export namespace Prisma {
     LeaveRequest: 'LeaveRequest',
     FingerprintEnrollment: 'FingerprintEnrollment',
     ExternalProcessor: 'ExternalProcessor',
+    JobWorkMachine: 'JobWorkMachine',
     JobWorkProcessType: 'JobWorkProcessType',
     JobWorkProcessRate: 'JobWorkProcessRate',
     JobWorkOrder: 'JobWorkOrder',
@@ -1076,7 +1092,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "publicHoliday" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment" | "externalProcessor" | "jobWorkProcessType" | "jobWorkProcessRate" | "jobWorkOrder" | "jobWorkPayment" | "jobWorkDispatch" | "jobWorkReceipt" | "jobWorkReceiptItem" | "jobWorkReconciliation"
+      modelProps: "admin" | "branch" | "department" | "employee" | "iotDevice" | "fingerprintTemplate" | "attendancePunch" | "attendance" | "deviceLog" | "advancePayment" | "payroll" | "extraWork" | "extraWorkSettlement" | "publicHoliday" | "activityLog" | "setting" | "companies" | "leaveType" | "leaveBalance" | "leaveRequest" | "fingerprintEnrollment" | "externalProcessor" | "jobWorkMachine" | "jobWorkProcessType" | "jobWorkProcessRate" | "jobWorkOrder" | "jobWorkPayment" | "jobWorkDispatch" | "jobWorkReceipt" | "jobWorkReceiptItem" | "jobWorkReconciliation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2532,6 +2548,72 @@ export namespace Prisma {
           }
         }
       }
+      JobWorkMachine: {
+        payload: Prisma.$JobWorkMachinePayload<ExtArgs>
+        fields: Prisma.JobWorkMachineFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobWorkMachineFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobWorkMachineFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          findFirst: {
+            args: Prisma.JobWorkMachineFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobWorkMachineFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          findMany: {
+            args: Prisma.JobWorkMachineFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>[]
+          }
+          create: {
+            args: Prisma.JobWorkMachineCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          createMany: {
+            args: Prisma.JobWorkMachineCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JobWorkMachineDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          update: {
+            args: Prisma.JobWorkMachineUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          deleteMany: {
+            args: Prisma.JobWorkMachineDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobWorkMachineUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JobWorkMachineUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobWorkMachinePayload>
+          }
+          aggregate: {
+            args: Prisma.JobWorkMachineAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobWorkMachine>
+          }
+          groupBy: {
+            args: Prisma.JobWorkMachineGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkMachineGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobWorkMachineCountArgs<ExtArgs>
+            result: $Utils.Optional<JobWorkMachineCountAggregateOutputType> | number
+          }
+        }
+      }
       JobWorkProcessType: {
         payload: Prisma.$JobWorkProcessTypePayload<ExtArgs>
         fields: Prisma.JobWorkProcessTypeFieldRefs
@@ -3205,6 +3287,7 @@ export namespace Prisma {
     leaveRequest?: LeaveRequestOmit
     fingerprintEnrollment?: FingerprintEnrollmentOmit
     externalProcessor?: ExternalProcessorOmit
+    jobWorkMachine?: JobWorkMachineOmit
     jobWorkProcessType?: JobWorkProcessTypeOmit
     jobWorkProcessRate?: JobWorkProcessRateOmit
     jobWorkOrder?: JobWorkOrderOmit
@@ -3736,6 +3819,7 @@ export namespace Prisma {
     publicHolidays: number
     externalProcessors: number
     jobWorkProcessTypes: number
+    jobWorkMachines: number
     jobWorkOrders: number
     jobWorkProcessRates: number
     jobWorkPayments: number
@@ -3752,6 +3836,7 @@ export namespace Prisma {
     publicHolidays?: boolean | CompaniesCountOutputTypeCountPublicHolidaysArgs
     externalProcessors?: boolean | CompaniesCountOutputTypeCountExternalProcessorsArgs
     jobWorkProcessTypes?: boolean | CompaniesCountOutputTypeCountJobWorkProcessTypesArgs
+    jobWorkMachines?: boolean | CompaniesCountOutputTypeCountJobWorkMachinesArgs
     jobWorkOrders?: boolean | CompaniesCountOutputTypeCountJobWorkOrdersArgs
     jobWorkProcessRates?: boolean | CompaniesCountOutputTypeCountJobWorkProcessRatesArgs
     jobWorkPayments?: boolean | CompaniesCountOutputTypeCountJobWorkPaymentsArgs
@@ -3841,6 +3926,13 @@ export namespace Prisma {
   /**
    * CompaniesCountOutputType without action
    */
+  export type CompaniesCountOutputTypeCountJobWorkMachinesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkMachineWhereInput
+  }
+
+  /**
+   * CompaniesCountOutputType without action
+   */
   export type CompaniesCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: JobWorkOrderWhereInput
   }
@@ -3906,10 +3998,12 @@ export namespace Prisma {
 
   export type ExternalProcessorCountOutputType = {
     jobWorkOrders: number
+    monthlyRates: number
   }
 
   export type ExternalProcessorCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     jobWorkOrders?: boolean | ExternalProcessorCountOutputTypeCountJobWorkOrdersArgs
+    monthlyRates?: boolean | ExternalProcessorCountOutputTypeCountMonthlyRatesArgs
   }
 
   // Custom InputTypes
@@ -3928,6 +4022,53 @@ export namespace Prisma {
    */
   export type ExternalProcessorCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: JobWorkOrderWhereInput
+  }
+
+  /**
+   * ExternalProcessorCountOutputType without action
+   */
+  export type ExternalProcessorCountOutputTypeCountMonthlyRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkProcessRateWhereInput
+  }
+
+
+  /**
+   * Count Type JobWorkMachineCountOutputType
+   */
+
+  export type JobWorkMachineCountOutputType = {
+    jobWorkOrders: number
+    monthlyRates: number
+  }
+
+  export type JobWorkMachineCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    jobWorkOrders?: boolean | JobWorkMachineCountOutputTypeCountJobWorkOrdersArgs
+    monthlyRates?: boolean | JobWorkMachineCountOutputTypeCountMonthlyRatesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobWorkMachineCountOutputType without action
+   */
+  export type JobWorkMachineCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachineCountOutputType
+     */
+    select?: JobWorkMachineCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobWorkMachineCountOutputType without action
+   */
+  export type JobWorkMachineCountOutputTypeCountJobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkOrderWhereInput
+  }
+
+  /**
+   * JobWorkMachineCountOutputType without action
+   */
+  export type JobWorkMachineCountOutputTypeCountMonthlyRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkProcessRateWhereInput
   }
 
 
@@ -22082,6 +22223,7 @@ export namespace Prisma {
     publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
     externalProcessors?: boolean | companies$externalProcessorsArgs<ExtArgs>
     jobWorkProcessTypes?: boolean | companies$jobWorkProcessTypesArgs<ExtArgs>
+    jobWorkMachines?: boolean | companies$jobWorkMachinesArgs<ExtArgs>
     jobWorkOrders?: boolean | companies$jobWorkOrdersArgs<ExtArgs>
     jobWorkProcessRates?: boolean | companies$jobWorkProcessRatesArgs<ExtArgs>
     jobWorkPayments?: boolean | companies$jobWorkPaymentsArgs<ExtArgs>
@@ -22112,6 +22254,7 @@ export namespace Prisma {
     publicHolidays?: boolean | companies$publicHolidaysArgs<ExtArgs>
     externalProcessors?: boolean | companies$externalProcessorsArgs<ExtArgs>
     jobWorkProcessTypes?: boolean | companies$jobWorkProcessTypesArgs<ExtArgs>
+    jobWorkMachines?: boolean | companies$jobWorkMachinesArgs<ExtArgs>
     jobWorkOrders?: boolean | companies$jobWorkOrdersArgs<ExtArgs>
     jobWorkProcessRates?: boolean | companies$jobWorkProcessRatesArgs<ExtArgs>
     jobWorkPayments?: boolean | companies$jobWorkPaymentsArgs<ExtArgs>
@@ -22131,6 +22274,7 @@ export namespace Prisma {
       publicHolidays: Prisma.$PublicHolidayPayload<ExtArgs>[]
       externalProcessors: Prisma.$ExternalProcessorPayload<ExtArgs>[]
       jobWorkProcessTypes: Prisma.$JobWorkProcessTypePayload<ExtArgs>[]
+      jobWorkMachines: Prisma.$JobWorkMachinePayload<ExtArgs>[]
       jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
       jobWorkProcessRates: Prisma.$JobWorkProcessRatePayload<ExtArgs>[]
       jobWorkPayments: Prisma.$JobWorkPaymentPayload<ExtArgs>[]
@@ -22493,6 +22637,7 @@ export namespace Prisma {
     publicHolidays<T extends companies$publicHolidaysArgs<ExtArgs> = {}>(args?: Subset<T, companies$publicHolidaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     externalProcessors<T extends companies$externalProcessorsArgs<ExtArgs> = {}>(args?: Subset<T, companies$externalProcessorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     jobWorkProcessTypes<T extends companies$jobWorkProcessTypesArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkProcessTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobWorkMachines<T extends companies$jobWorkMachinesArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkMachinesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     jobWorkOrders<T extends companies$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     jobWorkProcessRates<T extends companies$jobWorkProcessRatesArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkProcessRatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessRatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     jobWorkPayments<T extends companies$jobWorkPaymentsArgs<ExtArgs> = {}>(args?: Subset<T, companies$jobWorkPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -23117,6 +23262,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: JobWorkProcessTypeScalarFieldEnum | JobWorkProcessTypeScalarFieldEnum[]
+  }
+
+  /**
+   * companies.jobWorkMachines
+   */
+  export type companies$jobWorkMachinesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    where?: JobWorkMachineWhereInput
+    orderBy?: JobWorkMachineOrderByWithRelationInput | JobWorkMachineOrderByWithRelationInput[]
+    cursor?: JobWorkMachineWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkMachineScalarFieldEnum | JobWorkMachineScalarFieldEnum[]
   }
 
   /**
@@ -27815,6 +27984,7 @@ export namespace Prisma {
     updatedAt?: boolean
     company?: boolean | companiesDefaultArgs<ExtArgs>
     jobWorkOrders?: boolean | ExternalProcessor$jobWorkOrdersArgs<ExtArgs>
+    monthlyRates?: boolean | ExternalProcessor$monthlyRatesArgs<ExtArgs>
     _count?: boolean | ExternalProcessorCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["externalProcessor"]>
 
@@ -27842,6 +28012,7 @@ export namespace Prisma {
   export type ExternalProcessorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     jobWorkOrders?: boolean | ExternalProcessor$jobWorkOrdersArgs<ExtArgs>
+    monthlyRates?: boolean | ExternalProcessor$monthlyRatesArgs<ExtArgs>
     _count?: boolean | ExternalProcessorCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -27850,6 +28021,7 @@ export namespace Prisma {
     objects: {
       company: Prisma.$companiesPayload<ExtArgs>
       jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
+      monthlyRates: Prisma.$JobWorkProcessRatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       externalProcessorId: number
@@ -28209,6 +28381,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     jobWorkOrders<T extends ExternalProcessor$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, ExternalProcessor$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    monthlyRates<T extends ExternalProcessor$monthlyRatesArgs<ExtArgs> = {}>(args?: Subset<T, ExternalProcessor$monthlyRatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessRatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -28625,6 +28798,30 @@ export namespace Prisma {
   }
 
   /**
+   * ExternalProcessor.monthlyRates
+   */
+  export type ExternalProcessor$monthlyRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessRate
+     */
+    select?: JobWorkProcessRateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessRate
+     */
+    omit?: JobWorkProcessRateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessRateInclude<ExtArgs> | null
+    where?: JobWorkProcessRateWhereInput
+    orderBy?: JobWorkProcessRateOrderByWithRelationInput | JobWorkProcessRateOrderByWithRelationInput[]
+    cursor?: JobWorkProcessRateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkProcessRateScalarFieldEnum | JobWorkProcessRateScalarFieldEnum[]
+  }
+
+  /**
    * ExternalProcessor without action
    */
   export type ExternalProcessorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -28640,6 +28837,1069 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ExternalProcessorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobWorkMachine
+   */
+
+  export type AggregateJobWorkMachine = {
+    _count: JobWorkMachineCountAggregateOutputType | null
+    _avg: JobWorkMachineAvgAggregateOutputType | null
+    _sum: JobWorkMachineSumAggregateOutputType | null
+    _min: JobWorkMachineMinAggregateOutputType | null
+    _max: JobWorkMachineMaxAggregateOutputType | null
+  }
+
+  export type JobWorkMachineAvgAggregateOutputType = {
+    machineId: number | null
+    companyId: number | null
+  }
+
+  export type JobWorkMachineSumAggregateOutputType = {
+    machineId: number | null
+    companyId: number | null
+  }
+
+  export type JobWorkMachineMinAggregateOutputType = {
+    machineId: number | null
+    companyId: number | null
+    code: string | null
+    name: string | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkMachineMaxAggregateOutputType = {
+    machineId: number | null
+    companyId: number | null
+    code: string | null
+    name: string | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type JobWorkMachineCountAggregateOutputType = {
+    machineId: number
+    companyId: number
+    code: number
+    name: number
+    description: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type JobWorkMachineAvgAggregateInputType = {
+    machineId?: true
+    companyId?: true
+  }
+
+  export type JobWorkMachineSumAggregateInputType = {
+    machineId?: true
+    companyId?: true
+  }
+
+  export type JobWorkMachineMinAggregateInputType = {
+    machineId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkMachineMaxAggregateInputType = {
+    machineId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type JobWorkMachineCountAggregateInputType = {
+    machineId?: true
+    companyId?: true
+    code?: true
+    name?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type JobWorkMachineAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkMachine to aggregate.
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkMachines to fetch.
+     */
+    orderBy?: JobWorkMachineOrderByWithRelationInput | JobWorkMachineOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobWorkMachineWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkMachines from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkMachines.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobWorkMachines
+    **/
+    _count?: true | JobWorkMachineCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JobWorkMachineAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JobWorkMachineSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobWorkMachineMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobWorkMachineMaxAggregateInputType
+  }
+
+  export type GetJobWorkMachineAggregateType<T extends JobWorkMachineAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobWorkMachine]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobWorkMachine[P]>
+      : GetScalarType<T[P], AggregateJobWorkMachine[P]>
+  }
+
+
+
+
+  export type JobWorkMachineGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWorkMachineWhereInput
+    orderBy?: JobWorkMachineOrderByWithAggregationInput | JobWorkMachineOrderByWithAggregationInput[]
+    by: JobWorkMachineScalarFieldEnum[] | JobWorkMachineScalarFieldEnum
+    having?: JobWorkMachineScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobWorkMachineCountAggregateInputType | true
+    _avg?: JobWorkMachineAvgAggregateInputType
+    _sum?: JobWorkMachineSumAggregateInputType
+    _min?: JobWorkMachineMinAggregateInputType
+    _max?: JobWorkMachineMaxAggregateInputType
+  }
+
+  export type JobWorkMachineGroupByOutputType = {
+    machineId: number
+    companyId: number
+    code: string
+    name: string
+    description: string | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: JobWorkMachineCountAggregateOutputType | null
+    _avg: JobWorkMachineAvgAggregateOutputType | null
+    _sum: JobWorkMachineSumAggregateOutputType | null
+    _min: JobWorkMachineMinAggregateOutputType | null
+    _max: JobWorkMachineMaxAggregateOutputType | null
+  }
+
+  type GetJobWorkMachineGroupByPayload<T extends JobWorkMachineGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobWorkMachineGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobWorkMachineGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobWorkMachineGroupByOutputType[P]>
+            : GetScalarType<T[P], JobWorkMachineGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobWorkMachineSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    machineId?: boolean
+    companyId?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | JobWorkMachine$jobWorkOrdersArgs<ExtArgs>
+    monthlyRates?: boolean | JobWorkMachine$monthlyRatesArgs<ExtArgs>
+    _count?: boolean | JobWorkMachineCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobWorkMachine"]>
+
+
+
+  export type JobWorkMachineSelectScalar = {
+    machineId?: boolean
+    companyId?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type JobWorkMachineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"machineId" | "companyId" | "code" | "name" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkMachine"]>
+  export type JobWorkMachineInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    company?: boolean | companiesDefaultArgs<ExtArgs>
+    jobWorkOrders?: boolean | JobWorkMachine$jobWorkOrdersArgs<ExtArgs>
+    monthlyRates?: boolean | JobWorkMachine$monthlyRatesArgs<ExtArgs>
+    _count?: boolean | JobWorkMachineCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $JobWorkMachinePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobWorkMachine"
+    objects: {
+      company: Prisma.$companiesPayload<ExtArgs>
+      jobWorkOrders: Prisma.$JobWorkOrderPayload<ExtArgs>[]
+      monthlyRates: Prisma.$JobWorkProcessRatePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      machineId: number
+      companyId: number
+      code: string
+      name: string
+      description: string | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["jobWorkMachine"]>
+    composites: {}
+  }
+
+  type JobWorkMachineGetPayload<S extends boolean | null | undefined | JobWorkMachineDefaultArgs> = $Result.GetResult<Prisma.$JobWorkMachinePayload, S>
+
+  type JobWorkMachineCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobWorkMachineFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobWorkMachineCountAggregateInputType | true
+    }
+
+  export interface JobWorkMachineDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobWorkMachine'], meta: { name: 'JobWorkMachine' } }
+    /**
+     * Find zero or one JobWorkMachine that matches the filter.
+     * @param {JobWorkMachineFindUniqueArgs} args - Arguments to find a JobWorkMachine
+     * @example
+     * // Get one JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobWorkMachineFindUniqueArgs>(args: SelectSubset<T, JobWorkMachineFindUniqueArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobWorkMachine that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobWorkMachineFindUniqueOrThrowArgs} args - Arguments to find a JobWorkMachine
+     * @example
+     * // Get one JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobWorkMachineFindUniqueOrThrowArgs>(args: SelectSubset<T, JobWorkMachineFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkMachine that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineFindFirstArgs} args - Arguments to find a JobWorkMachine
+     * @example
+     * // Get one JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobWorkMachineFindFirstArgs>(args?: SelectSubset<T, JobWorkMachineFindFirstArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobWorkMachine that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineFindFirstOrThrowArgs} args - Arguments to find a JobWorkMachine
+     * @example
+     * // Get one JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobWorkMachineFindFirstOrThrowArgs>(args?: SelectSubset<T, JobWorkMachineFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobWorkMachines that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobWorkMachines
+     * const jobWorkMachines = await prisma.jobWorkMachine.findMany()
+     * 
+     * // Get first 10 JobWorkMachines
+     * const jobWorkMachines = await prisma.jobWorkMachine.findMany({ take: 10 })
+     * 
+     * // Only select the `machineId`
+     * const jobWorkMachineWithMachineIdOnly = await prisma.jobWorkMachine.findMany({ select: { machineId: true } })
+     * 
+     */
+    findMany<T extends JobWorkMachineFindManyArgs>(args?: SelectSubset<T, JobWorkMachineFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobWorkMachine.
+     * @param {JobWorkMachineCreateArgs} args - Arguments to create a JobWorkMachine.
+     * @example
+     * // Create one JobWorkMachine
+     * const JobWorkMachine = await prisma.jobWorkMachine.create({
+     *   data: {
+     *     // ... data to create a JobWorkMachine
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobWorkMachineCreateArgs>(args: SelectSubset<T, JobWorkMachineCreateArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobWorkMachines.
+     * @param {JobWorkMachineCreateManyArgs} args - Arguments to create many JobWorkMachines.
+     * @example
+     * // Create many JobWorkMachines
+     * const jobWorkMachine = await prisma.jobWorkMachine.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobWorkMachineCreateManyArgs>(args?: SelectSubset<T, JobWorkMachineCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JobWorkMachine.
+     * @param {JobWorkMachineDeleteArgs} args - Arguments to delete one JobWorkMachine.
+     * @example
+     * // Delete one JobWorkMachine
+     * const JobWorkMachine = await prisma.jobWorkMachine.delete({
+     *   where: {
+     *     // ... filter to delete one JobWorkMachine
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobWorkMachineDeleteArgs>(args: SelectSubset<T, JobWorkMachineDeleteArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobWorkMachine.
+     * @param {JobWorkMachineUpdateArgs} args - Arguments to update one JobWorkMachine.
+     * @example
+     * // Update one JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobWorkMachineUpdateArgs>(args: SelectSubset<T, JobWorkMachineUpdateArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobWorkMachines.
+     * @param {JobWorkMachineDeleteManyArgs} args - Arguments to filter JobWorkMachines to delete.
+     * @example
+     * // Delete a few JobWorkMachines
+     * const { count } = await prisma.jobWorkMachine.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobWorkMachineDeleteManyArgs>(args?: SelectSubset<T, JobWorkMachineDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobWorkMachines.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobWorkMachines
+     * const jobWorkMachine = await prisma.jobWorkMachine.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobWorkMachineUpdateManyArgs>(args: SelectSubset<T, JobWorkMachineUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JobWorkMachine.
+     * @param {JobWorkMachineUpsertArgs} args - Arguments to update or create a JobWorkMachine.
+     * @example
+     * // Update or create a JobWorkMachine
+     * const jobWorkMachine = await prisma.jobWorkMachine.upsert({
+     *   create: {
+     *     // ... data to create a JobWorkMachine
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobWorkMachine we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobWorkMachineUpsertArgs>(args: SelectSubset<T, JobWorkMachineUpsertArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobWorkMachines.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineCountArgs} args - Arguments to filter JobWorkMachines to count.
+     * @example
+     * // Count the number of JobWorkMachines
+     * const count = await prisma.jobWorkMachine.count({
+     *   where: {
+     *     // ... the filter for the JobWorkMachines we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobWorkMachineCountArgs>(
+      args?: Subset<T, JobWorkMachineCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobWorkMachineCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobWorkMachine.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobWorkMachineAggregateArgs>(args: Subset<T, JobWorkMachineAggregateArgs>): Prisma.PrismaPromise<GetJobWorkMachineAggregateType<T>>
+
+    /**
+     * Group by JobWorkMachine.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobWorkMachineGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobWorkMachineGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobWorkMachineGroupByArgs['orderBy'] }
+        : { orderBy?: JobWorkMachineGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobWorkMachineGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobWorkMachineGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobWorkMachine model
+   */
+  readonly fields: JobWorkMachineFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobWorkMachine.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobWorkMachineClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    jobWorkOrders<T extends JobWorkMachine$jobWorkOrdersArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkMachine$jobWorkOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    monthlyRates<T extends JobWorkMachine$monthlyRatesArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkMachine$monthlyRatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkProcessRatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobWorkMachine model
+   */
+  interface JobWorkMachineFieldRefs {
+    readonly machineId: FieldRef<"JobWorkMachine", 'Int'>
+    readonly companyId: FieldRef<"JobWorkMachine", 'Int'>
+    readonly code: FieldRef<"JobWorkMachine", 'String'>
+    readonly name: FieldRef<"JobWorkMachine", 'String'>
+    readonly description: FieldRef<"JobWorkMachine", 'String'>
+    readonly isActive: FieldRef<"JobWorkMachine", 'Boolean'>
+    readonly createdAt: FieldRef<"JobWorkMachine", 'DateTime'>
+    readonly updatedAt: FieldRef<"JobWorkMachine", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobWorkMachine findUnique
+   */
+  export type JobWorkMachineFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkMachine to fetch.
+     */
+    where: JobWorkMachineWhereUniqueInput
+  }
+
+  /**
+   * JobWorkMachine findUniqueOrThrow
+   */
+  export type JobWorkMachineFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkMachine to fetch.
+     */
+    where: JobWorkMachineWhereUniqueInput
+  }
+
+  /**
+   * JobWorkMachine findFirst
+   */
+  export type JobWorkMachineFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkMachine to fetch.
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkMachines to fetch.
+     */
+    orderBy?: JobWorkMachineOrderByWithRelationInput | JobWorkMachineOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkMachines.
+     */
+    cursor?: JobWorkMachineWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkMachines from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkMachines.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkMachines.
+     */
+    distinct?: JobWorkMachineScalarFieldEnum | JobWorkMachineScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkMachine findFirstOrThrow
+   */
+  export type JobWorkMachineFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkMachine to fetch.
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkMachines to fetch.
+     */
+    orderBy?: JobWorkMachineOrderByWithRelationInput | JobWorkMachineOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobWorkMachines.
+     */
+    cursor?: JobWorkMachineWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkMachines from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkMachines.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkMachines.
+     */
+    distinct?: JobWorkMachineScalarFieldEnum | JobWorkMachineScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkMachine findMany
+   */
+  export type JobWorkMachineFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter, which JobWorkMachines to fetch.
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobWorkMachines to fetch.
+     */
+    orderBy?: JobWorkMachineOrderByWithRelationInput | JobWorkMachineOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobWorkMachines.
+     */
+    cursor?: JobWorkMachineWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobWorkMachines from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobWorkMachines.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobWorkMachines.
+     */
+    distinct?: JobWorkMachineScalarFieldEnum | JobWorkMachineScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkMachine create
+   */
+  export type JobWorkMachineCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobWorkMachine.
+     */
+    data: XOR<JobWorkMachineCreateInput, JobWorkMachineUncheckedCreateInput>
+  }
+
+  /**
+   * JobWorkMachine createMany
+   */
+  export type JobWorkMachineCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobWorkMachines.
+     */
+    data: JobWorkMachineCreateManyInput | JobWorkMachineCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JobWorkMachine update
+   */
+  export type JobWorkMachineUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobWorkMachine.
+     */
+    data: XOR<JobWorkMachineUpdateInput, JobWorkMachineUncheckedUpdateInput>
+    /**
+     * Choose, which JobWorkMachine to update.
+     */
+    where: JobWorkMachineWhereUniqueInput
+  }
+
+  /**
+   * JobWorkMachine updateMany
+   */
+  export type JobWorkMachineUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobWorkMachines.
+     */
+    data: XOR<JobWorkMachineUpdateManyMutationInput, JobWorkMachineUncheckedUpdateManyInput>
+    /**
+     * Filter which JobWorkMachines to update
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * Limit how many JobWorkMachines to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkMachine upsert
+   */
+  export type JobWorkMachineUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobWorkMachine to update in case it exists.
+     */
+    where: JobWorkMachineWhereUniqueInput
+    /**
+     * In case the JobWorkMachine found by the `where` argument doesn't exist, create a new JobWorkMachine with this data.
+     */
+    create: XOR<JobWorkMachineCreateInput, JobWorkMachineUncheckedCreateInput>
+    /**
+     * In case the JobWorkMachine was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobWorkMachineUpdateInput, JobWorkMachineUncheckedUpdateInput>
+  }
+
+  /**
+   * JobWorkMachine delete
+   */
+  export type JobWorkMachineDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    /**
+     * Filter which JobWorkMachine to delete.
+     */
+    where: JobWorkMachineWhereUniqueInput
+  }
+
+  /**
+   * JobWorkMachine deleteMany
+   */
+  export type JobWorkMachineDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobWorkMachines to delete
+     */
+    where?: JobWorkMachineWhereInput
+    /**
+     * Limit how many JobWorkMachines to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobWorkMachine.jobWorkOrders
+   */
+  export type JobWorkMachine$jobWorkOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkOrder
+     */
+    select?: JobWorkOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkOrder
+     */
+    omit?: JobWorkOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkOrderInclude<ExtArgs> | null
+    where?: JobWorkOrderWhereInput
+    orderBy?: JobWorkOrderOrderByWithRelationInput | JobWorkOrderOrderByWithRelationInput[]
+    cursor?: JobWorkOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkOrderScalarFieldEnum | JobWorkOrderScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkMachine.monthlyRates
+   */
+  export type JobWorkMachine$monthlyRatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkProcessRate
+     */
+    select?: JobWorkProcessRateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkProcessRate
+     */
+    omit?: JobWorkProcessRateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkProcessRateInclude<ExtArgs> | null
+    where?: JobWorkProcessRateWhereInput
+    orderBy?: JobWorkProcessRateOrderByWithRelationInput | JobWorkProcessRateOrderByWithRelationInput[]
+    cursor?: JobWorkProcessRateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobWorkProcessRateScalarFieldEnum | JobWorkProcessRateScalarFieldEnum[]
+  }
+
+  /**
+   * JobWorkMachine without action
+   */
+  export type JobWorkMachineDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
   }
 
 
@@ -29747,6 +31007,8 @@ export namespace Prisma {
   export type JobWorkProcessRateAvgAggregateOutputType = {
     processRateId: number | null
     companyId: number | null
+    externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     rate: Decimal | null
   }
@@ -29754,6 +31016,8 @@ export namespace Prisma {
   export type JobWorkProcessRateSumAggregateOutputType = {
     processRateId: number | null
     companyId: number | null
+    externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     rate: Decimal | null
   }
@@ -29761,6 +31025,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMinAggregateOutputType = {
     processRateId: number | null
     companyId: number | null
+    externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     rateMonth: Date | null
     chargeUnit: string | null
@@ -29772,6 +31038,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMaxAggregateOutputType = {
     processRateId: number | null
     companyId: number | null
+    externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     rateMonth: Date | null
     chargeUnit: string | null
@@ -29783,6 +31051,8 @@ export namespace Prisma {
   export type JobWorkProcessRateCountAggregateOutputType = {
     processRateId: number
     companyId: number
+    externalProcessorId: number
+    machineId: number
     processTypeId: number
     rateMonth: number
     chargeUnit: number
@@ -29796,6 +31066,8 @@ export namespace Prisma {
   export type JobWorkProcessRateAvgAggregateInputType = {
     processRateId?: true
     companyId?: true
+    externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     rate?: true
   }
@@ -29803,6 +31075,8 @@ export namespace Prisma {
   export type JobWorkProcessRateSumAggregateInputType = {
     processRateId?: true
     companyId?: true
+    externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     rate?: true
   }
@@ -29810,6 +31084,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMinAggregateInputType = {
     processRateId?: true
     companyId?: true
+    externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     rateMonth?: true
     chargeUnit?: true
@@ -29821,6 +31097,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMaxAggregateInputType = {
     processRateId?: true
     companyId?: true
+    externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     rateMonth?: true
     chargeUnit?: true
@@ -29832,6 +31110,8 @@ export namespace Prisma {
   export type JobWorkProcessRateCountAggregateInputType = {
     processRateId?: true
     companyId?: true
+    externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     rateMonth?: true
     chargeUnit?: true
@@ -29930,6 +31210,8 @@ export namespace Prisma {
   export type JobWorkProcessRateGroupByOutputType = {
     processRateId: number
     companyId: number
+    externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number
     rateMonth: Date
     chargeUnit: string
@@ -29960,6 +31242,8 @@ export namespace Prisma {
   export type JobWorkProcessRateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     processRateId?: boolean
     companyId?: boolean
+    externalProcessorId?: boolean
+    machineId?: boolean
     processTypeId?: boolean
     rateMonth?: boolean
     chargeUnit?: boolean
@@ -29967,6 +31251,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     company?: boolean | companiesDefaultArgs<ExtArgs>
+    externalProcessor?: boolean | JobWorkProcessRate$externalProcessorArgs<ExtArgs>
+    machine?: boolean | JobWorkProcessRate$machineArgs<ExtArgs>
     processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["jobWorkProcessRate"]>
 
@@ -29975,6 +31261,8 @@ export namespace Prisma {
   export type JobWorkProcessRateSelectScalar = {
     processRateId?: boolean
     companyId?: boolean
+    externalProcessorId?: boolean
+    machineId?: boolean
     processTypeId?: boolean
     rateMonth?: boolean
     chargeUnit?: boolean
@@ -29983,9 +31271,11 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type JobWorkProcessRateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"processRateId" | "companyId" | "processTypeId" | "rateMonth" | "chargeUnit" | "rate" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkProcessRate"]>
+  export type JobWorkProcessRateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"processRateId" | "companyId" | "externalProcessorId" | "machineId" | "processTypeId" | "rateMonth" | "chargeUnit" | "rate" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkProcessRate"]>
   export type JobWorkProcessRateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | companiesDefaultArgs<ExtArgs>
+    externalProcessor?: boolean | JobWorkProcessRate$externalProcessorArgs<ExtArgs>
+    machine?: boolean | JobWorkProcessRate$machineArgs<ExtArgs>
     processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
   }
 
@@ -29993,11 +31283,15 @@ export namespace Prisma {
     name: "JobWorkProcessRate"
     objects: {
       company: Prisma.$companiesPayload<ExtArgs>
+      externalProcessor: Prisma.$ExternalProcessorPayload<ExtArgs> | null
+      machine: Prisma.$JobWorkMachinePayload<ExtArgs> | null
       processType: Prisma.$JobWorkProcessTypePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       processRateId: number
       companyId: number
+      externalProcessorId: number | null
+      machineId: number | null
       processTypeId: number
       rateMonth: Date
       chargeUnit: string
@@ -30345,6 +31639,8 @@ export namespace Prisma {
   export interface Prisma__JobWorkProcessRateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    externalProcessor<T extends JobWorkProcessRate$externalProcessorArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessRate$externalProcessorArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    machine<T extends JobWorkProcessRate$machineArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessRate$machineArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     processType<T extends JobWorkProcessTypeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessTypeDefaultArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -30377,6 +31673,8 @@ export namespace Prisma {
   interface JobWorkProcessRateFieldRefs {
     readonly processRateId: FieldRef<"JobWorkProcessRate", 'Int'>
     readonly companyId: FieldRef<"JobWorkProcessRate", 'Int'>
+    readonly externalProcessorId: FieldRef<"JobWorkProcessRate", 'Int'>
+    readonly machineId: FieldRef<"JobWorkProcessRate", 'Int'>
     readonly processTypeId: FieldRef<"JobWorkProcessRate", 'Int'>
     readonly rateMonth: FieldRef<"JobWorkProcessRate", 'DateTime'>
     readonly chargeUnit: FieldRef<"JobWorkProcessRate", 'String'>
@@ -30731,6 +32029,44 @@ export namespace Prisma {
   }
 
   /**
+   * JobWorkProcessRate.externalProcessor
+   */
+  export type JobWorkProcessRate$externalProcessorArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExternalProcessor
+     */
+    select?: ExternalProcessorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExternalProcessor
+     */
+    omit?: ExternalProcessorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExternalProcessorInclude<ExtArgs> | null
+    where?: ExternalProcessorWhereInput
+  }
+
+  /**
+   * JobWorkProcessRate.machine
+   */
+  export type JobWorkProcessRate$machineArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    where?: JobWorkMachineWhereInput
+  }
+
+  /**
    * JobWorkProcessRate without action
    */
   export type JobWorkProcessRateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -30766,6 +32102,7 @@ export namespace Prisma {
     companyId: number | null
     branchId: number | null
     externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     quotedRate: Decimal | null
     createdByAdminId: number | null
@@ -30776,6 +32113,7 @@ export namespace Prisma {
     companyId: number | null
     branchId: number | null
     externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     quotedRate: Decimal | null
     createdByAdminId: number | null
@@ -30787,6 +32125,7 @@ export namespace Prisma {
     branchId: number | null
     jobNumber: string | null
     externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     orderDate: Date | null
     quotedRate: Decimal | null
@@ -30806,6 +32145,7 @@ export namespace Prisma {
     branchId: number | null
     jobNumber: string | null
     externalProcessorId: number | null
+    machineId: number | null
     processTypeId: number | null
     orderDate: Date | null
     quotedRate: Decimal | null
@@ -30825,6 +32165,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: number
     externalProcessorId: number
+    machineId: number
     processTypeId: number
     orderDate: number
     quotedRate: number
@@ -30845,6 +32186,7 @@ export namespace Prisma {
     companyId?: true
     branchId?: true
     externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     quotedRate?: true
     createdByAdminId?: true
@@ -30855,6 +32197,7 @@ export namespace Prisma {
     companyId?: true
     branchId?: true
     externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     quotedRate?: true
     createdByAdminId?: true
@@ -30866,6 +32209,7 @@ export namespace Prisma {
     branchId?: true
     jobNumber?: true
     externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     orderDate?: true
     quotedRate?: true
@@ -30885,6 +32229,7 @@ export namespace Prisma {
     branchId?: true
     jobNumber?: true
     externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     orderDate?: true
     quotedRate?: true
@@ -30904,6 +32249,7 @@ export namespace Prisma {
     branchId?: true
     jobNumber?: true
     externalProcessorId?: true
+    machineId?: true
     processTypeId?: true
     orderDate?: true
     quotedRate?: true
@@ -31010,6 +32356,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId: number | null
     processTypeId: number
     orderDate: Date
     quotedRate: Decimal | null
@@ -31048,6 +32395,7 @@ export namespace Prisma {
     branchId?: boolean
     jobNumber?: boolean
     externalProcessorId?: boolean
+    machineId?: boolean
     processTypeId?: boolean
     orderDate?: boolean
     quotedRate?: boolean
@@ -31062,6 +32410,7 @@ export namespace Prisma {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     externalProcessor?: boolean | ExternalProcessorDefaultArgs<ExtArgs>
+    machine?: boolean | JobWorkOrder$machineArgs<ExtArgs>
     processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
     createdByAdmin?: boolean | JobWorkOrder$createdByAdminArgs<ExtArgs>
     dispatches?: boolean | JobWorkOrder$dispatchesArgs<ExtArgs>
@@ -31078,6 +32427,7 @@ export namespace Prisma {
     branchId?: boolean
     jobNumber?: boolean
     externalProcessorId?: boolean
+    machineId?: boolean
     processTypeId?: boolean
     orderDate?: boolean
     quotedRate?: boolean
@@ -31091,11 +32441,12 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type JobWorkOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"jobWorkOrderId" | "companyId" | "branchId" | "jobNumber" | "externalProcessorId" | "processTypeId" | "orderDate" | "quotedRate" | "quotedChargeUnit" | "quotedRateMonth" | "status" | "description" | "notes" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkOrder"]>
+  export type JobWorkOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"jobWorkOrderId" | "companyId" | "branchId" | "jobNumber" | "externalProcessorId" | "machineId" | "processTypeId" | "orderDate" | "quotedRate" | "quotedChargeUnit" | "quotedRateMonth" | "status" | "description" | "notes" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["jobWorkOrder"]>
   export type JobWorkOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     company?: boolean | companiesDefaultArgs<ExtArgs>
     branch?: boolean | BranchDefaultArgs<ExtArgs>
     externalProcessor?: boolean | ExternalProcessorDefaultArgs<ExtArgs>
+    machine?: boolean | JobWorkOrder$machineArgs<ExtArgs>
     processType?: boolean | JobWorkProcessTypeDefaultArgs<ExtArgs>
     createdByAdmin?: boolean | JobWorkOrder$createdByAdminArgs<ExtArgs>
     dispatches?: boolean | JobWorkOrder$dispatchesArgs<ExtArgs>
@@ -31110,6 +32461,7 @@ export namespace Prisma {
       company: Prisma.$companiesPayload<ExtArgs>
       branch: Prisma.$BranchPayload<ExtArgs>
       externalProcessor: Prisma.$ExternalProcessorPayload<ExtArgs>
+      machine: Prisma.$JobWorkMachinePayload<ExtArgs> | null
       processType: Prisma.$JobWorkProcessTypePayload<ExtArgs>
       createdByAdmin: Prisma.$AdminPayload<ExtArgs> | null
       dispatches: Prisma.$JobWorkDispatchPayload<ExtArgs>[]
@@ -31122,6 +32474,7 @@ export namespace Prisma {
       branchId: number
       jobNumber: string
       externalProcessorId: number
+      machineId: number | null
       processTypeId: number
       orderDate: Date
       quotedRate: Prisma.Decimal | null
@@ -31476,6 +32829,7 @@ export namespace Prisma {
     company<T extends companiesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, companiesDefaultArgs<ExtArgs>>): Prisma__companiesClient<$Result.GetResult<Prisma.$companiesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     branch<T extends BranchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BranchDefaultArgs<ExtArgs>>): Prisma__BranchClient<$Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     externalProcessor<T extends ExternalProcessorDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ExternalProcessorDefaultArgs<ExtArgs>>): Prisma__ExternalProcessorClient<$Result.GetResult<Prisma.$ExternalProcessorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    machine<T extends JobWorkOrder$machineArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$machineArgs<ExtArgs>>): Prisma__JobWorkMachineClient<$Result.GetResult<Prisma.$JobWorkMachinePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     processType<T extends JobWorkProcessTypeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkProcessTypeDefaultArgs<ExtArgs>>): Prisma__JobWorkProcessTypeClient<$Result.GetResult<Prisma.$JobWorkProcessTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     createdByAdmin<T extends JobWorkOrder$createdByAdminArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$createdByAdminArgs<ExtArgs>>): Prisma__AdminClient<$Result.GetResult<Prisma.$AdminPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     dispatches<T extends JobWorkOrder$dispatchesArgs<ExtArgs> = {}>(args?: Subset<T, JobWorkOrder$dispatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobWorkDispatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -31515,6 +32869,7 @@ export namespace Prisma {
     readonly branchId: FieldRef<"JobWorkOrder", 'Int'>
     readonly jobNumber: FieldRef<"JobWorkOrder", 'String'>
     readonly externalProcessorId: FieldRef<"JobWorkOrder", 'Int'>
+    readonly machineId: FieldRef<"JobWorkOrder", 'Int'>
     readonly processTypeId: FieldRef<"JobWorkOrder", 'Int'>
     readonly orderDate: FieldRef<"JobWorkOrder", 'DateTime'>
     readonly quotedRate: FieldRef<"JobWorkOrder", 'Decimal'>
@@ -31871,6 +33226,25 @@ export namespace Prisma {
      * Limit how many JobWorkOrders to delete.
      */
     limit?: number
+  }
+
+  /**
+   * JobWorkOrder.machine
+   */
+  export type JobWorkOrder$machineArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobWorkMachine
+     */
+    select?: JobWorkMachineSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobWorkMachine
+     */
+    omit?: JobWorkMachineOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobWorkMachineInclude<ExtArgs> | null
+    where?: JobWorkMachineWhereInput
   }
 
   /**
@@ -35293,6 +36667,8 @@ export namespace Prisma {
     returnedCarats: Decimal | null
     returnedWeightGrams: Decimal | null
     rateMonth: Date | null
+    appliedRateMonth: Date | null
+    rateSource: string | null
     appliedChargeUnit: string | null
     appliedRate: Decimal | null
     billableQuantity: Decimal | null
@@ -35309,6 +36685,8 @@ export namespace Prisma {
     returnedCarats: Decimal | null
     returnedWeightGrams: Decimal | null
     rateMonth: Date | null
+    appliedRateMonth: Date | null
+    rateSource: string | null
     appliedChargeUnit: string | null
     appliedRate: Decimal | null
     billableQuantity: Decimal | null
@@ -35325,6 +36703,8 @@ export namespace Prisma {
     returnedCarats: number
     returnedWeightGrams: number
     rateMonth: number
+    appliedRateMonth: number
+    rateSource: number
     appliedChargeUnit: number
     appliedRate: number
     billableQuantity: number
@@ -35365,6 +36745,8 @@ export namespace Prisma {
     returnedCarats?: true
     returnedWeightGrams?: true
     rateMonth?: true
+    appliedRateMonth?: true
+    rateSource?: true
     appliedChargeUnit?: true
     appliedRate?: true
     billableQuantity?: true
@@ -35381,6 +36763,8 @@ export namespace Prisma {
     returnedCarats?: true
     returnedWeightGrams?: true
     rateMonth?: true
+    appliedRateMonth?: true
+    rateSource?: true
     appliedChargeUnit?: true
     appliedRate?: true
     billableQuantity?: true
@@ -35397,6 +36781,8 @@ export namespace Prisma {
     returnedCarats?: true
     returnedWeightGrams?: true
     rateMonth?: true
+    appliedRateMonth?: true
+    rateSource?: true
     appliedChargeUnit?: true
     appliedRate?: true
     billableQuantity?: true
@@ -35500,6 +36886,8 @@ export namespace Prisma {
     returnedCarats: Decimal
     returnedWeightGrams: Decimal
     rateMonth: Date | null
+    appliedRateMonth: Date | null
+    rateSource: string | null
     appliedChargeUnit: string | null
     appliedRate: Decimal | null
     billableQuantity: Decimal | null
@@ -35535,6 +36923,8 @@ export namespace Prisma {
     returnedCarats?: boolean
     returnedWeightGrams?: boolean
     rateMonth?: boolean
+    appliedRateMonth?: boolean
+    rateSource?: boolean
     appliedChargeUnit?: boolean
     appliedRate?: boolean
     billableQuantity?: boolean
@@ -35554,6 +36944,8 @@ export namespace Prisma {
     returnedCarats?: boolean
     returnedWeightGrams?: boolean
     rateMonth?: boolean
+    appliedRateMonth?: boolean
+    rateSource?: boolean
     appliedChargeUnit?: boolean
     appliedRate?: boolean
     billableQuantity?: boolean
@@ -35562,7 +36954,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type JobWorkReceiptItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"receiptItemId" | "receiptId" | "returnCondition" | "returnedPieces" | "returnedCarats" | "returnedWeightGrams" | "rateMonth" | "appliedChargeUnit" | "appliedRate" | "billableQuantity" | "processingCharge" | "remarks" | "createdAt", ExtArgs["result"]["jobWorkReceiptItem"]>
+  export type JobWorkReceiptItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"receiptItemId" | "receiptId" | "returnCondition" | "returnedPieces" | "returnedCarats" | "returnedWeightGrams" | "rateMonth" | "appliedRateMonth" | "rateSource" | "appliedChargeUnit" | "appliedRate" | "billableQuantity" | "processingCharge" | "remarks" | "createdAt", ExtArgs["result"]["jobWorkReceiptItem"]>
   export type JobWorkReceiptItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     receipt?: boolean | JobWorkReceiptDefaultArgs<ExtArgs>
   }
@@ -35580,6 +36972,8 @@ export namespace Prisma {
       returnedCarats: Prisma.Decimal
       returnedWeightGrams: Prisma.Decimal
       rateMonth: Date | null
+      appliedRateMonth: Date | null
+      rateSource: string | null
       appliedChargeUnit: string | null
       appliedRate: Prisma.Decimal | null
       billableQuantity: Prisma.Decimal | null
@@ -35963,6 +37357,8 @@ export namespace Prisma {
     readonly returnedCarats: FieldRef<"JobWorkReceiptItem", 'Decimal'>
     readonly returnedWeightGrams: FieldRef<"JobWorkReceiptItem", 'Decimal'>
     readonly rateMonth: FieldRef<"JobWorkReceiptItem", 'DateTime'>
+    readonly appliedRateMonth: FieldRef<"JobWorkReceiptItem", 'DateTime'>
+    readonly rateSource: FieldRef<"JobWorkReceiptItem", 'String'>
     readonly appliedChargeUnit: FieldRef<"JobWorkReceiptItem", 'String'>
     readonly appliedRate: FieldRef<"JobWorkReceiptItem", 'Decimal'>
     readonly billableQuantity: FieldRef<"JobWorkReceiptItem", 'Decimal'>
@@ -37793,6 +39189,20 @@ export namespace Prisma {
   export type ExternalProcessorScalarFieldEnum = (typeof ExternalProcessorScalarFieldEnum)[keyof typeof ExternalProcessorScalarFieldEnum]
 
 
+  export const JobWorkMachineScalarFieldEnum: {
+    machineId: 'machineId',
+    companyId: 'companyId',
+    code: 'code',
+    name: 'name',
+    description: 'description',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type JobWorkMachineScalarFieldEnum = (typeof JobWorkMachineScalarFieldEnum)[keyof typeof JobWorkMachineScalarFieldEnum]
+
+
   export const JobWorkProcessTypeScalarFieldEnum: {
     processTypeId: 'processTypeId',
     companyId: 'companyId',
@@ -37812,6 +39222,8 @@ export namespace Prisma {
   export const JobWorkProcessRateScalarFieldEnum: {
     processRateId: 'processRateId',
     companyId: 'companyId',
+    externalProcessorId: 'externalProcessorId',
+    machineId: 'machineId',
     processTypeId: 'processTypeId',
     rateMonth: 'rateMonth',
     chargeUnit: 'chargeUnit',
@@ -37829,6 +39241,7 @@ export namespace Prisma {
     branchId: 'branchId',
     jobNumber: 'jobNumber',
     externalProcessorId: 'externalProcessorId',
+    machineId: 'machineId',
     processTypeId: 'processTypeId',
     orderDate: 'orderDate',
     quotedRate: 'quotedRate',
@@ -37903,6 +39316,8 @@ export namespace Prisma {
     returnedCarats: 'returnedCarats',
     returnedWeightGrams: 'returnedWeightGrams',
     rateMonth: 'rateMonth',
+    appliedRateMonth: 'appliedRateMonth',
+    rateSource: 'rateSource',
     appliedChargeUnit: 'appliedChargeUnit',
     appliedRate: 'appliedRate',
     billableQuantity: 'billableQuantity',
@@ -38134,6 +39549,15 @@ export namespace Prisma {
   export type ExternalProcessorOrderByRelevanceFieldEnum = (typeof ExternalProcessorOrderByRelevanceFieldEnum)[keyof typeof ExternalProcessorOrderByRelevanceFieldEnum]
 
 
+  export const JobWorkMachineOrderByRelevanceFieldEnum: {
+    code: 'code',
+    name: 'name',
+    description: 'description'
+  };
+
+  export type JobWorkMachineOrderByRelevanceFieldEnum = (typeof JobWorkMachineOrderByRelevanceFieldEnum)[keyof typeof JobWorkMachineOrderByRelevanceFieldEnum]
+
+
   export const JobWorkProcessTypeOrderByRelevanceFieldEnum: {
     code: 'code',
     name: 'name',
@@ -38190,6 +39614,7 @@ export namespace Prisma {
 
   export const JobWorkReceiptItemOrderByRelevanceFieldEnum: {
     returnCondition: 'returnCondition',
+    rateSource: 'rateSource',
     appliedChargeUnit: 'appliedChargeUnit',
     remarks: 'remarks'
   };
@@ -39772,6 +41197,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayListRelationFilter
     externalProcessors?: ExternalProcessorListRelationFilter
     jobWorkProcessTypes?: JobWorkProcessTypeListRelationFilter
+    jobWorkMachines?: JobWorkMachineListRelationFilter
     jobWorkOrders?: JobWorkOrderListRelationFilter
     jobWorkProcessRates?: JobWorkProcessRateListRelationFilter
     jobWorkPayments?: JobWorkPaymentListRelationFilter
@@ -39795,6 +41221,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayOrderByRelationAggregateInput
     externalProcessors?: ExternalProcessorOrderByRelationAggregateInput
     jobWorkProcessTypes?: JobWorkProcessTypeOrderByRelationAggregateInput
+    jobWorkMachines?: JobWorkMachineOrderByRelationAggregateInput
     jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
     jobWorkProcessRates?: JobWorkProcessRateOrderByRelationAggregateInput
     jobWorkPayments?: JobWorkPaymentOrderByRelationAggregateInput
@@ -39822,6 +41249,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayListRelationFilter
     externalProcessors?: ExternalProcessorListRelationFilter
     jobWorkProcessTypes?: JobWorkProcessTypeListRelationFilter
+    jobWorkMachines?: JobWorkMachineListRelationFilter
     jobWorkOrders?: JobWorkOrderListRelationFilter
     jobWorkProcessRates?: JobWorkProcessRateListRelationFilter
     jobWorkPayments?: JobWorkPaymentListRelationFilter
@@ -40267,6 +41695,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     jobWorkOrders?: JobWorkOrderListRelationFilter
+    monthlyRates?: JobWorkProcessRateListRelationFilter
   }
 
   export type ExternalProcessorOrderByWithRelationInput = {
@@ -40287,6 +41716,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     company?: companiesOrderByWithRelationInput
     jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
+    monthlyRates?: JobWorkProcessRateOrderByRelationAggregateInput
     _relevance?: ExternalProcessorOrderByRelevanceInput
   }
 
@@ -40312,6 +41742,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ExternalProcessor"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     jobWorkOrders?: JobWorkOrderListRelationFilter
+    monthlyRates?: JobWorkProcessRateListRelationFilter
   }, "externalProcessorId" | "companyId_processorCode">
 
   export type ExternalProcessorOrderByWithAggregationInput = {
@@ -40356,6 +41787,87 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"ExternalProcessor"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ExternalProcessor"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ExternalProcessor"> | Date | string
+  }
+
+  export type JobWorkMachineWhereInput = {
+    AND?: JobWorkMachineWhereInput | JobWorkMachineWhereInput[]
+    OR?: JobWorkMachineWhereInput[]
+    NOT?: JobWorkMachineWhereInput | JobWorkMachineWhereInput[]
+    machineId?: IntFilter<"JobWorkMachine"> | number
+    companyId?: IntFilter<"JobWorkMachine"> | number
+    code?: StringFilter<"JobWorkMachine"> | string
+    name?: StringFilter<"JobWorkMachine"> | string
+    description?: StringNullableFilter<"JobWorkMachine"> | string | null
+    isActive?: BoolFilter<"JobWorkMachine"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+    monthlyRates?: JobWorkProcessRateListRelationFilter
+  }
+
+  export type JobWorkMachineOrderByWithRelationInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    company?: companiesOrderByWithRelationInput
+    jobWorkOrders?: JobWorkOrderOrderByRelationAggregateInput
+    monthlyRates?: JobWorkProcessRateOrderByRelationAggregateInput
+    _relevance?: JobWorkMachineOrderByRelevanceInput
+  }
+
+  export type JobWorkMachineWhereUniqueInput = Prisma.AtLeast<{
+    machineId?: number
+    companyId_code?: JobWorkMachineCompanyIdCodeCompoundUniqueInput
+    companyId_name?: JobWorkMachineCompanyIdNameCompoundUniqueInput
+    AND?: JobWorkMachineWhereInput | JobWorkMachineWhereInput[]
+    OR?: JobWorkMachineWhereInput[]
+    NOT?: JobWorkMachineWhereInput | JobWorkMachineWhereInput[]
+    companyId?: IntFilter<"JobWorkMachine"> | number
+    code?: StringFilter<"JobWorkMachine"> | string
+    name?: StringFilter<"JobWorkMachine"> | string
+    description?: StringNullableFilter<"JobWorkMachine"> | string | null
+    isActive?: BoolFilter<"JobWorkMachine"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+    company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    jobWorkOrders?: JobWorkOrderListRelationFilter
+    monthlyRates?: JobWorkProcessRateListRelationFilter
+  }, "machineId" | "companyId_code" | "companyId_name">
+
+  export type JobWorkMachineOrderByWithAggregationInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: JobWorkMachineCountOrderByAggregateInput
+    _avg?: JobWorkMachineAvgOrderByAggregateInput
+    _max?: JobWorkMachineMaxOrderByAggregateInput
+    _min?: JobWorkMachineMinOrderByAggregateInput
+    _sum?: JobWorkMachineSumOrderByAggregateInput
+  }
+
+  export type JobWorkMachineScalarWhereWithAggregatesInput = {
+    AND?: JobWorkMachineScalarWhereWithAggregatesInput | JobWorkMachineScalarWhereWithAggregatesInput[]
+    OR?: JobWorkMachineScalarWhereWithAggregatesInput[]
+    NOT?: JobWorkMachineScalarWhereWithAggregatesInput | JobWorkMachineScalarWhereWithAggregatesInput[]
+    machineId?: IntWithAggregatesFilter<"JobWorkMachine"> | number
+    companyId?: IntWithAggregatesFilter<"JobWorkMachine"> | number
+    code?: StringWithAggregatesFilter<"JobWorkMachine"> | string
+    name?: StringWithAggregatesFilter<"JobWorkMachine"> | string
+    description?: StringNullableWithAggregatesFilter<"JobWorkMachine"> | string | null
+    isActive?: BoolWithAggregatesFilter<"JobWorkMachine"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"JobWorkMachine"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"JobWorkMachine"> | Date | string
   }
 
   export type JobWorkProcessTypeWhereInput = {
@@ -40455,6 +41967,8 @@ export namespace Prisma {
     NOT?: JobWorkProcessRateWhereInput | JobWorkProcessRateWhereInput[]
     processRateId?: IntFilter<"JobWorkProcessRate"> | number
     companyId?: IntFilter<"JobWorkProcessRate"> | number
+    externalProcessorId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
+    machineId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
     processTypeId?: IntFilter<"JobWorkProcessRate"> | number
     rateMonth?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     chargeUnit?: StringFilter<"JobWorkProcessRate"> | string
@@ -40462,12 +41976,16 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     updatedAt?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    externalProcessor?: XOR<ExternalProcessorNullableScalarRelationFilter, ExternalProcessorWhereInput> | null
+    machine?: XOR<JobWorkMachineNullableScalarRelationFilter, JobWorkMachineWhereInput> | null
     processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
   }
 
   export type JobWorkProcessRateOrderByWithRelationInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrderInput | SortOrder
+    machineId?: SortOrderInput | SortOrder
     processTypeId?: SortOrder
     rateMonth?: SortOrder
     chargeUnit?: SortOrder
@@ -40475,17 +41993,21 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     company?: companiesOrderByWithRelationInput
+    externalProcessor?: ExternalProcessorOrderByWithRelationInput
+    machine?: JobWorkMachineOrderByWithRelationInput
     processType?: JobWorkProcessTypeOrderByWithRelationInput
     _relevance?: JobWorkProcessRateOrderByRelevanceInput
   }
 
   export type JobWorkProcessRateWhereUniqueInput = Prisma.AtLeast<{
     processRateId?: number
-    companyId_processTypeId_rateMonth?: JobWorkProcessRateCompanyIdProcessTypeIdRateMonthCompoundUniqueInput
+    companyId_externalProcessorId_machineId_processTypeId_rateMonth?: JobWorkProcessRateCompanyIdExternalProcessorIdMachineIdProcessTypeIdRateMonthCompoundUniqueInput
     AND?: JobWorkProcessRateWhereInput | JobWorkProcessRateWhereInput[]
     OR?: JobWorkProcessRateWhereInput[]
     NOT?: JobWorkProcessRateWhereInput | JobWorkProcessRateWhereInput[]
     companyId?: IntFilter<"JobWorkProcessRate"> | number
+    externalProcessorId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
+    machineId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
     processTypeId?: IntFilter<"JobWorkProcessRate"> | number
     rateMonth?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     chargeUnit?: StringFilter<"JobWorkProcessRate"> | string
@@ -40493,12 +42015,16 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     updatedAt?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
+    externalProcessor?: XOR<ExternalProcessorNullableScalarRelationFilter, ExternalProcessorWhereInput> | null
+    machine?: XOR<JobWorkMachineNullableScalarRelationFilter, JobWorkMachineWhereInput> | null
     processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
-  }, "processRateId" | "companyId_processTypeId_rateMonth">
+  }, "processRateId" | "companyId_externalProcessorId_machineId_processTypeId_rateMonth">
 
   export type JobWorkProcessRateOrderByWithAggregationInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrderInput | SortOrder
+    machineId?: SortOrderInput | SortOrder
     processTypeId?: SortOrder
     rateMonth?: SortOrder
     chargeUnit?: SortOrder
@@ -40518,6 +42044,8 @@ export namespace Prisma {
     NOT?: JobWorkProcessRateScalarWhereWithAggregatesInput | JobWorkProcessRateScalarWhereWithAggregatesInput[]
     processRateId?: IntWithAggregatesFilter<"JobWorkProcessRate"> | number
     companyId?: IntWithAggregatesFilter<"JobWorkProcessRate"> | number
+    externalProcessorId?: IntNullableWithAggregatesFilter<"JobWorkProcessRate"> | number | null
+    machineId?: IntNullableWithAggregatesFilter<"JobWorkProcessRate"> | number | null
     processTypeId?: IntWithAggregatesFilter<"JobWorkProcessRate"> | number
     rateMonth?: DateTimeWithAggregatesFilter<"JobWorkProcessRate"> | Date | string
     chargeUnit?: StringWithAggregatesFilter<"JobWorkProcessRate"> | string
@@ -40535,6 +42063,7 @@ export namespace Prisma {
     branchId?: IntFilter<"JobWorkOrder"> | number
     jobNumber?: StringFilter<"JobWorkOrder"> | string
     externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    machineId?: IntNullableFilter<"JobWorkOrder"> | number | null
     processTypeId?: IntFilter<"JobWorkOrder"> | number
     orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
     quotedRate?: DecimalNullableFilter<"JobWorkOrder"> | Decimal | DecimalJsLike | number | string | null
@@ -40549,6 +42078,7 @@ export namespace Prisma {
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     externalProcessor?: XOR<ExternalProcessorScalarRelationFilter, ExternalProcessorWhereInput>
+    machine?: XOR<JobWorkMachineNullableScalarRelationFilter, JobWorkMachineWhereInput> | null
     processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
     createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
     dispatches?: JobWorkDispatchListRelationFilter
@@ -40562,6 +42092,7 @@ export namespace Prisma {
     branchId?: SortOrder
     jobNumber?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrderInput | SortOrder
     processTypeId?: SortOrder
     orderDate?: SortOrder
     quotedRate?: SortOrderInput | SortOrder
@@ -40576,6 +42107,7 @@ export namespace Prisma {
     company?: companiesOrderByWithRelationInput
     branch?: BranchOrderByWithRelationInput
     externalProcessor?: ExternalProcessorOrderByWithRelationInput
+    machine?: JobWorkMachineOrderByWithRelationInput
     processType?: JobWorkProcessTypeOrderByWithRelationInput
     createdByAdmin?: AdminOrderByWithRelationInput
     dispatches?: JobWorkDispatchOrderByRelationAggregateInput
@@ -40594,6 +42126,7 @@ export namespace Prisma {
     branchId?: IntFilter<"JobWorkOrder"> | number
     jobNumber?: StringFilter<"JobWorkOrder"> | string
     externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    machineId?: IntNullableFilter<"JobWorkOrder"> | number | null
     processTypeId?: IntFilter<"JobWorkOrder"> | number
     orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
     quotedRate?: DecimalNullableFilter<"JobWorkOrder"> | Decimal | DecimalJsLike | number | string | null
@@ -40608,6 +42141,7 @@ export namespace Prisma {
     company?: XOR<CompaniesScalarRelationFilter, companiesWhereInput>
     branch?: XOR<BranchScalarRelationFilter, BranchWhereInput>
     externalProcessor?: XOR<ExternalProcessorScalarRelationFilter, ExternalProcessorWhereInput>
+    machine?: XOR<JobWorkMachineNullableScalarRelationFilter, JobWorkMachineWhereInput> | null
     processType?: XOR<JobWorkProcessTypeScalarRelationFilter, JobWorkProcessTypeWhereInput>
     createdByAdmin?: XOR<AdminNullableScalarRelationFilter, AdminWhereInput> | null
     dispatches?: JobWorkDispatchListRelationFilter
@@ -40621,6 +42155,7 @@ export namespace Prisma {
     branchId?: SortOrder
     jobNumber?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrderInput | SortOrder
     processTypeId?: SortOrder
     orderDate?: SortOrder
     quotedRate?: SortOrderInput | SortOrder
@@ -40648,6 +42183,7 @@ export namespace Prisma {
     branchId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
     jobNumber?: StringWithAggregatesFilter<"JobWorkOrder"> | string
     externalProcessorId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
+    machineId?: IntNullableWithAggregatesFilter<"JobWorkOrder"> | number | null
     processTypeId?: IntWithAggregatesFilter<"JobWorkOrder"> | number
     orderDate?: DateTimeWithAggregatesFilter<"JobWorkOrder"> | Date | string
     quotedRate?: DecimalNullableWithAggregatesFilter<"JobWorkOrder"> | Decimal | DecimalJsLike | number | string | null
@@ -40949,6 +42485,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     rateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    appliedRateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    rateSource?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedChargeUnit?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedRate?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
@@ -40966,6 +42504,8 @@ export namespace Prisma {
     returnedCarats?: SortOrder
     returnedWeightGrams?: SortOrder
     rateMonth?: SortOrderInput | SortOrder
+    appliedRateMonth?: SortOrderInput | SortOrder
+    rateSource?: SortOrderInput | SortOrder
     appliedChargeUnit?: SortOrderInput | SortOrder
     appliedRate?: SortOrderInput | SortOrder
     billableQuantity?: SortOrderInput | SortOrder
@@ -40987,6 +42527,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     rateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    appliedRateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    rateSource?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedChargeUnit?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedRate?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
@@ -41004,6 +42546,8 @@ export namespace Prisma {
     returnedCarats?: SortOrder
     returnedWeightGrams?: SortOrder
     rateMonth?: SortOrderInput | SortOrder
+    appliedRateMonth?: SortOrderInput | SortOrder
+    rateSource?: SortOrderInput | SortOrder
     appliedChargeUnit?: SortOrderInput | SortOrder
     appliedRate?: SortOrderInput | SortOrder
     billableQuantity?: SortOrderInput | SortOrder
@@ -41028,6 +42572,8 @@ export namespace Prisma {
     returnedCarats?: DecimalWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     rateMonth?: DateTimeNullableWithAggregatesFilter<"JobWorkReceiptItem"> | Date | string | null
+    appliedRateMonth?: DateTimeNullableWithAggregatesFilter<"JobWorkReceiptItem"> | Date | string | null
+    rateSource?: StringNullableWithAggregatesFilter<"JobWorkReceiptItem"> | string | null
     appliedChargeUnit?: StringNullableWithAggregatesFilter<"JobWorkReceiptItem"> | string | null
     appliedRate?: DecimalNullableWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: DecimalNullableWithAggregatesFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
@@ -42687,6 +44233,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -42710,6 +44257,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -42732,6 +44280,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -42755,6 +44304,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -43222,6 +44772,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutExternalProcessorsInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutExternalProcessorInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorUncheckedCreateInput = {
@@ -43241,6 +44792,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorUpdateInput = {
@@ -43259,6 +44811,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutExternalProcessorNestedInput
   }
 
   export type ExternalProcessorUncheckedUpdateInput = {
@@ -43278,6 +44831,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorNestedInput
   }
 
   export type ExternalProcessorCreateManyInput = {
@@ -43328,6 +44882,87 @@ export namespace Prisma {
     paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkMachineCreateInput = {
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkMachinesInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutMachineInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineUncheckedCreateInput = {
+    machineId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutMachineInput
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineUpdateInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkMachinesNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutMachineNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineUncheckedUpdateInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutMachineNestedInput
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineCreateManyInput = {
+    machineId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkMachineUpdateManyMutationInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkMachineUncheckedUpdateManyInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -43434,12 +45069,16 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutJobWorkProcessRatesInput
+    externalProcessor?: ExternalProcessorCreateNestedOneWithoutMonthlyRatesInput
+    machine?: JobWorkMachineCreateNestedOneWithoutMonthlyRatesInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutMonthlyRatesInput
   }
 
   export type JobWorkProcessRateUncheckedCreateInput = {
     processRateId?: number
     companyId: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     processTypeId: number
     rateMonth: Date | string
     chargeUnit: string
@@ -43455,12 +45094,16 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutJobWorkProcessRatesNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneWithoutMonthlyRatesNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutMonthlyRatesNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutMonthlyRatesNestedInput
   }
 
   export type JobWorkProcessRateUncheckedUpdateInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
     companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
@@ -43472,6 +45115,8 @@ export namespace Prisma {
   export type JobWorkProcessRateCreateManyInput = {
     processRateId?: number
     companyId: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     processTypeId: number
     rateMonth: Date | string
     chargeUnit: string
@@ -43491,6 +45136,8 @@ export namespace Prisma {
   export type JobWorkProcessRateUncheckedUpdateManyInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
     companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
@@ -43513,6 +45160,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -43526,6 +45174,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -43556,6 +45205,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -43569,6 +45219,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -43591,6 +45242,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -43623,6 +45275,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -43921,6 +45574,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -43938,6 +45593,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -43952,6 +45609,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -43969,6 +45628,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -43985,6 +45646,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -43999,6 +45662,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -44015,6 +45680,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -45674,6 +47341,12 @@ export namespace Prisma {
     none?: JobWorkProcessTypeWhereInput
   }
 
+  export type JobWorkMachineListRelationFilter = {
+    every?: JobWorkMachineWhereInput
+    some?: JobWorkMachineWhereInput
+    none?: JobWorkMachineWhereInput
+  }
+
   export type JobWorkProcessRateListRelationFilter = {
     every?: JobWorkProcessRateWhereInput
     some?: JobWorkProcessRateWhereInput
@@ -45701,6 +47374,10 @@ export namespace Prisma {
   }
 
   export type JobWorkProcessTypeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobWorkMachineOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -46113,6 +47790,65 @@ export namespace Prisma {
     companyId?: SortOrder
   }
 
+  export type JobWorkMachineOrderByRelevanceInput = {
+    fields: JobWorkMachineOrderByRelevanceFieldEnum | JobWorkMachineOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JobWorkMachineCompanyIdCodeCompoundUniqueInput = {
+    companyId: number
+    code: string
+  }
+
+  export type JobWorkMachineCompanyIdNameCompoundUniqueInput = {
+    companyId: number
+    name: string
+  }
+
+  export type JobWorkMachineCountOrderByAggregateInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkMachineAvgOrderByAggregateInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+  }
+
+  export type JobWorkMachineMaxOrderByAggregateInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkMachineMinOrderByAggregateInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type JobWorkMachineSumOrderByAggregateInput = {
+    machineId?: SortOrder
+    companyId?: SortOrder
+  }
+
   export type JobWorkProcessTypeOrderByRelevanceInput = {
     fields: JobWorkProcessTypeOrderByRelevanceFieldEnum | JobWorkProcessTypeOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -46180,6 +47916,16 @@ export namespace Prisma {
     defaultRate?: SortOrder
   }
 
+  export type ExternalProcessorNullableScalarRelationFilter = {
+    is?: ExternalProcessorWhereInput | null
+    isNot?: ExternalProcessorWhereInput | null
+  }
+
+  export type JobWorkMachineNullableScalarRelationFilter = {
+    is?: JobWorkMachineWhereInput | null
+    isNot?: JobWorkMachineWhereInput | null
+  }
+
   export type JobWorkProcessTypeScalarRelationFilter = {
     is?: JobWorkProcessTypeWhereInput
     isNot?: JobWorkProcessTypeWhereInput
@@ -46191,8 +47937,10 @@ export namespace Prisma {
     search: string
   }
 
-  export type JobWorkProcessRateCompanyIdProcessTypeIdRateMonthCompoundUniqueInput = {
+  export type JobWorkProcessRateCompanyIdExternalProcessorIdMachineIdProcessTypeIdRateMonthCompoundUniqueInput = {
     companyId: number
+    externalProcessorId: number
+    machineId: number
     processTypeId: number
     rateMonth: Date | string
   }
@@ -46200,6 +47948,8 @@ export namespace Prisma {
   export type JobWorkProcessRateCountOrderByAggregateInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     rateMonth?: SortOrder
     chargeUnit?: SortOrder
@@ -46211,6 +47961,8 @@ export namespace Prisma {
   export type JobWorkProcessRateAvgOrderByAggregateInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     rate?: SortOrder
   }
@@ -46218,6 +47970,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMaxOrderByAggregateInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     rateMonth?: SortOrder
     chargeUnit?: SortOrder
@@ -46229,6 +47983,8 @@ export namespace Prisma {
   export type JobWorkProcessRateMinOrderByAggregateInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     rateMonth?: SortOrder
     chargeUnit?: SortOrder
@@ -46240,6 +47996,8 @@ export namespace Prisma {
   export type JobWorkProcessRateSumOrderByAggregateInput = {
     processRateId?: SortOrder
     companyId?: SortOrder
+    externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     rate?: SortOrder
   }
@@ -46266,6 +48024,7 @@ export namespace Prisma {
     branchId?: SortOrder
     jobNumber?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     orderDate?: SortOrder
     quotedRate?: SortOrder
@@ -46284,6 +48043,7 @@ export namespace Prisma {
     companyId?: SortOrder
     branchId?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     quotedRate?: SortOrder
     createdByAdminId?: SortOrder
@@ -46295,6 +48055,7 @@ export namespace Prisma {
     branchId?: SortOrder
     jobNumber?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     orderDate?: SortOrder
     quotedRate?: SortOrder
@@ -46314,6 +48075,7 @@ export namespace Prisma {
     branchId?: SortOrder
     jobNumber?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     orderDate?: SortOrder
     quotedRate?: SortOrder
@@ -46332,6 +48094,7 @@ export namespace Prisma {
     companyId?: SortOrder
     branchId?: SortOrder
     externalProcessorId?: SortOrder
+    machineId?: SortOrder
     processTypeId?: SortOrder
     quotedRate?: SortOrder
     createdByAdminId?: SortOrder
@@ -46563,6 +48326,8 @@ export namespace Prisma {
     returnedCarats?: SortOrder
     returnedWeightGrams?: SortOrder
     rateMonth?: SortOrder
+    appliedRateMonth?: SortOrder
+    rateSource?: SortOrder
     appliedChargeUnit?: SortOrder
     appliedRate?: SortOrder
     billableQuantity?: SortOrder
@@ -46590,6 +48355,8 @@ export namespace Prisma {
     returnedCarats?: SortOrder
     returnedWeightGrams?: SortOrder
     rateMonth?: SortOrder
+    appliedRateMonth?: SortOrder
+    rateSource?: SortOrder
     appliedChargeUnit?: SortOrder
     appliedRate?: SortOrder
     billableQuantity?: SortOrder
@@ -46606,6 +48373,8 @@ export namespace Prisma {
     returnedCarats?: SortOrder
     returnedWeightGrams?: SortOrder
     rateMonth?: SortOrder
+    appliedRateMonth?: SortOrder
+    rateSource?: SortOrder
     appliedChargeUnit?: SortOrder
     appliedRate?: SortOrder
     billableQuantity?: SortOrder
@@ -48593,6 +50362,13 @@ export namespace Prisma {
     connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
   }
 
+  export type JobWorkMachineCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput> | JobWorkMachineCreateWithoutCompanyInput[] | JobWorkMachineUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutCompanyInput | JobWorkMachineCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkMachineCreateManyCompanyInputEnvelope
+    connect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+  }
+
   export type JobWorkOrderCreateNestedManyWithoutCompanyInput = {
     create?: XOR<JobWorkOrderCreateWithoutCompanyInput, JobWorkOrderUncheckedCreateWithoutCompanyInput> | JobWorkOrderCreateWithoutCompanyInput[] | JobWorkOrderUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: JobWorkOrderCreateOrConnectWithoutCompanyInput | JobWorkOrderCreateOrConnectWithoutCompanyInput[]
@@ -48682,6 +50458,13 @@ export namespace Prisma {
     connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutCompanyInput | JobWorkProcessTypeCreateOrConnectWithoutCompanyInput[]
     createMany?: JobWorkProcessTypeCreateManyCompanyInputEnvelope
     connect?: JobWorkProcessTypeWhereUniqueInput | JobWorkProcessTypeWhereUniqueInput[]
+  }
+
+  export type JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput> | JobWorkMachineCreateWithoutCompanyInput[] | JobWorkMachineUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutCompanyInput | JobWorkMachineCreateOrConnectWithoutCompanyInput[]
+    createMany?: JobWorkMachineCreateManyCompanyInputEnvelope
+    connect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
   }
 
   export type JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput = {
@@ -48843,6 +50626,20 @@ export namespace Prisma {
     update?: JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput | JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+  }
+
+  export type JobWorkMachineUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput> | JobWorkMachineCreateWithoutCompanyInput[] | JobWorkMachineUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutCompanyInput | JobWorkMachineCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkMachineUpsertWithWhereUniqueWithoutCompanyInput | JobWorkMachineUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkMachineCreateManyCompanyInputEnvelope
+    set?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    disconnect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    delete?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    connect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    update?: JobWorkMachineUpdateWithWhereUniqueWithoutCompanyInput | JobWorkMachineUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkMachineUpdateManyWithWhereWithoutCompanyInput | JobWorkMachineUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkMachineScalarWhereInput | JobWorkMachineScalarWhereInput[]
   }
 
   export type JobWorkOrderUpdateManyWithoutCompanyNestedInput = {
@@ -49025,6 +50822,20 @@ export namespace Prisma {
     update?: JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput | JobWorkProcessTypeUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput | JobWorkProcessTypeUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: JobWorkProcessTypeScalarWhereInput | JobWorkProcessTypeScalarWhereInput[]
+  }
+
+  export type JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput> | JobWorkMachineCreateWithoutCompanyInput[] | JobWorkMachineUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutCompanyInput | JobWorkMachineCreateOrConnectWithoutCompanyInput[]
+    upsert?: JobWorkMachineUpsertWithWhereUniqueWithoutCompanyInput | JobWorkMachineUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: JobWorkMachineCreateManyCompanyInputEnvelope
+    set?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    disconnect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    delete?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    connect?: JobWorkMachineWhereUniqueInput | JobWorkMachineWhereUniqueInput[]
+    update?: JobWorkMachineUpdateWithWhereUniqueWithoutCompanyInput | JobWorkMachineUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: JobWorkMachineUpdateManyWithWhereWithoutCompanyInput | JobWorkMachineUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: JobWorkMachineScalarWhereInput | JobWorkMachineScalarWhereInput[]
   }
 
   export type JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput = {
@@ -49250,11 +51061,25 @@ export namespace Prisma {
     connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
   }
 
+  export type JobWorkProcessRateCreateNestedManyWithoutExternalProcessorInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput> | JobWorkProcessRateCreateWithoutExternalProcessorInput[] | JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput | JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput[]
+    createMany?: JobWorkProcessRateCreateManyExternalProcessorInputEnvelope
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+  }
+
   export type JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput = {
     create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
     connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
     createMany?: JobWorkOrderCreateManyExternalProcessorInputEnvelope
     connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkProcessRateUncheckedCreateNestedManyWithoutExternalProcessorInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput> | JobWorkProcessRateCreateWithoutExternalProcessorInput[] | JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput | JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput[]
+    createMany?: JobWorkProcessRateCreateManyExternalProcessorInputEnvelope
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
   }
 
   export type companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput = {
@@ -49279,6 +51104,20 @@ export namespace Prisma {
     deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
   }
 
+  export type JobWorkProcessRateUpdateManyWithoutExternalProcessorNestedInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput> | JobWorkProcessRateCreateWithoutExternalProcessorInput[] | JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput | JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput[]
+    upsert?: JobWorkProcessRateUpsertWithWhereUniqueWithoutExternalProcessorInput | JobWorkProcessRateUpsertWithWhereUniqueWithoutExternalProcessorInput[]
+    createMany?: JobWorkProcessRateCreateManyExternalProcessorInputEnvelope
+    set?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    disconnect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    delete?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    update?: JobWorkProcessRateUpdateWithWhereUniqueWithoutExternalProcessorInput | JobWorkProcessRateUpdateWithWhereUniqueWithoutExternalProcessorInput[]
+    updateMany?: JobWorkProcessRateUpdateManyWithWhereWithoutExternalProcessorInput | JobWorkProcessRateUpdateManyWithWhereWithoutExternalProcessorInput[]
+    deleteMany?: JobWorkProcessRateScalarWhereInput | JobWorkProcessRateScalarWhereInput[]
+  }
+
   export type JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput = {
     create?: XOR<JobWorkOrderCreateWithoutExternalProcessorInput, JobWorkOrderUncheckedCreateWithoutExternalProcessorInput> | JobWorkOrderCreateWithoutExternalProcessorInput[] | JobWorkOrderUncheckedCreateWithoutExternalProcessorInput[]
     connectOrCreate?: JobWorkOrderCreateOrConnectWithoutExternalProcessorInput | JobWorkOrderCreateOrConnectWithoutExternalProcessorInput[]
@@ -49291,6 +51130,118 @@ export namespace Prisma {
     update?: JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput | JobWorkOrderUpdateWithWhereUniqueWithoutExternalProcessorInput[]
     updateMany?: JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput | JobWorkOrderUpdateManyWithWhereWithoutExternalProcessorInput[]
     deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorNestedInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput> | JobWorkProcessRateCreateWithoutExternalProcessorInput[] | JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput | JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput[]
+    upsert?: JobWorkProcessRateUpsertWithWhereUniqueWithoutExternalProcessorInput | JobWorkProcessRateUpsertWithWhereUniqueWithoutExternalProcessorInput[]
+    createMany?: JobWorkProcessRateCreateManyExternalProcessorInputEnvelope
+    set?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    disconnect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    delete?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    update?: JobWorkProcessRateUpdateWithWhereUniqueWithoutExternalProcessorInput | JobWorkProcessRateUpdateWithWhereUniqueWithoutExternalProcessorInput[]
+    updateMany?: JobWorkProcessRateUpdateManyWithWhereWithoutExternalProcessorInput | JobWorkProcessRateUpdateManyWithWhereWithoutExternalProcessorInput[]
+    deleteMany?: JobWorkProcessRateScalarWhereInput | JobWorkProcessRateScalarWhereInput[]
+  }
+
+  export type companiesCreateNestedOneWithoutJobWorkMachinesInput = {
+    create?: XOR<companiesCreateWithoutJobWorkMachinesInput, companiesUncheckedCreateWithoutJobWorkMachinesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkMachinesInput
+    connect?: companiesWhereUniqueInput
+  }
+
+  export type JobWorkOrderCreateNestedManyWithoutMachineInput = {
+    create?: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput> | JobWorkOrderCreateWithoutMachineInput[] | JobWorkOrderUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutMachineInput | JobWorkOrderCreateOrConnectWithoutMachineInput[]
+    createMany?: JobWorkOrderCreateManyMachineInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkProcessRateCreateNestedManyWithoutMachineInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput> | JobWorkProcessRateCreateWithoutMachineInput[] | JobWorkProcessRateUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutMachineInput | JobWorkProcessRateCreateOrConnectWithoutMachineInput[]
+    createMany?: JobWorkProcessRateCreateManyMachineInputEnvelope
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+  }
+
+  export type JobWorkOrderUncheckedCreateNestedManyWithoutMachineInput = {
+    create?: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput> | JobWorkOrderCreateWithoutMachineInput[] | JobWorkOrderUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutMachineInput | JobWorkOrderCreateOrConnectWithoutMachineInput[]
+    createMany?: JobWorkOrderCreateManyMachineInputEnvelope
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+  }
+
+  export type JobWorkProcessRateUncheckedCreateNestedManyWithoutMachineInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput> | JobWorkProcessRateCreateWithoutMachineInput[] | JobWorkProcessRateUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutMachineInput | JobWorkProcessRateCreateOrConnectWithoutMachineInput[]
+    createMany?: JobWorkProcessRateCreateManyMachineInputEnvelope
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+  }
+
+  export type companiesUpdateOneRequiredWithoutJobWorkMachinesNestedInput = {
+    create?: XOR<companiesCreateWithoutJobWorkMachinesInput, companiesUncheckedCreateWithoutJobWorkMachinesInput>
+    connectOrCreate?: companiesCreateOrConnectWithoutJobWorkMachinesInput
+    upsert?: companiesUpsertWithoutJobWorkMachinesInput
+    connect?: companiesWhereUniqueInput
+    update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutJobWorkMachinesInput, companiesUpdateWithoutJobWorkMachinesInput>, companiesUncheckedUpdateWithoutJobWorkMachinesInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithoutMachineNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput> | JobWorkOrderCreateWithoutMachineInput[] | JobWorkOrderUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutMachineInput | JobWorkOrderCreateOrConnectWithoutMachineInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutMachineInput | JobWorkOrderUpsertWithWhereUniqueWithoutMachineInput[]
+    createMany?: JobWorkOrderCreateManyMachineInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutMachineInput | JobWorkOrderUpdateWithWhereUniqueWithoutMachineInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutMachineInput | JobWorkOrderUpdateManyWithWhereWithoutMachineInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkProcessRateUpdateManyWithoutMachineNestedInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput> | JobWorkProcessRateCreateWithoutMachineInput[] | JobWorkProcessRateUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutMachineInput | JobWorkProcessRateCreateOrConnectWithoutMachineInput[]
+    upsert?: JobWorkProcessRateUpsertWithWhereUniqueWithoutMachineInput | JobWorkProcessRateUpsertWithWhereUniqueWithoutMachineInput[]
+    createMany?: JobWorkProcessRateCreateManyMachineInputEnvelope
+    set?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    disconnect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    delete?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    update?: JobWorkProcessRateUpdateWithWhereUniqueWithoutMachineInput | JobWorkProcessRateUpdateWithWhereUniqueWithoutMachineInput[]
+    updateMany?: JobWorkProcessRateUpdateManyWithWhereWithoutMachineInput | JobWorkProcessRateUpdateManyWithWhereWithoutMachineInput[]
+    deleteMany?: JobWorkProcessRateScalarWhereInput | JobWorkProcessRateScalarWhereInput[]
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutMachineNestedInput = {
+    create?: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput> | JobWorkOrderCreateWithoutMachineInput[] | JobWorkOrderUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkOrderCreateOrConnectWithoutMachineInput | JobWorkOrderCreateOrConnectWithoutMachineInput[]
+    upsert?: JobWorkOrderUpsertWithWhereUniqueWithoutMachineInput | JobWorkOrderUpsertWithWhereUniqueWithoutMachineInput[]
+    createMany?: JobWorkOrderCreateManyMachineInputEnvelope
+    set?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    disconnect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    delete?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    connect?: JobWorkOrderWhereUniqueInput | JobWorkOrderWhereUniqueInput[]
+    update?: JobWorkOrderUpdateWithWhereUniqueWithoutMachineInput | JobWorkOrderUpdateWithWhereUniqueWithoutMachineInput[]
+    updateMany?: JobWorkOrderUpdateManyWithWhereWithoutMachineInput | JobWorkOrderUpdateManyWithWhereWithoutMachineInput[]
+    deleteMany?: JobWorkOrderScalarWhereInput | JobWorkOrderScalarWhereInput[]
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateManyWithoutMachineNestedInput = {
+    create?: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput> | JobWorkProcessRateCreateWithoutMachineInput[] | JobWorkProcessRateUncheckedCreateWithoutMachineInput[]
+    connectOrCreate?: JobWorkProcessRateCreateOrConnectWithoutMachineInput | JobWorkProcessRateCreateOrConnectWithoutMachineInput[]
+    upsert?: JobWorkProcessRateUpsertWithWhereUniqueWithoutMachineInput | JobWorkProcessRateUpsertWithWhereUniqueWithoutMachineInput[]
+    createMany?: JobWorkProcessRateCreateManyMachineInputEnvelope
+    set?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    disconnect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    delete?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    connect?: JobWorkProcessRateWhereUniqueInput | JobWorkProcessRateWhereUniqueInput[]
+    update?: JobWorkProcessRateUpdateWithWhereUniqueWithoutMachineInput | JobWorkProcessRateUpdateWithWhereUniqueWithoutMachineInput[]
+    updateMany?: JobWorkProcessRateUpdateManyWithWhereWithoutMachineInput | JobWorkProcessRateUpdateManyWithWhereWithoutMachineInput[]
+    deleteMany?: JobWorkProcessRateScalarWhereInput | JobWorkProcessRateScalarWhereInput[]
   }
 
   export type companiesCreateNestedOneWithoutJobWorkProcessTypesInput = {
@@ -49397,6 +51348,18 @@ export namespace Prisma {
     connect?: companiesWhereUniqueInput
   }
 
+  export type ExternalProcessorCreateNestedOneWithoutMonthlyRatesInput = {
+    create?: XOR<ExternalProcessorCreateWithoutMonthlyRatesInput, ExternalProcessorUncheckedCreateWithoutMonthlyRatesInput>
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutMonthlyRatesInput
+    connect?: ExternalProcessorWhereUniqueInput
+  }
+
+  export type JobWorkMachineCreateNestedOneWithoutMonthlyRatesInput = {
+    create?: XOR<JobWorkMachineCreateWithoutMonthlyRatesInput, JobWorkMachineUncheckedCreateWithoutMonthlyRatesInput>
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutMonthlyRatesInput
+    connect?: JobWorkMachineWhereUniqueInput
+  }
+
   export type JobWorkProcessTypeCreateNestedOneWithoutMonthlyRatesInput = {
     create?: XOR<JobWorkProcessTypeCreateWithoutMonthlyRatesInput, JobWorkProcessTypeUncheckedCreateWithoutMonthlyRatesInput>
     connectOrCreate?: JobWorkProcessTypeCreateOrConnectWithoutMonthlyRatesInput
@@ -49409,6 +51372,26 @@ export namespace Prisma {
     upsert?: companiesUpsertWithoutJobWorkProcessRatesInput
     connect?: companiesWhereUniqueInput
     update?: XOR<XOR<companiesUpdateToOneWithWhereWithoutJobWorkProcessRatesInput, companiesUpdateWithoutJobWorkProcessRatesInput>, companiesUncheckedUpdateWithoutJobWorkProcessRatesInput>
+  }
+
+  export type ExternalProcessorUpdateOneWithoutMonthlyRatesNestedInput = {
+    create?: XOR<ExternalProcessorCreateWithoutMonthlyRatesInput, ExternalProcessorUncheckedCreateWithoutMonthlyRatesInput>
+    connectOrCreate?: ExternalProcessorCreateOrConnectWithoutMonthlyRatesInput
+    upsert?: ExternalProcessorUpsertWithoutMonthlyRatesInput
+    disconnect?: ExternalProcessorWhereInput | boolean
+    delete?: ExternalProcessorWhereInput | boolean
+    connect?: ExternalProcessorWhereUniqueInput
+    update?: XOR<XOR<ExternalProcessorUpdateToOneWithWhereWithoutMonthlyRatesInput, ExternalProcessorUpdateWithoutMonthlyRatesInput>, ExternalProcessorUncheckedUpdateWithoutMonthlyRatesInput>
+  }
+
+  export type JobWorkMachineUpdateOneWithoutMonthlyRatesNestedInput = {
+    create?: XOR<JobWorkMachineCreateWithoutMonthlyRatesInput, JobWorkMachineUncheckedCreateWithoutMonthlyRatesInput>
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutMonthlyRatesInput
+    upsert?: JobWorkMachineUpsertWithoutMonthlyRatesInput
+    disconnect?: JobWorkMachineWhereInput | boolean
+    delete?: JobWorkMachineWhereInput | boolean
+    connect?: JobWorkMachineWhereUniqueInput
+    update?: XOR<XOR<JobWorkMachineUpdateToOneWithWhereWithoutMonthlyRatesInput, JobWorkMachineUpdateWithoutMonthlyRatesInput>, JobWorkMachineUncheckedUpdateWithoutMonthlyRatesInput>
   }
 
   export type JobWorkProcessTypeUpdateOneRequiredWithoutMonthlyRatesNestedInput = {
@@ -49435,6 +51418,12 @@ export namespace Prisma {
     create?: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
     connectOrCreate?: ExternalProcessorCreateOrConnectWithoutJobWorkOrdersInput
     connect?: ExternalProcessorWhereUniqueInput
+  }
+
+  export type JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput = {
+    create?: XOR<JobWorkMachineCreateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutJobWorkOrdersInput
+    connect?: JobWorkMachineWhereUniqueInput
   }
 
   export type JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput = {
@@ -49513,6 +51502,16 @@ export namespace Prisma {
     upsert?: ExternalProcessorUpsertWithoutJobWorkOrdersInput
     connect?: ExternalProcessorWhereUniqueInput
     update?: XOR<XOR<ExternalProcessorUpdateToOneWithWhereWithoutJobWorkOrdersInput, ExternalProcessorUpdateWithoutJobWorkOrdersInput>, ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput = {
+    create?: XOR<JobWorkMachineCreateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedCreateWithoutJobWorkOrdersInput>
+    connectOrCreate?: JobWorkMachineCreateOrConnectWithoutJobWorkOrdersInput
+    upsert?: JobWorkMachineUpsertWithoutJobWorkOrdersInput
+    disconnect?: JobWorkMachineWhereInput | boolean
+    delete?: JobWorkMachineWhereInput | boolean
+    connect?: JobWorkMachineWhereUniqueInput
+    update?: XOR<XOR<JobWorkMachineUpdateToOneWithWhereWithoutJobWorkOrdersInput, JobWorkMachineUpdateWithoutJobWorkOrdersInput>, JobWorkMachineUncheckedUpdateWithoutJobWorkOrdersInput>
   }
 
   export type JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput = {
@@ -50151,6 +52150,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -50173,6 +52173,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -50275,6 +52276,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
     reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
@@ -50287,6 +52289,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -50481,6 +52484,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -50503,6 +52507,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -50603,6 +52608,7 @@ export namespace Prisma {
     branchId?: IntFilter<"JobWorkOrder"> | number
     jobNumber?: StringFilter<"JobWorkOrder"> | string
     externalProcessorId?: IntFilter<"JobWorkOrder"> | number
+    machineId?: IntNullableFilter<"JobWorkOrder"> | number | null
     processTypeId?: IntFilter<"JobWorkOrder"> | number
     orderDate?: DateTimeFilter<"JobWorkOrder"> | Date | string
     quotedRate?: DecimalNullableFilter<"JobWorkOrder"> | Decimal | DecimalJsLike | number | string | null
@@ -50763,6 +52769,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -50785,6 +52792,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -51000,6 +53008,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -51012,6 +53021,7 @@ export namespace Prisma {
     companyId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -51065,6 +53075,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -51087,6 +53098,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -51296,6 +53308,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -51318,6 +53331,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -51540,6 +53554,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -51562,6 +53577,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -52129,6 +54145,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -52151,6 +54168,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -52737,6 +54755,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -52759,6 +54778,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -52988,6 +55008,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -53010,6 +55031,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -53126,6 +55148,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -53148,6 +55171,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -55230,6 +57254,7 @@ export namespace Prisma {
     settings?: SettingCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -55252,6 +57277,7 @@ export namespace Prisma {
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -55319,6 +57345,7 @@ export namespace Prisma {
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -55341,6 +57368,7 @@ export namespace Prisma {
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -55548,6 +57576,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -55570,6 +57599,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -55607,6 +57637,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -55629,6 +57660,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -55989,6 +58021,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutExternalProcessorInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorUncheckedCreateWithoutCompanyInput = {
@@ -56007,6 +58040,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorCreateOrConnectWithoutCompanyInput = {
@@ -56056,6 +58090,39 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JobWorkMachineCreateWithoutCompanyInput = {
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutMachineInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineUncheckedCreateWithoutCompanyInput = {
+    machineId?: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutMachineInput
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineCreateOrConnectWithoutCompanyInput = {
+    where: JobWorkMachineWhereUniqueInput
+    create: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkMachineCreateManyCompanyInputEnvelope = {
+    data: JobWorkMachineCreateManyCompanyInput | JobWorkMachineCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type JobWorkOrderCreateWithoutCompanyInput = {
     jobNumber: string
     orderDate: Date | string
@@ -56069,6 +58136,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -56081,6 +58149,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -56113,11 +58182,15 @@ export namespace Prisma {
     rate: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
+    externalProcessor?: ExternalProcessorCreateNestedOneWithoutMonthlyRatesInput
+    machine?: JobWorkMachineCreateNestedOneWithoutMonthlyRatesInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutMonthlyRatesInput
   }
 
   export type JobWorkProcessRateUncheckedCreateWithoutCompanyInput = {
     processRateId?: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     processTypeId: number
     rateMonth: Date | string
     chargeUnit: string
@@ -56426,6 +58499,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"JobWorkProcessType"> | Date | string
   }
 
+  export type JobWorkMachineUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkMachineWhereUniqueInput
+    update: XOR<JobWorkMachineUpdateWithoutCompanyInput, JobWorkMachineUncheckedUpdateWithoutCompanyInput>
+    create: XOR<JobWorkMachineCreateWithoutCompanyInput, JobWorkMachineUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type JobWorkMachineUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: JobWorkMachineWhereUniqueInput
+    data: XOR<JobWorkMachineUpdateWithoutCompanyInput, JobWorkMachineUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type JobWorkMachineUpdateManyWithWhereWithoutCompanyInput = {
+    where: JobWorkMachineScalarWhereInput
+    data: XOR<JobWorkMachineUpdateManyMutationInput, JobWorkMachineUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type JobWorkMachineScalarWhereInput = {
+    AND?: JobWorkMachineScalarWhereInput | JobWorkMachineScalarWhereInput[]
+    OR?: JobWorkMachineScalarWhereInput[]
+    NOT?: JobWorkMachineScalarWhereInput | JobWorkMachineScalarWhereInput[]
+    machineId?: IntFilter<"JobWorkMachine"> | number
+    companyId?: IntFilter<"JobWorkMachine"> | number
+    code?: StringFilter<"JobWorkMachine"> | string
+    name?: StringFilter<"JobWorkMachine"> | string
+    description?: StringNullableFilter<"JobWorkMachine"> | string | null
+    isActive?: BoolFilter<"JobWorkMachine"> | boolean
+    createdAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+    updatedAt?: DateTimeFilter<"JobWorkMachine"> | Date | string
+  }
+
   export type JobWorkOrderUpsertWithWhereUniqueWithoutCompanyInput = {
     where: JobWorkOrderWhereUniqueInput
     update: XOR<JobWorkOrderUpdateWithoutCompanyInput, JobWorkOrderUncheckedUpdateWithoutCompanyInput>
@@ -56464,6 +58567,8 @@ export namespace Prisma {
     NOT?: JobWorkProcessRateScalarWhereInput | JobWorkProcessRateScalarWhereInput[]
     processRateId?: IntFilter<"JobWorkProcessRate"> | number
     companyId?: IntFilter<"JobWorkProcessRate"> | number
+    externalProcessorId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
+    machineId?: IntNullableFilter<"JobWorkProcessRate"> | number | null
     processTypeId?: IntFilter<"JobWorkProcessRate"> | number
     rateMonth?: DateTimeFilter<"JobWorkProcessRate"> | Date | string
     chargeUnit?: StringFilter<"JobWorkProcessRate"> | string
@@ -56580,6 +58685,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -56602,6 +58708,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -56671,6 +58778,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -56693,6 +58801,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -57336,6 +59445,7 @@ export namespace Prisma {
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -57358,6 +59468,7 @@ export namespace Prisma {
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -57381,6 +59492,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -57393,6 +59505,7 @@ export namespace Prisma {
     companyId: number
     branchId: number
     jobNumber: string
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -57416,6 +59529,39 @@ export namespace Prisma {
 
   export type JobWorkOrderCreateManyExternalProcessorInputEnvelope = {
     data: JobWorkOrderCreateManyExternalProcessorInput | JobWorkOrderCreateManyExternalProcessorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkProcessRateCreateWithoutExternalProcessorInput = {
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkProcessRatesInput
+    machine?: JobWorkMachineCreateNestedOneWithoutMonthlyRatesInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutMonthlyRatesInput
+  }
+
+  export type JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput = {
+    processRateId?: number
+    companyId: number
+    machineId?: number | null
+    processTypeId: number
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessRateCreateOrConnectWithoutExternalProcessorInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    create: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkProcessRateCreateManyExternalProcessorInputEnvelope = {
+    data: JobWorkProcessRateCreateManyExternalProcessorInput | JobWorkProcessRateCreateManyExternalProcessorInput[]
     skipDuplicates?: boolean
   }
 
@@ -57446,6 +59592,7 @@ export namespace Prisma {
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -57468,6 +59615,7 @@ export namespace Prisma {
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -57489,6 +59637,246 @@ export namespace Prisma {
     data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorInput>
   }
 
+  export type JobWorkProcessRateUpsertWithWhereUniqueWithoutExternalProcessorInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    update: XOR<JobWorkProcessRateUpdateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedUpdateWithoutExternalProcessorInput>
+    create: XOR<JobWorkProcessRateCreateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedCreateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkProcessRateUpdateWithWhereUniqueWithoutExternalProcessorInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    data: XOR<JobWorkProcessRateUpdateWithoutExternalProcessorInput, JobWorkProcessRateUncheckedUpdateWithoutExternalProcessorInput>
+  }
+
+  export type JobWorkProcessRateUpdateManyWithWhereWithoutExternalProcessorInput = {
+    where: JobWorkProcessRateScalarWhereInput
+    data: XOR<JobWorkProcessRateUpdateManyMutationInput, JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorInput>
+  }
+
+  export type companiesCreateWithoutJobWorkMachinesInput = {
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminCreateNestedManyWithoutCompanyInput
+    branches?: BranchCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeCreateNestedManyWithoutCompanyInput
+    settings?: SettingCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
+    jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
+    jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesUncheckedCreateWithoutJobWorkMachinesInput = {
+    company_id?: number
+    company_name: string
+    address?: string | null
+    contact_email?: string | null
+    contact_phone?: string | null
+    created_at?: Date | string
+    updated_at: Date | string
+    admins?: AdminUncheckedCreateNestedManyWithoutCompanyInput
+    branches?: BranchUncheckedCreateNestedManyWithoutCompanyInput
+    departments?: DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+    devices?: IotDeviceUncheckedCreateNestedManyWithoutCompanyInput
+    leaveTypes?: LeaveTypeUncheckedCreateNestedManyWithoutCompanyInput
+    settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
+    publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
+    externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type companiesCreateOrConnectWithoutJobWorkMachinesInput = {
+    where: companiesWhereUniqueInput
+    create: XOR<companiesCreateWithoutJobWorkMachinesInput, companiesUncheckedCreateWithoutJobWorkMachinesInput>
+  }
+
+  export type JobWorkOrderCreateWithoutMachineInput = {
+    jobNumber: string
+    orderDate: Date | string
+    quotedRate?: Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: string | null
+    quotedRateMonth?: Date | string | null
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkOrdersInput
+    branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
+    externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
+    createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
+    dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
+    payments?: JobWorkPaymentCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderUncheckedCreateWithoutMachineInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    quotedRate?: Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: string | null
+    quotedRateMonth?: Date | string | null
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    dispatches?: JobWorkDispatchUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    reconciliations?: JobWorkReconciliationUncheckedCreateNestedManyWithoutJobWorkOrderInput
+    payments?: JobWorkPaymentUncheckedCreateNestedManyWithoutJobWorkOrderInput
+  }
+
+  export type JobWorkOrderCreateOrConnectWithoutMachineInput = {
+    where: JobWorkOrderWhereUniqueInput
+    create: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput>
+  }
+
+  export type JobWorkOrderCreateManyMachineInputEnvelope = {
+    data: JobWorkOrderCreateManyMachineInput | JobWorkOrderCreateManyMachineInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobWorkProcessRateCreateWithoutMachineInput = {
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkProcessRatesInput
+    externalProcessor?: ExternalProcessorCreateNestedOneWithoutMonthlyRatesInput
+    processType: JobWorkProcessTypeCreateNestedOneWithoutMonthlyRatesInput
+  }
+
+  export type JobWorkProcessRateUncheckedCreateWithoutMachineInput = {
+    processRateId?: number
+    companyId: number
+    externalProcessorId?: number | null
+    processTypeId: number
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessRateCreateOrConnectWithoutMachineInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    create: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput>
+  }
+
+  export type JobWorkProcessRateCreateManyMachineInputEnvelope = {
+    data: JobWorkProcessRateCreateManyMachineInput | JobWorkProcessRateCreateManyMachineInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type companiesUpsertWithoutJobWorkMachinesInput = {
+    update: XOR<companiesUpdateWithoutJobWorkMachinesInput, companiesUncheckedUpdateWithoutJobWorkMachinesInput>
+    create: XOR<companiesCreateWithoutJobWorkMachinesInput, companiesUncheckedCreateWithoutJobWorkMachinesInput>
+    where?: companiesWhereInput
+  }
+
+  export type companiesUpdateToOneWithWhereWithoutJobWorkMachinesInput = {
+    where?: companiesWhereInput
+    data: XOR<companiesUpdateWithoutJobWorkMachinesInput, companiesUncheckedUpdateWithoutJobWorkMachinesInput>
+  }
+
+  export type companiesUpdateWithoutJobWorkMachinesInput = {
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
+    jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type companiesUncheckedUpdateWithoutJobWorkMachinesInput = {
+    company_id?: IntFieldUpdateOperationsInput | number
+    company_name?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_email?: NullableStringFieldUpdateOperationsInput | string | null
+    contact_phone?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminUncheckedUpdateManyWithoutCompanyNestedInput
+    branches?: BranchUncheckedUpdateManyWithoutCompanyNestedInput
+    departments?: DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+    devices?: IotDeviceUncheckedUpdateManyWithoutCompanyNestedInput
+    leaveTypes?: LeaveTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
+    publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
+    externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type JobWorkOrderUpsertWithWhereUniqueWithoutMachineInput = {
+    where: JobWorkOrderWhereUniqueInput
+    update: XOR<JobWorkOrderUpdateWithoutMachineInput, JobWorkOrderUncheckedUpdateWithoutMachineInput>
+    create: XOR<JobWorkOrderCreateWithoutMachineInput, JobWorkOrderUncheckedCreateWithoutMachineInput>
+  }
+
+  export type JobWorkOrderUpdateWithWhereUniqueWithoutMachineInput = {
+    where: JobWorkOrderWhereUniqueInput
+    data: XOR<JobWorkOrderUpdateWithoutMachineInput, JobWorkOrderUncheckedUpdateWithoutMachineInput>
+  }
+
+  export type JobWorkOrderUpdateManyWithWhereWithoutMachineInput = {
+    where: JobWorkOrderScalarWhereInput
+    data: XOR<JobWorkOrderUpdateManyMutationInput, JobWorkOrderUncheckedUpdateManyWithoutMachineInput>
+  }
+
+  export type JobWorkProcessRateUpsertWithWhereUniqueWithoutMachineInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    update: XOR<JobWorkProcessRateUpdateWithoutMachineInput, JobWorkProcessRateUncheckedUpdateWithoutMachineInput>
+    create: XOR<JobWorkProcessRateCreateWithoutMachineInput, JobWorkProcessRateUncheckedCreateWithoutMachineInput>
+  }
+
+  export type JobWorkProcessRateUpdateWithWhereUniqueWithoutMachineInput = {
+    where: JobWorkProcessRateWhereUniqueInput
+    data: XOR<JobWorkProcessRateUpdateWithoutMachineInput, JobWorkProcessRateUncheckedUpdateWithoutMachineInput>
+  }
+
+  export type JobWorkProcessRateUpdateManyWithWhereWithoutMachineInput = {
+    where: JobWorkProcessRateScalarWhereInput
+    data: XOR<JobWorkProcessRateUpdateManyMutationInput, JobWorkProcessRateUncheckedUpdateManyWithoutMachineInput>
+  }
+
   export type companiesCreateWithoutJobWorkProcessTypesInput = {
     company_name: string
     address?: string | null
@@ -57505,6 +59893,7 @@ export namespace Prisma {
     settings?: SettingCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
@@ -57527,6 +59916,7 @@ export namespace Prisma {
     settings?: SettingUncheckedCreateNestedManyWithoutCompanyInput
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
@@ -57551,6 +59941,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
     reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
@@ -57563,6 +59954,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
     quotedChargeUnit?: string | null
@@ -57595,11 +59987,15 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutJobWorkProcessRatesInput
+    externalProcessor?: ExternalProcessorCreateNestedOneWithoutMonthlyRatesInput
+    machine?: JobWorkMachineCreateNestedOneWithoutMonthlyRatesInput
   }
 
   export type JobWorkProcessRateUncheckedCreateWithoutProcessTypeInput = {
     processRateId?: number
     companyId: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     rateMonth: Date | string
     chargeUnit: string
     rate: Decimal | DecimalJsLike | number | string
@@ -57644,6 +60040,7 @@ export namespace Prisma {
     settings?: SettingUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
@@ -57666,6 +60063,7 @@ export namespace Prisma {
     settings?: SettingUncheckedUpdateManyWithoutCompanyNestedInput
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -57720,6 +60118,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
   }
@@ -57742,6 +60141,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -57749,6 +60149,76 @@ export namespace Prisma {
   export type companiesCreateOrConnectWithoutJobWorkProcessRatesInput = {
     where: companiesWhereUniqueInput
     create: XOR<companiesCreateWithoutJobWorkProcessRatesInput, companiesUncheckedCreateWithoutJobWorkProcessRatesInput>
+  }
+
+  export type ExternalProcessorCreateWithoutMonthlyRatesInput = {
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutExternalProcessorsInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorUncheckedCreateWithoutMonthlyRatesInput = {
+    externalProcessorId?: number
+    companyId: number
+    processorCode: string
+    name: string
+    contactPerson?: string | null
+    phone?: string | null
+    email?: string | null
+    address?: string | null
+    gstin?: string | null
+    pan?: string | null
+    paymentTerms?: string | null
+    notes?: string | null
+    status?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutExternalProcessorInput
+  }
+
+  export type ExternalProcessorCreateOrConnectWithoutMonthlyRatesInput = {
+    where: ExternalProcessorWhereUniqueInput
+    create: XOR<ExternalProcessorCreateWithoutMonthlyRatesInput, ExternalProcessorUncheckedCreateWithoutMonthlyRatesInput>
+  }
+
+  export type JobWorkMachineCreateWithoutMonthlyRatesInput = {
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkMachinesInput
+    jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineUncheckedCreateWithoutMonthlyRatesInput = {
+    machineId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineCreateOrConnectWithoutMonthlyRatesInput = {
+    where: JobWorkMachineWhereUniqueInput
+    create: XOR<JobWorkMachineCreateWithoutMonthlyRatesInput, JobWorkMachineUncheckedCreateWithoutMonthlyRatesInput>
   }
 
   export type JobWorkProcessTypeCreateWithoutMonthlyRatesInput = {
@@ -57811,6 +60281,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
   }
@@ -57833,8 +60304,91 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type ExternalProcessorUpsertWithoutMonthlyRatesInput = {
+    update: XOR<ExternalProcessorUpdateWithoutMonthlyRatesInput, ExternalProcessorUncheckedUpdateWithoutMonthlyRatesInput>
+    create: XOR<ExternalProcessorCreateWithoutMonthlyRatesInput, ExternalProcessorUncheckedCreateWithoutMonthlyRatesInput>
+    where?: ExternalProcessorWhereInput
+  }
+
+  export type ExternalProcessorUpdateToOneWithWhereWithoutMonthlyRatesInput = {
+    where?: ExternalProcessorWhereInput
+    data: XOR<ExternalProcessorUpdateWithoutMonthlyRatesInput, ExternalProcessorUncheckedUpdateWithoutMonthlyRatesInput>
+  }
+
+  export type ExternalProcessorUpdateWithoutMonthlyRatesInput = {
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type ExternalProcessorUncheckedUpdateWithoutMonthlyRatesInput = {
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    processorCode?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    contactPerson?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    gstin?: NullableStringFieldUpdateOperationsInput | string | null
+    pan?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentTerms?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type JobWorkMachineUpsertWithoutMonthlyRatesInput = {
+    update: XOR<JobWorkMachineUpdateWithoutMonthlyRatesInput, JobWorkMachineUncheckedUpdateWithoutMonthlyRatesInput>
+    create: XOR<JobWorkMachineCreateWithoutMonthlyRatesInput, JobWorkMachineUncheckedCreateWithoutMonthlyRatesInput>
+    where?: JobWorkMachineWhereInput
+  }
+
+  export type JobWorkMachineUpdateToOneWithWhereWithoutMonthlyRatesInput = {
+    where?: JobWorkMachineWhereInput
+    data: XOR<JobWorkMachineUpdateWithoutMonthlyRatesInput, JobWorkMachineUncheckedUpdateWithoutMonthlyRatesInput>
+  }
+
+  export type JobWorkMachineUpdateWithoutMonthlyRatesInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkMachinesNestedInput
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineUncheckedUpdateWithoutMonthlyRatesInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutMachineNestedInput
   }
 
   export type JobWorkProcessTypeUpsertWithoutMonthlyRatesInput = {
@@ -57892,6 +60446,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentCreateNestedManyWithoutCompanyInput
   }
@@ -57914,6 +60469,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkPayments?: JobWorkPaymentUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -57968,6 +60524,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     company: companiesCreateNestedOneWithoutExternalProcessorsInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput = {
@@ -57986,11 +60543,40 @@ export namespace Prisma {
     status?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutExternalProcessorInput
   }
 
   export type ExternalProcessorCreateOrConnectWithoutJobWorkOrdersInput = {
     where: ExternalProcessorWhereUniqueInput
     create: XOR<ExternalProcessorCreateWithoutJobWorkOrdersInput, ExternalProcessorUncheckedCreateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkMachineCreateWithoutJobWorkOrdersInput = {
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    company: companiesCreateNestedOneWithoutJobWorkMachinesInput
+    monthlyRates?: JobWorkProcessRateCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineUncheckedCreateWithoutJobWorkOrdersInput = {
+    machineId?: number
+    companyId: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    monthlyRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutMachineInput
+  }
+
+  export type JobWorkMachineCreateOrConnectWithoutJobWorkOrdersInput = {
+    where: JobWorkMachineWhereUniqueInput
+    create: XOR<JobWorkMachineCreateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedCreateWithoutJobWorkOrdersInput>
   }
 
   export type JobWorkProcessTypeCreateWithoutJobWorkOrdersInput = {
@@ -58202,6 +60788,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUpdateManyWithoutCompanyNestedInput
   }
@@ -58224,6 +60811,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkPayments?: JobWorkPaymentUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -58290,6 +60878,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutExternalProcessorsNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutExternalProcessorNestedInput
   }
 
   export type ExternalProcessorUncheckedUpdateWithoutJobWorkOrdersInput = {
@@ -58308,6 +60897,41 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorNestedInput
+  }
+
+  export type JobWorkMachineUpsertWithoutJobWorkOrdersInput = {
+    update: XOR<JobWorkMachineUpdateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedUpdateWithoutJobWorkOrdersInput>
+    create: XOR<JobWorkMachineCreateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedCreateWithoutJobWorkOrdersInput>
+    where?: JobWorkMachineWhereInput
+  }
+
+  export type JobWorkMachineUpdateToOneWithWhereWithoutJobWorkOrdersInput = {
+    where?: JobWorkMachineWhereInput
+    data: XOR<JobWorkMachineUpdateWithoutJobWorkOrdersInput, JobWorkMachineUncheckedUpdateWithoutJobWorkOrdersInput>
+  }
+
+  export type JobWorkMachineUpdateWithoutJobWorkOrdersInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkMachinesNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineUncheckedUpdateWithoutJobWorkOrdersInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutMachineNestedInput
   }
 
   export type JobWorkProcessTypeUpsertWithoutJobWorkOrdersInput = {
@@ -58457,6 +61081,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateCreateNestedManyWithoutCompanyInput
   }
@@ -58479,6 +61104,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedCreateNestedManyWithoutCompanyInput
     externalProcessors?: ExternalProcessorUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedCreateNestedManyWithoutCompanyInput
+    jobWorkMachines?: JobWorkMachineUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkOrders?: JobWorkOrderUncheckedCreateNestedManyWithoutCompanyInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -58502,6 +61128,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -58514,6 +61141,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -58600,6 +61228,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUpdateManyWithoutCompanyNestedInput
   }
@@ -58622,6 +61251,7 @@ export namespace Prisma {
     publicHolidays?: PublicHolidayUncheckedUpdateManyWithoutCompanyNestedInput
     externalProcessors?: ExternalProcessorUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessTypes?: JobWorkProcessTypeUncheckedUpdateManyWithoutCompanyNestedInput
+    jobWorkMachines?: JobWorkMachineUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutCompanyNestedInput
     jobWorkProcessRates?: JobWorkProcessRateUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -58651,6 +61281,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -58663,6 +61294,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -58736,6 +61368,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     reconciliations?: JobWorkReconciliationCreateNestedManyWithoutJobWorkOrderInput
@@ -58748,6 +61381,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -58862,6 +61496,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
@@ -58874,6 +61509,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -59029,6 +61665,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -59044,6 +61682,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -59175,6 +61815,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string
     rateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    appliedRateMonth?: DateTimeNullableFilter<"JobWorkReceiptItem"> | Date | string | null
+    rateSource?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedChargeUnit?: StringNullableFilter<"JobWorkReceiptItem"> | string | null
     appliedRate?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: DecimalNullableFilter<"JobWorkReceiptItem"> | Decimal | DecimalJsLike | number | string | null
@@ -59255,6 +61897,7 @@ export namespace Prisma {
     company: companiesCreateNestedOneWithoutJobWorkOrdersInput
     branch: BranchCreateNestedOneWithoutJobWorkOrdersInput
     externalProcessor: ExternalProcessorCreateNestedOneWithoutJobWorkOrdersInput
+    machine?: JobWorkMachineCreateNestedOneWithoutJobWorkOrdersInput
     processType: JobWorkProcessTypeCreateNestedOneWithoutJobWorkOrdersInput
     createdByAdmin?: AdminCreateNestedOneWithoutJobWorkOrdersCreatedInput
     dispatches?: JobWorkDispatchCreateNestedManyWithoutJobWorkOrderInput
@@ -59267,6 +61910,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -59350,6 +61994,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -59362,6 +62007,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -59457,6 +62103,7 @@ export namespace Prisma {
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -59622,6 +62269,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
     reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
@@ -59634,6 +62282,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -59655,6 +62304,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -59887,6 +62537,7 @@ export namespace Prisma {
     companyId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -60127,6 +62778,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -60139,6 +62791,7 @@ export namespace Prisma {
     companyId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -60160,6 +62813,7 @@ export namespace Prisma {
     companyId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -61315,11 +63969,22 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type JobWorkMachineCreateManyCompanyInput = {
+    machineId?: number
+    code: string
+    name: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type JobWorkOrderCreateManyCompanyInput = {
     jobWorkOrderId?: number
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -61335,6 +64000,8 @@ export namespace Prisma {
 
   export type JobWorkProcessRateCreateManyCompanyInput = {
     processRateId?: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     processTypeId: number
     rateMonth: Date | string
     chargeUnit: string
@@ -61735,6 +64402,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobWorkOrders?: JobWorkOrderUpdateManyWithoutExternalProcessorNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutExternalProcessorNestedInput
   }
 
   export type ExternalProcessorUncheckedUpdateWithoutCompanyInput = {
@@ -61753,6 +64421,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutExternalProcessorNestedInput
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorNestedInput
   }
 
   export type ExternalProcessorUncheckedUpdateManyWithoutCompanyInput = {
@@ -61811,6 +64480,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type JobWorkMachineUpdateWithoutCompanyInput = {
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUpdateManyWithoutMachineNestedInput
+    monthlyRates?: JobWorkProcessRateUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineUncheckedUpdateWithoutCompanyInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobWorkOrders?: JobWorkOrderUncheckedUpdateManyWithoutMachineNestedInput
+    monthlyRates?: JobWorkProcessRateUncheckedUpdateManyWithoutMachineNestedInput
+  }
+
+  export type JobWorkMachineUncheckedUpdateManyWithoutCompanyInput = {
+    machineId?: IntFieldUpdateOperationsInput | number
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type JobWorkOrderUpdateWithoutCompanyInput = {
     jobNumber?: StringFieldUpdateOperationsInput | string
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -61824,6 +64526,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -61836,6 +64539,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -61857,6 +64561,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -61876,11 +64581,15 @@ export namespace Prisma {
     rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    externalProcessor?: ExternalProcessorUpdateOneWithoutMonthlyRatesNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutMonthlyRatesNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutMonthlyRatesNestedInput
   }
 
   export type JobWorkProcessRateUncheckedUpdateWithoutCompanyInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
@@ -61891,6 +64600,8 @@ export namespace Prisma {
 
   export type JobWorkProcessRateUncheckedUpdateManyWithoutCompanyInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
@@ -62056,6 +64767,7 @@ export namespace Prisma {
     companyId: number
     branchId: number
     jobNumber: string
+    machineId?: number | null
     processTypeId: number
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
@@ -62065,6 +64777,18 @@ export namespace Prisma {
     description?: string | null
     notes?: string | null
     createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessRateCreateManyExternalProcessorInput = {
+    processRateId?: number
+    companyId: number
+    machineId?: number | null
+    processTypeId: number
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -62082,6 +64806,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
@@ -62094,6 +64819,7 @@ export namespace Prisma {
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -62115,6 +64841,7 @@ export namespace Prisma {
     companyId?: IntFieldUpdateOperationsInput | number
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     processTypeId?: IntFieldUpdateOperationsInput | number
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -62128,12 +64855,176 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type JobWorkProcessRateUpdateWithoutExternalProcessorInput = {
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkProcessRatesNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutMonthlyRatesNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutMonthlyRatesNestedInput
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateWithoutExternalProcessorInput = {
+    processRateId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateManyWithoutExternalProcessorInput = {
+    processRateId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkOrderCreateManyMachineInput = {
+    jobWorkOrderId?: number
+    companyId: number
+    branchId: number
+    jobNumber: string
+    externalProcessorId: number
+    processTypeId: number
+    orderDate: Date | string
+    quotedRate?: Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: string | null
+    quotedRateMonth?: Date | string | null
+    status?: string
+    description?: string | null
+    notes?: string | null
+    createdByAdminId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkProcessRateCreateManyMachineInput = {
+    processRateId?: number
+    companyId: number
+    externalProcessorId?: number | null
+    processTypeId: number
+    rateMonth: Date | string
+    chargeUnit: string
+    rate: Decimal | DecimalJsLike | number | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type JobWorkOrderUpdateWithoutMachineInput = {
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    quotedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
+    dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
+    payments?: JobWorkPaymentUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateWithoutMachineInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    quotedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dispatches?: JobWorkDispatchUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    reconciliations?: JobWorkReconciliationUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+    payments?: JobWorkPaymentUncheckedUpdateManyWithoutJobWorkOrderNestedInput
+  }
+
+  export type JobWorkOrderUncheckedUpdateManyWithoutMachineInput = {
+    jobWorkOrderId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    branchId?: IntFieldUpdateOperationsInput | number
+    jobNumber?: StringFieldUpdateOperationsInput | string
+    externalProcessorId?: IntFieldUpdateOperationsInput | number
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    quotedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    quotedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdByAdminId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessRateUpdateWithoutMachineInput = {
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    company?: companiesUpdateOneRequiredWithoutJobWorkProcessRatesNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneWithoutMonthlyRatesNestedInput
+    processType?: JobWorkProcessTypeUpdateOneRequiredWithoutMonthlyRatesNestedInput
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateWithoutMachineInput = {
+    processRateId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobWorkProcessRateUncheckedUpdateManyWithoutMachineInput = {
+    processRateId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    processTypeId?: IntFieldUpdateOperationsInput | number
+    rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
+    chargeUnit?: StringFieldUpdateOperationsInput | string
+    rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type JobWorkOrderCreateManyProcessTypeInput = {
     jobWorkOrderId?: number
     companyId: number
     branchId: number
     jobNumber: string
     externalProcessorId: number
+    machineId?: number | null
     orderDate: Date | string
     quotedRate?: Decimal | DecimalJsLike | number | string | null
     quotedChargeUnit?: string | null
@@ -62149,6 +65040,8 @@ export namespace Prisma {
   export type JobWorkProcessRateCreateManyProcessTypeInput = {
     processRateId?: number
     companyId: number
+    externalProcessorId?: number | null
+    machineId?: number | null
     rateMonth: Date | string
     chargeUnit: string
     rate: Decimal | DecimalJsLike | number | string
@@ -62170,6 +65063,7 @@ export namespace Prisma {
     company?: companiesUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     branch?: BranchUpdateOneRequiredWithoutJobWorkOrdersNestedInput
     externalProcessor?: ExternalProcessorUpdateOneRequiredWithoutJobWorkOrdersNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutJobWorkOrdersNestedInput
     createdByAdmin?: AdminUpdateOneWithoutJobWorkOrdersCreatedNestedInput
     dispatches?: JobWorkDispatchUpdateManyWithoutJobWorkOrderNestedInput
     reconciliations?: JobWorkReconciliationUpdateManyWithoutJobWorkOrderNestedInput
@@ -62182,6 +65076,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quotedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62203,6 +65098,7 @@ export namespace Prisma {
     branchId?: IntFieldUpdateOperationsInput | number
     jobNumber?: StringFieldUpdateOperationsInput | string
     externalProcessorId?: IntFieldUpdateOperationsInput | number
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     orderDate?: DateTimeFieldUpdateOperationsInput | Date | string
     quotedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     quotedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62222,11 +65118,15 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: companiesUpdateOneRequiredWithoutJobWorkProcessRatesNestedInput
+    externalProcessor?: ExternalProcessorUpdateOneWithoutMonthlyRatesNestedInput
+    machine?: JobWorkMachineUpdateOneWithoutMonthlyRatesNestedInput
   }
 
   export type JobWorkProcessRateUncheckedUpdateWithoutProcessTypeInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
     companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
     rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -62237,6 +65137,8 @@ export namespace Prisma {
   export type JobWorkProcessRateUncheckedUpdateManyWithoutProcessTypeInput = {
     processRateId?: IntFieldUpdateOperationsInput | number
     companyId?: IntFieldUpdateOperationsInput | number
+    externalProcessorId?: NullableIntFieldUpdateOperationsInput | number | null
+    machineId?: NullableIntFieldUpdateOperationsInput | number | null
     rateMonth?: DateTimeFieldUpdateOperationsInput | Date | string
     chargeUnit?: StringFieldUpdateOperationsInput | string
     rate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -62455,6 +65357,8 @@ export namespace Prisma {
     returnedCarats: Decimal | DecimalJsLike | number | string
     returnedWeightGrams: Decimal | DecimalJsLike | number | string
     rateMonth?: Date | string | null
+    appliedRateMonth?: Date | string | null
+    rateSource?: string | null
     appliedChargeUnit?: string | null
     appliedRate?: Decimal | DecimalJsLike | number | string | null
     billableQuantity?: Decimal | DecimalJsLike | number | string | null
@@ -62469,6 +65373,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -62484,6 +65390,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -62499,6 +65407,8 @@ export namespace Prisma {
     returnedCarats?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     returnedWeightGrams?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     rateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedRateMonth?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rateSource?: NullableStringFieldUpdateOperationsInput | string | null
     appliedChargeUnit?: NullableStringFieldUpdateOperationsInput | string | null
     appliedRate?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     billableQuantity?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null

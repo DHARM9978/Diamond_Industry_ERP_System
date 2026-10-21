@@ -74,31 +74,6 @@ const adminNav = [
       { to: '/admin/departments', icon: Network, label: 'Departments' },
     ],
   },
-    {
-    section: 'Diamond Job Work',
-    items: [
-      {
-        to: '/admin/job-work/processors',
-        icon: Building2,
-        label: 'External Processors',
-      },
-      {
-        to: '/admin/job-work/process-types',
-        icon: ClipboardList,
-        label: 'Processing Types',
-      },
-      {
-        to: '/admin/job-work/process-rates',
-        icon: CircleDollarSign,
-        label: 'Monthly Processing Rates',
-      },
-      {
-        to: '/admin/job-work/orders',
-        icon: ClipboardList,
-        label: 'Job Work Orders',
-      },
-    ],
-  },
   {
     section: 'Insights',
     items: [

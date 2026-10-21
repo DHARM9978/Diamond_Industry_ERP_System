@@ -22,10 +22,6 @@ import { AdminCompany } from '@/pages/admin/AdminCompany';
 import { AdminProfile } from '@/pages/admin/AdminProfile';
 import { AdminBranches } from '@/pages/admin/AdminBranches';
 import { AdminDepartments } from '@/pages/admin/AdminDepartments';
-import { AdminExternalProcessors } from '@/pages/admin/AdminExternalProcessors';
-import { AdminJobWorkProcessTypes } from '@/pages/admin/AdminJobWorkProcessTypes';
-import { AdminJobWorkProcessRates } from '@/pages/admin/AdminJobWorkProcessRates';
-import { AdminJobWorkOrders } from '@/pages/admin/AdminJobWorkOrders';
 import { AdminReports } from '@/pages/admin/AdminReports';
 import { BonusPayments } from '@/pages/admin/BonusPayments';
 import { AdminPublicHolidays } from '@/pages/admin/AdminPublicHolidays';
@@ -299,69 +295,6 @@ function App() {
 
 
             {/* ==================================================
-                DIAMOND JOB WORK
-            ================================================== */}
-
-            <Route
-              path="/admin/job-work/processors"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminExternalProcessors />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-             {/* Processing Type Master */}
-
-            <Route
-              path="/admin/job-work/process-types"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminJobWorkProcessTypes />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/admin/job-work/process-rates"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminJobWorkProcessRates />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/admin/job-work/orders"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminJobWorkOrders />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-
-            <Route
-              path="/admin/reports"
-              element={
-                <ProtectedRoute adminOnly>
-                  <AppLayout adminMode>
-                    <AdminReports />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-
-
-            {/* ==================================================
                 EMPLOYEE ROUTES
             ================================================== */}
 
@@ -470,6 +403,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AppLayout adminMode>
+                    <AdminReports />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
 
 
             <Route

@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 
@@ -32,15 +33,6 @@ const leaveBalanceRoutes = require("./routes/leaveBalance.routes");
 const leaveRequestRoutes = require("./routes/leaveRequest.routes");
 const reportRoutes = require("./routes/report.routes");
 const publicHolidayRoutes = require("./routes/public-holiday.routes");
-
-// ============================================================
-// DIAMOND JOB WORK ROUTES
-// ============================================================
-
-const externalProcessorRoutes = require("./routes/externalProcessor.routes");
-const jobWorkProcessTypeRoutes = require("./routes/jobWorkProcessType.routes");
-const jobWorkProcessRateRoutes = require("./routes/jobWorkProcessRate.routes");
-const jobWorkOrderRoutes = require("./routes/jobWorkOrder.routes");
 
 // ============================================================
 // EXPRESS APP
@@ -84,23 +76,6 @@ app.use("/api/reports", reportRoutes);
 
 // Public holidays.
 app.use("/api/holidays", publicHolidayRoutes);
-
-// ============================================================
-// DIAMOND JOB WORK API ROUTES
-// ============================================================
-
-// External Processor Master.
-// Example: GET /api/job-work/processors
-app.use("/api/job-work/processors",externalProcessorRoutes);
-
-// Processing Type Master.
-// Example: GET /api/job-work/process-types
-app.use("/api/job-work/process-types",jobWorkProcessTypeRoutes);
-
-// Monthly Processing Rate Master.
-// Example: GET /api/job-work/process-rates?rateMonth=2026-10
-app.use("/api/job-work/process-rates",jobWorkProcessRateRoutes);
-app.use("/api/job-work/orders", jobWorkOrderRoutes);
 
 // ============================================================
 // HEALTH CHECK
